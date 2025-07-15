@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instrumen Wawancara AI: Rekam & Transkripsi</title>
+    
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Quill.js Styles -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <style>
+        /* Custom styles to integrate with Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+
+        /* Styling for the Quill editor toolbar and container */
+        .ql-toolbar {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            border-color: #e2e8f0; /* slate-200 */
+        }
+        .ql-container {
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            border-color: #e2e8f0; /* slate-200 */
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .ql-editor {
+            min-height: 300px; /* Adjusted height */
+            color: #334155; /* slate-700 */
+        }
+        .ql-editor.ql-blank::before {
+            color: #94a3b8; /* slate-400 */
+            font-style: normal;
+        }
+
+        /* Blinking animation for recording indicator */
+        @keyframes blink {
+            50% { opacity: 0.5; }
+        }
+        .blinking-dot {
+            animation: blink 1.5s infinite;
+        }
+        
+        /* Custom select arrow */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-700">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-slate-800">WAWANCARA</h1>
+            <p class="text-lg text-slate-500 mt-2">PELATIHAN PEMBELAJARAN KODING DAN KA</p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column: Controls & Metadata -->
+            <div class="lg:col-span-1 flex flex-col gap-6">
+                        <div>
+                            <label for="informan_status" class="block text-sm font-medium text-slate-600">Status Informan</label>
+                            <select id="informan_status" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">-- Pilih Status --</option>
+                                <option>Fasilitator</option>
+                                <option>Peserta</option>
+                                <option>Dinas Pendidikan</option>
+                            </select>
+                        </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <h2 class="text-lg font-semibold mb-4 text-slate-800">Kontrol Rekaman</h2>
+                    
+                    <div id="recording-status" class="hidden mb-4 flex items-center justify-center bg-red-100 text-red-700 p-3 rounded-lg">
+                        <div class="w-3 h-3 bg-red-500 rounded-full mr-3 blinking-dot"></div>
+                        <span class="font-medium">Sedang Merekam...</span>
+                    </div>
+
+                    <div class="flex flex-col space-y-3">
+                         <button id="start-recording" class="w-full flex items-center justify-center bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-sm hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+                            Mulai Rekaman
+                        </button>
+                        <button id="stop-recording" class="hidden w-full flex items-center justify-center bg-red-600 text-white font-semibold py-3 px-4 rounded-lg shadow-sm hover:bg-red-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="mr-2"><path d="M6 6h12v12H6z"></path></svg>
+                            Stop Rekaman
+                        </button>
+                    </div>
+
+                    <div class="mt-5">
+                        <label class="text-sm font-medium text-slate-600">Level Mikrofon:</label>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5 mt-1 overflow-hidden">
+                            <div id="mic-fill" class="bg-green-500 h-2.5 rounded-full transition-all duration-100" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Editor Card -->
+                <div class="bg-white p-2 sm:p-4 rounded-xl shadow-md border border-slate-200 flex-grow">
+                    <div id="editor-container">
+                        <div id="editor"></div>
+                    </div>
+                </div>
+
+                <!-- Interviewer Identity Card -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <h2 class="text-lg font-semibold mb-4 text-slate-800">Identitas Pewawancara</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="pewawancara_nama" class="block text-sm font-medium text-slate-600">Nama</label>
+                            <input type="text" id="pewawancara_nama" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="pewawancara_unit" class="block text-sm font-medium text-slate-600">Unit Kerja</label>
+                            <input type="text" id="pewawancara_unit" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="pewawancara_phone" class="block text-sm font-medium text-slate-600">Phone</label>
+                            <input type="tel" id="pewawancara_phone" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="pewawancara_pengampu" class="block text-sm font-medium text-slate-600">Pengampu</label>
+                            <select id="pewawancara_pengampu" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                <option>Direktorat SD</option>
+                                <option>Direktorat SMP</option>
+                                <option>Direktorat SMA</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informant Identity Card -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <h2 class="text-lg font-semibold mb-4 text-slate-800">Identitas Informan</h2>
+                    <div class="space-y-4">
+                         <div>
+                            <label for="informan_tgl_wawancara" class="block text-sm font-medium text-slate-600">Tanggal Wawancara</label>
+                            <input type="date" id="informan_tgl_wawancara" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="informan_waktu_pelatihan" class="block text-sm font-medium text-slate-600">Waktu Pelatihan</label>
+                            <input type="date" id="informan_waktu_pelatihan" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="informan_hari_pelatihan" class="block text-sm font-medium text-slate-600">Hari Pelatihan</label>
+                            <select id="informan_hari_pelatihan" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                <option>Hari-1</option>
+                                <option>Hari-2</option>
+                                <option>Hari-3</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="informan_phone" class="block text-sm font-medium text-slate-600">Phone Informan</label>
+                            <input type="tel" id="informan_phone" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="informan_lpd" class="block text-sm font-medium text-slate-600">Nama LPD</label>
+                            <input type="text" id="informan_lpd" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                         <div>
+                            <label for="informan_provinsi" class="block text-sm font-medium text-slate-600">Provinsi Pelatihan</label>
+                            <select id="informan_provinsi" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                <option>DKI Jakarta</option>
+                                <option>Banten</option>
+                                <option>Lampung</option>
+                                <option>Jawa Barat</option>
+                                <option>Sumatera Utara</option>
+								<option>Jawa Barat</option>
+								<option>Lampung</option>
+								<option>Jawa Timur</option>
+								<option>Sulawesi Selatan</option>
+								<option>Riau</option>
+								<option>Nusa Tenggara Barat</option>
+								<option>Bali</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="informan_kota" class="block text-sm font-medium text-slate-600">Kab/Kota Pelatihan</label>
+							<select id="informan_kota" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                            	<option>Kab. Bogor</option>
+								<option>Kab. Karawang</option>
+								<option>Kab. Bandung Barat</option>
+								<option>Kota Surabaya</option>
+								<option>Kota Tangerang Selatan</option>
+								<option>Kota Makassar</option>
+								<option>Kota Pekanbaru</option> 
+								<option>Kab. Lombok Barat</option>
+								<option>Kota Denpasar</option>
+						     </select>						
+                        </div>
+                         <div>
+                            <label for="informan_tempat" class="block text-sm font-medium text-slate-600">Tempat Pelatihan</label>
+                            <input type="text" id="informan_tempat" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="informan_jenjang" class="block text-sm font-medium text-slate-600">Jenjang</label>
+                            <select id="informan_jenjang" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                <option>SD</option>
+                                <option>SMP</option>
+                                <option>SMA</option>
+                                <option>SMK</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="informan_rombel" class="block text-sm font-medium text-slate-600">Total Rombel yang diampu</label>
+                            <input type="number" id="informan_rombel" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="informan_total_peserta" class="block text-sm font-medium text-slate-600">Total peserta yang diampu</label>
+                            <input type="number" id="informan_total_peserta" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="informan_pendidikan" class="block text-sm font-medium text-slate-600">Pendidikan terakhir Informan</label>
+                            <select id="informan_pendidikan" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                <option>S1</option>
+                                <option>S2</option>
+                                <option>S3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="informan_prodi" class="block text-sm font-medium text-slate-600">Prodi/Jurusan Terakhir</label>
+                            <input type="text" id="informan_prodi" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="informan_lama_mengajar" class="block text-sm font-medium text-slate-600">Lama Mengajar</label>
+                            <input type="text" id="informan_lama_mengajar" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Editor, Questions & Download -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+					
+                <div class="bg-white p-2 sm:p-4 rounded-xl shadow-md border border-slate-200 flex-grow">
+					<div id="question-guide-container" class="bg-white p-6 rounded-xl shadow-md border border-slate-200 hidden">
+						<h3 class="text-lg font-semibold mb-4 text-slate-800"><a href="https://docs.google.com/document/d/1bbyJRWWnuwEif7fyHeWt0vApZB19Izp30lCuDm9ifZ0/edit?tab=t.0#heading=h.fy35nonoxh51" target="_blank">Panduan Pertanyaan</a></h3>
+						<div id="question-list" class="space-y-1 text-slate-700 text-sm">
+							<!-- Pertanyaan akan muncul di sini -->
+						</div>
+					</div>
+                </div>
+
+                <!-- NEW: Question Guide Card -->
+
+                
+                <!-- Download Buttons -->
+                 <div class="flex justify-end gap-4">
+                    <button id="download-audio" class="hidden flex items-center justify-center bg-sky-600 text-white font-semibold py-3 px-6 rounded-lg shadow-sm hover:bg-sky-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M9 12l2 2 4-4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5z"></path><path d="M18 12h-5a2 2 0 0 1-2-2V5"></path></svg>
+                        Unduh Audio (.webm)
+                    </button>
+                    <button id="download-pdf" class="flex items-center justify-center bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-sm hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+                        Unduh sebagai PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quill.js & jsPDF -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+   <script>
+        // --- Bank Pertanyaan ---
+        const questionBank = {
+            'Fasilitator': [
+                "1. Bagaimana pandangan Bapak/Ibu terhadap skema ToT bagi fasilitator pelatihan Koding/KA?",
+					"a- Apakah menurut Bapak/Ibu, materi ToT yang diberikan dirasa cukup untuk membekali fasilitator dalam melatih guru terkait pembelajaran Koding/KA?",
+					"b- Apakah durasi pelaksanaan ToT dirasa cukup untuk membekali fasilitator dalam melatih guru terkait pembelajaran Koding/KA?",
+                "2. Materi apa saja yang Bapak/Ibu berikan dalam proses pelatihan IN-1 pembelajaran Koding/KA kepada peserta?",
+                "a- Apakah materi yang disampaikan sesuai (sama persis) dengan yang disediakan oleh Kemendikdasmen? Apakah ada materi tambahan? [Jika Ada] materi tambahan apa yang diberikan?",
+                "b- Apa pertimbangan fasilitator LPD memberikan materi tambahan tersebut?",
+                "3. Apakah di dalam pelatihan Koding/KA, fasilitator juga mengajarkan pemanfaatan AI untuk penguatan kompetensi peserta pelatihan dalam memfasilitasi pembelajaran? (misalnya melalui fitur AI Companion di zoom, fireflies.ai, Meeting.ai, ChatGPT, Gemini, dll.)",
+                "4. Apakah Bapak/Ibu melakukan asesmen awal untuk mengetahui kompetensi awal peserta pelatihan? Jelaskan?",
+                "- Jika Ya",
+                "a- Bagaimana cara melakukan asesmen awal?",
+                "b- Bagaimana gambaran umum kemampuan awal peserta?",
+                "- Jika Tidak - Mengapa!",
+                "5. Bagaimana metode mengajar yang Bapak/Ibu terapkan selama pelatihan? (Misalnya penjelasan konsep, diskusi kelompok, penugasan individu/kelompok, kegiatan praktik,dll.)",
+                "a- Apakah ada penyesuaian metode mengajar berdasarkan kemampuan peserta pelatihan?, Jika Ya jelaskan bentuknya.",
+                "b- Bagaimana pendekatan yang digunakan dalam pelatihan? Apakah Bapak/Ibu mengajarkan materi secara unplugged, plugged, dan/atau internet based? Jelaskan",
+                "c- Media ajar apa saja yang digunakan untuk menunjang proses pelatihan?",
+                "6. Apakah Bapak/Ibu melakukan penilaian terhadap pemahaman peserta selama proses pelatihan?",
+                "- Jika Ya",
+                "a- Bagaimana cara Bapak/Ibu melakukan penilaian tersebut?",
+                "b- Kapan penilaian tersebut dilakukan? (misalnya setiap pertemuan, hanya di akhir pelatihan, dll.)",
+                "- Jika Belum - Mengapa belum dilakukan?",
+                "7. Secara umum, bagaimana gambaran pemahaman peserta pelatihan di kelas yang Bapak/Ibu ampu?",
+                "a- Materi apa yang cukup mudah dikuasai oleh peserta? Mengapa?",
+                "b- Materi apa yang cukup sulit dikuasai oleh peserta? Mengapa?",
+                "8. Bagaimana pandangan Bapak/Ibu terkait kesiapan secara umum peserta pelatihan dalam menerapkan pembelajaran Koding/KA di satuan pendidikan?",
+                "9. Dari proses pelatihan yang sudah berjalan, hal apa saja yang menurut Bapak/Ibu sudah berjalan dengan baik?",
+                "a- [Jika Ada] Faktor apa saja yang memengaruhi hal yang sudah berjalan baik tersebut? (misalnya keaktifan peserta, latar belakang keilmuan peserta, sarpras pelatihan memadai, jarak tempuh sekolah ke lokasi pelatihan, dll.)",
+                "b- Kendala apa saja yang dialami fasilitator selama proses pelatihan? (sarpras, lokasi, jadwal, dll.)",
+                "c- Kendala apa saja yang dialami peserta pelatihan menurut fasilitator? (sarpras, lokasi, jadwal, pemahaman dasar, dll.)",
+                "d- Bagaimana fasilitator/LPD mengatasi kendala yang dihadapi?",
+                "10. Dari proses pelatihan yang sudah berjalan, hal apa yang menjadi prioritas utama untuk segera diperbaiki?",
+                "11. Bagaimana rencana Bapak/Ibu dalam memberikan pendampingan kepada satuan pendidikan saat implementasi pembelajaran Koding/KA (pada tahap ON)?"
+            ],
+            'Peserta': [
+                "1. Bagaimana pandangan Bapak/Ibu terhadap skema pelatihan Koding/KA?",
+                "a- Apakah durasi untuk pembekalan materi konsep dirasa cukup?",
+                "b- Apakah durasi untuk kegiatan praktik keterampilan teknis dirasa cukup?",
+                "2. Bagaimana pandangan Bapak/Ibu terhadap materi pelatihan Koding/KA yang diberikan?",
+                "a- Apakah materi yang diberikan relevan dengan kebutuhan pembelajaran? [Jika Tidak] Materi apa yang diharapkan diajarkan di dalam pelatihan?",
+                "b- Apakah materi pelatihan sudah cukup memberikan inspirasi terkait ragam praktik pembelajaran Koding/KA (unplugged, plugged, dan internet based)?",
+                "c- Apa saja bentuk kegiatan praktik yang dilakukan saat pelatihan pembelajaran Koding/KA?",
+                "d- Apakah kegiatan praktik yang dilakukan saat pelatihan relevan dengan kebutuhan pembelajaran? [Jika Tidak] Kegiatan praktik apa yang Bapak/Ibu harapkan diajarkan dalam pelatihan Koding/KA (namun belum difasilitasi)? Jelaskan.",
+                "3. Setelah mengikuti pelatihan, bagaimana pemahaman Bapak/Ibu terkait pembelajaran Koding/KA?",
+                "a- Materi apa yang relatif mudah untuk dikuasai/dipahami? Mengapa?",
+                "b- Materi apa yang dianggap sulit untuk dikuasai/dipahami? Mengapa?",
+                "4. Bagaimana pandangan Bapak/Ibu terkait kinerja fasilitator dalam memfasilitasi pelatihan pembelajaran Koding/KA?",
+                "a- Apakah fasilitator dapat menjaga fokus peserta selama pelatihan?",
+                "b- Apakah penyampaian materi cukup mudah dipahami?",
+                "c- Apakah fasilitator sudah cukup memberikan kesempatan untuk peserta bertanya?",
+                "d- Bagaimana kualitas umpan balik yang diberikan oleh fasilitator?",
+                "5. Berapa biaya yang Bapak/Ibu bayarkan saat mendaftar pelatihan ini?",
+                "a- Apakah nominal biaya tersebut dirasa memberatkan (mahal).",
+                "b- Dengan nominal biaya tersebut, apakah kualitas pelatihannya sesuai dengan yang diharapkan?",
+                "6. Kendala apa saja yang dialami selama proses pelatihan? Jelaskan.",
+                "a- Sarana dan prasarana pelatihan",
+                "b- Lokasi dan jarak tempat pelatihan",
+                "c- Waktu/jadwal pelaksanaan pelatihan",
+                "d- Kendala lainnya",
+                "7. Bagaimana peran Dinas Pendidikan dalam mendukung persiapan/pelaksanaan pelatihan pembelajaran Koding/KA?",
+                "a- Bentuk dukungan yang diberikan? (misalnya: sosialisasi, pendampingan penyusunan RAB, pendampingan pendaftaran, dll.)",
+                "b- Apakah dukungan yang diberikan sudah cukup/sesuai harapan?",
+                "8. Setelah menjalani pelatihan, bagaimana kesiapan Bapak/Ibu untuk mengajarkan pembelajaran Koding/KA kepada peserta didik?",
+                "a- Dari segi pemahaman materi",
+                "b- Dari segi keterampilan/kompetensi teknis guru",
+                "c- Dari segi sarana dan prasarana satuan pendidikan",
+                "9. Apakah satuan pendidikan tempat Bapak/Ibu bertugas sudah merencanakan akan menerapkan pembelajaran Koding/KA di tahun ajaran 2025/2026? Jelaskan.",
+                "a- [Jika sudah merencanakan menerapkan] Dalam bentuk apa pembelajaran koding dan KA akan diterapkan? (intrakurikuler, ekstrakurikuler, pembentukan klub, dll.)",
+                "b- [Jika belum berencana menerapkan] Mengapa? Jelaskan.",
+                "10. Dari proses pelatihan yang sudah berjalan, hal apa yang menjadi prioritas utama untuk segera diperbaiki?",
+                "a- Dari satuan pendidikan",
+                "b- Dari dinas pendidikan",
+                "c- Dari kementerian",
+                "d- Dari fasilitator pelatihan",
+                "11. Adakah saran dari Bapak/Ibu untuk perbaikan pelaksanaan pelatihan pembelajaran Koding/KA? Jelaskan."
+            ],
+            'Dinas Pendidikan': [
+                "1. Apakah dinas pendidikan mengetahui informasi terkait pelatihan pembelajaran Koding/KA?",
+                "a- Bagaimana linimasa pelatihannya?",
+                "b- Satuan pendidikan mana saja yang menjadi sasaran pelatihan?",
+                "c- LPD apa saja yang tersedia di daerah?",
+                "d- Bagaimana skema pembiayaan pelatihannya?",
+                "2. Apa saja bentuk dukungan dinas pendidikan terkait pelatihan pembelajaran Koding/KA? (baik yang sudah ataupun sedang dilakukan)",
+                "a- Apakah dinas pendidikan melakukan Sosialisasi ke satpen terkait pemanfaatan BOSKIN untuk mengikuti pelatihan?",
+                "b- Apakah dinas pendidikan melakukan Memantau pemanfaatan BOSKIN",
+                "c- Apakah dinas pendidikan melakukan Pendampingan kepada satpen dalam memilih LPD",
+                "d- Apakah dinas pendidikan melakukan Dukungan lain jika ada",
+                "3. Bagaimana persepsi dinas pendidikan terkait mekanisme penganggaran pelatihan Koding/KA melalui BOSKIN (mudah atau tidak)? Jelaskan",
+                "4. Apakah dinas pendidikan sudah memberikan sosialisasi/dorongan kepada satuan pendidikan lainnya (selain penerima BOSKIN) untuk berpartisipasi dalam pelatihan Koding/KA?",
+                "- [Jika Ya] bagaimana respons dari satuan pendidikan terkait hal ini? Jelaskan.",
+                "- [Jika Belum] Mengapa?",
+                "5. Dalam mendukung kelancaran implementasi pembelajaran Koding/KA di tahun ajaran 2025/2026 mendatang, apakah dinas pendidikan memiliki rencana untuk memberikan dukungan tertentu kepada satuan pendidikan pelaksana pembelajaran Koding/KA?",
+                "- Jika Ya",
+                "a- Dukungan program pendukung (misalnya pelatihan dari dinas, pendampingan, dll.)",
+                "b- Dukungan sarpras",
+                "c- Dukungan lainnya",
+                "- [Jika Tidak] Mengapa?",
+                "6. Berdasarkan pengamatan dinas pendidikan, bagaimana kesiapan sekolah di wilayah Bapak/Ibu dalam mengimplementasikan pembelajaran Koding/KA?",
+                "a- Apakah sekolah sudah siap dan berencana menerapkan? Atau sekolah belum berencana menerapkan?"
+            ]
+        };
+
+    // --- DOM Elements ---
+    const startButton = document.getElementById("start-recording");
+    const stopButton = document.getElementById("stop-recording");
+    const downloadPdfButton = document.getElementById("download-pdf");
+    const downloadAudioButton = document.getElementById("download-audio");
+    const recordingStatus = document.getElementById("recording-status");
+    const micFill = document.getElementById("mic-fill");
+    const informanStatusSelect = document.getElementById("informan_status");
+    const questionGuideContainer = document.getElementById("question-guide-container");
+    const questionList = document.getElementById("question-list");
+
+    // --- State Variables ---
+    let mediaRecorder;
+    let audioChunks = [];
+    let audioUrl = null;
+    let recognition;
+    let fullTranscript = "";
+    let audioContext; // Variabel audioContext dipindah ke sini
+    let micVisualizer;
+
+    // --- Speech Recognition Setup ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const supportsSpeechRecognition = !!SpeechRecognition && !isIOS;
+
+    // --- Quill Editor Setup ---
+    const quill = new Quill("#editor", {
+        theme: "snow",
+        placeholder: "Hasil transkripsi wawancara akan muncul di sini...",
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'color': [] }, { 'background': [] }],
+                ['clean']
+            ]
+        }
+    });
+
+    // --- Event Listeners ---
+    startButton.addEventListener("click", startRecording);
+    stopButton.addEventListener("click", stopRecording);
+    downloadPdfButton.addEventListener("click", generatePdf);
+    downloadAudioButton.addEventListener("click", downloadAudio);
+    informanStatusSelect.addEventListener("change", updateQuestionGuide);
+
+    // --- Core Functions ---
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            // ✅ PERBAIKAN 1: Inisialisasi dan "bangunkan" AudioContext SETELAH izin diberikan
+            if (!audioContext || audioContext.state === 'closed') {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            // Reset UI and state for new recording
+            if (audioUrl) {
+                URL.revokeObjectURL(audioUrl);
+                audioUrl = null;
+            }
+            downloadAudioButton.classList.add('hidden');
+            startButton.classList.add("hidden");
+            stopButton.classList.remove("hidden");
+            recordingStatus.classList.remove("hidden");
+            
+            audioChunks = [];
+            fullTranscript = quill.getText().trim().length > 0 ? quill.getText() : "";
+
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
+            
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                audioUrl = URL.createObjectURL(audioBlob);
+                downloadAudioButton.classList.remove('hidden');
+                // ✅ PERBAIKAN 2: Hentikan track mikrofon untuk mematikan indikator di browser
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+
+            if (supportsSpeechRecognition) {
+                startSpeechRecognition();
+            } else {
+                alert("Transkripsi otomatis tidak didukung di browser/perangkat ini. Rekaman audio tetap berjalan.");
+            }
+            
+            startMicVisualizer(stream);
+
+        } catch (err) {
+            console.error("Error accessing microphone:", err);
+            alert("Gagal mengakses mikrofon. Pastikan Anda telah memberikan izin pada browser.");
+            startButton.classList.remove("hidden");
+            stopButton.classList.add("hidden");
+            recordingStatus.classList.add("hidden");
+        }
+    }
+
+    function stopRecording() {
+        if (mediaRecorder?.state === "recording") {
+             mediaRecorder.stop();
+        }
+        if (supportsSpeechRecognition && recognition) {
+            recognition.stop();
+        }
+        stopMicVisualizer();
+        
+        stopButton.classList.add("hidden");
+        startButton.classList.remove("hidden");
+        recordingStatus.classList.add("hidden");
+    }
+
+    function startSpeechRecognition() {
+        recognition = new SpeechRecognition();
+        recognition.lang = "id-ID";
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onresult = (event) => {
+            let interimTranscript = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcriptPart = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    fullTranscript += (fullTranscript ? " " : "") + transcriptPart.trim() + ".";
+                } else {
+                    interimTranscript += transcriptPart;
+                }
+            }
+            const currentText = fullTranscript + interimTranscript;
+            quill.setText(currentText);
+            quill.setSelection(currentText.length, 0);
+        };
+        
+        recognition.onerror = (event) => console.error("Speech recognition error:", event.error);
+        recognition.start();
+    }
+
+    function updateQuestionGuide() {
+        const selectedStatus = informanStatusSelect.value;
+        const questions = questionBank[selectedStatus];
+
+        questionList.innerHTML = '';
+
+        if (questions && questions.length > 0) {
+            questions.forEach(q => {
+                const li = document.createElement('li');
+                const text = q.trim();
+                li.textContent = text;
+                
+                li.style.listStyle = 'none';
+                li.style.paddingLeft = '0';
+
+                if (/^\d{1,2}\./.test(text)) {
+                    li.className = 'font-semibold mt-3';
+                } else {
+                    li.className = 'pl-6';
+                    if (/^-\s/.test(text) || /^-\[/.test(text)) {
+                        li.classList.add('italic');
+                    }
+                }
+                questionList.appendChild(li);
+            });
+            questionGuideContainer.classList.remove('hidden');
+        } else {
+            questionGuideContainer.classList.add('hidden');
+        }
+    }
+
+
+    // --- Visualization Functions ---
+    function startMicVisualizer(stream) {
+        // ✅ PERBAIKAN 3: Fungsi ini tidak lagi membuat AudioContext baru.
+        // Ia menggunakan audioContext yang sudah diaktifkan di startRecording().
+        const analyser = audioContext.createAnalyser();
+        const sourceNode = audioContext.createMediaStreamSource(stream);
+        sourceNode.connect(analyser);
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function updateMicLevel() {
+            analyser.getByteFrequencyData(dataArray);
+            const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+            const percent = Math.min(100, (average / 128) * 120);
+            
+            micFill.style.width = `${percent}%`;
+            
+            if (percent < 40) micFill.className = 'bg-green-500 h-2.5 rounded-full transition-all duration-100';
+            else if (percent < 70) micFill.className = 'bg-yellow-400 h-2.5 rounded-full transition-all duration-100';
+            else micFill.className = 'bg-red-500 h-2.5 rounded-full transition-all duration-100';
+
+            micVisualizer = requestAnimationFrame(updateMicLevel);
+        }
+        updateMicLevel();
+    }
+
+    function stopMicVisualizer() {
+        if (micVisualizer) cancelAnimationFrame(micVisualizer);
+        // Tutup AudioContext untuk melepaskan sumber daya
+        if (audioContext?.state !== 'closed') {
+            audioContext.close();
+        }
+        micFill.style.width = '0%';
+        micFill.className = 'bg-green-500 h-2.5 rounded-full transition-all duration-100';
+    }
+
+    // --- Download Functions ---
+    function downloadAudio() {
+        if (!audioUrl) return;
+
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = audioUrl;
+        const pewawancara_nama = document.getElementById("pewawancara_nama").value || 'rekaman';
+        const tgl_wawancara = document.getElementById("informan_tgl_wawancara").value || new Date().toISOString().split('T')[0];
+        a.download = `Rekaman - ${pewawancara_nama} - ${tgl_wawancara}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function generatePdf() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+        // --- Get data from forms ---
+        const pewawancara_nama = document.getElementById("pewawancara_nama").value;
+        const pewawancara_unit = document.getElementById("pewawancara_unit").value;
+        const pewawancara_phone = document.getElementById("pewawancara_phone").value;
+        const pewawancara_pengampu = document.getElementById("pewawancara_pengampu").value;
+
+        const informan_tgl_wawancara_raw = document.getElementById("informan_tgl_wawancara").value;
+        const informan_waktu_pelatihan_raw = document.getElementById("informan_waktu_pelatihan").value;
+        const informan_hari_pelatihan = document.getElementById("informan_hari_pelatihan").value;
+        const informan_status = document.getElementById("informan_status").value;
+        const informan_phone = document.getElementById("informan_phone").value;
+        const informan_lpd = document.getElementById("informan_lpd").value;
+        const informan_provinsi = document.getElementById("informan_provinsi").value;
+        const informan_kota = document.getElementById("informan_kota").value;
+        const informan_tempat = document.getElementById("informan_tempat").value;
+        const informan_jenjang = document.getElementById("informan_jenjang").value;
+        const informan_rombel = document.getElementById("informan_rombel").value;
+        const informan_total_peserta = document.getElementById("informan_total_peserta").value;
+        const informan_pendidikan = document.getElementById("informan_pendidikan").value;
+        const informan_prodi = document.getElementById("informan_prodi").value;
+        const informan_lama_mengajar = document.getElementById("informan_lama_mengajar").value;
+
+        function formatDate(dateString) {
+            if (!dateString) return "Tidak Ditetapkan";
+            return new Date(dateString).toLocaleDateString('id-ID', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
+        const informan_tgl_wawancara = formatDate(informan_tgl_wawancara_raw);
+        const informan_waktu_pelatihan = formatDate(informan_waktu_pelatihan_raw);
+
+        // --- PDF Layout Constants ---
+        const marginLeft = 15;
+        const page_width = doc.internal.pageSize.getWidth();
+        const contentWidth = page_width - (marginLeft * 2);
+        let yPos = 20;
+
+        // --- PDF Header ---
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        doc.text("WAWANCARA", page_width / 2, yPos, { align: 'center' });
+        yPos += 7;
+        doc.setFontSize(12);
+        doc.text((informan_status || "STATUS BELUM DIPILIH").toUpperCase(), page_width / 2, yPos, { align: 'center' });
+        yPos += 12;
+
+        // --- Two-column layout setup ---
+        const col1X = marginLeft;
+        const col2X = page_width / 2 + 3;
+        const colWidth = (contentWidth / 2) - 5;
+        let y1 = yPos;
+        let y2 = yPos;
+
+        // Helper function for adding fields in columns
+        const addField = (label, value, x, currentY) => {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.text(label, x, currentY);
+            
+            doc.setFont("helvetica", "normal");
+            const textLines = doc.splitTextToSize(value || "-", colWidth);
+            doc.text(textLines, x, currentY + 4);
+            
+            return currentY + (textLines.length * 4) + 6; // Return the new Y position
+        };
+
+        // --- Column 1: Interviewer Section ---
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("Identitas Pewawancara", col1X, y1);
+        doc.setLineWidth(0.2);
+        doc.line(col1X, y1 + 2, col1X + colWidth, y1 + 2);
+        y1 += 8;
+
+        y1 = addField("Nama:", pewawancara_nama, col1X, y1);
+        y1 = addField("Unit Kerja:", pewawancara_unit, col1X, y1);
+        y1 = addField("Phone:", pewawancara_phone, col1X, y1);
+        y1 = addField("Pengampu:", pewawancara_pengampu, col1X, y1);
+
+        // --- Column 2: Informant Section ---
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("Identitas Informan", col2X, y2);
+        doc.setLineWidth(0.2);
+        doc.line(col2X, y2 + 2, col2X + colWidth, y2 + 2);
+        y2 += 8;
+        
+        y2 = addField("Tgl Wawancara:", informan_tgl_wawancara, col2X, y2);
+        y2 = addField("Waktu Pelatihan:", informan_waktu_pelatihan, col2X, y2);
+        y2 = addField("Hari Pelatihan:", informan_hari_pelatihan, col2X, y2);
+        y2 = addField("Status:", informan_status, col2X, y2);
+        y2 = addField("Phone:", informan_phone, col2X, y2);
+        y2 = addField("Nama LPD:", informan_lpd, col2X, y2);
+        y2 = addField("Provinsi:", informan_provinsi, col2X, y2);
+        y2 = addField("Kab/Kota:", informan_kota, col2X, y2);
+        y2 = addField("Tempat:", informan_tempat, col2X, y2);
+        y2 = addField("Jenjang:", informan_jenjang, col2X, y2);
+        y2 = addField("Total Rombel:", informan_rombel, col2X, y2);
+        y2 = addField("Total Peserta:", informan_total_peserta, col2X, y2);
+        y2 = addField("Pendidikan:", informan_pendidikan, col2X, y2);
+        y2 = addField("Prodi/Jurusan:", informan_prodi, col2X, y2);
+        y2 = addField("Lama Mengajar:", informan_lama_mengajar, col2X, y2);
+
+        // --- Move to next section ---
+        yPos = Math.max(y1, y2) + 10;
+
+        // --- Transcription Section ---
+        if (yPos > 260) {
+            doc.addPage();
+            yPos = 20;
+        }
+
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("Hasil Transkripsi Wawancara", marginLeft, yPos);
+        doc.line(marginLeft, yPos + 2, contentWidth + marginLeft, yPos + 2);
+        yPos += 10;
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        const text = quill.getText();
+        const lines = doc.splitTextToSize(text, contentWidth);
+        
+        lines.forEach(line => {
+            if (yPos > 280) {
+                doc.addPage();
+                yPos = 20;
+            }
+            doc.text(line, marginLeft, yPos);
+            yPos += 6;
+        });
+
+        // --- Save the PDF ---
+        doc.save(`Wawancara - ${pewawancara_nama || 'instrumen'}.pdf`);
+    }
+
+    // Initialize the question guide on page load
+    updateQuestionGuide();
+</script>
+</body>
+</html>
