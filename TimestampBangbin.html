@@ -13,6 +13,9 @@
     <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <!-- PENTING: Tambahkan library MediaPipe Selfie Segmentation -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -58,10 +61,11 @@
         <div id="mainView">
             <h1 class="text-2xl md:text-3xl font-bold text-center mb-6">Bangbin Camera</h1>
 
-            <!-- BAGIAN KAMERA & PETA - DIKEMBALIKAN KE SEMULA (LANDSCAPE) -->
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div class="relative bg-black rounded-lg overflow-hidden aspect-video">
-                    <video id="videoFeed" class="w-full h-full object-cover" playsinline autoplay muted></video>
+                    <canvas id="previewCanvas" class="w-full h-full object-cover"></canvas>
+                    <video id="videoFeed" class="absolute top-0 left-0 w-full h-full object-cover -z-10 opacity-0" playsinline autoplay muted></video>
+                    
                     <div id="infoOverlay" class="absolute bottom-0 left-0 w-full p-2 text-white pointer-events-none z-10"></div>
                     <div id="loadingMessage" class="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50 transition-opacity duration-300">
                         <svg class="animate-spin text-4xl text-blue-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="em" fill="currentColor" viewBox="0 0 256 256"><path d="M232,128a104,104,0,0,1-208,0c0-41.21,24-76.3,58.74-92.65a8,8,0,0,1,8.52,13.3,88,88,0,1,0,81.48,0,8,8,0,0,1,8.52-13.3C208,51.7,232,86.79,232,128Z"></path></svg>
@@ -75,10 +79,16 @@
                 </div>
             </div>
 
-            <!-- BAGIAN TOMBOL AKSI -->
             <footer class="mb-6 p-4 bg-gray-800 rounded-lg flex items-center justify-center gap-4">
                 <button id="switchCameraBtn" title="Ganti Kamera" class="p-3 bg-gray-700 rounded-full hover:bg-gray-600 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M232,96a8,8,0,0,1-8,8H175.31a80,80,0,0,1-142.62,0H24a8,8,0,0,1,0-16H80a8,8,0,0,1,7.92,6.66A64,64,0,0,1,215.3,86.42L227.88,73.85A8,8,0,0,1,240.12,86.12l-24,24A8,8,0,0,1,208,112a8,8,0,0,1-5.88-2.12L180.27,90.4a8,8,0,1,1,11.46-11.13L204.69,92A64.09,64.09,0,0,0,88,88a8,8,0,0,1,7.92-6.66,80,80,0,0,1,142.62,0H224A8,8,0,0,1,232,96Z"></path></svg>
+                </button>
+                <button id="toggleBgBtn" title="Hapus Background Preview" class="p-3 bg-gray-700 rounded-full hover:bg-gray-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M236.24,193.76,160,117.51V40a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v77.51L19.76,193.76A16,16,0,0,0,32,224H224A16,16,0,0,0,236.24,193.76ZM112,48h32v67.51l-16,16-16-16Zm101.44,160H42.56a.37.37,0,0,1-.28-.16L96,154.11V216H160V154.11l53.72,53.73A.37.37,0,0,1,213.44,208Z"></path></svg>
+                </button>
+                <input type="file" id="bgFileInput" accept="image/*" class="hidden">
+                <button id="addBgBtn" title="Tambah Background Gambar" class="p-3 bg-gray-700 rounded-full hover:bg-gray-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,176H48V48H208V208ZM116,124a12,12,0,1,1-12-12A12,12,0,0,1,116,124Zm82.34-45.66-56,56a8,8,0,0,1-11.32,0L96,100,45.66,150.34a8,8,0,0,1-11.32-11.32L84.69,89.66a8,8,0,0,1,11.31,0L136,120l50.34-50.34a8,8,0,0,1,11.32,11.32Z"></path></svg>
                 </button>
                 <button id="captureBtn" class="w-16 h-16 bg-blue-600 rounded-full focus:outline-none border-4 border-blue-400 hover:bg-blue-500 transition"></button>
                 <input type="file" id="fileInput" accept="image/*" class="hidden">
@@ -87,57 +97,25 @@
                 </button>
             </footer>
 
-            <!-- BAGIAN INPUT DATA -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div class="input-group space-y-4">
                     <h2 class="font-bold text-lg border-b border-gray-500 pb-2 mb-2">Profil & Waktu</h2>
-                    <div>
-                        <label for="nameInput" class="input-label">Nama</label>
-                        <input type="text" id="nameInput" class="form-input" placeholder="Nama Anda">
-                    </div>
-                    <div>
-                        <label for="nrkInput" class="input-label">NRK</label>
-                        <input type="text" id="nrkInput" class="form-input" placeholder="Nomor NRK">
-                    </div>
-                    <div>
-                        <label for="profileDateInput" class="input-label">Tanggal</label>
-                        <input type="date" id="profileDateInput" class="form-input">
-                    </div>
-                    <div>
-                        <label for="profileTimeInput" class="input-label">Waktu</label>
-                        <input type="time" id="profileTimeInput" class="form-input">
-                    </div>
+                    <div><label for="nameInput" class="input-label">Nama</label><input type="text" id="nameInput" class="form-input" placeholder="Nama Anda"></div>
+                    <div><label for="nrkInput" class="input-label">NRK</label><input type="text" id="nrkInput" class="form-input" placeholder="Nomor NRK"></div>
+                    <div><label for="profileDateInput" class="input-label">Tanggal</label><input type="date" id="profileDateInput" class="form-input"></div>
+                    <div><label for="profileTimeInput" class="input-label">Waktu</label><input type="time" id="profileTimeInput" class="form-input"></div>
                 </div>
-
                 <div class="input-group md:col-span-2 space-y-3">
                     <h2 class="font-bold text-lg border-b border-gray-500 pb-2 mb-2">Detail Lokasi</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label for="latitudeInput" class="input-label">Latitude</label>
-                            <input type="text" id="latitudeInput" class="form-input">
-                        </div>
-                        <div>
-                            <label for="longitudeInput" class="input-label">Longitude</label>
-                            <input type="text" id="longitudeInput" class="form-input">
-                        </div>
+                        <div><label for="latitudeInput" class="input-label">Latitude</label><input type="text" id="latitudeInput" class="form-input"></div>
+                        <div><label for="longitudeInput" class="input-label">Longitude</label><input type="text" id="longitudeInput" class="form-input"></div>
                     </div>
-                     <div>
-                        <label for="streetInput" class="input-label">Jalan</label>
-                        <input type="text" id="streetInput" class="form-input">
-                    </div>
-                    <div>
-                        <label for="subDistrictInput" class="input-label">Kecamatan</label>
-                        <input type="text" id="subDistrictInput" class="form-input">
-                    </div>
+                    <div><label for="streetInput" class="input-label">Jalan</label><input type="text" id="streetInput" class="form-input"></div>
+                    <div><label for="subDistrictInput" class="input-label">Kecamatan</label><input type="text" id="subDistrictInput" class="form-input"></div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                       <div>
-                            <label for="cityInput" class="input-label">Kota</label>
-                            <input type="text" id="cityInput" class="form-input">
-                        </div>
-                        <div>
-                            <label for="provinceInput" class="input-label">Provinsi</label>
-                            <input type="text" id="provinceInput" class="form-input">
-                        </div>
+                        <div><label for="cityInput" class="input-label">Kota</label><input type="text" id="cityInput" class="form-input"></div>
+                        <div><label for="provinceInput" class="input-label">Provinsi</label><input type="text" id="provinceInput" class="form-input"></div>
                     </div>
                 </div>
             </div>
@@ -173,8 +151,6 @@
         const flashOverlay = document.getElementById('flashOverlay');
         const infoOverlay = document.getElementById('infoOverlay');
         const context = canvas.getContext('2d');
-
-        // Input Fields
         const nameInput = document.getElementById('nameInput');
         const nrkInput = document.getElementById('nrkInput');
         const profileDateInput = document.getElementById('profileDateInput');
@@ -187,28 +163,31 @@
         const longitudeInput = document.getElementById('longitudeInput');
         const fileInput = document.getElementById('fileInput');
         const selectFileBtn = document.getElementById('selectFileBtn');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const previewContext = previewCanvas.getContext('2d');
+        const toggleBgBtn = document.getElementById('toggleBgBtn');
+        const addBgBtn = document.getElementById('addBgBtn');
+        const bgFileInput = document.getElementById('bgFileInput');
 
-        // --- State Aplikasi (LOGIKA ASLI DIKEMBALIKAN) ---
+        // --- State Aplikasi ---
         let userProfile = { name: '', nrk: '', date: '', time: '' };
-        let locationData = {
-            latitude: -6.175000,
-            longitude: 106.828000,
-            street: 'No.5 Jalan Medan Merdeka Selatan',
-            subDistrict: 'Kecamatan Gambir',
-            city: 'Kota Jakarta Pusat',
-            province: 'Daerah Khusus Ibukota Jakarta'
-        };
+        let locationData = { latitude: -6.175000, longitude: 106.828000, street: 'No.5 Jalan Medan Merdeka Selatan', subDistrict: 'Kecamatan Gambir', city: 'Kota Jakarta Pusat', province: 'Daerah Khusus Ibukota Jakarta' };
         let currentStream;
         let currentFacingMode = 'environment';
         let isCameraActive = false;
-
-        // --- Variabel Peta Leaflet ---
         let map;
         let marker = null;
         let mapInitialized = false;
+        let selfieSegmentation;
+        let isBgRemovalPreviewActive = false;
+        let animationFrameId;
+        let backgroundImage = null;
+        let defaultBackgroundImage = null;
 
         // --- Fungsi Utama ---
         async function initialize() {
+            loadDefaultBackground();
+            setupMediaPipe();
             try {
                 await startCamera(currentFacingMode);
             } catch (error) {
@@ -225,9 +204,19 @@
             }
         }
         
+        function loadDefaultBackground() {
+            defaultBackgroundImage = new Image();
+            defaultBackgroundImage.crossOrigin = "anonymous";
+            defaultBackgroundImage.src = 'https://cdn.kibrispdr.org/data/459/gambar-monas-vector-21.jpg';
+            defaultBackgroundImage.onload = () => console.log("Gambar background default berhasil dimuat.");
+            defaultBackgroundImage.onerror = () => console.error("Gagal memuat gambar background default.");
+        }
+
         function startCamera(facingMode) {
             return new Promise(async (resolve, reject) => {
                 if (currentStream) currentStream.getTracks().forEach(track => track.stop());
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
@@ -236,7 +225,12 @@
                     video.srcObject = stream;
                     currentStream = stream;
                     isCameraActive = true;
-                    video.onloadedmetadata = () => resolve();
+                    video.onloadedmetadata = () => {
+                        previewCanvas.width = video.videoWidth;
+                        previewCanvas.height = video.videoHeight;
+                        startRenderLoop();
+                        resolve();
+                    };
                 } catch (err) { 
                     isCameraActive = false;
                     reject(new Error("Gagal mengakses kamera.")); 
@@ -258,6 +252,62 @@
             }
         }
 
+        function startRenderLoop() {
+            async function render() {
+                if (!isCameraActive) return;
+
+                if (isBgRemovalPreviewActive) {
+                    if (video.readyState >= 2) {
+                        await selfieSegmentation.send({ image: video });
+                    }
+                } else {
+                    if (currentFacingMode === 'user') {
+                        previewContext.save();
+                        previewContext.scale(-1, 1);
+                        previewContext.drawImage(video, -previewCanvas.width, 0, previewCanvas.width, previewCanvas.height);
+                        previewContext.restore();
+                    } else {
+                        previewContext.drawImage(video, 0, 0, previewCanvas.width, previewCanvas.height);
+                    }
+                }
+                animationFrameId = requestAnimationFrame(render);
+            }
+            render();
+        }
+
+        function setupMediaPipe() {
+            selfieSegmentation = new SelfieSegmentation({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`});
+            selfieSegmentation.setOptions({ modelSelection: 1 });
+            selfieSegmentation.onResults(onRealTimeResults);
+        }
+
+        // --- FUNGSI DIPERBAIKI ---
+        function onRealTimeResults(results) {
+            previewContext.save();
+            previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+            
+            if (currentFacingMode === 'user') {
+                previewContext.scale(-1, 1);
+                previewContext.translate(-previewCanvas.width, 0);
+            }
+            
+            previewContext.drawImage(results.image, 0, 0, previewCanvas.width, previewCanvas.height);
+            previewContext.globalCompositeOperation = 'destination-in';
+            previewContext.drawImage(results.segmentationMask, 0, 0, previewCanvas.width, previewCanvas.height);
+            previewContext.globalCompositeOperation = 'destination-over';
+
+            // Cek apakah ada background image (default atau kustom) DAN apakah sudah selesai loading.
+            if (backgroundImage && backgroundImage.complete && backgroundImage.naturalHeight !== 0) {
+                previewContext.drawImage(backgroundImage, 0, 0, previewCanvas.width, previewCanvas.height);
+            } else {
+                // Jika tidak ada, atau belum loading, atau gagal loading, gunakan warna hijau sebagai fallback.
+                previewContext.fillStyle = '#00FF00'; 
+                previewContext.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+            }
+            
+            previewContext.restore();
+        }
+
         function formatCoordinateForDisplay(value, type) {
             if (typeof value !== 'number' || isNaN(value)) return 'N/A';
             const sign = value < 0 ? (type === 'lat' ? 'S' : 'W') : (type === 'lat' ? 'N' : 'E');
@@ -272,7 +322,6 @@
             } else {
                 displayDateTime = formatDateTime(new Date());
             }
-
             const lines = [
                 `Network : ${displayDateTime}`,
                 `Local   : ${displayDateTime}`,
@@ -282,7 +331,6 @@
                 locationData.city,
                 locationData.province
             ];
-
             if (userProfile.name || userProfile.nrk) {
                 const namePart = userProfile.name ? userProfile.name.toUpperCase() : '';
                 const nrkPart = userProfile.nrk ? userProfile.nrk : '';
@@ -294,37 +342,16 @@
             return lines;
         }
 
-        function updateInfo() {
-            infoOverlay.innerHTML = '';
-            const elementWidth = video.offsetWidth;
-            if (elementWidth === 0) return;
-            const fontSize = Math.floor(elementWidth / 45); 
-            getInfoLines().forEach(line => {
-                const p = document.createElement('p');
-                p.textContent = line;
-                p.style.fontSize = `${fontSize}px`;
-                infoOverlay.appendChild(p);
-            });
-        }
-        
-        async function captureImage(sourceImage) {
+        async function captureImage() {
             flashOverlay.classList.add('opacity-100');
             setTimeout(() => flashOverlay.classList.remove('opacity-100'), 200);
 
-            let imageToDraw = sourceImage || video;
+            let imageToDraw = previewCanvas;
             
-            canvas.width = imageToDraw.videoWidth || imageToDraw.naturalWidth;
-            canvas.height = imageToDraw.videoHeight || imageToDraw.naturalHeight;
+            canvas.width = imageToDraw.width;
+            canvas.height = imageToDraw.height;
             context.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (imageToDraw === video && currentFacingMode === 'user') {
-                context.save();
-                context.scale(-1, 1);
-                context.drawImage(imageToDraw, -canvas.width, 0, canvas.width, canvas.height);
-                context.restore();
-            } else {
-                context.drawImage(imageToDraw, 0, 0, canvas.width, canvas.height);
-            }
+            context.drawImage(imageToDraw, 0, 0, canvas.width, canvas.height);
 
             try {
                 const mapElement = document.getElementById('map');
@@ -337,9 +364,7 @@
                 context.globalAlpha = 0.55;
                 context.drawImage(mapCanvas, mapX, mapY, mapWidth, mapHeight);
                 context.globalAlpha = 1.0;
-            } catch (error) {
-                console.error("Gagal menggambar peta:", error);
-            }
+            } catch (error) { console.error("Gagal menggambar peta:", error); }
             
             const infoLines = getInfoLines();
             const fontSize = Math.floor(canvas.width / 45);
@@ -367,94 +392,33 @@
         function showResultView() {
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
-                video.srcObject = null;
                 isCameraActive = false;
+            }
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
             }
             mainView.classList.add('hidden');
             resultView.classList.remove('hidden');
         }
 
-        function formatDateTime(date) {
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            const datePart = new Intl.DateTimeFormat('id-ID', options).format(date);
-            const timePart = date.toTimeString().slice(0, 8);
-            return `${datePart.replace(/ /g, ' ')} ${timePart} WIB`;
-        }
-
-        function initMap() {
-            if (mapInitialized) {
-                map.invalidateSize();
-                return;
-            }
-            map = L.map('map').setView([locationData.latitude, locationData.longitude], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            marker = L.marker([locationData.latitude, locationData.longitude]).addTo(map);
-
-            map.on('click', async function(e) {
-                const { lat, lng } = e.latlng;
-                const addressDetails = await getAddressDetails(lat, lng);
-
-                locationData.latitude = lat;
-                locationData.longitude = lng;
-                if (!addressDetails.error) {
-                    locationData.street = addressDetails.jalan;
-                    locationData.subDistrict = addressDetails.kecamatan;
-                    locationData.city = addressDetails.kota;
-                    locationData.province = addressDetails.provinsi;
-                }
-                
-                populateInputsFromState();
-                if (marker) map.removeLayer(marker);
-                marker = L.marker([lat, lng]).addTo(map);
-                map.panTo([lat, lng]);
-                updateInfo();
+        function updateInfo() {
+            infoOverlay.innerHTML = '';
+            const elementWidth = previewCanvas.offsetWidth;
+            if (elementWidth === 0) return;
+            const fontSize = Math.floor(elementWidth / 45); 
+            getInfoLines().forEach(line => {
+                const p = document.createElement('p');
+                p.textContent = line;
+                p.style.fontSize = `${fontSize}px`;
+                infoOverlay.appendChild(p);
             });
-            mapInitialized = true;
         }
-
-        async function getAddressDetails(lat, lng) {
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=id`);
-                const data = await response.json();
-                if (data.error) return { error: "Alamat tidak ditemukan" };
-                
-                const addr = data.address || {};
-                const jalan = `${addr.road || ''}${addr.house_number ? ' No.' + addr.house_number : ''}` || addr.pedestrian || addr.hamlet || '';
-                
-                return {
-                    jalan: jalan || 'Jalan tidak tersedia', 
-                    kecamatan: addr.suburb || addr.city_district || addr.village || 'Kecamatan tidak tersedia',
-                    kota: addr.city || addr.town || addr.county || 'Kota tidak tersedia',
-                    provinsi: addr.state || addr.state_district || 'Daerah Khusus Ibukota Jakarta',
-                };
-            } catch (error) {
-                return { error: `Gagal mengambil data alamat` };
-            }
-        }
-
-        function populateInputsFromState() {
-            nameInput.value = userProfile.name;
-            nrkInput.value = userProfile.nrk;
-            profileDateInput.value = userProfile.date;
-            profileTimeInput.value = userProfile.time;
-            
-            latitudeInput.value = locationData.latitude.toFixed(6);
-            longitudeInput.value = locationData.longitude.toFixed(6);
-            streetInput.value = locationData.street;
-            subDistrictInput.value = locationData.subDistrict;
-            cityInput.value = locationData.city;
-            provinceInput.value = locationData.province;
-        }
-
+        
         function setupEventListeners() {
             nameInput.addEventListener('input', (e) => { userProfile.name = e.target.value; updateInfo(); });
             nrkInput.addEventListener('input', (e) => { userProfile.nrk = e.target.value; updateInfo(); });
             profileDateInput.addEventListener('input', (e) => { userProfile.date = e.target.value; updateInfo(); });
             profileTimeInput.addEventListener('input', (e) => { userProfile.time = e.target.value; updateInfo(); });
-
             latitudeInput.addEventListener('input', (e) => { locationData.latitude = parseFloat(e.target.value) || 0; updateInfo(); });
             longitudeInput.addEventListener('input', (e) => { locationData.longitude = parseFloat(e.target.value) || 0; updateInfo(); });
             streetInput.addEventListener('input', (e) => { locationData.street = e.target.value; updateInfo(); });
@@ -462,7 +426,7 @@
             cityInput.addEventListener('input', (e) => { locationData.city = e.target.value; updateInfo(); });
             provinceInput.addEventListener('input', (e) => { locationData.province = e.target.value; updateInfo(); });
             
-            captureBtn.addEventListener('click', () => captureImage(isCameraActive ? video : null));
+            captureBtn.addEventListener('click', captureImage);
             switchCameraBtn.addEventListener('click', switchCamera);
             retakeBtn.addEventListener('click', () => {
                 mainView.classList.remove('hidden');
@@ -477,16 +441,92 @@
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const img = new Image();
-                        img.onload = () => captureImage(img);
+                        img.onload = () => {
+                            if (currentStream) currentStream.getTracks().forEach(track => track.stop());
+                            isCameraActive = false;
+                            captureImageFromFile(img);
+                        }
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            toggleBgBtn.addEventListener('click', () => {
+                isBgRemovalPreviewActive = !isBgRemovalPreviewActive;
+                toggleBgBtn.style.backgroundColor = isBgRemovalPreviewActive ? '#1D4ED8' : '#374151';
+                if (isBgRemovalPreviewActive) {
+                    backgroundImage = defaultBackgroundImage;
+                } else {
+                    backgroundImage = null;
+                }
+            });
+
+            addBgBtn.addEventListener('click', () => bgFileInput.click());
+
+            bgFileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            backgroundImage = img;
+                            if (!isBgRemovalPreviewActive) {
+                                isBgRemovalPreviewActive = true;
+                                toggleBgBtn.style.backgroundColor = '#1D4ED8';
+                            }
+                        };
                         img.src = e.target.result;
                     };
                     reader.readAsDataURL(file);
                 }
             });
         }
+        
+        async function captureImageFromFile(sourceImage) {
+            canvas.width = sourceImage.naturalWidth;
+            canvas.height = sourceImage.naturalHeight;
+            context.drawImage(sourceImage, 0, 0);
+            try {
+                const mapElement = document.getElementById('map');
+                const mapCanvas = await html2canvas(mapElement, { backgroundColor: null, useCORS: true });
+                const mapWidth = canvas.width * 0.25;
+                const mapHeight = mapWidth;
+                const mapPadding = canvas.width * 0.025;
+                const mapX = canvas.width - mapWidth - mapPadding;
+                const mapY = canvas.height - mapHeight - mapPadding;
+                context.globalAlpha = 0.55;
+                context.drawImage(mapCanvas, mapX, mapY, mapWidth, mapHeight);
+                context.globalAlpha = 1.0;
+            } catch (error) { console.error("Gagal menggambar peta:", error); }
+            const infoLines = getInfoLines();
+            const fontSize = Math.floor(canvas.width / 45);
+            const padding = fontSize * 1.5;
+            const lineHeight = fontSize * 1.3;
+            context.font = `bold ${fontSize}px 'Inter', sans-serif`;
+            context.textAlign = 'left';
+            context.fillStyle = 'white';
+            context.shadowColor = 'rgba(0, 0, 0, 1)';
+            context.shadowBlur = 5;
+            context.shadowOffsetX = 2;
+            context.shadowOffsetY = 2;
+            infoLines.forEach((line, index) => {
+                const y = canvas.height - (padding/2) - ((infoLines.length - 1 - index) * lineHeight);
+                context.fillText(line, padding, y);
+            });
+            resultImage.src = canvas.toDataURL('image/jpeg', 0.9);
+            downloadLink.href = resultImage.src;
+            downloadLink.download = `foto_${new Date().toISOString()}.jpeg`;
+            showResultView();
+        }
+
+        function formatDateTime(date) { const options = { day: 'numeric', month: 'short', year: 'numeric' }; const datePart = new Intl.DateTimeFormat('id-ID', options).format(date); const timePart = date.toTimeString().slice(0, 8); return `${datePart.replace(/ /g, ' ')} ${timePart} WIB`; }
+        function initMap() { if (mapInitialized) { map.invalidateSize(); return; } map = L.map('map').setView([locationData.latitude, locationData.longitude], 15); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); marker = L.marker([locationData.latitude, locationData.longitude]).addTo(map); map.on('click', async function(e) { const { lat, lng } = e.latlng; const addressDetails = await getAddressDetails(lat, lng); locationData.latitude = lat; locationData.longitude = lng; if (!addressDetails.error) { locationData.street = addressDetails.jalan; locationData.subDistrict = addressDetails.kecamatan; locationData.city = addressDetails.kota; locationData.province = addressDetails.provinsi; } populateInputsFromState(); if (marker) map.removeLayer(marker); marker = L.marker([lat, lng]).addTo(map); map.panTo([lat, lng]); updateInfo(); }); mapInitialized = true; }
+        async function getAddressDetails(lat, lng) { try { const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=id`); const data = await response.json(); if (data.error) return { error: "Alamat tidak ditemukan" }; const addr = data.address || {}; const jalan = `${addr.road || ''}${addr.house_number ? ' No.' + addr.house_number : ''}` || addr.pedestrian || addr.hamlet || ''; return { jalan: jalan || 'Jalan tidak tersedia', kecamatan: addr.suburb || addr.city_district || addr.village || 'Kecamatan tidak tersedia', kota: addr.city || addr.town || addr.county || 'Kota tidak tersedia', provinsi: addr.state || addr.state_district || 'Daerah Khusus Ibukota Jakarta', }; } catch (error) { return { error: `Gagal mengambil data alamat` }; } }
+        function populateInputsFromState() { nameInput.value = userProfile.name; nrkInput.value = userProfile.nrk; profileDateInput.value = userProfile.date; profileTimeInput.value = userProfile.time; latitudeInput.value = locationData.latitude.toFixed(6); longitudeInput.value = locationData.longitude.toFixed(6); streetInput.value = locationData.street; subDistrictInput.value = locationData.subDistrict; cityInput.value = locationData.city; provinceInput.value = locationData.province; }
 
         document.addEventListener('DOMContentLoaded', initialize);
     </script>
 </body>
 </html>
-
