@@ -359,7 +359,7 @@
             // Gunakan video.offsetWidth hanya jika kamera aktif, jika tidak gunakan resultImage.offsetWidth
             const referenceElement = isCameraActive ? video : resultImage;
             const elementWidth = referenceElement.offsetWidth || referenceElement.clientWidth;
-            const fontSize = Math.floor(elementWidth / 15);
+            const fontSize = Math.floor(elementWidth / 50);
             getInfoLines().forEach(line => {
                 const p = document.createElement('p');
                 p.textContent = line;
@@ -369,7 +369,7 @@
         }
 
         function captureImage(sourceImage) {
-            flashOverlay.classList.add('flash-effect');
+            flashOverlay.classList.add('flash-effect');a
             setTimeout(() => flashOverlay.classList.remove('flash-effect'), 500);
 
             let imageToDraw = sourceImage || video;
@@ -389,7 +389,7 @@
             }
 
             const infoLines = getInfoLines();
-            const fontSize = Math.floor(canvas.width / 10);
+            const fontSize = Math.floor(canvas.width / 50);
             const padding = fontSize * 1.5;
             const lineHeight = fontSize * 1.25;
             
