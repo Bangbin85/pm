@@ -14,7 +14,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Mencegah highlight biru saat disentuh */
+            -webkit-tap-highlight-color: transparent;
         }
         #captureBtn {
             border: 4px solid white;
@@ -31,7 +31,8 @@
             font-weight: bold;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
             margin: 0;
-            line-height: 1.4;
+            /* PERBAIKAN: Jarak antar baris dipersempit */
+            line-height: 1.25;
         }
         .modal {
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -55,7 +56,8 @@
 
         <div id="cameraView" class="flex flex-col h-full">
             <header class="p-4 flex justify-between items-center bg-gray-900 bg-opacity-50 z-20">
-                <div class="w-9 h-9"></div> <h1 class="text-xl font-bold">Uhuuyy</h1>
+                <div class="w-9 h-9"></div>
+                <h1 class="text-xl font-bold">Uhuuyy</h1>
                 <button id="profileBtn" class="text-white/80 hover:text-white transition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64.06,64.06,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-49.84-44.49,48,48,0,1,0-59.84,0,79.66,79.66,0,0,0-49.84,44.49,88,88,0,1,1,159.52,0Z"></path></svg>
                 </button>
@@ -63,7 +65,7 @@
             
             <main class="relative flex-grow flex items-center justify-center bg-black pb-36">
                 <video id="videoFeed" class="w-full h-full object-cover" playsinline autoplay muted></video>
-                <div id="infoOverlay" class="absolute bottom-0 left-0 w-full p-4 text-white pointer-events-none z-10"></div>
+                <div id="infoOverlay" class="absolute bottom-32 left-0 w-full p-4 text-white pointer-events-none z-10"></div>
             </main>
 
             <footer class="absolute bottom-0 left-0 w-full p-4 z-20">
@@ -87,7 +89,7 @@
 
         <div id="resultView" class="hidden flex-col h-full">
             <header class="p-4 text-center bg-gray-900"><h1 class="text-xl font-bold">Hasil Foto</h1></header>
-            <main class="relative flex-grow flex items-center justify-center bg-black p-4">
+            <main class="relative flex-grow flex items-center justify-center bg-black p-4 overflow-y-auto">
                 <img id="resultImage" class="max-w-full max-h-full rounded-lg shadow-lg" alt="Hasil foto">
             </main>
             <footer class="p-4 grid grid-cols-2 gap-4 bg-gray-900">
@@ -224,7 +226,6 @@
         function updateInfo() {
             infoOverlay.innerHTML = '';
             const elementWidth = video.offsetWidth || video.clientWidth;
-            // MODIFIKASI: Ukuran font diperbesar untuk keterbacaan di mobile (pembagi diubah dari 45 ke 28)
             const fontSize = Math.floor(elementWidth / 28);
             getInfoLines().forEach(line => {
                 const p = document.createElement('p');
@@ -251,10 +252,10 @@
             }
 
             const infoLines = getInfoLines();
-            // MODIFIKASI: Ukuran font di canvas juga diperbesar (pembagi diubah dari 45 ke 28)
             const fontSize = Math.floor(canvas.width / 28);
             const padding = fontSize * 1.5;
-            const lineHeight = fontSize * 1.4;
+            // PERBAIKAN: Jarak antar baris di gambar canvas juga dipersempit
+            const lineHeight = fontSize * 1.25;
             
             context.font = `bold ${fontSize}px 'Inter', sans-serif`;
             context.textAlign = 'left';
