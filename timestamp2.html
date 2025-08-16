@@ -31,8 +31,7 @@
             font-weight: bold;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
             margin: 0;
-            /* PERBAIKAN: Jarak antar baris dipersempit */
-            line-height: 1.25;
+            line-height: 1.25; /* Jarak antar baris yang lebih rapat */
         }
         .modal {
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -63,9 +62,9 @@
                 </button>
             </header>
             
-            <main class="relative flex-grow flex items-center justify-center bg-black pb-36">
+            <main class="relative flex-grow flex items-center justify-center bg-black">
                 <video id="videoFeed" class="w-full h-full object-cover" playsinline autoplay muted></video>
-                <div id="infoOverlay" class="absolute bottom-32 left-0 w-full p-4 text-white pointer-events-none z-10"></div>
+                <div id="infoOverlay" class="absolute bottom-0 left-0 w-full px-4 pt-4 pb-36 text-white pointer-events-none z-10"></div>
             </main>
 
             <footer class="absolute bottom-0 left-0 w-full p-4 z-20">
@@ -254,7 +253,6 @@
             const infoLines = getInfoLines();
             const fontSize = Math.floor(canvas.width / 28);
             const padding = fontSize * 1.5;
-            // PERBAIKAN: Jarak antar baris di gambar canvas juga dipersempit
             const lineHeight = fontSize * 1.25;
             
             context.font = `bold ${fontSize}px 'Inter', sans-serif`;
@@ -264,9 +262,11 @@
             context.shadowBlur = 5;
             context.shadowOffsetX = 2;
             context.shadowOffsetY = 2;
-
+            
+            // PERBAIKAN: Posisi teks di canvas juga disesuaikan dengan padding yang baru
+            const footerClearance = canvas.width / 4.5; // Meniru `pb-36` secara proporsional
             infoLines.forEach((line, index) => {
-                const y = canvas.height - padding - ((infoLines.length - 1 - index) * lineHeight);
+                const y = canvas.height - footerClearance - ((infoLines.length - 1 - index) * lineHeight);
                 context.fillText(line, padding, y);
             });
             
