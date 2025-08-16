@@ -309,40 +309,50 @@
             return `${Math.abs(value).toFixed(6)}${sign}`;
         }
 
-        function getInfoLines() {
-            let displayDateTime;
-            if (userProfile.date && userProfile.time) {
-                const profileDate = new Date(`${userProfile.date}T${userProfile.time}`);
-                displayDateTime = formatDateTime(profileDate);
-            } else {
-                displayDateTime = formatDateTime(new Date());
-            }
+function getInfoLines() {
+    let displayDateTime;
+    if (userProfile.date && userProfile.time) {
+        const profileDate = new Date(`${userProfile.date}T${userProfile.time}`);
+        displayDateTime = formatDateTime(profileDate);
+    } else {
+        displayDateTime = formatDateTime(new Date());
+    }
 
-            const lines = [
-                `Network : ${displayDateTime}`,
-                `Local   : ${displayDateTime}`,
-                `${formatCoordinateForDisplay(locationData.latitude, 'lat')} ${formatCoordinateForDisplay(locationData.longitude, 'lon')}`,
-                locationData.street,
-                locationData.subDistrict,
-                locationData.city,
-                locationData.province
-            ];
-            // Tambahkan nama dan NRK jika ada
-            if (userProfile.name) {
-                lines.unshift(userProfile.name.toUpperCase()); // Ubah jadi BINTANG A. PERMAMA
-            }
-            if (userProfile.nrk) {
-                 lines.splice(1, 0, userProfile.nrk); // Tambahkan NRK di baris kedua
-            }
-            return lines;
+    // Daftar informasi utama, tanpa nama dan NRK
+    const lines = [
+        `Network : ${displayDateTime}`,
+        `Local   : ${displayDateTime}`,
+        `${formatCoordinateForDisplay(locationData.latitude, 'lat')} ${formatCoordinateForDisplay(locationData.longitude, 'lon')}`,
+        locationData.street,
+        locationData.subDistrict,
+        locationData.city,
+        locationData.province
+    ];
+
+    // Cek jika ada nama atau NRK, lalu gabungkan dan tambahkan ke akhir daftar
+    if (userProfile.name || userProfile.nrk) {
+        const namePart = userProfile.name ? userProfile.name.toUpperCase() : '';
+        const nrkPart = userProfile.nrk ? userProfile.nrk : '';
+        let profileLine = namePart;
+
+        if (namePart && nrkPart) {
+            profileLine += ` / ${nrkPart}`; // Gabungkan jika keduanya ada
+        } else if (nrkPart) {
+            profileLine = nrkPart; // Tampilkan NRK saja jika hanya NRK yang ada
         }
+        
+        lines.push(profileLine); // Tambahkan ke baris paling bawah
+    }
+
+    return lines;
+}
 
 
         function updateInfo() {
             infoOverlay.innerHTML = '';
             const referenceElement = isCameraActive ? video : resultImage;
             const elementWidth = referenceElement.offsetWidth || referenceElement.clientWidth;
-            const fontSize = Math.floor(elementWidth / 45); // Sedikit lebih kecil agar muat
+            const fontSize = Math.floor(elementWidth / 40); // Sedikit lebih kecil agar muat
             getInfoLines().forEach(line => {
                 const p = document.createElement('p');
                 p.textContent = line;
@@ -381,7 +391,7 @@
                     useCORS: true // Important for map tiles
                 });
                 
-			const mapWidth = canvas.width * 0.22;
+			const mapWidth = canvas.width * 0.28;
 			const mapHeight = mapWidth;
 			const mapPadding = canvas.width * 0.025; // Jarak dari tepi
 
@@ -400,7 +410,7 @@
             
             // 3. Draw the text information
             const infoLines = getInfoLines();
-            const fontSize = Math.floor(canvas.width / 45);
+            const fontSize = Math.floor(canvas.width / 40);
             const padding = fontSize * 1.5;
             const lineHeight = fontSize * 1.3;
             
