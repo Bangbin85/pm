@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Memuat CSS Leaflet versi 1.7.1 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
 
     <style>
@@ -40,6 +42,27 @@
             opacity: 0;
             visibility: hidden;
         }
+        /* Animasi saat marker ditambahkan (opsional) */
+        .leaflet-marker-pane .leaflet-marker-icon {
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            70% {
+                transform: scale(0.9);
+                }
+            100% {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-900 flex items-center justify-center min-h-screen text-white overflow-hidden">
@@ -70,14 +93,20 @@
             <footer class="absolute bottom-0 left-0 w-full p-4 z-20">
                 <div class="w-full max-w-sm mx-auto p-2 bg-black bg-opacity-40 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-sm">
                     <div class="flex-1 flex justify-center">
-                        <button id="editTimeBtn" class="text-white/80 hover:text-white transition p-3 rounded-full hover:bg-white/10">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,176H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V208ZM128,120H88a8,8,0,0,1,0-16h40a8,8,0,0,1,0,16Zm40,32H88a8,8,0,0,1,0-16h80a8,8,0,0,1,0,16Z"></path></svg>
+                        <button id="editLocationBtn" class="text-white/80 hover:text-white transition p-3 rounded-full hover:bg-white/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112A88,88,0,0,0,40,104c0,72,80,144,88,152a8,8,0,0,0,16,0c8-8,88-80,88-152A88,88,0,0,0,128,16Zm0,208c-27.15-26.66-72-87.5-72-120a72,72,0,0,1,144,0C200,104.5,155.15,197.34,128,224Z"></path></svg>
                         </button>
                     </div>
                     <div class="flex-none">
                         <button id="captureBtn" class="w-20 h-20 bg-blue-500 rounded-full focus:outline-none"></button>
                     </div>
                     <div class="flex-1 flex justify-center">
+                        <!-- Tombol untuk memilih gambar dari file -->
+                        <input type="file" id="fileInput" accept="image/*" class="hidden">
+                        <button id="selectFileBtn" class="text-white/80 hover:text-white transition p-3 rounded-full hover:bg-white/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M216,40H88a8,8,0,0,0-8,8V72H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V184h32a8,8,0,0,0,8-8V48A8,8,0,0,0,216,40ZM160,208H48V88H80v96a8,8,0,0,0,8,8H160Zm48-48H176V80a8,8,0,0,0-8-8H96V48h112Z"></path></svg>
+                        </button>
+                        <!-- Tombol untuk mengganti kamera (hanya terlihat jika kamera aktif) -->
                         <button id="switchCameraBtn" class="text-white/80 hover:text-white transition p-3 rounded-full hover:bg-white/10">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M232,96a8,8,0,0,1-8,8H175.31a80,80,0,0,1-142.62,0H24a8,8,0,0,1,0-16H80a8,8,0,0,1,7.92,6.66A64,64,0,0,1,215.3,86.42L227.88,73.85A8,8,0,0,1,240.12,86.12l-24,24A8,8,0,0,1,208,112a8,8,0,0,1-5.88-2.12L180.27,90.4a8,8,0,1,1,11.46-11.13L204.69,92A64.09,64.09,0,0,0,88,88a8,8,0,0,1,7.92-6.66,80,80,0,0,1,142.62,0H224A8,8,0,0,1,232,96Z"></path></svg>
                         </button>
@@ -98,25 +127,48 @@
         </div>
 
         <canvas id="canvas" class="hidden"></canvas>
+
     </div>
 
-    <div id="timeModal" class="modal hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-sm">
-            <h2 class="text-xl font-bold mb-4">Edit Waktu</h2>
-            <input type="datetime-local" id="timeInput" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+    <!-- Modal Lokasi Baru -->
+    <div id="locationModal" class="modal hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-lg md:max-w-3xl max-h-[90vh] overflow-y-auto"> <!-- Added max-h and overflow-y-auto -->
+            <h2 class="text-xl font-bold mb-4">Edit Lokasi & Koordinat</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Bagian Kiri: Peta -->
+                <div class="flex flex-col">
+                    <h3 class="text-lg font-semibold mb-2">Pilih Lokasi di Peta</h3>
+                    <div id="map" class="w-full" style="height: 350px; border-radius: 0.5rem; overflow: hidden;"></div> <!-- Map div -->
+                </div>
+                <!-- Bagian Kanan: Informasi Lokasi Input Fields -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Informasi Lokasi</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="latitudeInput" placeholder="Latitude" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+                        <input type="text" id="longitudeInput" placeholder="Longitude" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+                        <input type="text" id="streetInput" placeholder="Nama Jalan" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+                        <input type="text" id="subDistrictInput" placeholder="Kecamatan" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+                        <input type="text" id="cityInput" placeholder="Kota" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+                        <input type="text" id="provinceInput" placeholder="Provinsi" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+                    </div>
+                </div>
+            </div>
             <div class="mt-6 flex justify-end gap-4">
-                <button id="closeTimeModalBtn" class="bg-gray-600 hover:bg-gray-500 font-bold py-2 px-4 rounded transition">Batal</button>
-                <button id="saveTimeBtn" class="bg-blue-600 hover:bg-blue-500 font-bold py-2 px-4 rounded transition">Simpan</button>
+                <button id="closeLocationModalBtn" class="bg-gray-600 hover:bg-gray-500 font-bold py-2 px-4 rounded transition">Batal</button>
+                <button id="saveLocationBtn" class="bg-blue-600 hover:bg-blue-500 font-bold py-2 px-4 rounded transition">Simpan</button>
             </div>
         </div>
     </div>
 
+    <!-- Modal Profil yang diperbarui -->
     <div id="profileModal" class="modal hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-sm">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto"> <!-- Added max-h and overflow-y-auto -->
             <h2 class="text-xl font-bold mb-4">Profil Pengguna</h2>
             <div class="space-y-4">
                 <input type="text" id="nameInput" placeholder="Nama Lengkap" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
                 <input type="text" id="nrkInput" placeholder="NRK" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+                <input type="date" id="profileDateInput" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+                <input type="time" id="profileTimeInput" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
             </div>
             <div class="mt-6 flex justify-end gap-4">
                 <button id="closeProfileModalBtn" class="bg-gray-600 hover:bg-gray-500 font-bold py-2 px-4 rounded transition">Batal</button>
@@ -125,6 +177,8 @@
         </div>
     </div>
 
+    <!-- Memuat JavaScript Leaflet versi 1.7.1 -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
         // --- Seleksi Elemen DOM ---
         const video = document.getElementById('videoFeed');
@@ -146,33 +200,72 @@
         const profileModal = document.getElementById('profileModal');
         const nameInput = document.getElementById('nameInput');
         const nrkInput = document.getElementById('nrkInput');
+        const profileDateInput = document.getElementById('profileDateInput'); // Input tanggal baru
+        const profileTimeInput = document.getElementById('profileTimeInput'); // Input jam baru
         const saveProfileBtn = document.getElementById('saveProfileBtn');
         const closeProfileModalBtn = document.getElementById('closeProfileModalBtn');
 
-        // Modal Waktu
-        const editTimeBtn = document.getElementById('editTimeBtn');
-        const timeModal = document.getElementById('timeModal');
-        const timeInput = document.getElementById('timeInput');
-        const saveTimeBtn = document.getElementById('saveTimeBtn');
-        const closeTimeModalBtn = document.getElementById('closeTimeModalBtn');
+        // Modal Lokasi
+        const editLocationBtn = document.getElementById('editLocationBtn');
+        const locationModal = document.getElementById('locationModal');       
+        const streetInput = document.getElementById('streetInput');
+        const subDistrictInput = document.getElementById('subDistrictInput');
+        const cityInput = document.getElementById('cityInput');
+        const provinceInput = document.getElementById('provinceInput');
+        const latitudeInput = document.getElementById('latitudeInput');
+        const longitudeInput = document.getElementById('longitudeInput');
+        const saveLocationBtn = document.getElementById('saveLocationBtn');
+        const closeLocationModalBtn = document.getElementById('closeLocationModalBtn');
+
+        // Input File
+        const fileInput = document.getElementById('fileInput');
+        const selectFileBtn = document.getElementById('selectFileBtn');
 
         // --- State Aplikasi ---
-        let userProfile = { name: '', nrk: '' };
-        let customTimestamp = '17 Agu 2025 16.42.37 WIB';
+        let userProfile = { 
+            name: '', 
+            nrk: '', 
+            date: '', // Tanggal dari profil
+            time: ''  // Waktu dari profil
+        };
+        // locationData sekarang menyimpan nilai numerik untuk lat/lon
+        let locationData = {
+            latitude: -6.175,  // Nilai default numerik
+            longitude: 106.828, // Nilai default numerik
+            street: 'No.5 Jalan Medan Merdeka Selatan',
+            subDistrict: 'Kecamatan Gambir',
+            city: 'Kota Jakarta Pusat',
+            province: 'Daerah Khusus Ibukota Jakarta'
+        };
         let currentStream;
         let currentFacingMode = 'environment';
+        let isCameraActive = false; // Menandakan apakah kamera sedang aktif
+
+        // --- Variabel Peta Leaflet ---
+        let map; // Untuk peta utama di modal
+        let marker = null;
+        let mapInitialized = false; // Flag untuk memastikan peta utama hanya diinisialisasi sekali
 
         // --- Fungsi Utama ---
         async function initialize() {
             try {
+                // Mencoba memulai kamera secara default
                 await startCamera(currentFacingMode);
+                isCameraActive = true;
+                // Menampilkan tombol ganti kamera
+                switchCameraBtn.classList.remove('hidden');
+            } catch (error) {
+                // Jika kamera gagal, sembunyikan tombol ganti kamera
+                switchCameraBtn.classList.add('hidden');
+                isCameraActive = false;
+                // Tetap tampilkan pesan jika kamera gagal diakses
+                const loadingIcon = document.getElementById('loadingIcon');
+                loadingIcon.outerHTML = '<svg id="loadingIcon" class="text-5xl text-red-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24a104,104,0,1,0,104,104A104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-40V120a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm-2.2-86.18a12,12,0,1,1,12,12.06A12,12,0,0,1,117.8,89.82Z"></path></svg>';
+                document.getElementById('loadingText').innerHTML = `Error: ${error.message}<br>Pastikan Anda memberikan izin kamera atau gunakan fitur "Pilih Gambar".`;
+            } finally {
                 updateInfo();
                 loadingMessage.classList.add('opacity-0');
                 setTimeout(() => loadingMessage.classList.add('hidden'), 300);
-            } catch (error) {
-                const loadingIcon = document.getElementById('loadingIcon');
-                loadingIcon.outerHTML = '<svg id="loadingIcon" class="text-5xl text-red-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24a104,104,0,1,0,104,104A104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-40V120a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm-2.2-86.18a12,12,0,1,1,12,12.06A12,12,0,0,1,117.8,89.82Z"></path></svg>';
-                document.getElementById('loadingText').innerHTML = `Error: ${error.message}<br>Pastikan Anda memberikan izin kamera.`;
             }
         }
         
@@ -188,8 +281,12 @@
                     });
                     video.srcObject = stream;
                     currentStream = stream;
+                    isCameraActive = true;
                     video.onloadedmetadata = () => resolve();
-                } catch (err) { reject(new Error("Gagal mengakses kamera.")); }
+                } catch (err) { 
+                    isCameraActive = false;
+                    reject(new Error("Gagal mengakses kamera.")); 
+                }
             });
         }
         
@@ -207,15 +304,34 @@
             }
         }
 
+        // Fungsi untuk memformat koordinat numerik ke string tampilan
+        function formatCoordinateForDisplay(value, type) {
+            if (typeof value !== 'number' || isNaN(value)) {
+                return 'N/A'; // Fallback
+            }
+            const sign = value < 0 ? (type === 'lat' ? 'S' : 'W') : (type === 'lat' ? 'N' : 'E');
+            return `${Math.abs(value).toFixed(6)}${sign}`;
+        }
+
         function getInfoLines() {
+            let displayDateTime;
+            if (userProfile.date && userProfile.time) {
+                // Gunakan tanggal dan jam dari profil jika diatur
+                const profileDate = new Date(`${userProfile.date}T${userProfile.time}`);
+                displayDateTime = formatDateTime(profileDate);
+            } else {
+                // Fallback ke tanggal dan jam sistem saat ini
+                displayDateTime = formatDateTime(new Date());
+            }
+
             const lines = [
-                `Network : ${customTimestamp}`,
-                `Local   : ${customTimestamp}`,
-                `6°10'46,945"S 106°49'33,621"E`,
-                'No.5 Jalan Medan Merdeka Selatan',
-                'Kecamatan Gambir',
-                'Kota Jakarta Pusat',
-                'Daerah Khusus Ibukota Jakarta'
+                `Network : ${displayDateTime}`,
+                `Local   : ${displayDateTime}`,
+                `${formatCoordinateForDisplay(locationData.latitude, 'lat')} ${formatCoordinateForDisplay(locationData.longitude, 'lon')}`,
+                locationData.street,
+                locationData.subDistrict,
+                locationData.city,
+                locationData.province
             ];
             if (userProfile.name) lines.push(userProfile.name);
             if (userProfile.nrk) lines.push(userProfile.nrk);
@@ -224,8 +340,10 @@
 
         function updateInfo() {
             infoOverlay.innerHTML = '';
-            const elementWidth = video.offsetWidth || video.clientWidth;
-            const fontSize = Math.floor(elementWidth / 28);
+            // Gunakan video.offsetWidth hanya jika kamera aktif, jika tidak gunakan resultImage.offsetWidth
+            const referenceElement = isCameraActive ? video : resultImage;
+            const elementWidth = referenceElement.offsetWidth || referenceElement.clientWidth;
+            const fontSize = Math.floor(elementWidth / 40);
             getInfoLines().forEach(line => {
                 const p = document.createElement('p');
                 p.textContent = line;
@@ -234,24 +352,28 @@
             });
         }
 
-        function captureImage() {
+        function captureImage(sourceImage) {
             flashOverlay.classList.add('flash-effect');
             setTimeout(() => flashOverlay.classList.remove('flash-effect'), 500);
 
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            let imageToDraw = sourceImage || video;
+
+            canvas.width = imageToDraw.videoWidth || imageToDraw.naturalWidth;
+            canvas.height = imageToDraw.videoHeight || imageToDraw.naturalHeight;
             
-            if (currentFacingMode === 'user') {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (imageToDraw === video && currentFacingMode === 'user') {
                 context.save();
                 context.scale(-1, 1);
-                context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+                context.drawImage(imageToDraw, -canvas.width, 0, canvas.width, canvas.height);
                 context.restore();
             } else {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                context.drawImage(imageToDraw, 0, 0, canvas.width, canvas.height);
             }
 
             const infoLines = getInfoLines();
-            const fontSize = Math.floor(canvas.width / 28);
+            const fontSize = Math.floor(canvas.width / 40);
             const padding = fontSize * 1.5;
             const lineHeight = fontSize * 1.25;
             
@@ -263,8 +385,8 @@
             context.shadowOffsetX = 2;
             context.shadowOffsetY = 2;
             
-            // PERBAIKAN: Posisi teks di canvas juga disesuaikan dengan padding yang baru
-            const footerClearance = canvas.width / 4.5; // Meniru `pb-36` secara proporsional
+            // Menyesuaikan footerClearance: minimum 30px atau 10% tinggi canvas, mana yang lebih besar
+            const footerClearance = Math.max(30, canvas.height * 0.02); 
             infoLines.forEach((line, index) => {
                 const y = canvas.height - footerClearance - ((infoLines.length - 1 - index) * lineHeight);
                 context.fillText(line, padding, y);
@@ -272,16 +394,36 @@
             
             const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
 
-            resultImage.src = imageDataUrl;
-            downloadLink.href = imageDataUrl;
-            downloadLink.download = `foto_${new Date().toISOString()}.jpeg`;
-            showResultView();
+            resultImage.src = imageDataUrl; // Set the src first
+
+            // Wait for the resultImage to load before showing the view and updating info
+            resultImage.onload = () => {
+                downloadLink.href = imageDataUrl;
+                downloadLink.download = `foto_${new Date().toISOString()}.jpeg`;
+                showResultView(); // This will call updateInfo()
+                resultImage.onload = null; // Clear the handler to prevent re-execution
+            };
+
+            // If the image is already cached or loads very quickly, onload might not fire.
+            // Check if it's already complete.
+            if (resultImage.complete && resultImage.naturalWidth !== 0) {
+                resultImage.onload(); // Manually trigger if already loaded
+            }
         }
         
         function showResultView() {
+            // Hentikan kamera jika sedang aktif
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                isCameraActive = false;
+            }
             cameraView.classList.add('hidden');
             resultView.classList.remove('hidden');
             resultView.classList.add('flex');
+            // Sembunyikan tombol switch kamera saat di tampilan hasil
+            switchCameraBtn.classList.add('hidden');
+            updateInfo(); // Perbarui info overlay untuk gambar hasil
         }
 
         function formatDateTime(date) {
@@ -291,38 +433,243 @@
             return `${datePart} ${timePart} WIB`;
         }
 
+        // --- Fungsi Leaflet Map Utama (di modal) ---
+        function initMap() {
+            if (mapInitialized) {
+                map.invalidateSize(); // Pastikan peta di-render ulang jika sudah ada
+                return;
+            }
+            // Inisialisasi peta
+            // Set tampilan awal peta ke Jakarta, Indonesia dengan zoom level 13
+            map = L.map('map').setView([-6.2088, 106.8456], 13); // Jakarta sebagai pusat awal
+
+            // Tambahkan layer peta dari OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Event listener ketika peta diklik
+            map.on('click', async function(e) {
+                const { lat, lng } = e.latlng; // Mendapatkan latitude dan longitude dari objek event
+                
+                // Set teks "Mendapatkan..." pada semua elemen alamat saat proses dimulai
+                latitudeInput.value = "Mendapatkan...";
+                longitudeInput.value = "Mendapatkan...";
+                streetInput.value = "Mendapatkan...";
+                subDistrictInput.value = "Mendapatkan...";
+                cityInput.value = "Mendapatkan...";
+                provinceInput.value = "Mendapatkan...";
+                
+                // Dapatkan detail alamat secara asinkron
+                const addressDetails = await getAddressDetails(lat, lng);
+
+                // Hapus marker yang ada sebelumnya (jika ada)
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                
+                if (addressDetails.error) {
+                    latitudeInput.value = lat.toFixed(6);
+                    longitudeInput.value = lng.toFixed(6);
+                    streetInput.value = addressDetails.error;
+                    subDistrictInput.value = "-";
+                    cityInput.value = "-";
+                    provinceInput.value = "-";
+                } else {
+                    // Perbarui input dengan detail alamat
+                    latitudeInput.value = `${lat.toFixed(6)}${lat < 0 ? 'S' : 'N'}`; // Format koordinat
+                    longitudeInput.value = `${lng.toFixed(6)}${lng < 0 ? 'W' : 'E'}`; // Format koordinat
+                    streetInput.value = addressDetails.jalan;
+                    subDistrictInput.value = addressDetails.kecamatan;
+                    cityInput.value = addressDetails.kota;
+                    provinceInput.value = addressDetails.provinsi;
+                }
+                
+                // Tambahkan marker baru di lokasi klik dan kaitkan popup
+                marker = L.marker([lat, lng]).addTo(map)
+                    .bindPopup(`<b>Koordinat:</b><br>${lat.toFixed(6)}, ${lng.toFixed(6)}<br><b>Alamat:</b><br>${addressDetails.jalan || "Alamat tidak tersedia"}`) 
+                    .openPopup(); // Langsung buka popup
+            });
+            mapInitialized = true;
+        }
+
+        // Fungsi asinkron untuk mendapatkan detail alamat dari koordinat menggunakan Nominatim API
+        async function getAddressDetails(lat, lng) {
+            try {
+                // Menggunakan addressdetails=1 untuk mendapatkan detail alamat yang lebih kaya
+                // dan zoom=18 untuk detail yang lebih spesifik pada tingkat jalan
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    return { error: "Alamat tidak ditemukan" };
+                }
+                
+                // Ekstrak komponen alamat dari objek 'address' di respons Nominatim
+                const address = data.address || {};
+                const displayAddress = data.display_name || "Alamat tidak tersedia";
+
+                // Menentukan nilai 'provinsi' dengan beberapa fallback dan prioritas DKI Jakarta
+                let provinsi = 'Tidak tersedia';
+                if (displayAddress.includes('Daerah Khusus Ibukota Jakarta') ||
+                    (address.city && address.city.includes('Jakarta')) ||
+                    (address.state_district && address.state_district.includes('Jakarta'))
+                ) {
+                    provinsi = 'Daerah Khusus Ibukota Jakarta';
+                } else if (address.state) {
+                    provinsi = address.state;
+                } else if (address.state_district) {
+                    provinsi = address.state_district;
+                } else if (address.county) {
+                    provinsi = address.county;
+                }
+
+                // Membangun "Jalan" agar lebih lengkap (hingga RT/RW jika ada)
+                let jalanLengkap = address.road || '';
+                if (address.house_number) {
+                    jalanLengkap += `, No. ${address.house_number}`;
+                }
+
+                // Pola regex untuk mencari RT/RW. Ini mencari "RT" atau "RW" diikuti angka, dengan atau tanpa "/" dan spasi.
+                const rtRwPattern = /(?:RT\s*\d{1,3}(?:\s*[\/\-]\s*RW\s*\d{1,3})?|RW\s*\d{1,3}(?:\s*[\/\-]\s*RT\s*\d{1,3})?)/i;
+                
+                const displayParts = displayAddress.split(',');
+                let rtRwFound = '';
+                for (const part of displayParts) {
+                    const match = part.trim().match(rtRwPattern);
+                    if (match) {
+                        rtRwFound = match[0].trim();
+                        break;
+                    }
+                }
+
+                if (rtRwFound && !jalanLengkap.includes(rtRwFound)) {
+                    // Hanya tambahkan jika belum ada di jalanLengkap
+                    jalanLengkap += (jalanLengkap ? ', ' : '') + rtRwFound;
+                }
+                
+                jalanLengkap = jalanLengkap || 'Tidak tersedia'; // Pastikan tidak kosong
+
+                return {
+                    jalan: jalanLengkap, 
+                    kecamatan: address.suburb || address.village || 'Tidak tersedia',
+                    kota: address.city || address.town || address.county || 'Tidak tersedia',
+                    provinsi: provinsi,
+                    postcode: address.postcode || 'Tidak tersedia',
+                };
+
+            } catch (error) {
+                console.error("Error saat mendapatkan detail alamat:", error);
+                return { error: `Gagal mendapatkan alamat: ${error.message}` };
+            }
+        }
+
+
         // --- Event Listeners ---
-        captureBtn.addEventListener('click', captureImage);
+        captureBtn.addEventListener('click', () => {
+            if (isCameraActive) { // Hanya izinkan capture jika kamera aktif
+                captureImage(video);
+            } else if (resultImage.src && resultView.classList.contains('flex')) {
+                // Jika sudah ada gambar di resultView (dari file), izinkan untuk distamp lagi
+                // Namun, ini bukan "capture" baru, melainkan stamping ulang gambar yang sudah ada
+                captureImage(resultImage); 
+            }
+            // Jika tidak ada kamera aktif dan tidak ada gambar di resultView, tidak melakukan apa-apa (tidak ada alert)
+        });
+
         switchCameraBtn.addEventListener('click', switchCamera);
+        
         retakeBtn.addEventListener('click', () => {
              cameraView.classList.remove('hidden');
              resultView.classList.add('hidden');
+             initialize(); // Inisialisasi ulang kamera saat "Ulangi"
         });
         window.addEventListener('resize', updateInfo);
 
         // Modal Profil Listeners
-        profileBtn.addEventListener('click', () => profileModal.classList.remove('hidden'));
+        profileBtn.addEventListener('click', () => {
+            // Isi input dengan nilai profil yang ada
+            nameInput.value = userProfile.name;
+            nrkInput.value = userProfile.nrk;
+
+            // Set default date/time to current if not already set
+            const now = new Date();
+            const defaultDate = now.toISOString().split('T')[0]; // Format YYYY-MM-DD
+            const defaultTime = now.toTimeString().slice(0, 5); // Format HH:MM
+
+            profileDateInput.value = userProfile.date || defaultDate;
+            profileTimeInput.value = userProfile.time || defaultTime;
+            
+            profileModal.classList.remove('hidden');
+        });
         closeProfileModalBtn.addEventListener('click', () => profileModal.classList.add('hidden'));
         saveProfileBtn.addEventListener('click', () => {
             userProfile.name = nameInput.value.trim();
             userProfile.nrk = nrkInput.value.trim();
+            userProfile.date = profileDateInput.value;
+            userProfile.time = profileTimeInput.value;
             profileModal.classList.add('hidden');
-            updateInfo();
+            updateInfo(); // Perbarui overlay setelah menyimpan profil
         });
 
-        // Modal Waktu Listeners
-        editTimeBtn.addEventListener('click', () => {
-            const date = new Date('2025-08-17T16:42:37');
-            timeInput.value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-            timeModal.classList.remove('hidden');
+        // Modal Lokasi Listeners
+        editLocationBtn.addEventListener('click', () => {
+            // Isi input dengan nilai lokasi yang ada
+            latitudeInput.value = formatCoordinateForDisplay(locationData.latitude, 'lat');
+            longitudeInput.value = formatCoordinateForDisplay(locationData.longitude, 'lon');
+            streetInput.value = locationData.street;
+            subDistrictInput.value = locationData.subDistrict;
+            cityInput.value = locationData.city;
+            provinceInput.value = locationData.province;
+            locationModal.classList.remove('hidden');
+            initMap(); // Inisialisasi peta utama saat modal dibuka
         });
-        closeTimeModalBtn.addEventListener('click', () => timeModal.classList.add('hidden'));
-        saveTimeBtn.addEventListener('click', () => {
-            if (timeInput.value) {
-                const newDate = new Date(timeInput.value);
-                customTimestamp = formatDateTime(newDate);
-                timeModal.classList.add('hidden');
-                updateInfo();
+        closeLocationModalBtn.addEventListener('click', () => {
+            locationModal.classList.add('hidden');
+            // Pastikan peta utama me-refresh ukuran setelah modal ditutup (jika visiblenya berubah)
+            if (mapInitialized) {
+                map.invalidateSize();
+            }
+        });
+        saveLocationBtn.addEventListener('click', () => {
+            // Parse latitude and longitude from input.value, strip S/N/E/W first
+            let latStr = latitudeInput.value.replace(/[SN]/g, '');
+            let lonStr = longitudeInput.value.replace(/[WE]/g, '');
+
+            let latVal = parseFloat(latStr);
+            let lonVal = parseFloat(lonStr);
+
+            // Apply negative sign if S or W was present in original string
+            if (latitudeInput.value.includes('S')) latVal = -Math.abs(latVal);
+            if (longitudeInput.value.includes('W')) lonVal = -Math.abs(lonVal);
+
+            locationData.latitude = isNaN(latVal) ? -6.175 : latVal; // Use initial default if parsing fails
+            locationData.longitude = isNaN(lonVal) ? 106.828 : lonVal; // Use initial default if parsing fails
+            locationData.street = streetInput.value.trim();
+            locationData.subDistrict = subDistrictInput.value.trim();
+            locationData.city = cityInput.value.trim();
+            locationData.province = provinceInput.value.trim();
+            
+            locationModal.classList.add('hidden');
+            updateInfo(); // Perbarui overlay setelah menyimpan lokasi
+        });
+
+        // Listener untuk tombol "Pilih Gambar"
+        selectFileBtn.addEventListener('click', () => fileInput.click());
+
+        // Listener saat file dipilih
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        captureImage(img); // Panggil captureImage dengan gambar dari file
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             }
         });
 
