@@ -3,43 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Call Grup (via Spreadsheet)</title>
+    <title>Video Call Grup Final</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #2c3e50; color: white; min-height: 100vh; box-sizing: border-box; margin: 0; }
         .hidden { display: none; }
+        #join-screen { text-align: center; max-width: 500px; }
         #join-screen h1 { font-size: 2em; }
         #join-screen p { margin-bottom: 20px; }
         .room-input { padding: 10px; font-size: 1.2em; text-align: center; border: 2px solid #3498db; border-radius: 5px; margin-right: 10px; }
         #join-btn { padding: 10px 20px; font-size: 1.2em; cursor: pointer; background-color: #3498db; color: white; border: none; border-radius: 5px; }
+        #join-btn:disabled { background-color: #95a5a6; }
         
         #call-screen h1 { margin-top: 0; }
         #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; width: 100%; max-width: 1200px; flex-grow: 1; }
-        video { width: 100%; height: auto; object-fit: cover; border: 3px solid #3498db; border-radius: 10px; background: #000; }
+        video { width: 100%; height: auto; object-fit: cover; border: 3px solid #3498db; border-radius: 10px; background: #000; transform: scaleX(-1); }
+        video.local-video { border-color: #2ecc71; }
+
         .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; background-color: #34495e; padding: 15px; border-radius: 10px; margin-top: 20px; position: sticky; bottom: 20px; z-index: 10; }
         button { padding: 8px 15px; border-radius: 5px; border: none; background-color: #3498db; color: white; cursor: pointer; font-weight: bold; }
         .control-btn { background-color: #2ecc71; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; }
-        .control-btn.disabled, #toggle-mic-btn.speaking { background-color: #e74c3c; }
+        .control-btn.disabled { background-color: #e74c3c; }
         #exit-btn { background-color: #c0392b; }
-        #room-info { background-color: #2c3e50; padding: 8px 15px; border-radius: 5px; }
+        #status-text { min-height: 24px; font-style: italic; color: #bdc3c7; }
     </style>
 </head>
 <body>
 
     <div id="join-screen">
-        <h1>Video Call Grup</h1>
+        <h1>Panggilan Video Grup</h1>
         <p>Masukkan ID Room untuk bergabung, atau biarkan kosong untuk membuat Room baru.</p>
         <div>
             <input type="text" id="room-id-input" class="room-input" placeholder="ID Room...">
             <button id="join-btn">Gabung</button>
         </div>
+        <p id="status-text"></p>
     </div>
 
     <div id="call-screen" class="hidden">
-        <h1>Video Call Grup</h1>
+        <h1 id="room-title"></h1>
         <div id="video-grid"></div>
         <div class="controls">
-            <div id="room-info"></div>
+            <button id="copy-room-btn">Copy Room ID</button>
             <button id="toggle-mic-btn" class="control-btn" title="Mute/Unmute Mic"><i class="fas fa-microphone"></i></button>
             <button id="toggle-cam-btn" class="control-btn" title="Turn On/Off Camera"><i class="fas fa-video"></i></button>
             <button id="exit-btn" class="control-btn" title="Keluar Panggilan"><i class="fas fa-phone-slash"></i></button>
@@ -48,161 +53,172 @@
 
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script>
-        // ######################################################################
-        // ## PASTE URL APLIKASI WEB ANDA DARI GOOGLE APPS SCRIPT DI SINI! ##
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZjswTzQBSlzdOtnbHYCp1LfltI9gO8WHaF9cVk6Sa_PSPvRX12-mbdYVg8dSOVjokiA/exec";
-        // ######################################################################
-
+        const SIGNALING_SERVER_URL = "wss://production-webrtc-signalling-gcp.fly.dev";
 
         const joinScreen = document.getElementById('join-screen');
         const callScreen = document.getElementById('call-screen');
         const joinBtn = document.getElementById('join-btn');
         const roomIdInput = document.getElementById('room-id-input');
+        const statusText = document.getElementById('status-text');
         const videoGrid = document.getElementById('video-grid');
-        const roomInfo = document.getElementById('room-info');
-        
-        let myPeer, myStream, roomId;
-        const peers = {};
-        let pollingInterval;
-        const POLLING_RATE_MS = 5000; // Bertanya ke server setiap 5 detik
+        const roomTitle = document.getElementById('room-title');
+        const copyRoomBtn = document.getElementById('copy-room-btn');
+        const exitBtn = document.getElementById('exit-btn');
+        const toggleMicBtn = document.getElementById('toggle-mic-btn');
+        const toggleCamBtn = document.getElementById('toggle-cam-btn');
 
-        // Saat tombol Gabung diklik
+        let myPeer, myStream, roomId, myPeerId;
+        let ws;
+        const peers = {}; // Menyimpan object 'call'
+
         joinBtn.addEventListener('click', () => {
             roomId = roomIdInput.value.trim();
             if (roomId === "") {
-                // Buat room ID acak jika kosong
                 roomId = Math.random().toString(36).substring(2, 9);
             }
-            
-            joinScreen.classList.add('hidden');
-            callScreen.classList.remove('hidden');
-            roomInfo.innerHTML = `<strong>Room:</strong> ${roomId} <button onclick="copyRoomId()">Copy ID</button>`;
-            
+            statusText.innerText = 'Memulai kamera...';
+            joinBtn.disabled = true;
             startCall();
         });
         
-        function copyRoomId() {
+        copyRoomBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(roomId);
-            alert("Room ID disalin!");
+            alert("Room ID disalin: " + roomId);
+        });
+
+        async function startCall() {
+            try {
+                myStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                addVideoStream(myStream, 'local', true);
+
+                statusText.innerText = 'Menghubungkan ke server PeerJS...';
+                myPeer = new Peer();
+
+                myPeer.on('open', (peerId) => {
+                    myPeerId = peerId;
+                    console.log("My Peer ID is:", myPeerId);
+                    connectToSignalingServer();
+                });
+
+                myPeer.on('call', call => {
+                    console.log("Menerima panggilan dari:", call.peer);
+                    call.answer(myStream);
+                    setupCallListeners(call);
+                });
+
+            } catch (err) {
+                console.error("Gagal memulai:", err);
+                statusText.innerText = "Gagal mengakses kamera/mic. Pastikan Anda memberi izin.";
+                joinBtn.disabled = false;
+            }
         }
 
-        function startCall() {
-            myPeer = new Peer(undefined, {
-                host: '0.peerjs.com', port: 443, path: '/', secure: true
-            });
-
-            myPeer.on('open', peerId => {
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-                .then(stream => {
-                    myStream = stream;
-                    addVideoStream(myStream, true); // Tambahkan video sendiri, 'true' untuk muted
-
-                    // Mulai proses signaling
-                    pollingInterval = setInterval(() => signalToServer(peerId), POLLING_RATE_MS);
-                    signalToServer(peerId); // Panggil sekali di awal
-
-                    // Menjawab panggilan masuk
-                    myPeer.on('call', call => {
-                        call.answer(myStream);
-                        call.on('stream', userVideoStream => {
-                            if (!peers[call.peer]) {
-                                addVideoStream(userVideoStream);
-                                peers[call.peer] = call;
-                            }
-                        });
-                        call.on('close', () => {
-                            removeVideoStream(call.peer);
-                        });
-                    });
-
-                }).catch(err => console.error("Gagal mengakses media:", err));
-            });
-        }
-        
-        // Fungsi utama untuk komunikasi dengan "server" Spreadsheet
-        async function signalToServer(peerId) {
-            // 1. Daftarkan diri kita ke server (POST)
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors', // Penting untuk Apps Script Web App
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ room: roomId, peerId: peerId })
-            });
-
-            // 2. Minta daftar teman di room (GET)
-            const response = await fetch(`${SCRIPT_URL}?room=${roomId}&peerId=${peerId}`);
-            const otherPeers = await response.json();
+        function connectToSignalingServer() {
+            statusText.innerText = 'Menghubungkan ke room...';
+            ws = new WebSocket(SIGNALING_SERVER_URL);
             
-            // 3. Panggil teman baru yang belum ada di daftar kita
-            otherPeers.forEach(otherPeerId => {
-                if (!peers[otherPeerId]) {
-                    connectToNewUser(otherPeerId, myStream);
-                }
-            });
+            ws.onopen = () => {
+                console.log("Terhubung ke signaling server");
+                ws.send(JSON.stringify({ type: 'join', room: roomId, peerId: myPeerId }));
+                
+                joinScreen.classList.add('hidden');
+                callScreen.classList.remove('hidden');
+                roomTitle.innerText = `Room: ${roomId}`;
+            };
 
-            // 4. (Opsional) Hapus teman yang sudah tidak ada di daftar server
-            Object.keys(peers).forEach(connectedPeerId => {
-                if (!otherPeers.includes(connectedPeerId)) {
-                    peers[connectedPeerId].close();
-                    removeVideoStream(connectedPeerId);
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                console.log("Pesan diterima:", message);
+
+                // Pesan 'session' dikirim saat kita pertama kali join, berisi semua user yang sudah ada
+                if (message.type === 'session') {
+                    message.peers.forEach(peerId => {
+                        if (peerId !== myPeerId) {
+                            connectToNewUser(peerId);
+                        }
+                    });
                 }
-            });
+                // Pesan 'user-joined' dikirim ke semua orang saat ada user baru masuk
+                else if (message.type === 'user-joined' && message.peerId !== myPeerId) {
+                     connectToNewUser(message.peerId);
+                } 
+                else if (message.type === 'user-left') {
+                    console.log("User keluar:", message.peerId);
+                    removeVideoStream(message.peerId);
+                }
+            };
+
+            ws.onclose = () => {
+                console.log("Koneksi ke signaling server terputus.");
+                alert("Koneksi ke room terputus.");
+            };
         }
 
-        function connectToNewUser(userId, stream) {
-            const call = myPeer.call(userId, stream);
-            call.on('stream', userVideoStream => {
-                if (!peers[call.peer]) { // Cek lagi untuk menghindari duplikat
-                    addVideoStream(userVideoStream);
-                    peers[call.peer] = call;
-                }
+        function connectToNewUser(peerId) {
+            if (peers[peerId]) return; // Jika sudah terhubung, jangan panggil lagi
+            console.log("Memanggil user baru:", peerId);
+            const call = myPeer.call(peerId, myStream);
+            setupCallListeners(call);
+        }
+
+        function setupCallListeners(call) {
+            const peerId = call.peer;
+            peers[peerId] = call;
+
+            call.on('stream', (userVideoStream) => {
+                console.log("Stream diterima dari:", peerId);
+                addVideoStream(userVideoStream, peerId);
             });
+
             call.on('close', () => {
-                removeVideoStream(call.peer);
+                console.log("Panggilan ditutup dari:", peerId);
+                removeVideoStream(peerId);
             });
-            peers[userId] = call;
+
+             call.on('error', (err) => {
+                console.error("Error panggilan dengan " + peerId, err);
+                removeVideoStream(peerId);
+            });
         }
 
-        function addVideoStream(stream, isMuted = false) {
+        function addVideoStream(stream, peerId, isMuted = false) {
+            if (document.querySelector(`video[data-peer-id="${peerId}"]`)) return;
             const video = document.createElement('video');
             video.srcObject = stream;
             video.muted = isMuted;
+            video.dataset.peerId = peerId;
+            if (isMuted) video.classList.add('local-video');
             video.addEventListener('loadedmetadata', () => video.play());
-            video.dataset.peerId = isMuted ? 'local' : stream.id; // Tandai video
             videoGrid.append(video);
         }
 
         function removeVideoStream(peerId) {
             if (peers[peerId]) {
-                const videoElements = document.querySelectorAll('video');
-                videoElements.forEach(video => {
-                    // Cari video yang sesuai (ini asumsi sederhana)
-                    if (video.srcObject.id === peers[peerId].remoteStream.id) {
-                        video.remove();
-                    }
-                });
+                peers[peerId].close();
                 delete peers[peerId];
             }
+            const videoToRemove = document.querySelector(`video[data-peer-id="${peerId}"]`);
+            if (videoToRemove) videoToRemove.remove();
         }
         
         // --- Kontrol Tombol ---
-        document.getElementById('toggle-mic-btn').addEventListener('click', () => {
+        toggleMicBtn.addEventListener('click', () => {
             const audioTrack = myStream.getAudioTracks()[0];
             audioTrack.enabled = !audioTrack.enabled;
-            // Style update (opsional)
-        });
-        document.getElementById('toggle-cam-btn').addEventListener('click', () => {
-            const videoTrack = myStream.getVideoTracks()[0];
-            videoTrack.enabled = !videoTrack.enabled;
-            // Style update (opsional)
-        });
-        document.getElementById('exit-btn').addEventListener('click', () => {
-            clearInterval(pollingInterval);
-            if (myStream) myStream.getTracks().forEach(track => track.stop());
-            if (myPeer) myPeer.destroy();
-            window.location.reload();
+            toggleMicBtn.classList.toggle('disabled', !audioTrack.enabled);
+            toggleMicBtn.querySelector('i').className = audioTrack.enabled ? 'fas fa-microphone' : 'fas fa-microphone-slash';
         });
 
+        toggleCamBtn.addEventListener('click', () => {
+            const videoTrack = myStream.getAudioTracks()[0];
+            videoTrack.enabled = !videoTrack.enabled;
+            toggleCamBtn.classList.toggle('disabled', !videoTrack.enabled);
+            toggleCamBtn.querySelector('i').className = videoTrack.enabled ? 'fas fa-video' : 'fas fa-video-slash';
+        });
+
+        exitBtn.addEventListener('click', () => {
+            window.location.reload();
+        });
     </script>
 </body>
 </html>
