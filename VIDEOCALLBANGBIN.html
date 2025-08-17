@@ -338,7 +338,11 @@
                         };
                     });
 
+                    // === PERBAIKAN: Mengelola koneksi data yang masuk ===
                     myPeer.on('connection', conn => {
+                        if (peers[conn.peer]) {
+                            peers[conn.peer].dataConnection = conn;
+                        }
                         conn.on('data', data => handleData(data, conn.peer));
                     });
 
@@ -619,11 +623,25 @@
             }
         }
 
+        // === PERBAIKAN: Fungsi sendCommand yang lebih andal ===
         function sendCommand(peerId, command, payload = {}) {
-            const conn = myPeer.connect(peerId);
-            conn.on('open', () => {
-                conn.send({ command, payload });
-            });
+            const existingConn = peers[peerId]?.dataConnection;
+
+            if (existingConn && existingConn.open) {
+                existingConn.send({ command, payload });
+            } else {
+                const newConn = myPeer.connect(peerId);
+                newConn.on('open', () => {
+                    if (peers[peerId]) {
+                        peers[peerId].dataConnection = newConn;
+                    }
+                    newConn.send({ command, payload });
+                });
+                newConn.on('data', data => handleData(data, peerId));
+                newConn.on('error', (err) => {
+                    console.error(`Koneksi data ke ${peerId} gagal: `, err);
+                });
+            }
         }
         
         function sendCommandToAll(command, payload = {}) {
