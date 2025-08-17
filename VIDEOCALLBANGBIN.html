@@ -3,348 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konferensi Video WebRTC</title>
-    <!-- Memuat Tailwind CSS untuk styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Memuat Font Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Video Call Grup dengan Kontrol</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #2c3e50; color: white; min-height: 100vh; box-sizing: border-box; margin: 0; }
+        h1 { margin-top: 0; }
+        #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; width: 100%; max-width: 1200px; flex-grow: 1; }
+        video { width: 100%; height: auto; object-fit: cover; border: 3px solid #3498db; border-radius: 10px; background: #000; }
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; background-color: #34495e; padding: 15px; border-radius: 10px; margin-top: 20px; position: sticky; bottom: 20px; z-index: 10; }
+        input[type="text"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 8px 15px; border-radius: 5px; border: none; background-color: #3498db; color: white; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+        button:hover { background-color: #2980b9; }
+
+        /* 2. CSS untuk Tombol Ikon Kontrol Baru */
+        .control-btn {
+            background-color: #2ecc71; /* Warna hijau untuk aktif */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        /* Style untuk video agar tidak terbalik (efek cermin) */
-        .remote-video {
-            transform: scaleX(-1);
+        .control-btn:hover {
+            background-color: #27ae60;
         }
-        /* Style untuk video lokal (diri sendiri) agar seperti cermin */
-        #local-video {
-            transform: scaleX(-1);
+        .control-btn.disabled {
+            background-color: #e74c3c; /* Warna merah untuk nonaktif */
         }
-        /* Grid dinamis untuk video peserta */
-        #video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
-            transition: all 0.3s ease-in-out;
+         .control-btn.disabled:hover {
+            background-color: #c0392b;
         }
+        /* Kelas 'speaking' akan ditambahkan oleh JS saat suara terdeteksi */
+        #toggle-mic-btn.speaking {
+            background-color: #e74c3c; /* Warna merah saat berbicara */
+            box-shadow: 0 0 15px #e74c3c;
+        }
+
+        #notification { position: fixed; top: 20px; background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 5px; display: none; transition: opacity 0.5s; z-index: 10; }
     </style>
 </head>
-<body class="bg-gray-900 text-white flex flex-col h-screen antialiased">
+<body>
 
-    <!-- Kontainer utama untuk video -->
-    <main class="flex-1 p-4 flex items-center justify-center">
-        <div id="video-grid" class="w-full h-full">
-            <!-- Video Lokal (Anda) -->
-            <div class="relative bg-black rounded-lg overflow-hidden shadow-lg">
-                <video id="local-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
-                <div class="absolute bottom-2 left-2 bg-black bg-opacity-50 px-2 py-1 rounded-md text-sm">
-                    <span id="local-user-id">Anda</span>
-                </div>
-            </div>
-            <!-- Video dari peserta lain akan ditambahkan di sini -->
+    <h1>Video Call Grup</h1>
+    <p>Bagikan ID Anda atau masukkan ID teman untuk bergabung.</p>
+
+    <div id="video-grid">
         </div>
-    </main>
 
-    <!-- Bar Kontrol di Bawah -->
-    <footer class="bg-gray-800 bg-opacity-70 p-4 flex justify-center items-center space-x-4">
-        <button id="mic-btn" class="p-3 bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 transition-colors">
-            <!-- Ikon Mikrofon -->
-            <svg id="mic-on-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-            <svg id="mic-off-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 14.154l-2.147-6.15m0 0A1.76 1.76 0 0113.417 8H14.5a1.76 1.76 0 011.76 1.76v.003M11 5.882a1.76 1.76 0 012.894.863l3.443 9.844a1.76 1.76 0 01-3.194.996l-3.443-9.844A1.76 1.76 0 0111 5.882z"></path></svg>
-        </button>
-        <button id="video-btn" class="p-3 bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 transition-colors">
-            <!-- Ikon Kamera -->
-            <svg id="video-on-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-            <svg id="video-off-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c1.667 0 3.223.42 4.695 1.142m3.124 3.124A11.04 11.04 0 0121.542 12c-1.274 4.057-5.064 7-9.542 7-1.667 0-3.223-.42-4.695-1.142m-3.124-3.124A11.036 11.036 0 012.458 12z"></path></svg>
-        </button>
-        <button id="end-call-btn" class="p-3 bg-red-600 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-red-500 transition-colors">
-            <!-- Ikon Tutup Telepon -->
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3.707 3.707a1 1 0 00-1.414 1.414L8.586 10l-6.293 6.293a1 1 0 101.414 1.414L10 11.414l6.293 6.293a1 1 0 001.414-1.414L11.414 10l6.293-6.293a1 1 0 00-1.414-1.414L10 8.586 3.707 3.707z"></path></svg>
-        </button>
-    </footer>
+    <div class="controls">
+        <strong>ID Anda:</strong> <span id="my-id">Memuat...</span>
+        <button id="copy-btn">Copy ID</button>
+        <input type="text" id="peer-id-input" placeholder="Masukkan ID teman">
+        <button id="call-btn">Panggil / Gabung</button>
 
-    <!-- Modal untuk notifikasi -->
-    <div id="notification-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-lg p-8 shadow-xl max-w-sm mx-auto text-center">
-            <h3 id="notification-title" class="text-xl font-bold mb-4">Pemberitahuan</h3>
-            <p id="notification-message" class="text-gray-300 mb-6"></p>
-            <button id="notification-close-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Tutup</button>
-        </div>
+        <button id="toggle-mic-btn" class="control-btn" title="Mute/Unmute Mic">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button id="toggle-cam-btn" class="control-btn" title="Turn On/Off Camera">
+            <i class="fas fa-video"></i>
+        </button>
     </div>
 
+    <div id="notification">ID berhasil disalin!</div>
 
-    <!-- PENTING: Anda perlu menyertakan library client Socket.IO -->
-    <!-- Jika server Anda berjalan di domain yang sama: <script src="/socket.io/socket.io.js"></script> -->
-    <!-- Atau dari CDN: -->
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script>
-        // --- Elemen DOM ---
-        const localVideo = document.getElementById('local-video');
         const videoGrid = document.getElementById('video-grid');
-        const localUserIdElement = document.getElementById('local-user-id');
-        
-        // Tombol Kontrol
-        const micBtn = document.getElementById('mic-btn');
-        const videoBtn = document.getElementById('video-btn');
-        const endCallBtn = document.getElementById('end-call-btn');
+        const myIdDisplay = document.getElementById('my-id');
+        const copyBtn = document.getElementById('copy-btn');
+        const peerIdInput = document.getElementById('peer-id-input');
+        const callBtn = document.getElementById('call-btn');
+        const notification = document.getElementById('notification');
+        // Referensi ke tombol ikon baru
+        const toggleMicBtn = document.getElementById('toggle-mic-btn');
+        const toggleCamBtn = document.getElementById('toggle-cam-btn');
 
-        // Ikon Tombol
-        const micOnIcon = document.getElementById('mic-on-icon');
-        const micOffIcon = document.getElementById('mic-off-icon');
-        const videoOnIcon = document.getElementById('video-on-icon');
-        const videoOffIcon = document.getElementById('video-off-icon');
+        const myPeer = new Peer(undefined, {
+            host: '0.peerjs.com', port: 443, path: '/', secure: true
+        });
 
-        // Modal Notifikasi
-        const notificationModal = document.getElementById('notification-modal');
-        const notificationTitle = document.getElementById('notification-title');
-        const notificationMessage = document.getElementById('notification-message');
-        const notificationCloseBtn = document.getElementById('notification-close-btn');
+        const myVideo = document.createElement('video');
+        myVideo.muted = true;
+        const peers = {};
 
-        // --- Variabel & Konfigurasi WebRTC ---
-        let localStream;
-        let myPeerId;
-        const peerConnections = {}; // Menyimpan semua koneksi peer
+        let myStream;
 
-        // Konfigurasi server STUN/TURN. Server STUN publik dari Google digunakan di sini.
-        const configuration = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        };
+        navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        }).then(stream => {
+            myStream = stream;
+            addVideoStream(myVideo, stream);
+            setupAudioVisualizer(); // Panggil fungsi untuk deteksi suara
 
-        // --- Koneksi ke Server Sinyal (Signaling Server) ---
-        // PENTING: Ganti URL ini dengan alamat server sinyal Anda.
-        // Server sinyal diperlukan untuk koordinasi antar pengguna (peer).
-        const SIGNALING_SERVER_URL = 'wss://your-webrtc-signaling-server.com'; // CONTOH URL, HARUS DIGANTI
-        
-        // Untuk tujuan demonstrasi, kita akan membuat objek socket palsu.
-        // Dalam aplikasi nyata, Anda akan menggunakan: const socket = io(SIGNALING_SERVER_URL);
-        const socket = {
-            on: (event, callback) => console.log(`[Socket.IO Mock] Listener untuk '${event}' terpasang.`),
-            emit: (event, data) => console.log(`[Socket.IO Mock] Mengirim event '${event}' dengan data:`, data),
-            id: `user_${Math.random().toString(36).substr(2, 9)}`
-        };
-        
-        // --- Fungsi Utama ---
-
-        // Fungsi untuk menampilkan notifikasi
-        function showNotification(title, message) {
-            notificationTitle.textContent = title;
-            notificationMessage.textContent = message;
-            notificationModal.classList.remove('hidden');
-        }
-
-        // Fungsi untuk memulai media (kamera & mikrofon)
-        async function startMedia() {
-            try {
-                // Meminta akses ke media stream (video dan audio)
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localVideo.srcObject = localStream;
-                localUserIdElement.textContent = `Anda (${socket.id})`;
-                myPeerId = socket.id;
-
-                // Setelah media berhasil didapat, hubungkan ke server sinyal
-                connectToSignalingServer();
-
-            } catch (error) {
-                console.error("Gagal mengakses media devices:", error);
-                showNotification(
-                    "Akses Ditolak",
-                    "Aplikasi ini memerlukan izin untuk mengakses kamera dan mikrofon Anda. Mohon segarkan halaman dan berikan izin."
-                );
-            }
-        }
-
-        // Fungsi untuk terhubung ke server sinyal
-        function connectToSignalingServer() {
-            // Dalam aplikasi nyata, koneksi akan terjadi di sini
-            // const socket = io(SIGNALING_SERVER_URL);
+            myPeer.on('call', call => {
+                call.answer(stream);
+                const video = document.createElement('video');
+                call.on('stream', userVideoStream => {
+                    addVideoStream(video, userVideoStream);
+                });
+                call.on('close', () => { video.remove(); });
+                peers[call.peer] = call;
+            });
             
-            // Memberi tahu server bahwa kita siap
-            socket.emit('ready', { room: 'default-room', peerId: myPeerId });
-
-            // --- Menangani Event dari Server Sinyal ---
-
-            // 1. Saat ada pengguna baru yang bergabung
-            socket.on('user-joined', (data) => {
-                const { peerId } = data;
-                console.log(`Pengguna baru bergabung: ${peerId}. Membuat offer...`);
-                
-                const peerConnection = createPeerConnection(peerId);
-                
-                // Buat offer untuk dikirim ke pengguna baru
-                peerConnection.createOffer()
-                    .then(offer => peerConnection.setLocalDescription(offer))
-                    .then(() => {
-                        socket.emit('offer', { 
-                            target: peerId, 
-                            caller: myPeerId, 
-                            sdp: peerConnection.localDescription 
-                        });
-                    })
-                    .catch(e => console.error("Error creating offer:", e));
-            });
-
-            // 2. Saat menerima 'offer' dari pengguna lain
-            socket.on('offer', (data) => {
-                const { caller, sdp } = data;
-                console.log(`Menerima offer dari: ${caller}`);
-
-                const peerConnection = createPeerConnection(caller);
-                peerConnection.setRemoteDescription(new RTCSessionDescription(sdp))
-                    .then(() => peerConnection.createAnswer())
-                    .then(answer => peerConnection.setLocalDescription(answer))
-                    .then(() => {
-                        socket.emit('answer', { 
-                            target: caller, 
-                            callee: myPeerId, 
-                            sdp: peerConnection.localDescription 
-                        });
-                    })
-                    .catch(e => console.error("Error processing offer:", e));
-            });
-
-            // 3. Saat menerima 'answer' dari pengguna lain
-            socket.on('answer', (data) => {
-                const { callee, sdp } = data;
-                console.log(`Menerima answer dari: ${callee}`);
-                const peerConnection = peerConnections[callee];
-                peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
-            });
-
-            // 4. Saat menerima 'ice-candidate'
-            socket.on('ice-candidate', (data) => {
-                const { sender, candidate } = data;
-                const peerConnection = peerConnections[sender];
-                peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-            });
-
-            // 5. Saat pengguna lain keluar
-            socket.on('user-left', (data) => {
-                const { peerId } = data;
-                console.log(`Pengguna keluar: ${peerId}`);
-                if (peerConnections[peerId]) {
-                    peerConnections[peerId].close();
-                    delete peerConnections[peerId];
-                }
-                const videoElement = document.getElementById(`video-${peerId}`);
-                if (videoElement) {
-                    videoElement.parentElement.remove();
+            callBtn.addEventListener('click', () => {
+                const friendId = peerIdInput.value;
+                if (friendId && !peers[friendId]) {
+                    connectToNewUser(friendId, stream);
                 }
             });
-        }
-        
-        // Fungsi untuk membuat koneksi peer baru
-        function createPeerConnection(peerId) {
-            const peerConnection = new RTCPeerConnection(configuration);
-            peerConnections[peerId] = peerConnection;
+        }).catch(err => {
+            console.error("Gagal mengakses media: ", err);
+            alert("Tidak bisa mengakses kamera/mikrofon. Pastikan Anda memberikan izin.");
+        });
 
-            // Tambahkan stream lokal ke koneksi agar peer lain bisa melihat kita
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
+        myPeer.on('open', id => {
+            myIdDisplay.textContent = id;
+        });
+
+        function connectToNewUser(userId, stream) {
+            const call = myPeer.call(userId, stream);
+            const video = document.createElement('video');
+            call.on('stream', userVideoStream => {
+                addVideoStream(video, userVideoStream);
             });
-
-            // Handler ketika menerima stream dari peer lain
-            peerConnection.ontrack = (event) => {
-                addRemoteVideo(peerId, event.streams[0]);
-            };
-
-            // Handler untuk mengumpulkan ICE candidates
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socket.emit('ice-candidate', {
-                        target: peerId,
-                        sender: myPeerId,
-                        candidate: event.candidate
-                    });
-                }
-            };
-            
-            return peerConnection;
+            call.on('close', () => {
+                video.remove();
+                delete peers[userId];
+            });
+            peers[userId] = call;
         }
 
-        // Fungsi untuk menambahkan elemen video remote
-        function addRemoteVideo(peerId, stream) {
-            // Cek jika elemen video sudah ada
-            if (document.getElementById(`video-${peerId}`)) return;
-
-            const videoContainer = document.createElement('div');
-            videoContainer.className = 'relative bg-black rounded-lg overflow-hidden shadow-lg';
-            
-            const remoteVideo = document.createElement('video');
-            remoteVideo.id = `video-${peerId}`;
-            remoteVideo.srcObject = stream;
-            remoteVideo.autoplay = true;
-            remoteVideo.playsInline = true;
-            remoteVideo.className = 'w-full h-full object-cover remote-video';
-            
-            const nameTag = document.createElement('div');
-            nameTag.className = 'absolute bottom-2 left-2 bg-black bg-opacity-50 px-2 py-1 rounded-md text-sm';
-            nameTag.textContent = peerId;
-
-            videoContainer.appendChild(remoteVideo);
-            videoContainer.appendChild(nameTag);
-            videoGrid.appendChild(videoContainer);
+        function addVideoStream(video, stream) {
+            video.srcObject = stream;
+            video.addEventListener('loadedmetadata', () => {
+                video.play();
+            });
+            videoGrid.append(video);
         }
 
-        // --- Event Listeners untuk Kontrol ---
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(myIdDisplay.textContent).then(() => {
+                notification.style.display = 'block';
+                setTimeout(() => { notification.style.display = 'none'; }, 2000);
+            });
+        });
+        
+        // --- 4. LOGIKA BARU UNTUK KONTROL MIC & KAMERA ---
 
-        // Tombol Mute/Unmute Mikrofon
-        micBtn.addEventListener('click', () => {
-            const audioTrack = localStream.getAudioTracks()[0];
+        // Fungsi untuk toggle Mikrofon
+        toggleMicBtn.addEventListener('click', () => {
+            const audioTrack = myStream.getAudioTracks()[0];
+            const icon = toggleMicBtn.querySelector('i');
+
             if (audioTrack.enabled) {
                 audioTrack.enabled = false;
-                micOnIcon.classList.add('hidden');
-                micOffIcon.classList.remove('hidden');
+                icon.className = 'fas fa-microphone-slash';
+                toggleMicBtn.classList.add('disabled');
             } else {
                 audioTrack.enabled = true;
-                micOnIcon.classList.remove('hidden');
-                micOffIcon.classList.add('hidden');
+                icon.className = 'fas fa-microphone';
+                toggleMicBtn.classList.remove('disabled');
             }
         });
 
-        // Tombol On/Off Video
-        videoBtn.addEventListener('click', () => {
-            const videoTrack = localStream.getVideoTracks()[0];
+        // Fungsi untuk toggle Kamera
+        toggleCamBtn.addEventListener('click', () => {
+            const videoTrack = myStream.getVideoTracks()[0];
+            const icon = toggleCamBtn.querySelector('i');
+
             if (videoTrack.enabled) {
                 videoTrack.enabled = false;
-                videoOnIcon.classList.add('hidden');
-                videoOffIcon.classList.remove('hidden');
+                icon.className = 'fas fa-video-slash';
+                toggleCamBtn.classList.add('disabled');
             } else {
                 videoTrack.enabled = true;
-                videoOnIcon.classList.remove('hidden');
-                videoOffIcon.classList.add('hidden');
+                icon.className = 'fas fa-video';
+                toggleCamBtn.classList.remove('disabled');
             }
         });
+        
+        // Fungsi untuk deteksi suara dan mengubah warna ikon mic
+        function setupAudioVisualizer() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const microphone = audioContext.createMediaStreamSource(myStream);
+            
+            // Konfigurasi analyser
+            analyser.fftSize = 512;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            // Hubungkan sumber mic ke analyser
+            microphone.connect(analyser);
+            
+            const detectSpeaking = () => {
+                // Cek apakah mic sedang aktif
+                const isMicEnabled = myStream.getAudioTracks()[0]?.enabled || false;
+                if (!isMicEnabled) {
+                     toggleMicBtn.classList.remove('speaking');
+                     requestAnimationFrame(detectSpeaking); // Tetap jalankan loop
+                     return;
+                }
 
-        // Tombol Tutup Panggilan
-        endCallBtn.addEventListener('click', () => {
-            // Tutup semua koneksi peer
-            for (const peerId in peerConnections) {
-                peerConnections[peerId].close();
-            }
-            // Hentikan stream lokal
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-            // Beri tahu server bahwa kita keluar
-            socket.emit('leave');
-            // Arahkan ke halaman kosong atau halaman utama
-            window.location.href = 'about:blank';
-        });
+                analyser.getByteFrequencyData(dataArray);
 
-        // Tombol tutup notifikasi
-        notificationCloseBtn.addEventListener('click', () => {
-            notificationModal.classList.add('hidden');
-        });
+                let sum = 0;
+                for(let i = 0; i < bufferLength; i++) {
+                    sum += dataArray[i];
+                }
+                let avg = sum / bufferLength;
 
-        // --- Inisialisasi Aplikasi ---
-        // Memulai proses saat halaman selesai dimuat
-        window.onload = startMedia;
+                // Jika rata-rata volume di atas ambang batas (misal: 20), anggap sedang berbicara
+                if (avg > 20) {
+                    toggleMicBtn.classList.add('speaking');
+                } else {
+                    toggleMicBtn.classList.remove('speaking');
+                }
+
+                // Terus panggil fungsi ini untuk deteksi real-time
+                requestAnimationFrame(detectSpeaking);
+            };
+
+            detectSpeaking(); // Mulai deteksi
+        }
+
     </script>
 </body>
 </html>
