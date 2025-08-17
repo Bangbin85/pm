@@ -3,81 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">    
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">   
     <title>BANGBIN VIDEO CALL</title>
     <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background-color: #2c3e50;
-            color: white;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        #video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
-            width: 100%;
-            max-width: 1200px;
-            margin-top: 20px;
-        }
-        video {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            border: 3px solid #3498db;
-            border-radius: 10px;
-            background: #000;
-        }
-        .controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background-color: #34495e;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        #my-id-container button {
-            margin-left: 10px;
-        }
-        button {
-            padding: 8px 15px;
-            border-radius: 5px;
-            border: none;
-            background-color: #3498db;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        #notification {
-            position: fixed;
-            top: 20px;
-            background-color: #2ecc71;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            display: none;
-            transition: opacity 0.5s;
-        }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #2c3e50; color: white; min-height: 100vh; box-sizing: border-box; margin: 0; }
+        #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; width: 100%; max-width: 1200px; margin-top: 20px; }
+        video { width: 100%; height: auto; object-fit: cover; border: 3px solid #3498db; border-radius: 10px; background: #000; }
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; background-color: #34495e; padding: 15px; border-radius: 10px; margin-top: 20px; }
+        input[type="text"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 8px 15px; border-radius: 5px; border: none; background-color: #3498db; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #2980b9; }
+        #notification { position: fixed; top: 20px; background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 5px; display: none; transition: opacity 0.5s; z-index: 10; }
     </style>
 </head>
 <body>
 
     <h1>BANGBIN VIDEO CALL</h1>
-    <p>Bagikan ID Anda ke teman agar mereka bisa bergabung.</p>
+    <p>Bagikan ID Anda atau masukkan ID teman untuk bergabung.</p>
 
     <div class="controls">
-        <strong id="my-id-label">ID Anda:</strong>
-        <span id="my-id">Memuat...</span>
+        <strong>ID Anda:</strong> <span id="my-id">Memuat...</span>
         <button id="copy-btn">Copy ID</button>
+        <input type="text" id="peer-id-input" placeholder="Masukkan ID teman">
+        <button id="call-btn">Panggil / Gabung</button>
     </div>
 
     <div id="video-grid">
@@ -86,31 +34,37 @@
     <div id="notification">ID berhasil disalin!</div>
 
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-
     <script>
         const videoGrid = document.getElementById('video-grid');
         const myIdDisplay = document.getElementById('my-id');
         const copyBtn = document.getElementById('copy-btn');
+        const peerIdInput = document.getElementById('peer-id-input');
+        const callBtn = document.getElementById('call-btn');
         const notification = document.getElementById('notification');
         
-        // Buat ID unik untuk setiap pengunjung
         const myPeer = new Peer(undefined, {
-            host: '/',
-            port: '9000' // PeerJS Server default, bisa ganti jika Anda host sendiri
+             // Opsi untuk menggunakan server PeerJS publik gratis
+            host: '0.peerjs.com',
+            port: 443,
+            path: '/',
+            secure: true
         });
 
         const myVideo = document.createElement('video');
-        myVideo.muted = true; // Matikan suara video sendiri
-        const peers = {}; // Objek untuk menyimpan koneksi ke peer lain
+        myVideo.muted = true;
+        const peers = {}; // Menyimpan koneksi agar tidak duplikat
 
-        // 1. Minta akses kamera dan mikrofon
+        let myStream;
+
+        // 1. Minta akses media
         navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true
         }).then(stream => {
+            myStream = stream;
             addVideoStream(myVideo, stream);
 
-            // 2. Menjawab panggilan yang masuk dari user baru
+            // 2. Jawab panggilan yang masuk
             myPeer.on('call', call => {
                 call.answer(stream);
                 const video = document.createElement('video');
@@ -122,21 +76,20 @@
                 });
                 peers[call.peer] = call;
             });
-
-            // 3. User baru terhubung ke user lain yang sudah ada
-            // (Kita akan handle ini menggunakan URL)
+            
+            // 3. FUNGSI UNTUK MEMANGGIL/GABUNG
+            callBtn.addEventListener('click', () => {
+                const friendId = peerIdInput.value;
+                if (friendId && !peers[friendId]) { // Cek jika sudah terhubung
+                    connectToNewUser(friendId, stream);
+                }
+            });
         });
 
-        // Tampilkan ID unik ke layar
         myPeer.on('open', id => {
             myIdDisplay.textContent = id;
-            // Dapatkan ID user lain dari URL untuk dihubungi
-            const friendId = prompt("Masukkan ID teman yang ingin dihubungi (atau biarkan kosong jika Anda yang pertama):");
-            if(friendId) {
-                connectToNewUser(friendId, myPeer.id);
-            }
         });
-
+        
         function connectToNewUser(userId, stream) {
             const call = myPeer.call(userId, stream);
             const video = document.createElement('video');
@@ -145,6 +98,7 @@
             });
             call.on('close', () => {
                 video.remove();
+                delete peers[userId]; // Hapus dari daftar saat koneksi ditutup
             });
             peers[userId] = call;
         }
@@ -157,18 +111,13 @@
             videoGrid.append(video);
         }
 
-        // Fungsi Tombol Copy ID
         copyBtn.addEventListener('click', () => {
-            const myId = myIdDisplay.textContent;
-            navigator.clipboard.writeText(myId).then(() => {
+            navigator.clipboard.writeText(myIdDisplay.textContent).then(() => {
                 notification.style.display = 'block';
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 2000); // Sembunyikan notifikasi setelah 2 detik
-            }).catch(err => {
-                console.error('Gagal menyalin ID:', err);
+                setTimeout(() => { notification.style.display = 'none'; }, 2000);
             });
         });
+
     </script>
 </body>
 </html>
