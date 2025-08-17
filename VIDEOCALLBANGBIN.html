@@ -301,7 +301,7 @@
                     }
 
                     myPeer.on('call', call => {
-                        const { name: callerName, isVideoEnabled: callerIsVideoEnabled } = call.metadata;
+                        const { name: callerName, isVideoEnabled: callerIsVideoEnabled, allPeers } = call.metadata;
                         call.answer(stream);
                         const video = document.createElement('video');
                         call.on('stream', userVideoStream => {
@@ -310,39 +310,35 @@
                         call.on('close', () => {
                             const container = document.querySelector(`[data-peer-id="${call.peer}"]`);
                             if (container) container.remove();
+                            sendCommandToAll('user_disconnected', { peerId: call.peer });
                             delete peers[call.peer];
                         });
                         
+                        // === PERBAIKAN LOGIKA KONEKSI ===
                         if (userRole === 'admin') {
-                            for (const existingPeerId in peers) {
-                                sendCommand(existingPeerId, 'connect_to_peer', { 
-                                    peerId: call.peer, 
-                                    name: callerName, 
-                                    isVideoEnabled: callerIsVideoEnabled 
-                                });
-                            }
-                            for (const existingPeerId in peers) {
-                                const existingPeer = peers[existingPeerId];
-                                sendCommand(call.peer, 'connect_to_peer', {
-                                    peerId: existingPeerId,
-                                    name: existingPeer.name,
-                                    isVideoEnabled: existingPeer.isVideoEnabled
-                                });
-                            }
+                            // Kirim daftar semua peserta yang sudah ada ke peserta baru
+                            const peerList = Object.keys(peers).map(peerId => ({
+                                peerId,
+                                name: peers[peerId].name,
+                                isVideoEnabled: peers[peerId].isVideoEnabled
+                            }));
+                            sendCommand(call.peer, 'connect_to_list', { peers: peerList });
+                            
+                            // Beri tahu semua peserta lama tentang peserta baru
+                            sendCommandToAll('new_user_joined', {
+                                peerId: call.peer,
+                                name: callerName,
+                                isVideoEnabled: callerIsVideoEnabled
+                            });
                         }
                         
-                        peers[call.peer] = { 
-                            call, 
-                            name: callerName, 
-                            isVideoEnabled: callerIsVideoEnabled 
-                        };
+                        if (!peers[call.peer]) peers[call.peer] = {};
+                        peers[call.peer].call = call;
+                        peers[call.peer].name = callerName;
+                        peers[call.peer].isVideoEnabled = callerIsVideoEnabled;
                     });
 
-                    // === PERBAIKAN: Mengelola koneksi data yang masuk ===
                     myPeer.on('connection', conn => {
-                        if (peers[conn.peer]) {
-                            peers[conn.peer].dataConnection = conn;
-                        }
                         conn.on('data', data => handleData(data, conn.peer));
                     });
 
@@ -519,8 +515,19 @@
                         { text: 'OK', class: 'primary', callback: () => window.location.reload() }
                     ]);
                     break;
-                case 'connect_to_peer':
+                // === PERBAIKAN: Perintah baru untuk peserta ===
+                case 'new_user_joined':
                     connectToNewUser(data.payload.peerId, myStream);
+                    break;
+                case 'connect_to_list':
+                    data.payload.peers.forEach(peerInfo => {
+                        connectToNewUser(peerInfo.peerId, myStream);
+                    });
+                    break;
+                case 'user_disconnected':
+                    const container = document.querySelector(`[data-peer-id="${data.payload.peerId}"]`);
+                    if (container) container.remove();
+                    delete peers[data.payload.peerId];
                     break;
                 case 'status_update':
                     const statusContainer = document.querySelector(`[data-peer-id="${data.payload.peerId}"]`);
@@ -552,11 +559,13 @@
         }
 
         function connectToNewUser(userId, stream) {
-            if (peers[userId] || userId === myPeer.id) return;
+            if (peers[userId]?.call || userId === myPeer.id) return;
+            
             const myCurrentVideoStatus = myStream.getVideoTracks()[0].enabled;
             const call = myPeer.call(userId, stream, { metadata: { name: myName, isVideoEnabled: myCurrentVideoStatus } });
-            const video = document.createElement('video');
+            
             if(call){
+                const video = document.createElement('video');
                 call.on('stream', userVideoStream => {
                     addVideoStream(video, userVideoStream, userId, call.metadata.name, call.metadata.isVideoEnabled);
                 });
@@ -565,11 +574,11 @@
                     if (container) container.remove();
                     delete peers[userId];
                 });
-                peers[userId] = { 
-                    call, 
-                    name: call.metadata.name, 
-                    isVideoEnabled: call.metadata.isVideoEnabled 
-                };
+                
+                if (!peers[userId]) peers[userId] = {};
+                peers[userId].call = call;
+                peers[userId].name = call.metadata.name;
+                peers[userId].isVideoEnabled = call.metadata.isVideoEnabled;
             }
         }
 
@@ -623,25 +632,11 @@
             }
         }
 
-        // === PERBAIKAN: Fungsi sendCommand yang lebih andal ===
         function sendCommand(peerId, command, payload = {}) {
-            const existingConn = peers[peerId]?.dataConnection;
-
-            if (existingConn && existingConn.open) {
-                existingConn.send({ command, payload });
-            } else {
-                const newConn = myPeer.connect(peerId);
-                newConn.on('open', () => {
-                    if (peers[peerId]) {
-                        peers[peerId].dataConnection = newConn;
-                    }
-                    newConn.send({ command, payload });
-                });
-                newConn.on('data', data => handleData(data, peerId));
-                newConn.on('error', (err) => {
-                    console.error(`Koneksi data ke ${peerId} gagal: `, err);
-                });
-            }
+            const conn = myPeer.connect(peerId, { reliable: true });
+            conn.on('open', () => {
+                conn.send({ command, payload });
+            });
         }
         
         function sendCommandToAll(command, payload = {}) {
