@@ -14,12 +14,18 @@
         #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 100; }
         #login-box { background-color: var(--secondary-bg); padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
         #login-box h2 { margin-top: 0; }
-        .input-group { position: relative; margin: 20px 0; } /* === PERUBAHAN CSS: Menambahkan position relative === */
-        .input-group input { width: calc(100% - 20px); padding: 10px; border-radius: 5px; border: none; }
+        .input-group { position: relative; margin: 20px 0; }
+        /* === PERBAIKAN CSS: Menyamakan ukuran semua input === */
+        .input-group input {
+            box-sizing: border-box; /* Memastikan padding termasuk dalam total lebar */
+            width: 100%; /* Lebar input menjadi 100% dari parent */
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
         #login-submit { width: 100%; padding: 12px; border-radius: 5px; border: none; background-color: var(--accent-color); color: white; cursor: pointer; font-weight: bold; font-size: 1em; }
         #login-error { color: var(--danger-color); margin-top: 10px; display: none; }
         
-        /* === PENAMBAHAN CSS BARU: Ikon Mata Password === */
         #toggle-password {
             position: absolute;
             right: 10px;
@@ -27,11 +33,10 @@
             transform: translateY(-50%);
             cursor: pointer;
             color: #95a5a6;
-            width: 20px; /* Menambahkan lebar agar mudah diklik */
             text-align: center;
         }
         #password-input {
-            padding-right: 40px; /* Memberi ruang untuk ikon */
+            padding-right: 40px; /* Memberi ruang untuk ikon di dalam input */
         }
 
 
@@ -148,7 +153,6 @@
                 <div class="input-group">
                     <input type="text" id="room-id-input" placeholder="Masukkan ID Rapat" required>
                 </div>
-                <!-- === PERUBAHAN HTML: Menambahkan ikon mata di dalam input group === -->
                 <div class="input-group">
                     <input type="password" id="password-input" placeholder="Masukkan Password" required>
                     <i class="fas fa-eye" id="toggle-password"></i>
@@ -200,7 +204,7 @@
         const videoBtn = document.getElementById('video-btn');
         const leaveBtn = document.getElementById('leave-btn');
         const micSelect = document.getElementById('mic-select');
-        const togglePassword = document.getElementById('toggle-password'); // === ELEMEN BARU ===
+        const togglePassword = document.getElementById('toggle-password');
 
         const ADMIN_PASSWORD = "BANGBIN123";
         const PARTICIPANT_PASSWORD = "PPESERTA123";
@@ -240,7 +244,6 @@
             modalOverlay.style.display = 'flex';
         }
 
-        // === PENAMBAHAN BARU: Event Listener untuk ikon mata ===
         togglePassword.addEventListener('click', function () {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
@@ -278,48 +281,68 @@
             roleBadge.textContent = userRole.toUpperCase();
             roomIdDisplay.textContent = roomId;
 
-            const peerId = (userRole === 'admin') ? roomId : `${roomId}-${Date.now()}`;
+            const peerId = (userRole === 'admin') ? roomId : undefined;
             myPeer = new Peer(peerId, {
                 host: '0.peerjs.com', port: 443, path: '/', secure: true
             });
 
-            const myVideo = document.createElement('video');
-            myVideo.muted = true;
+            myPeer.on('open', id => {
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+                    myStream = stream;
+                    const isVideoEnabled = myStream.getVideoTracks()[0].enabled;
+                    addVideoStream(myVideo, stream, id, myName, isVideoEnabled, true);
+                    
+                    populateDeviceLists();
+                    setupVoiceDetection(stream);
 
-            navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-                myStream = stream;
-                const isVideoEnabled = myStream.getVideoTracks()[0].enabled;
-                addVideoStream(myVideo, stream, myPeer.id, myName, isVideoEnabled, true);
-                
-                populateDeviceLists();
-                setupVoiceDetection(stream);
+                    if (userRole === 'participant') {
+                        connectToNewUser(roomId, stream);
+                    }
 
-                if (userRole === 'participant') {
-                    setTimeout(() => { connectToNewUser(roomId, stream); }, 1000);
-                }
-
-                myPeer.on('call', call => {
-                    const { name: callerName, isVideoEnabled: callerIsVideoEnabled } = call.metadata;
-                    call.answer(stream);
-                    const video = document.createElement('video');
-                    call.on('stream', userVideoStream => {
-                        addVideoStream(video, userVideoStream, call.peer, callerName, callerIsVideoEnabled);
-                        const myCurrentVideoStatus = myStream.getVideoTracks()[0].enabled;
-                        sendCommand(call.peer, 'user_info', { name: myName, isVideoEnabled: myCurrentVideoStatus });
+                    myPeer.on('call', call => {
+                        const { name: callerName, isVideoEnabled: callerIsVideoEnabled } = call.metadata;
+                        call.answer(stream);
+                        const video = document.createElement('video');
+                        call.on('stream', userVideoStream => {
+                            addVideoStream(video, userVideoStream, call.peer, callerName, callerIsVideoEnabled);
+                        });
+                        call.on('close', () => {
+                            const container = document.querySelector(`[data-peer-id="${call.peer}"]`);
+                            if (container) container.remove();
+                            delete peers[call.peer];
+                        });
+                        
+                        if (userRole === 'admin') {
+                            for (const existingPeerId in peers) {
+                                sendCommand(existingPeerId, 'connect_to_peer', { 
+                                    peerId: call.peer, 
+                                    name: callerName, 
+                                    isVideoEnabled: callerIsVideoEnabled 
+                                });
+                            }
+                            for (const existingPeerId in peers) {
+                                const existingPeer = peers[existingPeerId];
+                                sendCommand(call.peer, 'connect_to_peer', {
+                                    peerId: existingPeerId,
+                                    name: existingPeer.name,
+                                    isVideoEnabled: existingPeer.isVideoEnabled
+                                });
+                            }
+                        }
+                        
+                        peers[call.peer] = { 
+                            call, 
+                            name: callerName, 
+                            isVideoEnabled: callerIsVideoEnabled 
+                        };
                     });
-                    call.on('close', () => {
-                        const container = document.querySelector(`[data-peer-id="${call.peer}"]`);
-                        if (container) container.remove();
-                        delete peers[call.peer];
+
+                    myPeer.on('connection', conn => {
+                        conn.on('data', data => handleData(data, conn.peer));
                     });
-                    peers[call.peer] = { call };
-                });
 
-                myPeer.on('connection', conn => {
-                    conn.on('data', data => handleData(data, conn.peer));
+                    setupControlListeners();
                 });
-
-                setupControlListeners();
             });
         }
 
@@ -491,8 +514,8 @@
                         { text: 'OK', class: 'primary', callback: () => window.location.reload() }
                     ]);
                     break;
-                case 'connect_to':
-                    connectToNewUser(data.payload.targetId, myStream);
+                case 'connect_to_peer':
+                    connectToNewUser(data.payload.peerId, myStream, data.payload.name, data.payload.isVideoEnabled);
                     break;
                 case 'status_update':
                     const statusContainer = document.querySelector(`[data-peer-id="${data.payload.peerId}"]`);
@@ -515,20 +538,8 @@
                             videoEl.style.display = data.payload.isVideoEnabled ? 'block' : 'none';
                             placeholderEl.style.display = data.payload.isVideoEnabled ? 'none' : 'flex';
                         }
-                    }
-                    break;
-                case 'user_info':
-                    const userContainer = document.querySelector(`[data-peer-id="${peerId}"]`);
-                    if (userContainer) {
-                        let nameTag = userContainer.querySelector('.video-name-tag');
-                        if (nameTag) {
-                            nameTag.textContent = data.payload.name;
-                        }
-                        const videoEl = userContainer.querySelector('video');
-                        const placeholderEl = userContainer.querySelector('.video-placeholder');
-                        if (videoEl && placeholderEl) {
-                            videoEl.style.display = data.payload.isVideoEnabled ? 'block' : 'none';
-                            placeholderEl.style.display = data.payload.isVideoEnabled ? 'none' : 'flex';
+                        if (peers[data.payload.peerId]) {
+                            peers[data.payload.peerId].isVideoEnabled = data.payload.isVideoEnabled;
                         }
                     }
                     break;
@@ -541,13 +552,19 @@
             const call = myPeer.call(userId, stream, { metadata: { name: myName, isVideoEnabled: myCurrentVideoStatus } });
             const video = document.createElement('video');
             if(call){
-                call.on('stream', userVideoStream => addVideoStream(video, userVideoStream, userId, '...', true));
+                call.on('stream', userVideoStream => {
+                    addVideoStream(video, userVideoStream, userId, call.metadata.name, call.metadata.isVideoEnabled);
+                });
                 call.on('close', () => {
                     const container = document.querySelector(`[data-peer-id="${userId}"]`);
                     if (container) container.remove();
                     delete peers[userId];
                 });
-                peers[userId] = { call };
+                peers[userId] = { 
+                    call, 
+                    name: call.metadata.name, 
+                    isVideoEnabled: call.metadata.isVideoEnabled 
+                };
             }
         }
 
@@ -602,26 +619,17 @@
         }
 
         function sendCommand(peerId, command, payload = {}) {
-            if (peers[peerId] && peers[peerId].dataConnection && peers[peerId].dataConnection.open) {
-                 peers[peerId].dataConnection.send({ command, payload });
-            } else {
-                const conn = myPeer.connect(peerId);
-                if(conn) {
-                    if (peers[peerId]) {
-                        peers[peerId].dataConnection = conn;
-                    } else {
-                        peers[peerId] = { call: peers[peerId]?.call, dataConnection: conn };
-                    }
-                    conn.on('open', () => {
-                        conn.send({ command, payload });
-                    });
-                }
-            }
+            const conn = myPeer.connect(peerId);
+            conn.on('open', () => {
+                conn.send({ command, payload });
+            });
         }
         
         function sendCommandToAll(command, payload = {}) {
             Object.keys(peers).forEach(peerId => {
-                sendCommand(peerId, command, payload);
+                if (peerId !== myPeer.id) {
+                    sendCommand(peerId, command, payload);
+                }
             });
         }
     </script>
