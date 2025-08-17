@@ -3,222 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Call Grup Final</title>
+    <title>Login - Video Call Grup</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #2c3e50; color: white; min-height: 100vh; box-sizing: border-box; margin: 0; }
-        .hidden { display: none; }
-        #join-screen { text-align: center; max-width: 500px; }
-        #join-screen h1 { font-size: 2em; }
-        #join-screen p { margin-bottom: 20px; }
-        .room-input { padding: 10px; font-size: 1.2em; text-align: center; border: 2px solid #3498db; border-radius: 5px; margin-right: 10px; }
-        #join-btn { padding: 10px 20px; font-size: 1.2em; cursor: pointer; background-color: #3498db; color: white; border: none; border-radius: 5px; }
-        #join-btn:disabled { background-color: #95a5a6; }
-        
-        #call-screen h1 { margin-top: 0; }
-        #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; width: 100%; max-width: 1200px; flex-grow: 1; }
-        video { width: 100%; height: auto; object-fit: cover; border: 3px solid #3498db; border-radius: 10px; background: #000; transform: scaleX(-1); }
-        video.local-video { border-color: #2ecc71; }
+        /* CSS untuk Modal Login */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
 
+        #login-modal {
+            background-color: #34495e;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            color: white;
+        }
+
+        #login-modal h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #333;
+        }
+
+        #login-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        #error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            min-height: 20px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
+        /* CSS Aplikasi Video Call */
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #2c3e50; color: white; min-height: 100vh; box-sizing: border-box; margin: 0; }
+        h1 { margin-top: 0; }
+        #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; width: 100%; max-width: 1200px; flex-grow: 1; }
+        video { width: 100%; height: auto; object-fit: cover; border: 3px solid #3498db; border-radius: 10px; background: #000; }
         .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; background-color: #34495e; padding: 15px; border-radius: 10px; margin-top: 20px; position: sticky; bottom: 20px; z-index: 10; }
-        button { padding: 8px 15px; border-radius: 5px; border: none; background-color: #3498db; color: white; cursor: pointer; font-weight: bold; }
+        input[type="text"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 8px 15px; border-radius: 5px; border: none; background-color: #3498db; color: white; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+        button:hover { background-color: #2980b9; }
         .control-btn { background-color: #2ecc71; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .control-btn:hover { background-color: #27ae60; }
         .control-btn.disabled { background-color: #e74c3c; }
+        .control-btn.disabled:hover { background-color: #c0392b; }
+        #toggle-mic-btn.speaking { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
         #exit-btn { background-color: #c0392b; }
-        #status-text { min-height: 24px; font-style: italic; color: #bdc3c7; }
+        #exit-btn:hover { background-color: #962d22; }
+        #notification { position: fixed; top: 20px; background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 5px; display: none; transition: opacity 0.5s; z-index: 10; }
     </style>
 </head>
 <body>
 
-    <div id="join-screen">
-        <h1>Panggilan Video Grup</h1>
-        <p>Masukkan ID Room untuk bergabung, atau biarkan kosong untuk membuat Room baru.</p>
-        <div>
-            <input type="text" id="room-id-input" class="room-input" placeholder="ID Room...">
-            <button id="join-btn">Gabung</button>
+    <div id="login-overlay">
+        <div id="login-modal">
+            <h2>Masuk ke Panggilan Video</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="user-id">ID</label>
+                    <input type="text" id="user-id" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" required>
+                        <i class="fas fa-eye" id="toggle-password"></i>
+                    </div>
+                </div>
+                <button type="submit" id="login-button">Masuk</button>
+                <div id="error-message"></div>
+            </form>
         </div>
-        <p id="status-text"></p>
     </div>
 
-    <div id="call-screen" class="hidden">
-        <h1 id="room-title"></h1>
+    <div id="app-container" class="hidden">
+        <h1>Video Call Grup</h1>
+        <p>Bagikan ID Anda atau masukkan ID teman untuk bergabung.</p>
         <div id="video-grid"></div>
         <div class="controls">
-            <button id="copy-room-btn">Copy Room ID</button>
+            <strong hidden>ID Anda:</strong> <span id="my-id" hidden>Memuat...</span>
+            
+            <button id="copy-btn">Copy ID</button>
+            <input type="text" id="peer-id-input" placeholder="Masukkan ID teman">
+            <button id="call-btn">Panggil / Gabung</button>
             <button id="toggle-mic-btn" class="control-btn" title="Mute/Unmute Mic"><i class="fas fa-microphone"></i></button>
             <button id="toggle-cam-btn" class="control-btn" title="Turn On/Off Camera"><i class="fas fa-video"></i></button>
             <button id="exit-btn" class="control-btn" title="Keluar Panggilan"><i class="fas fa-phone-slash"></i></button>
         </div>
+        <div id="notification">ID berhasil disalin!</div>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script>
-        const SIGNALING_SERVER_URL = "wss://production-webrtc-signalling-gcp.fly.dev";
+        // ## JAVASCRIPT LOGIN (VERSI TANPA SHA) ##
 
-        const joinScreen = document.getElementById('join-screen');
-        const callScreen = document.getElementById('call-screen');
-        const joinBtn = document.getElementById('join-btn');
-        const roomIdInput = document.getElementById('room-id-input');
-        const statusText = document.getElementById('status-text');
-        const videoGrid = document.getElementById('video-grid');
-        const roomTitle = document.getElementById('room-title');
-        const copyRoomBtn = document.getElementById('copy-room-btn');
-        const exitBtn = document.getElementById('exit-btn');
-        const toggleMicBtn = document.getElementById('toggle-mic-btn');
-        const toggleCamBtn = document.getElementById('toggle-cam-btn');
+        const loginOverlay = document.getElementById('login-overlay');
+        const loginForm = document.getElementById('login-form');
+        const userIdInput = document.getElementById('user-id');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('toggle-password');
+        const errorMessage = document.getElementById('error-message');
+        const appContainer = document.getElementById('app-container');
 
-        let myPeer, myStream, roomId, myPeerId;
-        let ws;
-        const peers = {}; // Menyimpan object 'call'
+        const CORRECT_ID = '123456';
+        const CORRECT_PASSWORD = 'B123';
 
-        joinBtn.addEventListener('click', () => {
-            roomId = roomIdInput.value.trim();
-            if (roomId === "") {
-                roomId = Math.random().toString(36).substring(2, 9);
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault(); 
+            errorMessage.textContent = ''; 
+
+            const enteredId = userIdInput.value;
+            const enteredPassword = passwordInput.value;
+            
+            if (enteredId === CORRECT_ID && enteredPassword === CORRECT_PASSWORD) {
+                loginOverlay.style.display = 'none'; 
+                appContainer.classList.remove('hidden'); 
+                initializeApp(); 
+            } else {
+                errorMessage.textContent = 'ID atau Password salah!';
             }
-            statusText.innerText = 'Memulai kamera...';
-            joinBtn.disabled = true;
-            startCall();
-        });
-        
-        copyRoomBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(roomId);
-            alert("Room ID disalin: " + roomId);
         });
 
-        async function startCall() {
-            try {
-                myStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                addVideoStream(myStream, 'local', true);
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePassword.classList.toggle('fa-eye');
+            togglePassword.classList.toggle('fa-eye-slash');
+        });
 
-                statusText.innerText = 'Menghubungkan ke server PeerJS...';
-                myPeer = new Peer();
 
-                myPeer.on('open', (peerId) => {
-                    myPeerId = peerId;
-                    console.log("My Peer ID is:", myPeerId);
-                    connectToSignalingServer();
-                });
+        // ## JAVASCRIPT Aplikasi Video Call (tidak berubah) ##
+        function initializeApp() {
+            const videoGrid = document.getElementById('video-grid');
+            const myIdDisplay = document.getElementById('my-id');
+            const copyBtn = document.getElementById('copy-btn');
+            const peerIdInput = document.getElementById('peer-id-input');
+            const callBtn = document.getElementById('call-btn');
+            const notification = document.getElementById('notification');
+            const toggleMicBtn = document.getElementById('toggle-mic-btn');
+            const toggleCamBtn = document.getElementById('toggle-cam-btn');
+            const exitBtn = document.getElementById('exit-btn');
+
+            const myPeer = new Peer(undefined, {
+                host: '0.peerjs.com', port: 443, path: '/', secure: true
+            });
+
+            const myVideo = document.createElement('video');
+            myVideo.muted = true;
+            const peers = {};
+            let myStream;
+            let audioVisualizerId;
+
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                myStream = stream;
+                addVideoStream(myVideo, stream);
+                setupAudioVisualizer();
 
                 myPeer.on('call', call => {
-                    console.log("Menerima panggilan dari:", call.peer);
-                    call.answer(myStream);
-                    setupCallListeners(call);
+                    call.answer(stream);
+                    const video = document.createElement('video');
+                    call.on('stream', userVideoStream => addVideoStream(video, userVideoStream));
+                    call.on('close', () => video.remove());
+                    peers[call.peer] = call;
                 });
 
-            } catch (err) {
-                console.error("Gagal memulai:", err);
-                statusText.innerText = "Gagal mengakses kamera/mic. Pastikan Anda memberi izin.";
-                joinBtn.disabled = false;
-            }
-        }
+                callBtn.addEventListener('click', () => {
+                    const friendId = peerIdInput.value;
+                    if (friendId && !peers[friendId]) {
+                        connectToNewUser(friendId, stream);
+                    }
+                });
 
-        function connectToSignalingServer() {
-            statusText.innerText = 'Menghubungkan ke room...';
-            ws = new WebSocket(SIGNALING_SERVER_URL);
-            
-            ws.onopen = () => {
-                console.log("Terhubung ke signaling server");
-                ws.send(JSON.stringify({ type: 'join', room: roomId, peerId: myPeerId }));
+                toggleMicBtn.addEventListener('click', () => {
+                    const audioTrack = myStream.getAudioTracks()[0];
+                    const icon = toggleMicBtn.querySelector('i');
+                    audioTrack.enabled = !audioTrack.enabled;
+                    icon.className = audioTrack.enabled ? 'fas fa-microphone' : 'fas fa-microphone-slash';
+                    toggleMicBtn.classList.toggle('disabled', !audioTrack.enabled);
+                });
+
+                toggleCamBtn.addEventListener('click', () => {
+                    const videoTrack = myStream.getVideoTracks()[0];
+                    const icon = toggleCamBtn.querySelector('i');
+                    videoTrack.enabled = !videoTrack.enabled;
+                    icon.className = videoTrack.enabled ? 'fas fa-video' : 'fas fa-video-slash';
+                    toggleCamBtn.classList.toggle('disabled', !videoTrack.enabled);
+                });
+
+                exitBtn.addEventListener('click', () => {
+                    if (audioVisualizerId) cancelAnimationFrame(audioVisualizerId);
+                    Object.values(peers).forEach(call => { if (call) call.close(); });
+                    if (myStream) myStream.getTracks().forEach(track => track.stop());
+                    if (myPeer && !myPeer.destroyed) myPeer.destroy();
+                    document.body.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100vh; background-color:#2c3e50; color:white; font-size: 2em;">Anda telah keluar.</div>';
+                });
+
+            }).catch(err => {
+                console.error("Gagal mengakses media: ", err);
+                alert("Tidak bisa mengakses kamera/mikrofon. Pastikan Anda memberikan izin.");
+            });
+
+            myPeer.on('open', id => {
+                myIdDisplay.textContent = id;
+            });
+
+            function connectToNewUser(userId, stream) {
+                const call = myPeer.call(userId, stream);
+                const video = document.createElement('video');
+                call.on('stream', userVideoStream => addVideoStream(video, userVideoStream));
+                call.on('close', () => {
+                    video.remove();
+                    delete peers[userId];
+                });
+                peers[userId] = call;
+            }
+
+            function addVideoStream(video, stream) {
+                video.srcObject = stream;
+                video.addEventListener('loadedmetadata', () => video.play());
+                videoGrid.append(video);
+            }
+
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(myIdDisplay.textContent).then(() => {
+                    notification.style.display = 'block';
+                    setTimeout(() => { notification.style.display = 'none'; }, 2000);
+                });
+            });
+
+            function setupAudioVisualizer() {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioContext.createAnalyser();
+                const microphone = audioContext.createMediaStreamSource(myStream);
+                analyser.fftSize = 512;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                microphone.connect(analyser);
                 
-                joinScreen.classList.add('hidden');
-                callScreen.classList.remove('hidden');
-                roomTitle.innerText = `Room: ${roomId}`;
-            };
-
-            ws.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-                console.log("Pesan diterima:", message);
-
-                // Pesan 'session' dikirim saat kita pertama kali join, berisi semua user yang sudah ada
-                if (message.type === 'session') {
-                    message.peers.forEach(peerId => {
-                        if (peerId !== myPeerId) {
-                            connectToNewUser(peerId);
-                        }
-                    });
-                }
-                // Pesan 'user-joined' dikirim ke semua orang saat ada user baru masuk
-                else if (message.type === 'user-joined' && message.peerId !== myPeerId) {
-                     connectToNewUser(message.peerId);
-                } 
-                else if (message.type === 'user-left') {
-                    console.log("User keluar:", message.peerId);
-                    removeVideoStream(message.peerId);
-                }
-            };
-
-            ws.onclose = () => {
-                console.log("Koneksi ke signaling server terputus.");
-                alert("Koneksi ke room terputus.");
-            };
-        }
-
-        function connectToNewUser(peerId) {
-            if (peers[peerId]) return; // Jika sudah terhubung, jangan panggil lagi
-            console.log("Memanggil user baru:", peerId);
-            const call = myPeer.call(peerId, myStream);
-            setupCallListeners(call);
-        }
-
-        function setupCallListeners(call) {
-            const peerId = call.peer;
-            peers[peerId] = call;
-
-            call.on('stream', (userVideoStream) => {
-                console.log("Stream diterima dari:", peerId);
-                addVideoStream(userVideoStream, peerId);
-            });
-
-            call.on('close', () => {
-                console.log("Panggilan ditutup dari:", peerId);
-                removeVideoStream(peerId);
-            });
-
-             call.on('error', (err) => {
-                console.error("Error panggilan dengan " + peerId, err);
-                removeVideoStream(peerId);
-            });
-        }
-
-        function addVideoStream(stream, peerId, isMuted = false) {
-            if (document.querySelector(`video[data-peer-id="${peerId}"]`)) return;
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.muted = isMuted;
-            video.dataset.peerId = peerId;
-            if (isMuted) video.classList.add('local-video');
-            video.addEventListener('loadedmetadata', () => video.play());
-            videoGrid.append(video);
-        }
-
-        function removeVideoStream(peerId) {
-            if (peers[peerId]) {
-                peers[peerId].close();
-                delete peers[peerId];
+                const detectSpeaking = () => {
+                    if (!myStream) return;
+                    const isMicEnabled = myStream.getAudioTracks()[0]?.enabled || false;
+                    if (!isMicEnabled) {
+                        toggleMicBtn.classList.remove('speaking');
+                        audioVisualizerId = requestAnimationFrame(detectSpeaking);
+                        return;
+                    }
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = dataArray.reduce((a, b) => a + b, 0);
+                    let avg = sum / bufferLength;
+                    toggleMicBtn.classList.toggle('speaking', avg > 20);
+                    audioVisualizerId = requestAnimationFrame(detectSpeaking);
+                };
+                detectSpeaking();
             }
-            const videoToRemove = document.querySelector(`video[data-peer-id="${peerId}"]`);
-            if (videoToRemove) videoToRemove.remove();
         }
-        
-        // --- Kontrol Tombol ---
-        toggleMicBtn.addEventListener('click', () => {
-            const audioTrack = myStream.getAudioTracks()[0];
-            audioTrack.enabled = !audioTrack.enabled;
-            toggleMicBtn.classList.toggle('disabled', !audioTrack.enabled);
-            toggleMicBtn.querySelector('i').className = audioTrack.enabled ? 'fas fa-microphone' : 'fas fa-microphone-slash';
-        });
-
-        toggleCamBtn.addEventListener('click', () => {
-            const videoTrack = myStream.getAudioTracks()[0];
-            videoTrack.enabled = !videoTrack.enabled;
-            toggleCamBtn.classList.toggle('disabled', !videoTrack.enabled);
-            toggleCamBtn.querySelector('i').className = videoTrack.enabled ? 'fas fa-video' : 'fas fa-video-slash';
-        });
-
-        exitBtn.addEventListener('click', () => {
-            window.location.reload();
-        });
     </script>
 </body>
 </html>
