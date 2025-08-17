@@ -2,95 +2,109 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">   
     <title>BANGBIN VIDEO CALL</title>
     <style>
         :root { --primary-bg: #2c3e50; --secondary-bg: #34495e; --accent-color: #3498db; --light-text: #ecf0f1; }
         body { font-family: sans-serif; background-color: var(--primary-bg); color: var(--light-text); margin: 0; }
 
-        /* Modal Password */
-        #password-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
-        #password-box { background-color: var(--secondary-bg); padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        #password-box h2 { margin-top: 0; }
-        #password-input { padding: 10px; border-radius: 5px; border: none; width: 80%; margin: 15px 0; }
-        #password-submit { padding: 10px 20px; border-radius: 5px; border: none; background-color: var(--accent-color); color: white; cursor: pointer; font-weight: bold; }
-        #password-error { color: #e74c3c; margin-top: 10px; display: none; }
+        /* Modal Login */
+        #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        #login-box { background-color: var(--secondary-bg); padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
+        #login-box h2 { margin-top: 0; }
+        .input-group { margin: 20px 0; }
+        .input-group input { width: calc(100% - 20px); padding: 10px; border-radius: 5px; border: none; }
+        #login-submit { width: 100%; padding: 12px; border-radius: 5px; border: none; background-color: var(--accent-color); color: white; cursor: pointer; font-weight: bold; font-size: 1em; }
+        #login-error { color: #e74c3c; margin-top: 10px; display: none; }
 
         /* Konten Utama */
         #main-content { display: none; padding: 20px; }
-        .controls { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center; background-color: var(--secondary-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .header { text-align: center; margin-bottom: 20px; }
         #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .video-container { position: relative; }
         video { width: 100%; border-radius: 10px; background: #000; }
-        .participant-controls { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; display: none; /* Hanya tampil untuk admin */ }
+        .participant-controls { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; display: none; }
         .participant-controls button { background: none; border: none; color: white; cursor: pointer; font-size: 1.2em; margin: 0 5px; }
     </style>
 </head>
 <body>
 
-    <div id="password-modal">
-        <div id="password-box">
-            <h2>Masuk Ruang Rapat</h2>
-            <form id="password-form">
-                <input type="password" id="password-input" placeholder="Masukkan password..." required>
-                <button type="submit" id="password-submit">Masuk</button>
-                <p id="password-error">Password salah!</p>
+    <div id="login-modal">
+        <div id="login-box">
+            <h2>Gabung atau Buat Rapat</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <input type="text" id="room-id-input" placeholder="Masukkan ID Rapat" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password-input" placeholder="Masukkan Password" required>
+                </div>
+                <button type="submit" id="login-submit">Masuk ke Rapat</button>
+                <p id="login-error">ID Rapat atau Password salah!</p>
             </form>
         </div>
     </div>
 
     <div id="main-content">
-        <h1>Ruang Rapat <span id="role-badge" style="font-size: 0.7em; background: #8e44ad; padding: 5px 10px; border-radius: 5px;"></span></h1>
-        <div class="controls">
-            <strong>ID Rapat Anda:</strong> <span id="my-id">Memuat...</span>
-            <input type="text" id="peer-id-input" placeholder="Masukkan ID untuk gabung">
-            <button id="call-btn">Gabung</button>
+        <div class="header">
+            <h1>Rapat: <span id="room-id-display" style="color: var(--accent-color);"></span></h1>
+            <p>Peran Anda: <span id="role-badge" style="background: #8e44ad; padding: 5px 10px; border-radius: 5px;"></span></p>
         </div>
         <div id="video-grid"></div>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script>
-        // --- Bagian Setup Elemen & Variabel ---
-        const passwordModal = document.getElementById('password-modal');
-        const passwordForm = document.getElementById('password-form');
+        // --- Elemen & Variabel ---
+        const loginModal = document.getElementById('login-modal');
+        const loginForm = document.getElementById('login-form');
+        const roomIdInput = document.getElementById('room-id-input');
         const passwordInput = document.getElementById('password-input');
-        const passwordError = document.getElementById('password-error');
+        const loginError = document.getElementById('login-error');
         const mainContent = document.getElementById('main-content');
         const videoGrid = document.getElementById('video-grid');
-        const myIdDisplay = document.getElementById('my-id');
-        const peerIdInput = document.getElementById('peer-id-input');
-        const callBtn = document.getElementById('call-btn');
+        const roomIdDisplay = document.getElementById('room-id-display');
         const roleBadge = document.getElementById('role-badge');
 
         const ADMIN_PASSWORD = "BANGBIN123";
         const PARTICIPANT_PASSWORD = "PPESERTA123";
-        let userRole = null;
-        let myPeer, myStream;
-        const peers = {}; // Menyimpan koneksi call & data
+        let userRole, myPeer, myStream, roomId;
+        const peers = {};
 
-        // --- Bagian 1: Logika Password ---
-        passwordForm.addEventListener('submit', (e) => {
+        // --- 1. Logika Login ---
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const password = passwordInput.value;
-            if (password === ADMIN_PASSWORD) {
-                userRole = 'admin';
-                initializeApp();
-            } else if (password === PARTICIPANT_PASSWORD) {
-                userRole = 'participant';
-                initializeApp();
-            } else {
-                passwordError.style.display = 'block';
+            roomId = roomIdInput.value.trim();
+
+            if (roomId === "") {
+                loginError.textContent = "ID Rapat tidak boleh kosong!";
+                loginError.style.display = 'block';
+                return;
             }
+
+            if (password === ADMIN_PASSWORD) userRole = 'admin';
+            else if (password === PARTICIPANT_PASSWORD) userRole = 'participant';
+            else {
+                loginError.textContent = "Password salah!";
+                loginError.style.display = 'block';
+                return;
+            }
+            
+            initializeApp();
         });
 
         function initializeApp() {
-            passwordModal.style.display = 'none';
+            loginModal.style.display = 'none';
             mainContent.style.display = 'block';
             roleBadge.textContent = userRole.toUpperCase();
+            roomIdDisplay.textContent = roomId;
 
-            // --- Bagian 2: Inisialisasi PeerJS & Media ---
-            myPeer = new Peer(undefined, {
+            // --- 2. Inisialisasi PeerJS ---
+            // Admin menggunakan ID yang bisa ditebak, peserta menggunakan ID acak
+            const peerId = (userRole === 'admin') ? roomId : undefined;
+            myPeer = new Peer(peerId, {
                 host: '0.peerjs.com', port: 443, path: '/', secure: true
             });
 
@@ -99,61 +113,76 @@
 
             navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
                 myStream = stream;
-                addVideoStream(myVideo, stream, myPeer.id, true); // Tambah video sendiri
+                addVideoStream(myVideo, stream, myPeer.id, true);
 
-                // JAWAB PANGGILAN VIDEO YANG MASUK
+                // Jika Anda peserta, otomatis panggil Admin
+                if (userRole === 'participant') {
+                    // Beri sedikit waktu agar koneksi PeerJS siap
+                    setTimeout(() => {
+                        connectToNewUser(roomId, stream);
+                    }, 1000);
+                }
+
+                // Terima panggilan masuk
                 myPeer.on('call', call => {
                     call.answer(stream);
                     const video = document.createElement('video');
                     call.on('stream', userVideoStream => {
                         addVideoStream(video, userVideoStream, call.peer);
+                        // Admin: Hubungkan penelepon baru ke semua peserta lama
+                        if (userRole === 'admin') {
+                            Object.keys(peers).forEach(peerId => {
+                                if (peerId !== call.peer) {
+                                    sendCommand(call.peer, 'connect_to', peerId);
+                                    sendCommand(peerId, 'connect_to', call.peer);
+                                }
+                            });
+                        }
                     });
                     call.on('close', () => video.parentElement.remove());
                     peers[call.peer] = { call };
                 });
 
-                // FUNGSI UNTUK GABUNG KE RAPAT
-                callBtn.addEventListener('click', () => {
-                    connectToNewUser(peerIdInput.value, stream);
+                // Terima koneksi data
+                myPeer.on('connection', conn => {
+                    conn.on('data', data => handleData(data, conn.peer));
                 });
             });
-
-            // TERIMA KONEKSI DATA (untuk perintah admin)
-            myPeer.on('connection', conn => {
-                conn.on('data', data => {
-                    if (data.command === 'mute') {
-                        myStream.getAudioTracks()[0].enabled = false;
-                        alert('Admin mematikan mic Anda.');
-                    } else if (data.command === 'kick') {
-                        alert('Anda dikeluarkan dari rapat oleh Admin.');
-                        myPeer.destroy();
-                        window.location.reload();
-                    }
-                });
-            });
-            
-            myPeer.on('open', id => myIdDisplay.textContent = id);
         }
-        
-        // --- Bagian 3: Fungsi-fungsi Bantuan ---
-        function connectToNewUser(userId, stream) {
-            if (peers[userId]) return; // Jangan hubungi jika sudah terhubung
 
-            // Buat koneksi video
+        // --- 3. Fungsi-fungsi Bantuan ---
+        function handleData(data, peerId) {
+            switch (data.command) {
+                case 'mute':
+                    myStream.getAudioTracks()[0].enabled = false;
+                    alert('Admin mematikan mic Anda.');
+                    break;
+                case 'kick':
+                    alert('Anda dikeluarkan dari rapat oleh Admin.');
+                    window.location.reload();
+                    break;
+                case 'connect_to':
+                    // Perintah dari Admin untuk menghubungkan ke user lain
+                    connectToNewUser(data.targetId, myStream);
+                    break;
+            }
+        }
+
+        function connectToNewUser(userId, stream) {
+            if (peers[userId]) return;
             const call = myPeer.call(userId, stream);
             const video = document.createElement('video');
-            call.on('stream', userVideoStream => {
-                addVideoStream(video, userVideoStream, userId);
-            });
-            call.on('close', () => video.parentElement.remove());
-
-            // Buat koneksi data
-            const dataConnection = myPeer.connect(userId);
-            
-            peers[userId] = { call, dataConnection };
+            if(call){ // pastikan call berhasil dibuat
+                call.on('stream', userVideoStream => addVideoStream(video, userVideoStream, userId));
+                call.on('close', () => video.parentElement.remove());
+                peers[userId] = { call };
+            }
         }
 
         function addVideoStream(video, stream, peerId, isSelf = false) {
+            // Cek agar tidak ada video duplikat
+            if (document.querySelector(`[data-peer-id="${peerId}"]`)) return;
+
             video.srcObject = stream;
             video.addEventListener('loadedmetadata', () => video.play());
             
@@ -166,31 +195,30 @@
                 const controls = document.createElement('div');
                 controls.classList.add('participant-controls');
                 
-                // Tombol Mute
                 const muteBtn = document.createElement('button');
-                muteBtn.innerHTML = '🎤'; // Emoji mic
-                muteBtn.title = 'Matikan Mic Peserta';
+                muteBtn.innerHTML = '🎤';
+                muteBtn.title = 'Matikan Mic';
                 muteBtn.onclick = () => sendCommand(peerId, 'mute');
 
-                // Tombol Kick
                 const kickBtn = document.createElement('button');
-                kickBtn.innerHTML = '❌'; // Emoji silang
-                kickBtn.title = 'Keluarkan Peserta';
+                kickBtn.innerHTML = '❌';
+                kickBtn.title = 'Keluarkan';
                 kickBtn.onclick = () => sendCommand(peerId, 'kick');
                 
                 controls.append(muteBtn, kickBtn);
                 container.append(controls);
-                controls.style.display = 'block'; // Tampilkan kontrol untuk admin
+                controls.style.display = 'block';
             }
-
             videoGrid.append(container);
         }
 
-        function sendCommand(peerId, command) {
+        function sendCommand(peerId, command, targetId = null) {
             const conn = myPeer.connect(peerId);
-            conn.on('open', () => {
-                conn.send({ command });
-            });
+            if(conn) {
+                conn.on('open', () => {
+                    conn.send({ command, targetId });
+                });
+            }
         }
     </script>
 </body>
