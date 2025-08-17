@@ -15,10 +15,9 @@
         #login-box { background-color: var(--secondary-bg); padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
         #login-box h2 { margin-top: 0; }
         .input-group { position: relative; margin: 20px 0; }
-        /* === PERBAIKAN CSS: Menyamakan ukuran semua input === */
         .input-group input {
-            box-sizing: border-box; /* Memastikan padding termasuk dalam total lebar */
-            width: 100%; /* Lebar input menjadi 100% dari parent */
+            box-sizing: border-box;
+            width: 100%;
             padding: 10px;
             border-radius: 5px;
             border: none;
@@ -36,7 +35,7 @@
             text-align: center;
         }
         #password-input {
-            padding-right: 40px; /* Memberi ruang untuk ikon di dalam input */
+            padding-right: 40px;
         }
 
 
@@ -289,6 +288,8 @@
             myPeer.on('open', id => {
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
                     myStream = stream;
+                    const myVideo = document.createElement('video');
+                    myVideo.muted = true;
                     const isVideoEnabled = myStream.getVideoTracks()[0].enabled;
                     addVideoStream(myVideo, stream, id, myName, isVideoEnabled, true);
                     
@@ -515,7 +516,7 @@
                     ]);
                     break;
                 case 'connect_to_peer':
-                    connectToNewUser(data.payload.peerId, myStream, data.payload.name, data.payload.isVideoEnabled);
+                    connectToNewUser(data.payload.peerId, myStream);
                     break;
                 case 'status_update':
                     const statusContainer = document.querySelector(`[data-peer-id="${data.payload.peerId}"]`);
