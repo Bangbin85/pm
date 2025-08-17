@@ -19,6 +19,44 @@
         #login-submit { width: 100%; padding: 12px; border-radius: 5px; border: none; background-color: var(--accent-color); color: white; cursor: pointer; font-weight: bold; font-size: 1em; }
         #login-error { color: var(--danger-color); margin-top: 10px; display: none; }
 
+        /* === PENAMBAHAN CSS BARU: Modal Kustom === */
+        #custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: none; /* Diubah ke flex oleh JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        #custom-modal-box {
+            background-color: var(--secondary-bg);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 350px;
+        }
+        #custom-modal-title { margin-top: 0; color: var(--accent-color); }
+        #custom-modal-message { margin: 20px 0; line-height: 1.5; }
+        #custom-modal-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .modal-btn.primary { background-color: var(--accent-color); }
+        .modal-btn.danger { background-color: var(--danger-color); }
+        .modal-btn.secondary { background-color: #576574; }
+
+
         /* Konten Utama */
         #main-content { display: none; padding: 20px; }
         .header { text-align: center; margin-bottom: 20px; }
@@ -39,12 +77,12 @@
             background-color: var(--secondary-bg);
             color: var(--light-text);
             font-size: 5em;
-            display: none; /* Defaultnya tersembunyi */
+            display: none;
             justify-content: center;
             align-items: center;
         }
 
-        /* === PENAMBAHAN CSS BARU: Tag Nama Video === */
+        /* Tag Nama Video */
         .video-name-tag {
             position: absolute;
             bottom: 8px;
@@ -88,7 +126,6 @@
         <div id="login-box">
             <h2>Gabung atau Buat Rapat</h2>
             <form id="login-form">
-                <!-- === PENAMBAHAN HTML BARU: Kolom Nama === -->
                 <div class="input-group">
                     <input type="text" id="name-input" placeholder="Masukkan Nama Anda" required>
                 </div>
@@ -101,6 +138,15 @@
                 <button type="submit" id="login-submit">Masuk ke Rapat</button>
                 <p id="login-error">ID Rapat atau Password salah!</p>
             </form>
+        </div>
+    </div>
+
+    <!-- === PENAMBAHAN HTML BARU: Modal Kustom === -->
+    <div id="custom-modal-overlay">
+        <div id="custom-modal-box">
+            <h3 id="custom-modal-title"></h3>
+            <p id="custom-modal-message"></p>
+            <div id="custom-modal-buttons"></div>
         </div>
     </div>
 
@@ -124,7 +170,7 @@
         // --- Elemen & Variabel ---
         const loginModal = document.getElementById('login-modal');
         const loginForm = document.getElementById('login-form');
-        const nameInput = document.getElementById('name-input'); // === ELEMEN BARU ===
+        const nameInput = document.getElementById('name-input');
         const roomIdInput = document.getElementById('room-id-input');
         const passwordInput = document.getElementById('password-input');
         const loginError = document.getElementById('login-error');
@@ -140,17 +186,49 @@
 
         const ADMIN_PASSWORD = "BANGBIN123";
         const PARTICIPANT_PASSWORD = "PPESERTA123";
-        let userRole, myPeer, myStream, roomId, myName; // === VARIABEL BARU: myName ===
+        let userRole, myPeer, myStream, roomId, myName;
         const peers = {};
         
         let audioContext, analyser, microphoneSource, dataArray, voiceDetectionLoop;
+
+        // === PENAMBAHAN BARU: Logika Modal Kustom ===
+        const modalOverlay = document.getElementById('custom-modal-overlay');
+        const modalTitle = document.getElementById('custom-modal-title');
+        const modalMessage = document.getElementById('custom-modal-message');
+        const modalButtons = document.getElementById('custom-modal-buttons');
+
+        function hideModal() {
+            modalOverlay.style.display = 'none';
+        }
+
+        function showModal(title, message, buttons = [{ text: 'OK', class: 'primary' }]) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalButtons.innerHTML = ''; // Kosongkan tombol sebelumnya
+
+            buttons.forEach(btnInfo => {
+                const button = document.createElement('button');
+                button.textContent = btnInfo.text;
+                button.className = `modal-btn ${btnInfo.class || 'primary'}`;
+                button.onclick = () => {
+                    hideModal();
+                    if (btnInfo.callback) {
+                        btnInfo.callback();
+                    }
+                };
+                modalButtons.appendChild(button);
+            });
+
+            modalOverlay.style.display = 'flex';
+        }
+
 
         // --- 1. Logika Login ---
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const password = passwordInput.value;
             roomId = roomIdInput.value.trim();
-            myName = nameInput.value.trim(); // === Mendapatkan nama dari input ===
+            myName = nameInput.value.trim();
 
             if (myName === "" || roomId === "") {
                 loginError.textContent = "Nama dan ID Rapat tidak boleh kosong!";
@@ -175,7 +253,7 @@
             roleBadge.textContent = userRole.toUpperCase();
             roomIdDisplay.textContent = roomId;
 
-            const peerId = (userRole === 'admin') ? roomId : `${roomId}-${Date.now()}`; // Pastikan ID unik untuk peserta
+            const peerId = (userRole === 'admin') ? roomId : `${roomId}-${Date.now()}`;
             myPeer = new Peer(peerId, {
                 host: '0.peerjs.com', port: 443, path: '/', secure: true
             });
@@ -185,7 +263,6 @@
 
             navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
                 myStream = stream;
-                // === PERUBAHAN: Mengirim nama saat menambahkan video sendiri ===
                 addVideoStream(myVideo, stream, myPeer.id, myName, true);
                 
                 populateDeviceLists();
@@ -196,13 +273,11 @@
                 }
 
                 myPeer.on('call', call => {
-                    // === PERUBAHAN: Mendapatkan nama penelepon dari metadata ===
                     const callerName = call.metadata.name;
                     call.answer(stream);
                     const video = document.createElement('video');
                     call.on('stream', userVideoStream => {
                         addVideoStream(video, userVideoStream, call.peer, callerName);
-                        // Mengirim info kita kembali ke penelepon
                         sendCommand(call.peer, 'user_info', { name: myName });
                     });
                     call.on('close', () => {
@@ -326,9 +401,11 @@
             });
 
             leaveBtn.addEventListener('click', () => {
-                if (confirm('Anda yakin ingin keluar dari rapat?')) {
-                    window.location.reload();
-                }
+                // === PERUBAHAN: Menggunakan Modal Kustom untuk konfirmasi ===
+                showModal('Keluar Rapat', 'Anda yakin ingin keluar dari rapat?', [
+                    { text: 'Ya, Keluar', class: 'danger', callback: () => window.location.reload() },
+                    { text: 'Batal', class: 'secondary' }
+                ]);
             });
 
             micSelect.addEventListener('change', switchAudioDevice);
@@ -364,7 +441,8 @@
 
             } catch (err) {
                 console.error("Gagal mengganti perangkat audio:", err);
-                alert("Tidak dapat beralih ke mikrofon yang dipilih. Pastikan tidak digunakan oleh aplikasi lain.");
+                // === PERUBAHAN: Menggunakan Modal Kustom untuk error ===
+                showModal('Gagal Beralih', 'Tidak dapat beralih ke mikrofon yang dipilih. Pastikan tidak digunakan oleh aplikasi lain.');
             }
         }
 
@@ -374,7 +452,8 @@
                 case 'mute':
                     if (myStream.getAudioTracks()[0]) {
                         myStream.getAudioTracks()[0].enabled = false;
-                        alert('Admin mematikan mic Anda.');
+                        // === PERUBAHAN: Menggunakan Modal Kustom untuk notifikasi ===
+                        showModal('Mikrofon Dimatikan', 'Admin telah mematikan mikrofon Anda.');
                         micBtn.classList.remove('active');
                         micBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
                         micBtn.style.backgroundColor = '#576574';
@@ -384,8 +463,10 @@
                     }
                     break;
                 case 'kick':
-                    alert('Anda dikeluarkan dari rapat oleh Admin.');
-                    window.location.reload();
+                    // === PERUBAHAN: Menggunakan Modal Kustom untuk notifikasi ===
+                    showModal('Dikeluarkan dari Rapat', 'Anda telah dikeluarkan dari rapat oleh Admin.', [
+                        { text: 'OK', class: 'primary', callback: () => window.location.reload() }
+                    ]);
                     break;
                 case 'connect_to':
                     connectToNewUser(data.payload.targetId, myStream);
@@ -413,7 +494,6 @@
                         }
                     }
                     break;
-                // === PENAMBAHAN BARU: Menangani info nama dari peserta lain ===
                 case 'user_info':
                     const userContainer = document.querySelector(`[data-peer-id="${peerId}"]`);
                     if (userContainer) {
@@ -428,11 +508,10 @@
 
         function connectToNewUser(userId, stream) {
             if (peers[userId] || userId === myPeer.id) return;
-            // === PERUBAHAN: Mengirim nama kita di metadata saat memanggil ===
             const call = myPeer.call(userId, stream, { metadata: { name: myName } });
             const video = document.createElement('video');
             if(call){
-                call.on('stream', userVideoStream => addVideoStream(video, userVideoStream, userId, '...')); // Nama akan diupdate via data connection
+                call.on('stream', userVideoStream => addVideoStream(video, userVideoStream, userId, '...'));
                 call.on('close', () => {
                     const container = document.querySelector(`[data-peer-id="${userId}"]`);
                     if (container) container.remove();
@@ -442,7 +521,6 @@
             }
         }
 
-        // === PERUBAHAN: Fungsi menerima parameter userName ===
         function addVideoStream(video, stream, peerId, userName, isSelf = false) {
             let container = document.querySelector(`[data-peer-id="${peerId}"]`);
             if (container) {
@@ -456,12 +534,11 @@
                 placeholder.classList.add('video-placeholder');
                 placeholder.innerHTML = '😴';
 
-                // === PENAMBAHAN BARU: Membuat elemen tag nama ===
                 const nameTag = document.createElement('div');
                 nameTag.classList.add('video-name-tag');
-                nameTag.textContent = userName || '...'; // Menampilkan nama
+                nameTag.textContent = userName || '...';
                 
-                container.append(video, placeholder, nameTag); // Menambahkan tag nama
+                container.append(video, placeholder, nameTag);
                 videoGrid.append(container);
             }
 
