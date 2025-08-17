@@ -3,652 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">   
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <title>BANGBIN VIDEO CALL2</title>
+    <title>Video Call Grup</title>
     <style>
-        :root { --primary-bg: #2c3e50; --secondary-bg: #34495e; --accent-color: #3498db; --danger-color: #e74c3c; --light-text: #ecf0f1; }
-        body { font-family: sans-serif; background-color: var(--primary-bg); color: var(--light-text); margin: 0; }
-
-        /* Modal Login */
-        #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 100; }
-        #login-box { background-color: var(--secondary-bg); padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
-        #login-box h2 { margin-top: 0; }
-        .input-group { position: relative; margin: 20px 0; }
-        .input-group input {
-            box-sizing: border-box;
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
+        :root {
+            --dark-bg: #222;
+            --primary-accent: #007bff;
+            --card-bg: #333;
+            --light-text: #f0f0f0;
         }
-        #login-submit { width: 100%; padding: 12px; border-radius: 5px; border: none; background-color: var(--accent-color); color: white; cursor: pointer; font-weight: bold; font-size: 1em; }
-        #login-error { color: var(--danger-color); margin-top: 10px; display: none; }
-        
-        #toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #95a5a6;
-            text-align: center;
-        }
-        #password-input {
-            padding-right: 40px;
-        }
-
-
-        /* Modal Kustom */
-        #custom-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 200;
-        }
-        #custom-modal-box {
-            background-color: var(--secondary-bg);
-            padding: 25px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 350px;
-        }
-        #custom-modal-title { margin-top: 0; color: var(--accent-color); }
-        #custom-modal-message { margin: 20px 0; line-height: 1.5; }
-        #custom-modal-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
-        .modal-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            color: white;
-        }
-        .modal-btn.primary { background-color: var(--accent-color); }
-        .modal-btn.danger { background-color: var(--danger-color); }
-        .modal-btn.secondary { background-color: #576574; }
-
-
-        /* Konten Utama */
-        #main-content { display: none; padding: 20px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .video-container { position: relative; background: #000; border-radius: 10px; overflow: hidden; aspect-ratio: 4 / 3; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        .admin-controls { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; display: none; }
-        .admin-controls button { background: none; border: none; color: white; cursor: pointer; font-size: 1.2em; margin: 0 5px; }
-        .status-icon { position: absolute; top: 10px; left: 10px; font-size: 1.5em; text-shadow: 0 0 5px black; }
-
-        /* Placeholder Video */
-        .video-placeholder {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--secondary-bg);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--dark-bg);
             color: var(--light-text);
-            font-size: 5em;
-            display: none;
-            justify-content: center;
+            margin: 0;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
             align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
         }
-
-        /* Tag Nama Video */
-        .video-name-tag {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            max-width: calc(100% - 16px);
+        h1 {
+            color: var(--primary-accent);
+            text-align: center;
+        }
+        #video-grid {
+            flex-grow: 1;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .video-container {
+            position: relative;
+            background-color: var(--card-bg);
+            border-radius: 8px;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
-
-        /* Kontrol Pengguna */
-        #self-controls { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--secondary-bg); padding: 10px 15px; border-radius: 25px; display: flex; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 50; align-items: center; }
-        #self-controls button { background-color: #576574; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 1.2em; cursor: pointer; transition: background-color 0.2s, box-shadow 0.2s; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
-        #self-controls button.active { background-color: var(--accent-color); }
-        #self-controls button.danger { background-color: var(--danger-color); }
-
-        /* Dropdown Pilihan Mikrofon */
-        #mic-select {
-            background-color: #576574;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 12px;
-            margin-left: 10px;
-            cursor: pointer;
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Efek cermin untuk kamera depan */
+        }
+        .participant-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 0.3em 0.6em;
+            margin: 0.5rem;
+            border-radius: 4px;
             font-size: 0.9em;
         }
-        #mic-select:focus {
-            outline: 2px solid var(--accent-color);
+        #controls {
+            padding: 1rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+        }
+        button {
+            background-color: var(--primary-accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 
-    <div id="login-modal">
-        <div id="login-box">
-            <h2>Gabung atau Buat Rapat</h2>
-            <form id="login-form">
-                <div class="input-group">
-                    <input type="text" id="name-input" placeholder="Masukkan Nama Anda" required>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="room-id-input" placeholder="Masukkan ID Rapat" required>
-                </div>
-                <div class="input-group">
-                    <input type="password" id="password-input" placeholder="Masukkan Password" required>
-                    <i class="fas fa-eye" id="toggle-password"></i>
-                </div>
-                <button type="submit" id="login-submit">Masuk ke Rapat</button>
-                <p id="login-error">ID Rapat atau Password salah!</p>
-            </form>
-        </div>
+    <h1>Video Call Grup</h1>
+    <div id="video-grid"></div>
+    <div id="controls">
+        <button id="joinButton">Gabung ke Ruangan</button>
     </div>
 
-    <div id="custom-modal-overlay">
-        <div id="custom-modal-box">
-            <h3 id="custom-modal-title"></h3>
-            <p id="custom-modal-message"></p>
-            <div id="custom-modal-buttons"></div>
-        </div>
-    </div>
+<script>
+    // === KONFIGURASI ===
+    // Ini adalah satu-satunya alamat "luar" yang dibutuhkan.
+    // Ini adalah alamat "papan pengumuman" publik dan gratis.
+    const SIGNALING_SERVER_URL = 'wss://simple-webrtc-signaling-server.glitch.me';
 
-    <div id="main-content">
-        <div class="header">
-            <h1>Rapat: <span id="room-id-display" style="color: var(--accent-color);"></span></h1>
-            <p>Peran Anda: <span id="role-badge" style="background: #8e44ad; padding: 5px 10px; border-radius: 5px;"></span></p>
-        </div>
-        <div id="video-grid"></div>
+    // Konfigurasi server STUN dari Google untuk membantu koneksi.
+    const ICE_SERVERS = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    };
 
-        <div id="self-controls">
-            <button id="mic-btn" class="active" title="Matikan Mikrofon"><i class="fas fa-microphone"></i></button>
-            <button id="video-btn" class="active" title="Matikan Kamera"><i class="fas fa-video"></i></button>
-            <select id="mic-select" title="Pilih Mikrofon"></select>
-            <button id="leave-btn" class="danger" title="Keluar Rapat"><i class="fas fa-phone-slash"></i></button>
-        </div>
-    </div>
+    // === ELEMEN PADA HALAMAN ===
+    const joinButton = document.getElementById('joinButton');
+    const videoGrid = document.getElementById('video-grid');
+    
+    // === VARIABEL GLOBAL ===
+    let localStream;
+    let myClientId;
+    const peerConnections = {}; // Menyimpan semua koneksi ke user lain
+    let signalingSocket;
 
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <script>
-        // --- Elemen & Variabel ---
-        const loginModal = document.getElementById('login-modal');
-        const loginForm = document.getElementById('login-form');
-        const nameInput = document.getElementById('name-input');
-        const roomIdInput = document.getElementById('room-id-input');
-        const passwordInput = document.getElementById('password-input');
-        const loginError = document.getElementById('login-error');
-        const mainContent = document.getElementById('main-content');
-        const videoGrid = document.getElementById('video-grid');
-        const roomIdDisplay = document.getElementById('room-id-display');
-        const roleBadge = document.getElementById('role-badge');
-        
-        const micBtn = document.getElementById('mic-btn');
-        const videoBtn = document.getElementById('video-btn');
-        const leaveBtn = document.getElementById('leave-btn');
-        const micSelect = document.getElementById('mic-select');
-        const togglePassword = document.getElementById('toggle-password');
+    // === FUNGSI UTAMA ===
 
-        const ADMIN_PASSWORD = "BANGBIN123";
-        const PARTICIPANT_PASSWORD = "PPESERTA123";
-        let userRole, myPeer, myStream, roomId, myName;
-        const peers = {};
-        
-        let audioContext, analyser, microphoneSource, dataArray, voiceDetectionLoop;
+    joinButton.onclick = async () => {
+        try {
+            // 1. Dapatkan akses ke kamera dan mikrofon
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            displayVideo('Anda (Lokal)', localStream);
 
-        // --- Logika Modal Kustom ---
-        const modalOverlay = document.getElementById('custom-modal-overlay');
-        const modalTitle = document.getElementById('custom-modal-title');
-        const modalMessage = document.getElementById('custom-modal-message');
-        const modalButtons = document.getElementById('custom-modal-buttons');
-
-        function hideModal() {
-            modalOverlay.style.display = 'none';
-        }
-
-        function showModal(title, message, buttons = [{ text: 'OK', class: 'primary' }]) {
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            modalButtons.innerHTML = '';
-
-            buttons.forEach(btnInfo => {
-                const button = document.createElement('button');
-                button.textContent = btnInfo.text;
-                button.className = `modal-btn ${btnInfo.class || 'primary'}`;
-                button.onclick = () => {
-                    hideModal();
-                    if (btnInfo.callback) {
-                        btnInfo.callback();
-                    }
-                };
-                modalButtons.appendChild(button);
-            });
-
-            modalOverlay.style.display = 'flex';
-        }
-
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.classList.toggle('fa-eye-slash');
-        });
-
-
-        // --- 1. Logika Login ---
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const password = passwordInput.value;
-            roomId = roomIdInput.value.trim();
-            myName = nameInput.value.trim();
-
-            if (myName === "" || roomId === "") {
-                loginError.textContent = "Nama dan ID Rapat tidak boleh kosong!";
-                loginError.style.display = 'block';
-                return;
-            }
-
-            if (password === ADMIN_PASSWORD) userRole = 'admin';
-            else if (password === PARTICIPANT_PASSWORD) userRole = 'participant';
-            else {
-                loginError.textContent = "Password salah!";
-                loginError.style.display = 'block';
-                return;
-            }
+            // 2. Hubungi "papan pengumuman"
+            connectToSignalingServer();
             
-            initializeApp();
-        });
-
-        function initializeApp() {
-            loginModal.style.display = 'none';
-            mainContent.style.display = 'block';
-            roleBadge.textContent = userRole.toUpperCase();
-            roomIdDisplay.textContent = roomId;
-
-            const peerId = (userRole === 'admin') ? roomId : undefined;
-            myPeer = new Peer(peerId, {
-                host: '0.peerjs.com', port: 443, path: '/', secure: true
-            });
-
-            myPeer.on('open', id => {
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-                    myStream = stream;
-                    const myVideo = document.createElement('video');
-                    myVideo.muted = true;
-                    const isVideoEnabled = myStream.getVideoTracks()[0].enabled;
-                    addVideoStream(myVideo, stream, id, myName, isVideoEnabled, true);
-                    
-                    populateDeviceLists();
-                    setupVoiceDetection(stream);
-
-                    if (userRole === 'participant') {
-                        connectToNewUser(roomId, stream);
-                    }
-
-                    myPeer.on('call', call => {
-                        const { name: callerName, isVideoEnabled: callerIsVideoEnabled } = call.metadata;
-                        call.answer(stream);
-                        const video = document.createElement('video');
-                        call.on('stream', userVideoStream => {
-                            addVideoStream(video, userVideoStream, call.peer, callerName, callerIsVideoEnabled);
-                        });
-                        call.on('close', () => {
-                            const container = document.querySelector(`[data-peer-id="${call.peer}"]`);
-                            if (container) container.remove();
-                            delete peers[call.peer];
-                        });
-                        
-                        if (userRole === 'admin') {
-                            const oldPeers = Object.keys(peers);
-                            const oldPeerInfo = oldPeers.map(peerId => ({
-                                peerId,
-                                name: peers[peerId].name,
-                                isVideoEnabled: peers[peerId].isVideoEnabled
-                            }));
-
-                            if (oldPeerInfo.length > 0) {
-                                sendCommand(call.peer, 'connect_to_list', { peers: oldPeerInfo });
-                            }
-
-                            oldPeers.forEach(peerId => {
-                                sendCommand(peerId, 'new_user_joined', {
-                                    peerId: call.peer,
-                                    name: callerName,
-                                    isVideoEnabled: callerIsVideoEnabled
-                                });
-                            });
-                        }
-                        
-                        if (!peers[call.peer]) peers[call.peer] = {};
-                        peers[call.peer].call = call;
-                        peers[call.peer].name = callerName;
-                        peers[call.peer].isVideoEnabled = callerIsVideoEnabled;
-                    });
-
-                    myPeer.on('connection', conn => {
-                        conn.on('data', data => handleData(data, conn.peer));
-                    });
-
-                    setupControlListeners();
-                });
-            });
+            joinButton.style.display = 'none'; // Sembunyikan tombol setelah bergabung
+        } catch (err) {
+            console.error("Error: Tidak bisa mengakses kamera/mikrofon.", err);
+            alert("Gagal mengakses kamera. Mohon berikan izin pada browser Anda.");
         }
+    };
 
-        async function populateDeviceLists() {
-            micSelect.innerHTML = '';
+    function connectToSignalingServer() {
+        signalingSocket = new WebSocket(SIGNALING_SERVER_URL);
+        
+        const roomName = window.location.hash.substring(1) || 'ruang-publik';
+
+        // Saat koneksi ke "papan pengumuman" berhasil
+        signalingSocket.onopen = () => {
+            console.log("Terhubung ke server signaling.");
+            // Kirim pesan bahwa kita mau bergabung ke sebuah ruangan
+            signalingSocket.send(JSON.stringify({ action: 'join', room: roomName }));
+        };
+
+        // Saat menerima pesan dari "papan pengumuman"
+        signalingSocket.onmessage = handleSignalingMessage;
+
+        signalingSocket.onclose = () => {
+            console.warn("Koneksi ke server signaling terputus.");
+        };
+        signalingSocket.onerror = (err) => {
+            console.error("Error pada server signaling:", err);
+        };
+    }
+
+    async function handleSignalingMessage(message) {
+        const msg = JSON.parse(message.data);
+
+        switch (msg.action) {
+            // Server memberi tahu ID unik kita
+            case 'id':
+                myClientId = msg.id;
+                break;
+            
+            // Saat ada user BARU yang bergabung
+            case 'user-joined':
+                const newClientId = msg.id;
+                console.log(`User baru bergabung: ${newClientId}`);
+                // Buat koneksi baru untuk user tersebut
+                const pc = createPeerConnection(newClientId);
+                // Buat penawaran untuk memulai panggilan
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                // Kirim penawaran ke user baru melalui server
+                sendSignal(newClientId, { type: 'offer', sdp: offer.sdp });
+                break;
+            
+            // Saat ada user yang KELUAR
+            case 'user-left':
+                const leftClientId = msg.id;
+                console.log(`User keluar: ${leftClientId}`);
+                if (peerConnections[leftClientId]) {
+                    peerConnections[leftClientId].close();
+                    delete peerConnections[leftClientId];
+                }
+                removeVideo(leftClientId);
+                break;
+
+            // Saat menerima "sinyal" (offer/answer/candidate) dari user lain
+            case 'signal':
+                handleSignalFromPeer(msg.from, msg.data);
+                break;
+        }
+    }
+    
+    async function handleSignalFromPeer(clientId, signal) {
+        const pc = peerConnections[clientId] || createPeerConnection(clientId);
+        
+        if (signal.type === 'offer') {
+            await pc.setRemoteDescription(new RTCSessionDescription(signal));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            sendSignal(clientId, { type: 'answer', sdp: answer.sdp });
+        } else if (signal.type === 'answer') {
+            await pc.setRemoteDescription(new RTCSessionDescription(signal));
+        } else if (signal.candidate) {
             try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const audioDevices = devices.filter(device => device.kind === 'audioinput');
-                
-                if (audioDevices.length < 2) {
-                    micSelect.style.display = 'none';
-                    return;
-                }
-                micSelect.style.display = 'inline-block';
-
-                audioDevices.forEach(device => {
-                    const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.text = device.label || `Mikrofon ${micSelect.options.length + 1}`;
-                    micSelect.appendChild(option);
-                });
-
-                const currentAudioTrack = myStream.getAudioTracks()[0];
-                if (currentAudioTrack) {
-                    const currentSettings = currentAudioTrack.getSettings();
-                    micSelect.value = currentSettings.deviceId;
-                }
-
+                await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
             } catch (err) {
-                console.error("Gagal mendapatkan daftar perangkat:", err);
+                console.error("Error menambahkan ICE candidate:", err);
             }
         }
+    }
 
-        function setupVoiceDetection(stream) {
-            if (voiceDetectionLoop) cancelAnimationFrame(voiceDetectionLoop);
-            if (audioContext && audioContext.state !== 'closed') audioContext.close();
+    function createPeerConnection(clientId) {
+        const pc = new RTCPeerConnection(ICE_SERVERS);
+        peerConnections[clientId] = pc;
 
-            const audioTrack = stream.getAudioTracks()[0];
-            if (!audioTrack || !audioTrack.enabled) return;
+        // Kirim stream video kita ke user lain saat koneksi terbentuk
+        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
 
-            audioContext = new AudioContext();
-            analyser = audioContext.createAnalyser();
-            microphoneSource = audioContext.createMediaStreamSource(stream);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-            analyser.smoothingTimeConstant = 0.8;
-            analyser.fftSize = 1024;
-            microphoneSource.connect(analyser);
-
-            function detectSpeaking() {
-                const currentAudioTrack = myStream ? myStream.getAudioTracks()[0] : undefined;
-                if (currentAudioTrack && currentAudioTrack.enabled) {
-                    analyser.getByteFrequencyData(dataArray);
-                    const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-
-                    if (average > 20) {
-                        micBtn.style.backgroundColor = 'var(--danger-color)';
-                        micBtn.style.boxShadow = '0 0 10px var(--danger-color)';
-                    } else {
-                        micBtn.style.backgroundColor = 'var(--accent-color)';
-                        micBtn.style.boxShadow = 'none';
-                    }
-                }
-                voiceDetectionLoop = requestAnimationFrame(detectSpeaking);
-            }
-            detectSpeaking();
-        }
+        // Saat menerima stream video DARI user lain
+        pc.ontrack = (event) => {
+            displayVideo(clientId, event.streams[0]);
+        };
         
-        function setupControlListeners() {
-            micBtn.addEventListener('click', () => {
-                const audioTrack = myStream.getAudioTracks()[0];
-                if (audioTrack) {
-                    audioTrack.enabled = !audioTrack.enabled;
-                    micBtn.classList.toggle('active', audioTrack.enabled);
-                    micBtn.innerHTML = audioTrack.enabled ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash"></i>';
-                    
-                    if (audioTrack.enabled) {
-                        setupVoiceDetection(myStream);
-                    } else {
-                        if (voiceDetectionLoop) cancelAnimationFrame(voiceDetectionLoop);
-                        micBtn.style.backgroundColor = '#576574';
-                        micBtn.style.boxShadow = 'none';
-                    }
-                    sendCommandToAll('status_update', { peerId: myPeer.id, isMuted: !audioTrack.enabled });
-                }
-            });
-
-            videoBtn.addEventListener('click', () => {
-                const videoTrack = myStream.getVideoTracks()[0];
-                if (videoTrack) {
-                    videoTrack.enabled = !videoTrack.enabled;
-                    videoBtn.classList.toggle('active', videoTrack.enabled);
-                    videoBtn.innerHTML = videoTrack.enabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
-                    
-                    const myContainer = document.querySelector(`[data-peer-id="${myPeer.id}"]`);
-                    if (myContainer) {
-                        const videoEl = myContainer.querySelector('video');
-                        const placeholderEl = myContainer.querySelector('.video-placeholder');
-                        if (videoEl && placeholderEl) {
-                            videoEl.style.display = videoTrack.enabled ? 'block' : 'none';
-                            placeholderEl.style.display = videoTrack.enabled ? 'none' : 'flex';
-                        }
-                    }
-                    sendCommandToAll('video_status_update', { peerId: myPeer.id, isVideoEnabled: videoTrack.enabled });
-                }
-            });
-
-            leaveBtn.addEventListener('click', () => {
-                showModal('Keluar Rapat', 'Anda yakin ingin keluar dari rapat?', [
-                    { text: 'Ya, Keluar', class: 'danger', callback: () => window.location.reload() },
-                    { text: 'Batal', class: 'secondary' }
-                ]);
-            });
-
-            micSelect.addEventListener('change', switchAudioDevice);
-        }
-
-        async function switchAudioDevice() {
-            const selectedDeviceId = micSelect.value;
-            myStream.getTracks().forEach(track => track.stop());
-
-            try {
-                const newStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: { deviceId: { exact: selectedDeviceId } }
-                });
-
-                myStream = newStream;
-
-                const myVideo = document.querySelector(`[data-peer-id="${myPeer.id}"] video`);
-                myVideo.srcObject = newStream;
-
-                const audioTrack = newStream.getAudioTracks()[0];
-                for (const peerId in peers) {
-                    const call = peers[peerId].call;
-                    if (call) {
-                         const sender = call.peerConnection.getSenders().find(s => s.track.kind === 'audio');
-                         if (sender) {
-                             sender.replaceTrack(audioTrack);
-                         }
-                    }
-                }
-                
-                setupVoiceDetection(newStream);
-
-            } catch (err) {
-                console.error("Gagal mengganti perangkat audio:", err);
-                showModal('Gagal Beralih', 'Tidak dapat beralih ke mikrofon yang dipilih. Pastikan tidak digunakan oleh aplikasi lain.');
+        // Kirim "alamat jaringan" (ICE candidate) ke user lain
+        pc.onicecandidate = (event) => {
+            if (event.candidate) {
+                sendSignal(clientId, { candidate: event.candidate });
             }
-        }
+        };
 
+        return pc;
+    }
 
-        function handleData(data, peerId) {
-            switch (data.command) {
-                case 'mute':
-                    if (myStream.getAudioTracks()[0]) {
-                        myStream.getAudioTracks()[0].enabled = false;
-                        showModal('Mikrofon Dimatikan', 'Admin telah mematikan mikrofon Anda.');
-                        micBtn.classList.remove('active');
-                        micBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-                        micBtn.style.backgroundColor = '#576574';
-                        micBtn.style.boxShadow = 'none';
-                        if (voiceDetectionLoop) cancelAnimationFrame(voiceDetectionLoop);
-                        sendCommandToAll('status_update', { peerId: myPeer.id, isMuted: true });
-                    }
-                    break;
-                case 'kick':
-                    showModal('Dikeluarkan dari Rapat', 'Anda telah dikeluarkan dari rapat oleh Admin.', [
-                        { text: 'OK', class: 'primary', callback: () => window.location.reload() }
-                    ]);
-                    break;
-                case 'new_user_joined':
-                    connectToNewUser(data.payload.peerId, myStream, data.payload);
-                    break;
-                case 'connect_to_list':
-                    data.payload.peers.forEach(peerInfo => {
-                        connectToNewUser(peerInfo.peerId, myStream, peerInfo);
-                    });
-                    break;
-                case 'user_disconnected':
-                    const container = document.querySelector(`[data-peer-id="${data.payload.peerId}"]`);
-                    if (container) container.remove();
-                    delete peers[data.payload.peerId];
-                    break;
-                case 'status_update':
-                    const statusContainer = document.querySelector(`[data-peer-id="${data.payload.peerId}"]`);
-                    if (statusContainer) {
-                        let statusIcon = statusContainer.querySelector('.status-icon');
-                        if (!statusIcon) {
-                            statusIcon = document.createElement('span');
-                            statusIcon.className = 'status-icon';
-                            statusContainer.append(statusIcon);
-                        }
-                        statusIcon.innerHTML = data.payload.isMuted ? '<i class="fas fa-microphone-slash" style="color: var(--danger-color);"></i>' : '';
-                    }
-                    break;
-                case 'video_status_update':
-                    const videoContainer = document.querySelector(`[data-peer-id="${data.payload.peerId}"]`);
-                    if (videoContainer) {
-                        const videoEl = videoContainer.querySelector('video');
-                        const placeholderEl = videoContainer.querySelector('.video-placeholder');
-                        if (videoEl && placeholderEl) {
-                            videoEl.style.display = data.payload.isVideoEnabled ? 'block' : 'none';
-                            placeholderEl.style.display = data.payload.isVideoEnabled ? 'none' : 'flex';
-                        }
-                        if (peers[data.payload.peerId]) {
-                            peers[data.payload.peerId].isVideoEnabled = data.payload.isVideoEnabled;
-                        }
-                    }
-                    break;
-            }
-        }
+    function sendSignal(to, data) {
+        signalingSocket.send(JSON.stringify({ action: 'signal', to, from: myClientId, data }));
+    }
 
-        function connectToNewUser(userId, stream, peerInfo = {}) {
-            if (peers[userId]?.call || userId === myPeer.id) return;
-            
-            const myCurrentVideoStatus = myStream.getVideoTracks()[0].enabled;
-            const call = myPeer.call(userId, stream, { metadata: { name: myName, isVideoEnabled: myCurrentVideoStatus } });
-            
-            if(call){
-                const video = document.createElement('video');
-                call.on('stream', userVideoStream => {
-                    addVideoStream(video, userVideoStream, userId, peerInfo.name || call.metadata.name, peerInfo.isVideoEnabled ?? call.metadata.isVideoEnabled);
-                });
-                call.on('close', () => {
-                    const container = document.querySelector(`[data-peer-id="${userId}"]`);
-                    if (container) container.remove();
-                    delete peers[userId];
-                });
-                
-                if (!peers[userId]) peers[userId] = {};
-                peers[userId].call = call;
-                peers[userId].name = peerInfo.name || call.metadata.name;
-                peers[userId].isVideoEnabled = peerInfo.isVideoEnabled ?? call.metadata.isVideoEnabled;
-            }
-        }
+    // === FUNGSI TAMPILAN (UI) ===
 
-        function addVideoStream(video, stream, peerId, userName, isVideoEnabled, isSelf = false) {
-            let container = document.querySelector(`[data-peer-id="${peerId}"]`);
-            if (container) {
-                video = container.querySelector('video');
-            } else {
-                container = document.createElement('div');
-                container.classList.add('video-container');
-                container.dataset.peerId = peerId;
-                
-                const placeholder = document.createElement('div');
-                placeholder.classList.add('video-placeholder');
-                placeholder.innerHTML = '😴';
+    function displayVideo(clientId, stream) {
+        if (document.getElementById(`video-container-${clientId}`)) return;
 
-                const nameTag = document.createElement('div');
-                nameTag.classList.add('video-name-tag');
-                nameTag.textContent = userName || '...';
-                
-                container.append(video, placeholder, nameTag);
-                videoGrid.append(container);
-            }
-
-            video.srcObject = stream;
-            video.addEventListener('loadedmetadata', () => video.play());
-            
-            const placeholderEl = container.querySelector('.video-placeholder');
-            if (video && placeholderEl) {
-                video.style.display = isVideoEnabled ? 'block' : 'none';
-                placeholderEl.style.display = isVideoEnabled ? 'none' : 'flex';
-            }
-            
-            if (userRole === 'admin' && !isSelf && !container.querySelector('.admin-controls')) {
-                const controls = document.createElement('div');
-                controls.classList.add('admin-controls');
-                
-                const muteBtn = document.createElement('button');
-                muteBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                muteBtn.title = 'Matikan Mic';
-                muteBtn.onclick = () => sendCommand(peerId, 'mute');
-
-                const kickBtn = document.createElement('button');
-                kickBtn.innerHTML = '<i class="fas fa-times"></i>';
-                kickBtn.title = 'Keluarkan';
-                kickBtn.onclick = () => sendCommand(peerId, 'kick');
-                
-                controls.append(muteBtn, kickBtn);
-                container.append(controls);
-                controls.style.display = 'block';
-            }
-        }
-
-        function sendCommand(peerId, command, payload = {}) {
-            const conn = myPeer.connect(peerId, { reliable: true });
-            conn.on('open', () => {
-                conn.send({ command, payload });
-            });
-            conn.on('error', (err) => console.error(`Data connection error to ${peerId}: `, err));
-        }
+        const container = document.createElement('div');
+        container.id = `video-container-${clientId}`;
+        container.className = 'video-container';
         
-        function sendCommandToAll(command, payload = {}) {
-            Object.keys(peers).forEach(peerId => {
-                if (peerId !== myPeer.id) {
-                    sendCommand(peerId, command, payload);
-                }
-            });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.playsInline = true;
+
+        const nameTag = document.createElement('p');
+        nameTag.className = 'participant-name';
+        nameTag.textContent = clientId === 'Anda (Lokal)' ? 'Anda' : `User ${clientId.substring(0, 6)}`;
+        
+        if (clientId === 'Anda (Lokal)') {
+            video.muted = true; // Agar suara kita tidak bergema
         }
-    </script>
+
+        container.appendChild(video);
+        container.appendChild(nameTag);
+        videoGrid.appendChild(container);
+    }
+    
+    function removeVideo(clientId) {
+        const container = document.getElementById(`video-container-${clientId}`);
+        if (container) {
+            container.remove();
+        }
+    }
+
+</script>
 </body>
 </html>
-
