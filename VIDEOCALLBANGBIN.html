@@ -14,12 +14,28 @@
         #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 100; }
         #login-box { background-color: var(--secondary-bg); padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
         #login-box h2 { margin-top: 0; }
-        .input-group { margin: 20px 0; }
+        .input-group { position: relative; margin: 20px 0; } /* === PERUBAHAN CSS: Menambahkan position relative === */
         .input-group input { width: calc(100% - 20px); padding: 10px; border-radius: 5px; border: none; }
         #login-submit { width: 100%; padding: 12px; border-radius: 5px; border: none; background-color: var(--accent-color); color: white; cursor: pointer; font-weight: bold; font-size: 1em; }
         #login-error { color: var(--danger-color); margin-top: 10px; display: none; }
+        
+        /* === PENAMBAHAN CSS BARU: Ikon Mata Password === */
+        #toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #95a5a6;
+            width: 20px; /* Menambahkan lebar agar mudah diklik */
+            text-align: center;
+        }
+        #password-input {
+            padding-right: 40px; /* Memberi ruang untuk ikon */
+        }
 
-        /* === PENAMBAHAN CSS BARU: Modal Kustom === */
+
+        /* Modal Kustom */
         #custom-modal-overlay {
             position: fixed;
             top: 0;
@@ -27,7 +43,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.7);
-            display: none; /* Diubah ke flex oleh JS */
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 200;
@@ -113,7 +129,7 @@
             padding: 8px 12px;
             margin-left: 10px;
             cursor: pointer;
-            font-size: 0.5em;
+            font-size: 0.9em;
         }
         #mic-select:focus {
             outline: 2px solid var(--accent-color);
@@ -132,8 +148,10 @@
                 <div class="input-group">
                     <input type="text" id="room-id-input" placeholder="Masukkan ID Rapat" required>
                 </div>
+                <!-- === PERUBAHAN HTML: Menambahkan ikon mata di dalam input group === -->
                 <div class="input-group">
                     <input type="password" id="password-input" placeholder="Masukkan Password" required>
+                    <i class="fas fa-eye" id="toggle-password"></i>
                 </div>
                 <button type="submit" id="login-submit">Masuk ke Rapat</button>
                 <p id="login-error">ID Rapat atau Password salah!</p>
@@ -141,7 +159,6 @@
         </div>
     </div>
 
-    <!-- === PENAMBAHAN HTML BARU: Modal Kustom === -->
     <div id="custom-modal-overlay">
         <div id="custom-modal-box">
             <h3 id="custom-modal-title"></h3>
@@ -183,6 +200,7 @@
         const videoBtn = document.getElementById('video-btn');
         const leaveBtn = document.getElementById('leave-btn');
         const micSelect = document.getElementById('mic-select');
+        const togglePassword = document.getElementById('toggle-password'); // === ELEMEN BARU ===
 
         const ADMIN_PASSWORD = "BANGBIN123";
         const PARTICIPANT_PASSWORD = "PPESERTA123";
@@ -191,7 +209,7 @@
         
         let audioContext, analyser, microphoneSource, dataArray, voiceDetectionLoop;
 
-        // === PENAMBAHAN BARU: Logika Modal Kustom ===
+        // --- Logika Modal Kustom ---
         const modalOverlay = document.getElementById('custom-modal-overlay');
         const modalTitle = document.getElementById('custom-modal-title');
         const modalMessage = document.getElementById('custom-modal-message');
@@ -204,7 +222,7 @@
         function showModal(title, message, buttons = [{ text: 'OK', class: 'primary' }]) {
             modalTitle.textContent = title;
             modalMessage.textContent = message;
-            modalButtons.innerHTML = ''; // Kosongkan tombol sebelumnya
+            modalButtons.innerHTML = '';
 
             buttons.forEach(btnInfo => {
                 const button = document.createElement('button');
@@ -221,6 +239,13 @@
 
             modalOverlay.style.display = 'flex';
         }
+
+        // === PENAMBAHAN BARU: Event Listener untuk ikon mata ===
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
 
 
         // --- 1. Logika Login ---
@@ -263,7 +288,8 @@
 
             navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
                 myStream = stream;
-                addVideoStream(myVideo, stream, myPeer.id, myName, true);
+                const isVideoEnabled = myStream.getVideoTracks()[0].enabled;
+                addVideoStream(myVideo, stream, myPeer.id, myName, isVideoEnabled, true);
                 
                 populateDeviceLists();
                 setupVoiceDetection(stream);
@@ -273,12 +299,13 @@
                 }
 
                 myPeer.on('call', call => {
-                    const callerName = call.metadata.name;
+                    const { name: callerName, isVideoEnabled: callerIsVideoEnabled } = call.metadata;
                     call.answer(stream);
                     const video = document.createElement('video');
                     call.on('stream', userVideoStream => {
-                        addVideoStream(video, userVideoStream, call.peer, callerName);
-                        sendCommand(call.peer, 'user_info', { name: myName });
+                        addVideoStream(video, userVideoStream, call.peer, callerName, callerIsVideoEnabled);
+                        const myCurrentVideoStatus = myStream.getVideoTracks()[0].enabled;
+                        sendCommand(call.peer, 'user_info', { name: myName, isVideoEnabled: myCurrentVideoStatus });
                     });
                     call.on('close', () => {
                         const container = document.querySelector(`[data-peer-id="${call.peer}"]`);
@@ -401,7 +428,6 @@
             });
 
             leaveBtn.addEventListener('click', () => {
-                // === PERUBAHAN: Menggunakan Modal Kustom untuk konfirmasi ===
                 showModal('Keluar Rapat', 'Anda yakin ingin keluar dari rapat?', [
                     { text: 'Ya, Keluar', class: 'danger', callback: () => window.location.reload() },
                     { text: 'Batal', class: 'secondary' }
@@ -441,7 +467,6 @@
 
             } catch (err) {
                 console.error("Gagal mengganti perangkat audio:", err);
-                // === PERUBAHAN: Menggunakan Modal Kustom untuk error ===
                 showModal('Gagal Beralih', 'Tidak dapat beralih ke mikrofon yang dipilih. Pastikan tidak digunakan oleh aplikasi lain.');
             }
         }
@@ -452,7 +477,6 @@
                 case 'mute':
                     if (myStream.getAudioTracks()[0]) {
                         myStream.getAudioTracks()[0].enabled = false;
-                        // === PERUBAHAN: Menggunakan Modal Kustom untuk notifikasi ===
                         showModal('Mikrofon Dimatikan', 'Admin telah mematikan mikrofon Anda.');
                         micBtn.classList.remove('active');
                         micBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
@@ -463,7 +487,6 @@
                     }
                     break;
                 case 'kick':
-                    // === PERUBAHAN: Menggunakan Modal Kustom untuk notifikasi ===
                     showModal('Dikeluarkan dari Rapat', 'Anda telah dikeluarkan dari rapat oleh Admin.', [
                         { text: 'OK', class: 'primary', callback: () => window.location.reload() }
                     ]);
@@ -501,6 +524,12 @@
                         if (nameTag) {
                             nameTag.textContent = data.payload.name;
                         }
+                        const videoEl = userContainer.querySelector('video');
+                        const placeholderEl = userContainer.querySelector('.video-placeholder');
+                        if (videoEl && placeholderEl) {
+                            videoEl.style.display = data.payload.isVideoEnabled ? 'block' : 'none';
+                            placeholderEl.style.display = data.payload.isVideoEnabled ? 'none' : 'flex';
+                        }
                     }
                     break;
             }
@@ -508,10 +537,11 @@
 
         function connectToNewUser(userId, stream) {
             if (peers[userId] || userId === myPeer.id) return;
-            const call = myPeer.call(userId, stream, { metadata: { name: myName } });
+            const myCurrentVideoStatus = myStream.getVideoTracks()[0].enabled;
+            const call = myPeer.call(userId, stream, { metadata: { name: myName, isVideoEnabled: myCurrentVideoStatus } });
             const video = document.createElement('video');
             if(call){
-                call.on('stream', userVideoStream => addVideoStream(video, userVideoStream, userId, '...'));
+                call.on('stream', userVideoStream => addVideoStream(video, userVideoStream, userId, '...', true));
                 call.on('close', () => {
                     const container = document.querySelector(`[data-peer-id="${userId}"]`);
                     if (container) container.remove();
@@ -521,7 +551,7 @@
             }
         }
 
-        function addVideoStream(video, stream, peerId, userName, isSelf = false) {
+        function addVideoStream(video, stream, peerId, userName, isVideoEnabled, isSelf = false) {
             let container = document.querySelector(`[data-peer-id="${peerId}"]`);
             if (container) {
                 video = container.querySelector('video');
@@ -547,8 +577,8 @@
             
             const placeholderEl = container.querySelector('.video-placeholder');
             if (video && placeholderEl) {
-                video.style.display = 'block';
-                placeholderEl.style.display = 'none';
+                video.style.display = isVideoEnabled ? 'block' : 'none';
+                placeholderEl.style.display = isVideoEnabled ? 'none' : 'flex';
             }
             
             if (userRole === 'admin' && !isSelf && !container.querySelector('.admin-controls')) {
