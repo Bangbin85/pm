@@ -3,362 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bangbin Pelatihan Koding KA</title>
+    <title>Profil Bintang Adhi Permana</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">	
+    <!-- SwiperJS for 3D Slider -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        /* Custom styles for the page */
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #111827; /* bg-gray-900 */
+            background-color: #111827; /* Dark background */
+            color: #e5e7eb;
         }
 
-        /* 3D Button Effect */
-        .btn-3d {
+        /* -- Canvas untuk Partikel -- */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* -- Efek Glassmorphism -- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        /* -- Animasi Saat Scroll -- */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* -- Styling Timeline Baru -- */
+        .timeline {
             position: relative;
-            background-color: #0891b2; /* bg-cyan-600 */
-            color: white;
-            border: none;
-            border-radius: 0.5rem; /* rounded-lg */
-            padding: 0.75rem 1.5rem; /* py-3 px-6 */
-            font-weight: 600; /* font-semibold */
-            transition: all 0.15s ease-out;
-            box-shadow: 0 5px 0 #0e7490; /* A darker shade of cyan */
+            padding-left: 3rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(59, 130, 246, 0.3);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3.5rem;
+            top: 5px;
+            width: 1rem;
+            height: 1rem;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            border: 3px solid #111827;
+            transition: all 0.3s ease;
+        }
+        .timeline-item:hover::before {
+            transform: scale(1.3);
+            background-color: #60a5fa;
+        }
+
+        /* -- Styling Modal -- */
+        #product-modal.hidden {
+            display: none;
+        }
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 300ms, transform 300ms;
+        }
+
+        /* -- Styling 3D Slider -- */
+        .swiper {
+            width: 100%;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 320px;
+            height: 320px;
+        }
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
             cursor: pointer;
-            text-decoration: none; /* Remove underline from links styled as buttons */
-            display: inline-block; /* Ensure anchor tags behave like buttons */
-            text-align: center; /* Center text for anchor tags */
         }
-
-        .btn-3d:hover {
-            background-color: #06b6d4; /* bg-cyan-500 */
+        .swiper-button-next, .swiper-button-prev {
+            color: #60a5fa;
         }
-
-        .btn-3d:active {
-            transform: translateY(5px);
-            box-shadow: 0 0 0 #0e7490;
-        }
-
-        /* Card hover glow effect */
-        .card-glow {
-            transition: all 0.3s ease-in-out;
-        }
-
-        .card-glow:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(22, 163, 74, 0.5), 0 0 10px rgba(22, 163, 74, 0.3);
-        }
-
-        /* Modal transition */
-        #modal, #password-modal {
-            transition: opacity 0.3s ease;
-        }
-
-        /* Animation for wrong password */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-        .shake {
-            animation: shake 0.3s ease-in-out;
+        .swiper-pagination-bullet-active {
+            background: #60a5fa;
         }
         
-        /* Style for bullet points in modal */
-        #modal-description ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
-        }
-        #modal-description li {
-            margin-bottom: 0.5rem;
+        /* -- Styling Lightbox -- */
+        #lightbox.hidden {
+            display: none;
         }
 
+        /* -- STYLING KHUSUS UNTUK PRINT -- */
+        @media print {
+            /* Sembunyikan semua elemen web */
+            header, footer, #particle-canvas, #web-content, #product-modal, #lightbox {
+                display: none !important;
+            }
+            
+            /* Tampilkan hanya layout cetak */
+            #print-layout {
+                display: block !important;
+            }
+            
+            /* Atur ulang body untuk cetak */
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* Atur ulang font */
+            p, ul, li, div {
+                font-size: 9pt !important;
+                line-height: 1.4;
+            }
+            h1 { font-size: 22pt !important; }
+            h2 { font-size: 14pt !important; }
+            h3 { font-size: 11pt !important; }
+
+            /* Atur ulang warna teks agar terbaca di kertas putih */
+            .print-text-primary { color: #1f2937 !important; }
+            .print-text-secondary { color: #4b5563 !important; }
+            
+            /* Hindari elemen terpotong antar halaman */
+            .print-section, .print-card {
+                break-inside: avoid;
+            }
+        }
+        
     </style>
 </head>
-<body class="text-white">
+<body class="w-full">
 
-    <!-- Password Modal -->
-    <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center p-4 z-50">
-        <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-sm md:max-w-lg lg:max-w-xl p-8 text-center">
-            <h2 class="text-2xl font-bold mb-4 bg-gradient-to-r from-green-400 to-cyan-500 text-transparent bg-clip-text">Verifikasi Akses</h2>
-            <p class="text-gray-400 mb-6">Silakan masukkan kata sandi untuk melanjutkan.</p>
-            <form id="password-form">
-                <input type="password" id="password-input" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Monev" required>
-                <p id="password-error" class="text-red-500 text-sm mb-4 hidden">Sepertinya anda bukan peserta pelatihan.</p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button type="submit" class="btn-3d w-full">Masuk</button>
-                    <a href="https://sites.google.com/view/pendampinganlpd?usp=sharing" target="_blank" class="btn-3d w-full" style="background-color: #16a34a; box-shadow: 0 5px 0 #15803d;">Back</a>
+    <!-- ================================================== -->
+    <!--  KONTEN UNTUK TAMPILAN WEB (INTERAKTIF)             -->
+    <!-- ================================================== -->
+    <div id="web-content">
+        <!-- HERO SECTION DENGAN PARTIKEL -->
+        <header class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+            <canvas id="particle-canvas"></canvas>
+            <div class="relative z-10 p-4 scroll-reveal">
+                <img src="https://lh3.googleusercontent.com/d/1QHVbK_TkBo00jcaxdxD5XWmOPV2DTD3o" alt="Foto Profil" class="w-36 h-36 rounded-full mx-auto border-4 border-blue-500 shadow-lg mb-4" onerror="this.onerror=null;this.src='https://placehold.co/150x150/374151/e5e7eb?text=BAP';">
+                <h1 class="text-5xl md:text-6xl font-bold text-white tracking-tight">Bintang Adhi Permana</h1>
+                <p class="text-xl md:text-2xl text-blue-300 mt-2">Guru & Pengembang Pendidikan</p>
+                <div class="mt-6 flex justify-center space-x-5">
+                    <a href="https://wa.me/6281310051985" target="_blank" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-whatsapp fa-2x"></i></a>
+                    <a href="https://www.facebook.com/bintang.a.permana.1/" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-instagram fa-2x"></i></a>
+                    <a href="#" id="download-pdf" title="Unduh sebagai PDF" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fas fa-file-pdf fa-2x"></i></a>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div id="main-content" class="container mx-auto px-6 py-12 min-h-screen flex-col items-center justify-center hidden">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-2 bg-gradient-to-r from-green-400 to-cyan-500 text-transparent bg-clip-text">
-                Monev Pelatihan Koding KA
-            </h1>
-            <p class="text-lg md:text-xl text-gray-400">
-                Monitoring dan Evaluasi Pelaksanaan Pelatihan IN-1 Pembelajaran Koding dan Kecerdasan Artifisial Tahun 2025.
-            </p>
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+        <!-- KONTEN UTAMA WEB -->
+        <main class="container mx-auto p-4 md:p-8 space-y-16">
+            <!-- TENTANG SAYA -->
+            <section class="scroll-reveal text-center max-w-3xl mx-auto">
+                 <h2 class="text-3xl font-bold text-center mb-6 text-blue-400">Tentang Saya</h2>
+                 <p class="text-gray-300 leading-relaxed">
+                    Bintang Adhi Permana adalah seorang pendidik dan pengembang yang berdedikasi tinggi, dengan hasrat untuk memajukan dunia pendidikan Indonesia. Dengan latar belakang yang kuat sebagai guru Sekolah Dasar, ia memadukan pengalaman praktis di kelas dengan keahlian teknis dalam analisis data, pengembangan kurikulum, dan pembuatan aplikasi pendidikan. Kontribusinya yang luas, mulai dari menulis buku ajar hingga mengembangkan sistem rapor digital, mencerminkan komitmennya untuk menciptakan solusi inovatif yang memberdayakan guru dan siswa di seluruh negeri.
+                 </p>
+            </section>
             
-            <!-- Card 1: Observasi -->
-            <div class="card-glow bg-gray-800 border border-gray-700 rounded-xl p-6 flex flex-col items-center text-center cursor-pointer"
-                 data-title="Observasi"
-                 data-description="
-					 <ul>
-					 <li>Rekaman sesi peer teaching selama proses pelatihan.</li>
-					 <li>Catatan ringkas dan temuan penting dari observasi.</li>
-					 <li>Peserta yang diobservasi berasal dari rombel yang sama dengan informan wawancara untuk konsistensi data.</li>
-					 </ul>"
-                 data-download="https://docs.google.com/document/d/1jUFH8vz2tUIw7t1FRoiCZPH4OfCwdo5r/edit?tab=t.0"
-                 data-preview="https://bangbin85.github.io/WawancaraBangbin/Observasi">
-                <div class="mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
+            <!-- GALERI FOTO -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-2 text-blue-400">Galeri Foto</h2>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+                      <div class="swiper-slide">
+                        <img src="https://lh3.googleusercontent.com/d/1TFoJt29QZ7ECknL_C99rKHyDQYhSHrZF" alt="Profil 1" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="https://lh3.googleusercontent.com/d/1nGQtWx09aa1fxIzxNt20R8Zq-fZymYqf" alt="Profil 2" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="https://lh3.googleusercontent.com/d/1bxvjRTwH4nKQIqZMyJoOuoplZN8kROh4" alt="Profil 3" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="https://lh3.googleusercontent.com/d/1QHVbK_TkBo00jcaxdxD5XWmOPV2DTD3o" alt="Profil 4" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="https://lh3.googleusercontent.com/d/19COp7PM3HluixA1Qm14BM67kuuJP1r6p" alt="Profil 5" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="https://lh3.googleusercontent.com/d/1iHjTNDzzEYA5eICGSVHupG_faK0WfE8L" alt="Profil 6" />
+                      </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
                 </div>
-                <h3 class="text-2xl font-semibold mb-2">Observasi</h3>
-                <p class="text-gray-400">Berupa rekaman sesi peer teaching pada proses pelatihan dan catatan ringkas.</p>
-            </div>
+            </section>
 
-            <!-- Card 2: Wawancara -->
-            <div class="card-glow bg-gray-800 border border-gray-700 rounded-xl p-6 flex flex-col items-center text-center cursor-pointer"
-                 data-title="Wawancara"
-                 data-description="
-					 <ul>
-					 <li>Wawancara mendalam dengan 1 Fasilitator untuk memahami perspektif penyampaian materi.</li>
-					 <li>Wawancara dengan perwakilan peserta untuk mendapatkan feedback langsung.</li>
-					 <li>Wawancara dengan pihak Dinas Pendidikan terkait dukungan dan gambaran umum pelaksanaan.</li>
-					 <li>Tujuan utama adalah memetakan gambaran pelaksanaan In-service Training 1 secara komprehensif.</li>
-					 <li>Petugas lapangan menanyakan kesediaan informan apabila sesi wawancara akan direkam dan didokumentasikan.</li>
-					 <li>Dalam mengajukan pertanyaan, petugas lapangan diperkenankan menggunakan bahasa yang lebih sederhana sehingga mudah dipahami informan, namun tidak mengarahkan jawaban informan.</li>
-					 <li>Petugas lapangan menggunakan perspektif “pengumpulan data”, bukan “sosialisasi atau diseminasi”, sehingga petugas lapangan tidak diperkenankan menanggapi dengan negatif atau mengoreksi jawaban responden.</li>
-					 </ul>"
-                 data-download="https://drive.google.com/uc?export=download&id=1bbyJRWWnuwEif7fyHeWt0vApZB19Izp30lCuDm9ifZ0"
-                 data-preview="https://bangbin85.github.io/WawancaraBangbin/Wawancara">
-                <div class="mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-semibold mb-2">Wawancara</h3>
-                <p class="text-gray-400">Melakukan wawan cara terhadap 1 Fasilitator, Peserta, Dinas Pendidikan terkait gambaran pelaksanaan Inservice training-1.</p>
-            </div>
-
-            <!-- Card 3: Laporan -->
-            <div class="card-glow bg-gray-800 border border-gray-700 rounded-xl p-6 flex flex-col items-center text-center cursor-pointer"
-                 data-title="Laporan"
-                 data-description="
-					 <ul>
-					 <li>Petugas lapangan perlu mencatat hasil wawancara dengan detail. </li>
-					 <li>Petugas lapangan dapat melakukan interpretasi dengan disertai basis data yang memadai.</li>
-					 <li>Input data dalam bentuk naratif per topik pertanyaan dengan mendeskripsikan setiap jawaban informan dari pendalaman pertanyaan.</li>
-					 <li>Ditulis dalam kalimat utuh dan lengkap.</li>
-					 <li>Kuotasi yang dianggap penting ditulis dalam tanda kutip “...” dengan format italic.</li>
-					 <li>Jika diperlukan dapat menuliskan catatan pewawancara di akhir narasi. (misalnya terkait: triangulasi data, dinamika pelatihan yang terlihat, interaksi antara fasilitator dan peserta, maupun antarpeserta, dll).</li>
-					 </ul>"
-                 data-download="https://drive.google.com/uc?export=download&id=1S3xPdZHvzNkxd5ke-tdt0KoziETiEm9K"
-                 data-preview="https://bangbin85.github.io/WawancaraBangbin/Ringkas">
-                <div class="mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-semibold mb-2">Laporan Ringkas</h3>
-                <p class="text-gray-400">Rangkuman Laporan Monev.</p>
-            </div>
-        </div>
-
-        <div class="mt-16 text-center">
-            <h3 class="text-2xl font-semibold mb-6">Form</h3>
-            <div class="flex flex-wrap gap-4 justify-center">
-                <a href="https://sites.google.com/view/bangbinedu/refleksi" target="_blank" class="btn-3d">Feedback</a>
-                <a href="https://forms.gle/CcshNYu243GFgMDm8" target="_blank" class="btn-3d" style="background-color: #4f46e5; box-shadow: 0 5px 0 #3730a3;">Wawancara Fasil</a>
-                <a href="https://forms.gle/vTxq1FTbGeMHGaKU8" target="_blank" class="btn-3d" style="background-color: #0feee1; box-shadow: 0 5px 0 #ee0f32;">Wawancara Guru</a>
-                <a href="https://forms.gle/WcfqxhQq7YwvLq25A" target="_blank" class="btn-3d" style="background-color: #ee0f32; box-shadow: 0 5px 0 #3730a3;">Wawancara Dinas</a>
-                <a href="https://forms.gle/pPj78qbtS3H1R3PH9" target="_blank" class="btn-3d" style="background-color: #0fee45; box-shadow: 0 5px 0 #3730a3;">Observasi</a>
-                <a href="https://forms.gle/Rb2924LNkXqR2u8j7" target="_blank" class="btn-3d" style="background-color: #e00fee; box-shadow: 0 5px 0 #ee0f32;">Laporan</a>
-                <a href="https://242522231-atari-embeds.googleusercontent.com/embeds/16cb204cf3a9d4d223a0a3fd8b0eec5d/inner-frame-minified.html?jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.en.iFs_Bhrqdio.O%2Fd%3D1%2Frs%3DAHpOoo-IvlQWaLHZdUKQFbafXd_3OEvU9Q%2Fm%3D__features__" target="_blank" class="btn-3d" style="background-color: #e00fee; box-shadow: 0 5px 0 #ee0f32;">Survey</a>              
-            </div>
-        </div>
-    </div>
-
-    <!-- Info Modal -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
-        <div id="modal-panel" class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-full overflow-y-auto transform transition-transform duration-300 scale-95">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 id="modal-title" class="text-2xl font-bold text-white"></h3>
-                    <button id="modal-close-btn" class="text-gray-400 hover:text-white transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <!-- Modal content with text/bullets -->
-                <div id="modal-content">
-                    <div id="modal-description" class="text-gray-300 mb-6"></div>
-                    <!-- Buttons remain the same -->
-                    <div class="flex flex-wrap gap-4">
-                        <a id="modal-download-link" href="#" target="_blank" class="btn-3d">
-                            Download 1
-                        </a>
-                        <a id="modal-download2-link" href="#" target="_blank" class="btn-3d" style="background-color: #ca8a04; box-shadow: 0 5px 0 #a16207;">
-                            Download 2
-                        </a>
-                        <a id="modal-preview-link" href="#" target="_blank" class="btn-3d" style="background-color: #16a34a; box-shadow: 0 5px 0 #15803d;">
-                            Preview
-                        </a>
+            <!-- PENGALAMAN MENGAJAR -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Pengalaman Mengajar</h2>
+                <div class="timeline max-w-2xl mx-auto">
+                    <div class="timeline-item">
+                        <p class="font-semibold text-lg text-gray-100">SDN Lubang Buaya 01</p>
+                        <p class="text-sm text-gray-400">2021 - Sekarang</p>
+                    </div>
+                    <div class="timeline-item">
+                        <p class="font-semibold text-lg text-gray-100">SDN Lubang Buaya 13</p>
+                        <p class="text-sm text-gray-400">2014 - 2021</p>
+                    </div>
+                    <div class="timeline-item">
+                        <p class="font-semibold text-lg text-gray-100">SDN Kalideres 12 Pagi</p>
+                        <p class="text-sm text-gray-400">2011 - 2014</p>
+                    </div>
+                    <div class="timeline-item">
+                        <p class="font-semibold text-lg text-gray-100">SDN Kebon Manggis 14 Pagi</p>
+                        <p class="text-sm text-gray-400">2007 - 2010</p>
                     </div>
                 </div>
+            </section>
+
+             <!-- PERAN & KONTRIBUSI -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Peran & Kontribusi</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Analis Data</h3>
+                        <p class="text-gray-400 text-sm mb-2">2024 - Sekarang</p>
+                        <ul class="list-disc list-inside text-gray-300 text-sm">
+                            <li>Direktorat PAUD, SD, SMP, SMA</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Pengembang Kurikulum</h3>
+                        <p class="text-gray-400 text-sm mb-2">2019 - Sekarang</p>
+                        <p class="text-gray-300 text-sm">PKLK Disdik DKI Jakarta</p>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Pengembang Erapor SD</h3>
+                         <p class="text-gray-400 text-sm mb-2">2019 - Sekarang</p>
+                        <p class="text-gray-300 text-sm">Direktorat SD Kemendikdasmen</p>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Sekretaris Kwartir Ranting</h3>
+                        <p class="text-gray-400 text-sm mb-2">2020 - Sekarang</p>
+                        <p class="text-gray-300 text-sm">Kwarran Cipayung, Jakarta Timur</p>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Penulis Buku</h3>
+                        <p class="text-gray-400 text-sm mb-2">2022 - 2023</p>
+                        <ul class="list-disc list-inside text-gray-300 text-sm">
+                            <li>Pancasila - Erlangga</li>
+                            <li>Matematika - Erlangga</li>
+                            <li>Koding Ka - Puskurbuk</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Penulis Modul Ajar</h3>
+                        <ul class="list-disc list-inside text-gray-300 text-sm">
+                            <li>Direktorat SD Kemendikdasmen</li>
+                            <li>Direktorat Guru dan Tenaga Kependidikan</li>
+                            <li>Pusat Kurikulum dan Pembelajaran</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PENDIDIKAN -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Pendidikan</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <div class="glass-card p-6 flex items-center space-x-4">
+                        <i class="fas fa-graduation-cap text-blue-400 text-3xl"></i>
+                        <div>
+                            <p class="font-semibold text-lg text-white">S2 - Penelitian dan Evaluasi Pendidikan</p>
+                            <p class="text-sm text-gray-400">Universitas Prof. DR. Hamka Jakarta</p>
+                        </div>
+                    </div>
+                     <div class="glass-card p-6 flex items-center space-x-4">
+                        <i class="fas fa-graduation-cap text-blue-400 text-3xl"></i>
+                        <div>
+                            <p class="font-semibold text-lg text-white">S1 - PGSD</p>
+                            <p class="text-sm text-gray-400">Universitas Negeri Jakarta</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PRODUK & KARYA -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Produk & Karya</h2>
+                <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Produk akan dimasukkan di sini oleh JavaScript -->
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center p-8 mt-16 border-t border-gray-800">
+            <p class="text-gray-500">&copy; 2024 Bintang Adhi Permana. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- ================================================== -->
+    <!--  KONTEN KHUSUS UNTUK CETAK (TIDAK TAMPIL DI WEB)   -->
+    <!-- ================================================== -->
+    <div id="print-layout" class="hidden p-8">
+        <!-- Header Cetak -->
+        <div class="text-center mb-8">
+            <h1 class="font-bold print-text-primary">Bintang Adhi Permana</h1>
+            <p class="print-text-secondary">Guru & Pengembang Pendidikan</p>
+            <p class="print-text-secondary text-xs mt-1">
+                <i class="fab fa-whatsapp"></i> 6281310051985
+            </p>
+        </div>
+
+        <!-- Kontainer 2 Kolom -->
+        <div class="grid grid-cols-2 gap-8">
+            <!-- Kolom Kiri -->
+            <div class="space-y-6">
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Tentang Saya</h2>
+                    <p class="print-text-secondary">
+                        Seorang pendidik dan pengembang yang berdedikasi, memadukan pengalaman di kelas dengan keahlian teknis dalam analisis data, pengembangan kurikulum, dan pembuatan aplikasi untuk memajukan pendidikan Indonesia.
+                    </p>
+                </section>
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Pendidikan</h2>
+                    <div class="print-card mb-2">
+                        <h3 class="font-semibold print-text-primary">S2 - Penelitian dan Evaluasi Pendidikan</h3>
+                        <p class="print-text-secondary">Universitas Prof. DR. Hamka Jakarta</p>
+                    </div>
+                    <div class="print-card">
+                        <h3 class="font-semibold print-text-primary">S1 - PGSD</h3>
+                        <p class="print-text-secondary">Universitas Negeri Jakarta</p>
+                    </div>
+                </section>
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Produk & Karya</h2>
+                    <ul class="list-disc list-inside print-text-secondary space-y-1">
+                        <li>Modul Ajar Matematika (Kelas 1, 2, 5)</li>
+                        <li>Modul Ajar Pancasila (Kelas 5)</li>
+                        <li>Konten Game Interaktif (Kelas 1)</li>
+                        <li>Buku Nilai Kokurikuler</li>
+                        <li>Aplikasi Rapor SD & Buku Induk</li>
+                        <li>Berbagai Video Pembelajaran</li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- Kolom Kanan -->
+            <div class="space-y-6">
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Pengalaman Mengajar</h2>
+                    <div class="space-y-2">
+                        <div>
+                            <h3 class="font-semibold print-text-primary">SDN Lubang Buaya 01</h3>
+                            <p class="print-text-secondary">2021 - Sekarang</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">SDN Lubang Buaya 13</h3>
+                            <p class="print-text-secondary">2014 - 2021</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">SDN Kalideres 12 Pagi</h3>
+                            <p class="print-text-secondary">2011 - 2014</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">SDN Kebon Manggis 14 Pagi</h3>
+                            <p class="print-text-secondary">2007 - 2010</p>
+                        </div>
+                    </div>
+                </section>
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Peran & Kontribusi</h2>
+                    <div class="space-y-2">
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Analis Data (2024 - Sekarang)</h3>
+                            <p class="print-text-secondary">Direktorat PAUD, SD, SMP, SMA</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Pengembang Kurikulum (2019 - Sekarang)</h3>
+                            <p class="print-text-secondary">PKLK Disdik DKI Jakarta</p>
+                        </div>
+                         <div>
+                            <h3 class="font-semibold print-text-primary">Pengembang Erapor SD (2019 - Sekarang)</h3>
+                            <p class="print-text-secondary">Direktorat SD Kemendikdasmen</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Sekretaris Kwartir Ranting (2020 - Sekarang)</h3>
+                            <p class="print-text-secondary">Kwarran Cipayung, Jakarta Timur</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Penulis Buku (2022 - 2023)</h3>
+                            <p class="print-text-secondary">Pancasila & Matematika (Erlangga), Koding Ka (Puskurbuk)</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Penulis Modul Ajar</h3>
+                            <p class="print-text-secondary">Direktorat SD, GTK, & Puskurla Kemendikdasmen</p>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
 
+    <!-- ================================================== -->
+    <!--  MODAL UNTUK DETAIL PRODUK                         -->
+    <!-- ================================================== -->
+    <div id="product-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div id="modal-content" class="glass-card p-8 rounded-2xl max-w-lg w-full relative modal-enter">
+            <button id="modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+            <h3 id="modal-title" class="text-2xl font-bold text-white mb-4"></h3>
+            <p id="modal-description" class="text-gray-300 mb-6"></p>
+            <a id="modal-link" href="#" target="_blank" class="inline-block bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                Lihat Detail <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- ================================================== -->
+    <!--  LIGHTBOX UNTUK GALERI FOTO                        -->
+    <!-- ================================================== -->
+    <div id="lightbox" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+        <button id="lightbox-close" class="absolute top-6 right-6 text-white text-4xl opacity-80 hover:opacity-100">&times;</button>
+        <img id="lightbox-img" src="" alt="Tampilan diperbesar" class="max-w-full max-h-full object-contain transform transition-transform duration-300 scale-95">
+    </div>
+
+
+    <!-- SwiperJS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- PASSWORD VERIFICATION LOGIC ---
-            const passwordModal = document.getElementById('password-modal');
-            const passwordForm = document.getElementById('password-form');
-            const passwordInput = document.getElementById('password-input');
-            const passwordError = document.getElementById('password-error');
-            const mainContent = document.getElementById('main-content');
-            const correctPassword = 'Monev';
+        // --- SCRIPT PARTIKEL ---
+        const canvas = document.getElementById('particle-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
-            // Focus the password input on load
-            passwordInput.focus();
+            let particlesArray;
 
-            passwordForm.addEventListener('submit', (e) => {
-                e.preventDefault(); // Prevent form from reloading the page
-                const enteredPassword = passwordInput.value;
+            class Particle {
+                constructor(x, y, directionX, directionY, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.directionX = directionX;
+                    this.directionY = directionY;
+                    this.size = size;
+                    this.color = color;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+                update() {
+                    if (this.x > canvas.width || this.x < 0) {
+                        this.directionX = -this.directionX;
+                    }
+                    if (this.y > canvas.height || this.y < 0) {
+                        this.directionY = -this.directionY;
+                    }
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                    this.draw();
+                }
+            }
 
-                if (enteredPassword === correctPassword) {
-                    // Fade out the password modal
-                    passwordModal.style.opacity = '0';
-                    setTimeout(() => {
-                        passwordModal.classList.add('hidden');
-                    }, 300); // Match transition duration
+            function init() {
+                particlesArray = [];
+                let numberOfParticles = (canvas.height * canvas.width) / 9000;
+                for (let i = 0; i < numberOfParticles; i++) {
+                    let size = (Math.random() * 2) + 1;
+                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                    let directionX = (Math.random() * .4) - .2;
+                    let directionY = (Math.random() * .4) - .2;
+                    let color = 'rgba(59, 130, 246, 0.5)';
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                }
+            }
 
-                    // Show and fade in the main content
-                    mainContent.classList.remove('hidden');
-                    mainContent.classList.add('flex'); // Make it flex again
-                    setTimeout(() => {
-                        mainContent.style.opacity = '1';
-                    }, 50); // Short delay to ensure display is set before opacity
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, innerWidth, innerHeight);
+                for (let i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+            }
 
-                } else {
-                    // Show error message and shake the form
-                    passwordError.classList.remove('hidden');
-                    passwordInput.classList.add('shake');
+            init();
+            animate();
 
-                    // Clear the input
-                    passwordInput.value = '';
-                    passwordInput.focus();
+            window.addEventListener('resize', () => {
+                canvas.width = innerWidth;
+                canvas.height = innerHeight;
+                init();
+            });
+        }
 
-                    // Remove shake animation after it finishes
-                    setTimeout(() => {
-                        passwordInput.classList.remove('shake');
-                    }, 300);
+        // --- SCRIPT ANIMASI SCROLL ---
+        const scrollElements = document.querySelectorAll(".scroll-reveal");
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
                 }
             });
+        }, { threshold: 0.1 });
 
-            // --- CARD MODAL LOGIC ---
-            const cards = document.querySelectorAll('.card-glow');
-            const modal = document.getElementById('modal');
-            const modalPanel = document.getElementById('modal-panel');
-            const modalCloseBtn = document.getElementById('modal-close-btn');
+        scrollElements.forEach(el => {
+            observer.observe(el);
+        });
+
+        // --- SCRIPT EFEK 3D TILT PADA KARTU ---
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const { width, height } = rect;
+                const rotateX = (y / height - 0.5) * -15; // Invert Y-axis for natural feel
+                const rotateY = (x / width - 0.5) * 15;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            });
+        });
+
+        // --- SCRIPT PRODUK, MODAL, & LIGHTBOX ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Data Produk
+            const products = [
+                { title: 'Modul Ajar Matematika Kls 1', description: 'Modul pembelajaran komprehensif untuk matematika tingkat dasar kelas 1.', link: '#' },
+                { title: 'Modul Ajar Matematika Kls 2', description: 'Melanjutkan pondasi matematika dasar dengan materi yang interaktif untuk kelas 2.', link: '#' },
+                { title: 'Modul Ajar Matematika Kls 5', description: 'Materi matematika untuk tingkat lanjut yang menantang dan sesuai kurikulum untuk kelas 5.', link: '#' },
+                { title: 'Modul Ajar Pancasila Kls 5', description: 'Pembelajaran mendalam mengenai nilai-nilai luhur Pancasila untuk siswa kelas 5.', link: '#' },
+                { title: 'Konten Game Interaktif Kls 1', description: 'Media belajar inovatif berbasis permainan untuk meningkatkan engagement siswa kelas 1.', link: '#' },
+                { title: 'Buku Nilai Kokurikuler', description: 'Alat bantu praktis bagi guru untuk melakukan penilaian kegiatan kokurikuler siswa.', link: '#' },
+                { title: 'Aplikasi Rapor SD', description: 'Aplikasi digital untuk mempermudah proses rekapitulasi dan pencetakan rapor Sekolah Dasar.', link: '#' },
+                { title: 'Aplikasi Buku Induk', description: 'Solusi digitalisasi untuk manajemen data administrasi siswa di sekolah.', link: '#' },
+                { title: 'Video Pembelajaran 1', description: 'Konten video edukatif yang menarik untuk membantu pemahaman siswa terhadap materi pelajaran.', link: '#' },
+                { title: 'Video Pembelajaran 2', description: 'Seri lanjutan dari konten video edukatif dengan topik yang lebih beragam.', link: '#' },
+                { title: 'Buku Matematika Erlangga', description: 'Buku teks pelajaran Matematika yang diterbitkan oleh Erlangga.', link: '#' },
+                { title: 'Buku Pancasila Erlangga', description: 'Buku teks pelajaran Pancasila yang diterbitkan oleh Erlangga.', link: '#' }
+            ];
+
+            const productListContainer = document.getElementById('product-list');
+            const modal = document.getElementById('product-modal');
+            const modalContent = document.getElementById('modal-content');
             const modalTitle = document.getElementById('modal-title');
             const modalDescription = document.getElementById('modal-description');
-            const modalDownloadLink = document.getElementById('modal-download-link');
-            const modalDownload2Link = document.getElementById('modal-download2-link');
-            const modalPreviewLink = document.getElementById('modal-preview-link');
+            const modalLink = document.getElementById('modal-link');
+            const modalCloseBtn = document.getElementById('modal-close');
 
-            // Function to open the modal
-            const openModal = (card) => {
-                const title = card.dataset.title;
-                const description = card.dataset.description; // This now contains HTML for the bullet points
-                const downloadLink = card.dataset.download;
-                const download2Link = card.dataset.download2;
-                const previewLink = card.dataset.preview;
+            // Generate product cards
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'glass-card product-card p-5 flex items-center justify-center text-center cursor-pointer';
+                card.innerHTML = `<p class="font-semibold text-white">${product.title}</p>`;
+                card.addEventListener('click', () => openModal(product));
+                productListContainer.appendChild(card);
+            });
 
-                modalTitle.textContent = title;
-                // Use innerHTML to render the bullet points from the data-description attribute
-                modalDescription.innerHTML = description;
-
-                // Logic for Download 1
-                if (downloadLink) {
-                    modalDownloadLink.href = downloadLink;
-                    modalDownloadLink.style.display = 'inline-block';
-                } else {
-                    modalDownloadLink.style.display = 'none';
-                }
-
-                // Logic for Download 2
-                if (download2Link) {
-                    modalDownload2Link.href = download2Link;
-                    modalDownload2Link.style.display = 'inline-block';
-                } else {
-                    modalDownload2Link.style.display = 'none';
-                }
-
-                // Logic for Preview
-                if (previewLink) {
-                    modalPreviewLink.href = previewLink;
-                    modalPreviewLink.style.display = 'inline-block';
-                } else {
-                    modalPreviewLink.style.display = 'none';
-                }
-
+            function openModal(product) {
+                modalTitle.textContent = product.title;
+                modalDescription.textContent = product.description;
+                modalLink.href = product.link;
                 modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
+                modalContent.classList.remove('modal-exit', 'modal-exit-active');
+                modalContent.classList.add('modal-enter-active');
+            }
 
-                requestAnimationFrame(() => {
-                    modal.style.opacity = '1';
-                    modalPanel.style.transform = 'scale(1)';
-                });
-            };
-
-            // Function to close the modal
-            const closeModal = () => {
-                modal.style.opacity = '0';
-                modalPanel.style.transform = 'scale(0.95)';
-
+            function closeModal() {
+                modalContent.classList.remove('modal-enter-active');
+                modalContent.classList.add('modal-exit-active');
                 setTimeout(() => {
                     modal.classList.add('hidden');
-                    document.body.style.overflow = 'auto';
                 }, 300);
-            };
+            }
 
-            // Add click event listener to each card
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    openModal(card);
+            modalCloseBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Lightbox Logic
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxClose = document.getElementById('lightbox-close');
+            const galleryImages = document.querySelectorAll('.swiper-slide img');
+
+            galleryImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    lightbox.classList.remove('hidden');
+                    lightboxImg.src = img.src;
+                    // Animate in
+                    setTimeout(() => lightboxImg.classList.add('scale-100'), 50);
                 });
             });
 
-            // Add click event listener to the close button
-            modalCloseBtn.addEventListener('click', closeModal);
+            function closeLightbox() {
+                // Animate out
+                lightboxImg.classList.remove('scale-100');
+                setTimeout(() => {
+                    lightbox.classList.add('hidden');
+                    lightboxImg.src = ''; // Clear src
+                }, 300);
+            }
 
-            // Add click event listener to the modal overlay
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    closeModal();
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    closeLightbox();
                 }
             });
+        });
 
-            // Add keyboard event listener for 'Escape' key
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    closeModal();
-                }
-            });
+        // --- SCRIPT 3D SLIDER ---
+        var swiper = new Swiper(".mySwiper", {
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            loop: true,
+            coverflowEffect: {
+              rotate: 50,
+              stretch: 0,
+              depth: 100,
+              modifier: 1,
+              slideShadows: true,
+            },
+            pagination: {
+              el: ".swiper-pagination",
+            },
+        });
+
+
+        // --- SCRIPT UNTUK CETAK ---
+        document.getElementById('download-pdf').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.print();
         });
     </script>
 </body>
