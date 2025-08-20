@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
+    <title>Input Nilai Ekstrakurikuler</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+
+    <style>
+        /* Variabel warna (jika belum ada di style.css) */
+        :root {
+            --primary-color: #0069d9;
+            --secondary-color: #6c757d;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            font-family: sans-serif;
+        }
+
+        /* Style untuk judul, ikon home, dan tombol tutorial */
+        .title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Mengurangi gap antar tombol */
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            flex-wrap: wrap; /* Agar tombol bisa turun baris jika tidak cukup */
+        }
+        .title-wrapper h1 {
+            margin: 0;
+            padding: 0;
+            border-bottom: none;
+            flex-grow: 1; /* Membuat judul mengambil ruang yang tersedia */
+        }
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-color);
+            transition: all 0.2s ease-in-out;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+        .home-link:hover {
+            transform: scale(1.15);
+            color: var(--primary-color);
+        }
+        .home-link svg {
+            width: 32px;
+            height: 32px;
+        }
+        .header-button { /* Kelas asli dari file Anda */
+            display: inline-flex; align-items: center; gap: 8px;
+            color: white; border: none; padding: 8px 15px;
+            border-radius: 8px; cursor: pointer; font-size: 0.9em;
+            font-weight: bold; transition: background-color 0.3s;
+            flex-shrink: 0;
+        }
+        .tutorial-button {
+            background-color: var(--info-color);
+        }
+        .tutorial-button:hover {
+            background-color: #138496;
+        }
+        #simpanEkstra {
+             background-color: var(--success-color);
+             padding: 8px 15px;
+             font-size: 0.9em;
+        }
+        #simpanEkstra:hover {
+            background-color: #218838;
+        }
+        #tombolExcel {
+            background-color: #1d6f42; /* Warna hijau tua untuk Excel */
+        }
+        #tombolExcel:hover {
+            background-color: #144e2e;
+        }
+        .header-button svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* PERUBAHAN 1: Membuat kontainer lebih lebar */
+        .container { min-width: 1400px; margin: 0 auto; }
+        .table-wrapper {
+            width: 100%; max-height: 70vh; overflow: auto; border: 1px solid var(--border-color);
+        }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th, td {
+            text-align: center; padding: 10px; border: 1px solid var(--border-color); vertical-align: middle;
+        }
+		thead th {
+			position: sticky; top: 0;
+			background-color: #3a75b8; /* Biru yang lebih modern & lembut */
+			color: white; z-index: 5;
+		}
+
+		thead th {
+			position: sticky; top: 0;
+			background-color: #3a75b8; /* Biru yang lebih modern & lembut */
+			color: white; z-index: 5;
+		}
+		thead tr:nth-child(2) th {
+			top: 45px;
+			background-color: #4e88c7; /* Warna sub-header sedikit lebih terang */
+			z-index: 4;
+		}
+		thead tr:nth-child(1) th:nth-child(1),
+		thead tr:nth-child(1) th:nth-child(2) { left: 0; z-index: 10; }
+		thead tr:nth-child(1) th:nth-child(2) { left: 51px; }
+        tbody td:nth-child(1), tbody td:nth-child(2) {
+            position: sticky; background: white; z-index: 1;
+        }
+        tbody td:nth-child(1) { left: 0; }
+        tbody td:nth-child(2) { left: 51px; border-right: 2px solid #ccc; }
+        tbody tr:nth-child(even) td:nth-child(1),
+        tbody tr:nth-child(even) td:nth-child(2) {
+             background-color: #f8f9fa;
+        }
+        td input, td select {
+            width: 100%; padding: 8px; border-radius: 5px;
+            border: 1px solid #ccc; box-sizing: border-box;
+        }
+
+        
+        /* Lebar kolom tidak lagi diatur secara spesifik agar lebih fleksibel */
+        .col-predikat { min-width: 220px; } 
+        .col-deskripsi { min-width: 300px; }
+
+        td input, td select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .header-predikat-bulk {
+            font-size: 0.8em; padding: 2px 4px; margin-left: 8px;
+            border-radius: 4px; vertical-align: middle; cursor: pointer;
+        }
+        
+        /* --- STYLE UNTUK MODAL EXCEL --- */
+        .excel-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .excel-modal-content {
+            background: var(--bg-color); padding: 25px; border-radius: var(--border-radius-md);
+            width: 90%; max-width: 550px; text-align: left;
+            box-shadow: 10px 10px 20px var(--dark-shadow), -10px -10px 20px var(--light-shadow);
+        }
+        .excel-modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--dark-shadow); padding-bottom: 15px; margin-bottom: 15px; }
+        .excel-modal-header h2 { margin: 0; font-size: 1.4em; color: var(--primary-color); }
+        .excel-modal-close { background: none; border: none; font-size: 2em; cursor: pointer; line-height: 1; }
+        .excel-section { margin-bottom: 20px; padding: 15px; border-radius: var(--border-radius-md); box-shadow: inset 3px 3px 6px var(--dark-shadow), inset -3px -3px 6px var(--light-shadow); }
+        .excel-section h3 { margin-top: 0; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color); }
+        .excel-button { /* Menggunakan gaya tombol modern */
+             width: 100%;
+        }
+        #fileExcelInput { display: none; }
+        #fileName { margin-top: 10px; font-style: italic; color: #333; }
+        #downloadFormatBtn { background-color: var(--success-color); }
+        #downloadFormatBtn:hover { background-color: #218838; }
+        #imporExcelBtn { background-color: var(--primary-color); }
+        #imporExcelBtn:hover { background-color: #0056b3;}
+        #uploadArea {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f8f9fa;
+        }
+        #uploadArea.drag-over {
+            background-color: #e9ecef;
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-wrapper">
+             <a href="bangbin_Rapor.html" class="home-link" title="Kembali ke Menu Utama">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" />
+                </svg>
+            </a>
+            <h1>Input Nilai Ekstrakurikuler</h1>
+            <button id="tombolExcel" class="header-button" title="Impor/Ekspor via Excel">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M4 3H14.5858L21 8.41421V21H4V3ZM6 5V19H19V10H14V5H6ZM13 12H16L12 18L8 12H11V9H13V12Z"></path></svg>
+                Excel
+            </button>
+            <button id="tombolTutorial" class="header-button tutorial-button" title="Lihat Tutorial">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                </svg>
+                Tutorial
+            </button>
+			<button id="simpanEkstra" class="header-button">Simpan</button>
+        </div>
+        <p>Pilih predikat dan berikan deskripsi untuk setiap kegiatan ekstrakurikuler yang diikuti oleh siswa.</p>
+
+        <div class="table-wrapper">
+            <table id="tabelEkstra">
+                <thead id="tabelEkstraHead"></thead>
+                <tbody id="tabelEkstraBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="excelModal" class="excel-modal-overlay">
+        <div class="excel-modal-content">
+            <div class="excel-modal-header">
+                <h2>Impor/Ekspor via Excel</h2>
+                <button id="closeExcelModal" class="excel-modal-close">×</button>
+            </div>
+            
+            <div class="excel-section">
+                <h3>1. Unduh Format</h3>
+                <p>Unduh format Excel yang sudah berisi data siswa. Isi nilai predikat dan deskripsi pada file ini.</p>
+                <button id="downloadFormatBtn" class="excel-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 15L12 3M12 15L16 11M12 15L8 11M4 21H20"></path></svg>
+                    Unduh Format Excel
+                </button>
+            </div>
+
+            <div class="excel-section">
+                <h3>2. Unggah File</h3>
+                <p>Pilih file Excel yang sudah Anda isi untuk diimpor ke dalam sistem.</p>
+                <div id="uploadArea">
+                    <input type="file" id="fileExcelInput" accept=".xlsx, .xls">
+                    <p>Klik atau seret file ke area ini</p>
+                    <p id="fileName"></p>
+                </div>
+                <br>
+                <button id="imporExcelBtn" class="excel-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 9L12 21M12 9L8 13M12 9L16 13M4 3H20"></path></svg>
+                    Impor Data
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="bangbin_uhuuyy.js"></script>
+<script>
+
+const _0xc844bc=_0x5b50;function _0x4c73(){const _0x5994ab=['Gagal\x20membaca\x20file.','flex','select,\x20input[type=\x22text\x22]','6xsTWKQ','Workbook','</th>','classList','</td><td\x20class=\x22col-nama\x22>','Tidak\x20ada\x20data\x20siswa\x20untuk\x20diekspor.','_deskripsi','createObjectURL','replace','\x20nilai\x20diperbarui.','display','utils','Perlu\x20Peningkatan','<tr>','nama','trim','push','simpanEkstra','eskulId','Data\x20dari\x20Excel\x20telah\x20berhasil\x20diimpor.\x20','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th\x20class=\x22col-deskripsi\x22>Deskripsi</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','dataValidation','drop','list','1439874YCltlH','dragenter','function','120SsLlkn','Sheets','dragover','Kelas_Tidak_Ditemukan','writeBuffer','result','columns','href','value','remove','innerHTML','target','</tr>','<td\x20class=\x22col-no\x22>','SheetNames','.header-predikat-bulk','getElementById','10543920gUwPJe','Terjadi\x20kesalahan\x20saat\x20memproses\x20file:\x20<br><small>','uploadArea','\x22>Belum\x20ada\x20data\x20siswa.\x20Silakan\x20isi\x20di\x20halaman\x20\x27Kelola\x20Data\x20Siswa\x27.</td></tr>','name','message','Nama\x20Siswa','Fungsi\x20modal\x20tidak\x20ditemukan.','<th\x20colspan=\x222\x22>','onerror','eachCell','deskripsi','preventDefault','length','kelas','map','filter','299437QOrbnF','click','dragleave','1250KOMGvN','error','<option\x20value=\x22','createElement','</td>','drag-over','\x22\x20data-type=\x22predikat\x22>','ID_Siswa','<tr><th\x20rowspan=\x222\x22\x20class=\x22col-no\x22>No</th><th\x20rowspan=\x222\x22\x20class=\x22col-nama\x22>Nama\x20Siswa</th>','\x20|\x20Deskripsi','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','Berhasil','1970493gRYwqm','_predikat','dataSiswa','Error','354992MLQOOQ','files','\x22\x20data-type=\x22deskripsi\x22></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Format\x20kolom\x20tidak\x20sesuai.\x20Pastikan\x20ada\x20kolom\x20\x27ID_Siswa\x27\x20dan\x20\x27Nama\x20Siswa\x27.','find','\x22][data-type=\x22predikat\x22]','addWorksheet','\x22\x20data-eskul-id=\x22','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><select\x20data-siswa-id=\x22','select[data-eskul-id=\x22','includes','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th\x20class=\x22col-predikat\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Predikat\x20','\x22\x20data-siswa-id=\x22','getColumn','Gagal','1914yduWdj','<option\x20value=\x22\x22>--\x20Pilih\x20--</option>','DOMContentLoaded','tombolExcel','<tr><td\x20colspan=\x22','1285988mEjmgq','Nilai\x20Ekstrakurikuler','tombolTutorial','</select></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><input\x20type=\x22text\x22\x20placeholder=\x22Deskripsi\x20capaian...\x22\x20value=\x22','<option\x20value=\x22\x22>☀</option>','addEventListener','ekstrakurikuler','dataTransfer','forEach','pelengkap','dataset','16Kzyhxu','Format_Ekstra_','Gagal\x20membuat\x20file\x20Excel.\x20Lihat\x20console\x20untuk\x20detail.','addRows','\x22\x20title=\x22Ubah\x20semua\x20predikat\x20di\x20kolom\x20ini\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','querySelectorAll','change','getRow','5mfUQMU','predikat','readAsBinaryString','\x20|\x20Predikat','textContent','read'];_0x4c73=function(){return _0x5994ab;};return _0x4c73();}function _0x5b50(_0x1b9471,_0x854624){const _0x4c732b=_0x4c73();return _0x5b50=function(_0x5b50ef,_0x16edcb){_0x5b50ef=_0x5b50ef-0x155;let _0x227a77=_0x4c732b[_0x5b50ef];return _0x227a77;},_0x5b50(_0x1b9471,_0x854624);}(function(_0x5b0c4b,_0x463e61){const _0x15ba4e=_0x5b50,_0x31191c=_0x5b0c4b();while(!![]){try{const _0x5c38f1=parseInt(_0x15ba4e(0x196))/0x1+-parseInt(_0x15ba4e(0x199))/0x2*(parseInt(_0x15ba4e(0x1b8))/0x3)+parseInt(_0x15ba4e(0x1bd))/0x4*(-parseInt(_0x15ba4e(0x1d0))/0x5)+parseInt(_0x15ba4e(0x159))/0x6*(-parseInt(_0x15ba4e(0x1a5))/0x7)+-parseInt(_0x15ba4e(0x1c8))/0x8*(parseInt(_0x15ba4e(0x171))/0x9)+parseInt(_0x15ba4e(0x174))/0xa*(parseInt(_0x15ba4e(0x1a9))/0xb)+parseInt(_0x15ba4e(0x185))/0xc;if(_0x5c38f1===_0x463e61)break;else _0x31191c['push'](_0x31191c['shift']());}catch(_0x24667e){_0x31191c['push'](_0x31191c['shift']());}}}(_0x4c73,0x3b7bb),document[_0xc844bc(0x1c2)](_0xc844bc(0x1ba),()=>{const _0x362530=_0xc844bc,_0x11cac2=loadData(),_0x573e30=_0x11cac2[_0x362530(0x1a7)]?.[_0x362530(0x195)](_0x17cba7=>_0x17cba7[_0x362530(0x167)]&&_0x17cba7[_0x362530(0x167)][_0x362530(0x168)]()!=='')||[],_0x59d9f9=_0x11cac2['ekstrakurikuler']||[],_0x1ec455=['Sangat\x20Baik','Baik','Cukup',_0x362530(0x165)],_0x1c5338=document[_0x362530(0x184)]('tabelEkstraHead'),_0x100dd6=document[_0x362530(0x184)]('tabelEkstraBody'),_0x30cf17=document[_0x362530(0x184)](_0x362530(0x16a)),_0xa1cd3f=document[_0x362530(0x184)](_0x362530(0x1bf)),_0x161a9b=document['getElementById'](_0x362530(0x1bb)),_0x5f0a32=document[_0x362530(0x184)]('excelModal'),_0x922672=document[_0x362530(0x184)]('closeExcelModal'),_0x376934=document[_0x362530(0x184)]('downloadFormatBtn'),_0x342e3f=document[_0x362530(0x184)]('imporExcelBtn'),_0x5daa42=document[_0x362530(0x184)](_0x362530(0x187)),_0x335953=document['getElementById']('fileExcelInput'),_0x5f4d4f=document[_0x362530(0x184)]('fileName');let _0x10e13e=null;const _0x55e307=_0x425707=>{const _0x1fb155=_0x362530;let _0x3d50c1=_0x1fb155(0x1c1);return _0x1ec455['forEach'](_0x4584f0=>{const _0x4416c1=_0x1fb155;_0x3d50c1+=_0x4416c1(0x19b)+_0x4584f0+'\x22>'+_0x4584f0+'</option>';}),'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<select\x20class=\x22header-predikat-bulk\x22\x20data-eskul-id=\x22'+_0x425707+_0x1fb155(0x1cc)+_0x3d50c1+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</select>\x0a\x20\x20\x20\x20\x20\x20\x20\x20';},_0x990c50=()=>{const _0x360e6f=_0x362530;let _0x298d34=_0x360e6f(0x1a1),_0x5ccada=_0x360e6f(0x166);_0x59d9f9[_0x360e6f(0x192)]===0x0?(_0x298d34+='<th>Tidak\x20ada\x20data\x20ekstrakurikuler</th></tr>',_0x1c5338[_0x360e6f(0x17e)]=_0x298d34):(_0x59d9f9[_0x360e6f(0x1c5)](_0x4f44c0=>{const _0x4c521b=_0x360e6f;_0x298d34+=_0x4c521b(0x18d)+_0x4f44c0['nama']+_0x4c521b(0x15b),_0x5ccada+=_0x4c521b(0x1b4)+_0x55e307(_0x4f44c0['id'])+_0x4c521b(0x16d);}),_0x298d34+=_0x360e6f(0x180),_0x5ccada+=_0x360e6f(0x180),_0x1c5338['innerHTML']=_0x298d34+_0x5ccada);_0x100dd6[_0x360e6f(0x17e)]='';if(_0x573e30[_0x360e6f(0x192)]===0x0){const _0x57094c=_0x59d9f9['length']*0x2+0x2;_0x100dd6[_0x360e6f(0x17e)]=_0x360e6f(0x1bc)+_0x57094c+_0x360e6f(0x188);return;}_0x573e30[_0x360e6f(0x1c5)]((_0x79ecc0,_0x42b68c)=>{const _0x48b015=_0x360e6f,_0x5dc1d7=document[_0x48b015(0x19c)]('tr');let _0x17b669=_0x48b015(0x181)+(_0x42b68c+0x1)+_0x48b015(0x15d)+_0x79ecc0['nama']+_0x48b015(0x19d);_0x59d9f9[_0x48b015(0x1c5)](_0x31eaf5=>{const _0x1d6030=_0x48b015,_0x82ad3a=_0x11cac2[_0x1d6030(0x1c6)]?.['ekstrakurikuler']?.[_0x79ecc0['id']]?.[_0x31eaf5['id']]||{};let _0x7a57b=_0x1d6030(0x1b9);_0x1ec455[_0x1d6030(0x1c5)](_0x4a26cf=>{const _0x326def=_0x1d6030,_0x33a804=_0x4a26cf===_0x82ad3a[_0x326def(0x1d1)]?'selected':'';_0x7a57b+=_0x326def(0x19b)+_0x4a26cf+'\x22\x20'+_0x33a804+'>'+_0x4a26cf+'</option>';}),_0x17b669+=_0x1d6030(0x1b1)+_0x79ecc0['id']+_0x1d6030(0x1b0)+_0x31eaf5['id']+_0x1d6030(0x19f)+_0x7a57b+_0x1d6030(0x1c0)+(_0x82ad3a['deskripsi']||'')+_0x1d6030(0x1b5)+_0x79ecc0['id']+_0x1d6030(0x1b0)+_0x31eaf5['id']+_0x1d6030(0x1ab);}),_0x5dc1d7[_0x48b015(0x17e)]=_0x17b669,_0x100dd6['appendChild'](_0x5dc1d7);});},_0x2edea1=async()=>{const _0x472f51=_0x362530;if(!_0x11cac2[_0x472f51(0x1c6)])_0x11cac2[_0x472f51(0x1c6)]={};if(!_0x11cac2['pelengkap'][_0x472f51(0x1c3)])_0x11cac2['pelengkap'][_0x472f51(0x1c3)]={};const _0x4ccb17=_0x100dd6[_0x472f51(0x1cd)](_0x472f51(0x158));_0x4ccb17[_0x472f51(0x1c5)](_0x4f9766=>{const _0x1fc1b5=_0x472f51,{siswaId:_0x19cb96,eskulId:_0x2cfbbe,type:_0x134891}=_0x4f9766[_0x1fc1b5(0x1c7)];!_0x11cac2[_0x1fc1b5(0x1c6)]['ekstrakurikuler'][_0x19cb96]&&(_0x11cac2['pelengkap'][_0x1fc1b5(0x1c3)][_0x19cb96]={});!_0x11cac2['pelengkap']['ekstrakurikuler'][_0x19cb96][_0x2cfbbe]&&(_0x11cac2[_0x1fc1b5(0x1c6)]['ekstrakurikuler'][_0x19cb96][_0x2cfbbe]={'predikat':'','deskripsi':''});_0x11cac2[_0x1fc1b5(0x1c6)][_0x1fc1b5(0x1c3)][_0x19cb96][_0x2cfbbe][_0x134891]=_0x4f9766[_0x1fc1b5(0x17c)][_0x1fc1b5(0x168)]();const _0x4aaa92=_0x11cac2[_0x1fc1b5(0x1c6)][_0x1fc1b5(0x1c3)][_0x19cb96][_0x2cfbbe];!_0x4aaa92[_0x1fc1b5(0x1d1)]&&!_0x4aaa92[_0x1fc1b5(0x190)]&&(delete _0x11cac2[_0x1fc1b5(0x1c6)][_0x1fc1b5(0x1c3)][_0x19cb96][_0x2cfbbe],Object['keys'](_0x11cac2[_0x1fc1b5(0x1c6)][_0x1fc1b5(0x1c3)][_0x19cb96])[_0x1fc1b5(0x192)]===0x0&&delete _0x11cac2[_0x1fc1b5(0x1c6)][_0x1fc1b5(0x1c3)][_0x19cb96]);}),saveData(_0x11cac2),await showModal(_0x472f51(0x1a4),'Data\x20nilai\x20ekstrakurikuler\x20telah\x20berhasil\x20disimpan.');},_0x2224a0=()=>{const _0xf0b9d5=_0x362530,_0x1f674e=document[_0xf0b9d5(0x1cd)](_0xf0b9d5(0x183));_0x1f674e[_0xf0b9d5(0x1c5)](_0x46b04b=>{const _0x5745cb=_0xf0b9d5;_0x46b04b[_0x5745cb(0x1c2)](_0x5745cb(0x1ce),_0x305566=>{const _0x4fcf0b=_0x5745cb,_0xd4049e=_0x305566[_0x4fcf0b(0x17f)]['value'],_0x1d8f67=_0x305566[_0x4fcf0b(0x17f)][_0x4fcf0b(0x1c7)][_0x4fcf0b(0x16b)];if(!_0xd4049e)return;const _0x4b6fe8=document[_0x4fcf0b(0x1cd)](_0x4fcf0b(0x1b2)+_0x1d8f67+_0x4fcf0b(0x1ae));_0x4b6fe8[_0x4fcf0b(0x1c5)](_0x3e106a=>{_0x3e106a['value']=_0xd4049e;}),_0x305566[_0x4fcf0b(0x17f)][_0x4fcf0b(0x17c)]='';});});},_0x594924=()=>{const _0x31e2df=_0x362530,_0x54a70d='Panduan\x20Penggunaan\x20Halaman\x20Ekstrakurikuler',_0x1862b6='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:\x20left;\x20line-height:\x201.6;\x20font-size:\x200.95em;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Halaman\x20ini\x20digunakan\x20untuk\x20menginput\x20nilai\x20ekstrakurikuler\x20siswa.</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<hr\x20style=\x22margin:\x2010px\x200;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>Langkah-langkah:</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<ul\x20style=\x22padding-left:\x2020px;\x20margin-top:\x2010px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<li><b>Isi\x20Nilai:</b>\x20Untuk\x20setiap\x20siswa,\x20pilih\x20predikat\x20(\x27Sangat\x20Baik\x27,\x20\x27Baik\x27,\x20dll.)\x20dari\x20menu\x20dropdown\x20dan\x20tuliskan\x20deskripsi\x20singkat.</li>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<li><b>Ubah\x20Semua\x20(Fitur\x20Cepat):</b>\x20Anda\x20bisa\x20mengubah\x20semua\x20predikat\x20dalam\x20satu\x20kolom\x20ekstrakurikuler\x20secara\x20massal\x20dengan\x20menggunakan\x20dropdown\x20☀️\x20yang\x20ada\x20di\x20judul\x20kolom.</li>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<li><b>Impor/Ekspor\x20Excel:</b>\x20Gunakan\x20tombol\x20\x27Excel\x27\x20untuk\x20mengunduh\x20format,\x20mengisi\x20data\x20di\x20Excel,\x20dan\x20mengunggahnya\x20kembali\x20untuk\x20mempercepat\x20pengisian.</li>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<li><b>Simpan\x20Data:</b>\x20Klik\x20tombol\x20\x22Simpan\x22\x20untuk\x20menyimpan\x20semua\x20perubahan.</li>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</ul>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<hr\x20style=\x22margin:\x2010px\x200;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Pastikan\x20semua\x20data\x20sudah\x20benar\x20sebelum\x20menyimpan.</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20';typeof showModal===_0x31e2df(0x173)?showModal(_0x54a70d,_0x1862b6,![]):alert(_0x31e2df(0x18c));},_0x2cb2c5=_0x22d518=>{const _0xa88879=_0x362530;_0x5f0a32['style'][_0xa88879(0x163)]=_0x22d518?_0xa88879(0x157):'none',!_0x22d518&&(_0x10e13e=null,_0x335953[_0xa88879(0x17c)]='',_0x5f4d4f[_0xa88879(0x1d4)]='',_0x5daa42[_0xa88879(0x15c)]['remove'](_0xa88879(0x19e)));},_0x4ee1e0=async()=>{const _0x22836a=_0x362530;if(_0x573e30['length']===0x0){showModal('Gagal',_0x22836a(0x15e));return;}try{const _0x17ed9f=_0x11cac2['infoDasar']?.[_0x22836a(0x193)]||_0x22836a(0x177),_0x4d578d=_0x22836a(0x1c9)+_0x17ed9f[_0x22836a(0x161)](/\s+/g,'_')+'.xlsx',_0x1b4cba=new ExcelJS[(_0x22836a(0x15a))](),_0x38c1c5=_0x1b4cba[_0x22836a(0x1af)](_0x22836a(0x1be)),_0x1f5fb7=[{'header':_0x22836a(0x1a0),'key':'id','width':0xf},{'header':_0x22836a(0x18b),'key':'nama','width':0x1e}];_0x59d9f9[_0x22836a(0x1c5)](_0x4b5ecc=>{const _0x501206=_0x22836a;_0x1f5fb7[_0x501206(0x169)]({'header':_0x4b5ecc['nama']+'\x20|\x20Predikat','key':_0x4b5ecc['id']+_0x501206(0x1a6),'width':0x19}),_0x1f5fb7['push']({'header':_0x4b5ecc[_0x501206(0x167)]+_0x501206(0x1a2),'key':_0x4b5ecc['id']+'_deskripsi','width':0x28});}),_0x38c1c5[_0x22836a(0x17a)]=_0x1f5fb7;const _0x34956d=_0x573e30[_0x22836a(0x194)](_0x335144=>{const _0x23d816=_0x22836a,_0x362a8a={'id':_0x335144['id'],'nama':_0x335144[_0x23d816(0x167)]};return _0x59d9f9['forEach'](_0x245686=>{const _0x310b3f=_0x23d816,_0x1e2f5d=_0x11cac2[_0x310b3f(0x1c6)]?.[_0x310b3f(0x1c3)]?.[_0x335144['id']]?.[_0x245686['id']]||{};_0x362a8a[_0x245686['id']+'_predikat']=_0x1e2f5d[_0x310b3f(0x1d1)]||'',_0x362a8a[_0x245686['id']+_0x310b3f(0x15f)]=_0x1e2f5d[_0x310b3f(0x190)]||'';}),_0x362a8a;});_0x38c1c5[_0x22836a(0x1cb)](_0x34956d);const _0x54673e='\x22'+_0x1ec455['join'](',')+'\x22';_0x59d9f9[_0x22836a(0x1c5)](_0x1be472=>{const _0x495b51=_0x22836a,_0x27bc62=_0x1be472['id']+_0x495b51(0x1a6);_0x38c1c5[_0x495b51(0x1b6)](_0x27bc62)[_0x495b51(0x18f)]({'includeEmpty':!![]},(_0x4eaecc,_0xa0cffa)=>{const _0x4efe41=_0x495b51;_0xa0cffa>0x1&&(_0x4eaecc[_0x4efe41(0x16e)]={'type':_0x4efe41(0x170),'allowBlank':!![],'formulae':[_0x54673e]});});}),_0x38c1c5[_0x22836a(0x1cf)](0x1)['font']={'bold':!![]};const _0x58b909=await _0x1b4cba['xlsx'][_0x22836a(0x178)](),_0x44ea78=new Blob([_0x58b909],{'type':_0x22836a(0x1a3)}),_0x194319=document[_0x22836a(0x19c)]('a');_0x194319[_0x22836a(0x17b)]=URL[_0x22836a(0x160)](_0x44ea78),_0x194319['download']=_0x4d578d,_0x194319[_0x22836a(0x197)]();}catch(_0x1b0221){console[_0x22836a(0x19a)]('Gagal\x20membuat\x20file\x20Excel\x20dengan\x20ExcelJS:',_0x1b0221),showModal(_0x22836a(0x1a8),_0x22836a(0x1ca));}},_0x21a98c=async()=>{const _0xca7b84=_0x362530;if(!_0x10e13e){await showModal(_0xca7b84(0x1b7),'Silakan\x20pilih\x20file\x20Excel\x20terlebih\x20dahulu.');return;}const _0x3959db=new FileReader();_0x3959db['onload']=async _0x55e551=>{const _0x223f65=_0xca7b84;try{const _0x2e55ef=XLSX[_0x223f65(0x155)](_0x55e551[_0x223f65(0x17f)][_0x223f65(0x179)],{'type':'binary'}),_0x261e78=_0x2e55ef[_0x223f65(0x182)][0x0],_0x2baae3=_0x2e55ef[_0x223f65(0x175)][_0x261e78],_0x3d6928=XLSX[_0x223f65(0x164)]['sheet_to_json'](_0x2baae3);if(_0x3d6928[_0x223f65(0x192)]===0x0)throw new Error('File\x20Excel\x20kosong\x20atau\x20format\x20tidak\x20sesuai.');if(!_0x3d6928[0x0]['ID_Siswa']||!_0x3d6928[0x0][_0x223f65(0x18b)])throw new Error(_0x223f65(0x1ac));if(!_0x11cac2[_0x223f65(0x1c6)])_0x11cac2[_0x223f65(0x1c6)]={};if(!_0x11cac2['pelengkap'][_0x223f65(0x1c3)])_0x11cac2[_0x223f65(0x1c6)][_0x223f65(0x1c3)]={};let _0x575d4c=0x0;_0x3d6928[_0x223f65(0x1c5)](_0x5a3e5f=>{const _0x26488f=_0x223f65,_0x5ea665=String(_0x5a3e5f['ID_Siswa']);_0x573e30[_0x26488f(0x1ad)](_0x4b2157=>_0x4b2157['id']===_0x5ea665)&&_0x59d9f9[_0x26488f(0x1c5)](_0x428d53=>{const _0x1aeb40=_0x26488f,_0x1ad925=_0x428d53[_0x1aeb40(0x167)]+_0x1aeb40(0x1d3),_0x5e3da9=_0x428d53[_0x1aeb40(0x167)]+'\x20|\x20Deskripsi';if(_0x5a3e5f[_0x1ad925]!==undefined||_0x5a3e5f[_0x5e3da9]!==undefined){!_0x11cac2['pelengkap'][_0x1aeb40(0x1c3)][_0x5ea665]&&(_0x11cac2[_0x1aeb40(0x1c6)][_0x1aeb40(0x1c3)][_0x5ea665]={});!_0x11cac2[_0x1aeb40(0x1c6)]['ekstrakurikuler'][_0x5ea665][_0x428d53['id']]&&(_0x11cac2[_0x1aeb40(0x1c6)][_0x1aeb40(0x1c3)][_0x5ea665][_0x428d53['id']]={});const _0x1bfd86=_0x5a3e5f[_0x1ad925]?String(_0x5a3e5f[_0x1ad925])[_0x1aeb40(0x168)]():'',_0x5529d5=_0x5a3e5f[_0x5e3da9]?String(_0x5a3e5f[_0x5e3da9])['trim']():'';_0x1ec455[_0x1aeb40(0x1b3)](_0x1bfd86)&&(_0x11cac2[_0x1aeb40(0x1c6)]['ekstrakurikuler'][_0x5ea665][_0x428d53['id']]['predikat']=_0x1bfd86),_0x11cac2[_0x1aeb40(0x1c6)][_0x1aeb40(0x1c3)][_0x5ea665][_0x428d53['id']][_0x1aeb40(0x190)]=_0x5529d5,_0x575d4c++;}});}),saveData(_0x11cac2),_0x990c50(),_0x2224a0(),_0x2cb2c5(![]),await showModal(_0x223f65(0x1a4),_0x223f65(0x16c)+_0x575d4c+_0x223f65(0x162));}catch(_0x486066){await showModal('Error',_0x223f65(0x186)+_0x486066[_0x223f65(0x18a)]+'</small>');}},_0x3959db[_0xca7b84(0x18e)]=async()=>{const _0x1cce7a=_0xca7b84;await showModal(_0x1cce7a(0x1a8),_0x1cce7a(0x156));},_0x3959db[_0xca7b84(0x1d2)](_0x10e13e);};_0x30cf17[_0x362530(0x1c2)](_0x362530(0x197),_0x2edea1),_0xa1cd3f[_0x362530(0x1c2)](_0x362530(0x197),_0x594924),_0x161a9b[_0x362530(0x1c2)](_0x362530(0x197),()=>_0x2cb2c5(!![])),_0x922672['addEventListener'](_0x362530(0x197),()=>_0x2cb2c5(![])),_0x5f0a32[_0x362530(0x1c2)](_0x362530(0x197),_0x19815d=>{const _0x31f073=_0x362530;_0x19815d[_0x31f073(0x17f)]===_0x5f0a32&&_0x2cb2c5(![]);}),_0x376934[_0x362530(0x1c2)](_0x362530(0x197),_0x4ee1e0),_0x342e3f[_0x362530(0x1c2)](_0x362530(0x197),_0x21a98c),_0x5daa42['addEventListener'](_0x362530(0x197),()=>_0x335953[_0x362530(0x197)]()),_0x335953[_0x362530(0x1c2)](_0x362530(0x1ce),_0x5666be=>{const _0x572951=_0x362530,_0x1cda01=_0x5666be[_0x572951(0x17f)][_0x572951(0x1aa)][0x0];_0x1cda01&&(_0x10e13e=_0x1cda01,_0x5f4d4f['textContent']=_0x1cda01['name']);}),[_0x362530(0x172),'dragover','dragleave','drop'][_0x362530(0x1c5)](_0x14cd86=>{const _0x359c5e=_0x362530;_0x5daa42[_0x359c5e(0x1c2)](_0x14cd86,_0x54a236=>{const _0xbdd2b=_0x359c5e;_0x54a236[_0xbdd2b(0x191)](),_0x54a236['stopPropagation']();},![]);}),[_0x362530(0x172),_0x362530(0x176)][_0x362530(0x1c5)](_0x341018=>{const _0x53eafa=_0x362530;_0x5daa42[_0x53eafa(0x1c2)](_0x341018,()=>_0x5daa42[_0x53eafa(0x15c)]['add'](_0x53eafa(0x19e)),![]);}),[_0x362530(0x198),_0x362530(0x16f)][_0x362530(0x1c5)](_0x533292=>{const _0x39c90c=_0x362530;_0x5daa42[_0x39c90c(0x1c2)](_0x533292,()=>_0x5daa42[_0x39c90c(0x15c)][_0x39c90c(0x17d)](_0x39c90c(0x19e)),![]);}),_0x5daa42[_0x362530(0x1c2)](_0x362530(0x16f),_0x3b7033=>{const _0x1b2ad7=_0x362530,_0x170651=_0x3b7033[_0x1b2ad7(0x1c4)][_0x1b2ad7(0x1aa)][0x0];_0x170651&&(_0x10e13e=_0x170651,_0x5f4d4f[_0x1b2ad7(0x1d4)]=_0x170651[_0x1b2ad7(0x189)],_0x335953[_0x1b2ad7(0x1aa)]=_0x3b7033['dataTransfer'][_0x1b2ad7(0x1aa)]);}),_0x990c50(),_0x2224a0();}));
+
+
+</script>
+</body>
+</html>

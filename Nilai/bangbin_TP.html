@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
+    <title>Kelola Tujuan Pembelajaran (TP)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Standarisasi & Reset */
+        :root {
+            --primary-color: #007aff;
+            --secondary-color: #586474;
+            --danger-color: #df4759;
+            --warning-color: #ffc107;
+            --bg-color: #eef2f5;
+            --font-color: #3e4a59;
+            --light-shadow: #ffffff;
+            --dark-shadow: #d1d9e6;
+            --border-radius-lg: 15px;
+            --border-radius-md: 12px;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--font-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: var(--bg-color);
+            padding: 30px;
+            border-radius: var(--border-radius-lg);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .title-wrapper {
+            display: flex; align-items: center; gap: 20px;
+            padding-bottom: 15px; margin-bottom: 25px;
+        }
+        .title-wrapper h1 { margin: 0; padding: 0; font-size: 2em; color: var(--primary-color); }
+        .home-link { color: var(--secondary-color); transition: all 0.2s ease; }
+        .home-link:hover { transform: scale(1.1); color: var(--primary-color); }
+        .home-link svg { width: 36px; height: 36px; }
+
+        /* --- DESAIN TOMBOL BARU (NEUMORPHISM) --- */
+        .btn, .choice-container label .choice-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 22px;
+            font-size: 1em;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            border-radius: var(--border-radius-md);
+            border: none;
+            cursor: pointer;
+            background: var(--bg-color);
+            color: var(--secondary-color);
+            transition: all 0.2s ease-out;
+            box-shadow: 5px 5px 10px var(--dark-shadow), -5px -5px 10px var(--light-shadow);
+        }
+        .btn:hover, .choice-container label:hover .choice-label {
+            color: var(--primary-color);
+        }
+        .btn:active, .choice-container input[type="radio"]:checked + .choice-label {
+            box-shadow: inset 3px 3px 6px var(--dark-shadow), inset -3px -3px 6px var(--light-shadow);
+            color: var(--primary-color);
+        }
+        .btn svg {
+            width: 20px; height: 20px;
+            stroke-width: 2;
+            transition: all 0.2s ease-out;
+        }
+        .btn:hover svg {
+            stroke: var(--primary-color);
+        }
+        .btn:active svg, .choice-container input[type="radio"]:checked + .choice-label svg {
+             stroke: var(--primary-color);
+        }
+        .btn.btn-sm { padding: 8px 14px; font-size: 0.9em; gap: 6px; }
+        .btn.btn-sm svg { width: 16px; height: 16px; }
+        .btn.danger { color: var(--danger-color); }
+        .btn.danger:hover svg { stroke: var(--danger-color); }
+        .btn.danger:active { color: var(--danger-color); }
+
+        .choice-container {
+            display: flex; gap: 15px; margin-bottom: 25px; align-items: center;
+        }
+        .choice-container input[type="radio"] {
+            display: none; /* Sembunyikan radio asli */
+        }
+        .tutorial-button {
+            margin-left: auto; width: 48px; height: 48px; padding: 0;
+            border-radius: 50%; color: var(--warning-color); font-size: 24px;
+        }
+        .tutorial-button:hover { transform: scale(1.1) rotate(15deg); }
+        .tutorial-button:active { transform: scale(0.95) rotate(15deg); }
+        /* --- AKHIR DESAIN TOMBOL BARU --- */
+
+        #mapelSelectorContainer, #kokuSelectorContainer { animation: fadeIn 0.4s ease; margin-bottom: 20px; }
+        h2 { color: var(--primary-color); border-bottom: 2px solid #e0e5ea; padding-bottom: 10px;}
+        select, input[type="text"] {
+            width: 100%; padding: 12px; border: none;
+            border-radius: var(--border-radius-md); box-sizing: border-box;
+            background: var(--bg-color);
+            box-shadow: inset 3px 3px 6px var(--dark-shadow), inset -3px -3px 6px var(--light-shadow);
+            color: var(--font-color); font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+        }
+        select:focus, input[type="text"]:focus { outline: none; }
+
+        /* Gaya Modal Universal */
+        .modal-backdrop {
+            position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.2); display: none; align-items: center;
+            justify-content: center; backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: var(--bg-color); border-radius: var(--border-radius-lg);
+            box-shadow: 10px 10px 20px var(--dark-shadow), -10px -10px 20px var(--light-shadow);
+            max-width: 600px; width: 90%; max-height: 85vh;
+            display: flex; flex-direction: column; animation: fadeIn 0.3s ease;
+            border: 1px solid var(--light-shadow);
+        }
+        .modal-content h3 {
+            padding: 20px 25px; margin: 0; color: var(--primary-color); font-size: 1.5em;
+        }
+        .modal-body { padding: 15px 25px; overflow-y: auto; line-height: 1.6; }
+        .modal-actions {
+            padding: 15px 25px; text-align: right;
+            border-top: 1px solid var(--dark-shadow);
+        }
+
+        /* Gaya dari file asli yang dipertahankan & disesuaikan */
+        .tp-container, .koku-tp-container { margin-top: 20px; padding: 25px; border-radius: var(--border-radius-lg); background: var(--bg-color); display: none; animation: fadeIn 0.5s ease; box-shadow: inset 5px 5px 10px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow); }
+        .tp-input-group { display: grid; grid-template-columns: auto 1fr; gap: 15px; align-items: center; margin-bottom: 15px; }
+        .tp-input-group label { font-weight: 500; text-align: right; }
+        .dimensi-row { display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: center; padding: 12px; border-radius: var(--border-radius-md); margin-bottom: 10px; background-color: var(--bg-color); box-shadow: 3px 3px 6px var(--dark-shadow), -3px -3px 6px var(--light-shadow); }
+        .dimensi-name { font-weight: 600; }
+        .dimensi-summary { font-size: 0.9em; }
+        .modal-body-tp { padding: 10px 25px; overflow-y: auto;}
+        .modal-section-title { font-weight: 600; margin-top: 15px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid var(--dark-shadow); }
+        .tp-checkbox-group label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 8px; }
+        .manage-tp-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #e0e5ea; }
+        .manage-tp-item p { margin: 0; flex-grow: 1; }
+        .add-tp-form { display: flex; gap: 10px; margin-top: 20px; }
+        .add-tp-form input { flex-grow: 1; }
+    </style>
+</head>
+<body>
+    <svg width="0" height="0" style="display:none;" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="icon-save" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></symbol>
+      <symbol id="icon-plus" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></symbol>
+      <symbol id="icon-edit" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" /></symbol>
+      <symbol id="icon-trash" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></symbol>
+      <symbol id="icon-close" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></symbol>
+    </svg>
+
+    <div class="container">
+        <div class="title-wrapper">
+             <a href="bangbin_Rapor.html" class="home-link" title="Kembali ke Menu Utama">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" /></svg>
+            </a>
+            <h1>Kelola Tujuan Pembelajaran</h1>
+        </div>
+        <p>Pilih jenis tujuan pembelajaran (TP) yang ingin dikelola. Klik ikon bintang (★) untuk panduan.</p>
+
+        <div class="choice-container">
+            <label>
+                <input type="radio" name="tp_choice" value="mapel" checked>
+                <span class="choice-label">Mata Pelajaran</span>
+            </label>
+            <label>
+                <input type="radio" name="tp_choice" value="koku">
+                <span class="choice-label">Kokurikuler</span>
+            </label>
+            <button id="tutorialSiswaButton" class="btn tutorial-button" title="Tampilkan Panduan">★</button>
+        </div>
+        
+        <div id="mapelSelectorContainer">
+            <label for="pilihMapel"><b>Pilih Mata Pelajaran:</b></label>
+            <select id="pilihMapel"><option value="">-- Silakan Pilih --</option></select>
+        </div>
+        <div id="kokuSelectorContainer" style="display: none;">
+            <label for="pilihKoku"><b>Pilih Kegiatan Kokurikuler:</b></label>
+            <select id="pilihKoku"><option value="">-- Silakan Pilih --</option></select>
+        </div>
+        <div id="tpContainer" class="tp-container">
+            <h2 id="judulInputTp">Input TP</h2>
+            <form id="formTP">
+                <div id="tpInputsWrapper"></div><br>
+                <button type="submit" class="btn"><svg><use href="#icon-save"/></svg><span>Simpan Tujuan</span></button>
+            </form>
+        </div>
+        <div id="kokuTpContainer" class="koku-tp-container">
+            <h2 id="judulInputKoku">Pilih Dimensi</h2>
+            <div id="dimensiInputsWrapper"></div><br>
+            <button id="simpanKokuTp" class="btn"><svg><use href="#icon-save"/></svg><span>Simpan Pilihan</span></button>
+        </div>
+    </div>
+
+    <div id="dimensiModal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3 id="dimensiModalTitle">Pilih & Kelola Tujuan</h3>
+            <div class="modal-body-tp">
+                <div id="dimensiModalSelectBody">
+                    <h4 class="modal-section-title">Pilih Tujuan untuk Kegiatan Ini</h4>
+                    <div id="selectionCheckboxes"></div>
+                </div>
+                <div id="dimensiModalManageBody">
+                    <h4 class="modal-section-title">Kelola Daftar Tujuan (Master)</h4>
+                    <div id="managementList"></div>
+                    <form id="addTpForm" class="add-tp-form">
+                        <input type="text" id="newTpInput" placeholder="Tambah tujuan baru..." required>
+                        <button type="submit" class="btn"><svg><use href="#icon-plus"/></svg><span>Tambah</span></button>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="tutupDimensiModal" class="btn"><svg><use href="#icon-close"/></svg><span>Tutup</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tutorialModal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3>Panduan Penggunaan</h3>
+            <div class="modal-body">
+                <h4>1. Memilih Jenis Pengelolaan</h4>
+                <p>Pilih mode pengelolaan dengan menekan tombol <strong>Mata Pelajaran</strong> atau <strong>Kokurikuler</strong>.</p>
+                <hr>
+                <h4>2. Mengelola TP Mata Pelajaran</h4>
+                <ol>
+                    <li>Pilih <strong>Mata Pelajaran</strong> dari menu dropdown.</li>
+                    <li>Isi 10 kolom isian yang tersedia.</li>
+                    <li>Tekan tombol <strong>Simpan Tujuan</strong>.</li>
+                </ol>
+                <hr>
+                <h4>3. Mengelola TP Kokurikuler (P5)</h4>
+                <ol>
+                    <li>Pilih <strong>Kegiatan Kokurikuler</strong> dari menu dropdown.</li>
+                    <li>Tekan tombol <strong>Pilih & Kelola</strong> pada salah satu dimensi.</li>
+                    <li>Di jendela baru, centang tujuan yang relevan dan kelola daftar master jika perlu.</li>
+                    <li>Tekan <strong>Tutup</strong>, lalu simpan semua perubahan dengan menekan <strong>Simpan Pilihan</strong>.</li>
+                </ol>
+            </div>
+            <div class="modal-actions">
+                <button id="closeTutorialModal" class="btn">Mengerti</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="bangbin_uhuuyy.js"></script>
+    <script>
+ 
+ const _0x2a01d6=_0x7c65;(function(_0x5c3b46,_0x2698b9){const _0x1a4695=_0x7c65,_0x5ceffe=_0x5c3b46();while(!![]){try{const _0xdc14d6=parseInt(_0x1a4695(0x1b0))/0x1*(-parseInt(_0x1a4695(0x183))/0x2)+parseInt(_0x1a4695(0x171))/0x3+-parseInt(_0x1a4695(0x1a1))/0x4*(-parseInt(_0x1a4695(0x13f))/0x5)+parseInt(_0x1a4695(0x14c))/0x6*(parseInt(_0x1a4695(0x16e))/0x7)+parseInt(_0x1a4695(0x158))/0x8*(parseInt(_0x1a4695(0x13d))/0x9)+parseInt(_0x1a4695(0x186))/0xa*(-parseInt(_0x1a4695(0x14a))/0xb)+parseInt(_0x1a4695(0x1b2))/0xc*(-parseInt(_0x1a4695(0x17a))/0xd);if(_0xdc14d6===_0x2698b9)break;else _0x5ceffe['push'](_0x5ceffe['shift']());}catch(_0x2a0c19){_0x5ceffe['push'](_0x5ceffe['shift']());}}}(_0x415c,0x695a7),document['addEventListener'](_0x2a01d6(0x14d),()=>{const _0x51612f=_0x2a01d6;let _0x17da42=loadData();const _0x46f42d=_0x17da42[_0x51612f(0x189)][_0x51612f(0x157)];let _0x3d122b={};const _0x650e6=document[_0x51612f(0x172)](_0x51612f(0x143)),_0x53e10a=document['getElementById'](_0x51612f(0x16c)),_0x3a7cbc=document[_0x51612f(0x164)](_0x51612f(0x155)),_0x4587f6=document['getElementById'](_0x51612f(0x173)),_0x5e17e0=document[_0x51612f(0x164)](_0x51612f(0x188)),_0x4b6ca4=document[_0x51612f(0x164)](_0x51612f(0x1a6)),_0x1f2149=document[_0x51612f(0x164)](_0x51612f(0x153)),_0x4a671d=document[_0x51612f(0x164)](_0x51612f(0x168)),_0x12d33f=document[_0x51612f(0x164)](_0x51612f(0x161)),_0x422409=document[_0x51612f(0x164)](_0x51612f(0x18b)),_0x1097b0=document[_0x51612f(0x164)]('dimensiModalTitle'),_0x47c192=document['getElementById'](_0x51612f(0x136)),_0x221bb4=document[_0x51612f(0x164)](_0x51612f(0x17b)),_0x237fdd=document[_0x51612f(0x164)](_0x51612f(0x145)),_0xa217de=document['getElementById'](_0x51612f(0x14b)),_0x17b802=document[_0x51612f(0x164)](_0x51612f(0x15f)),_0x269ac5=document[_0x51612f(0x164)](_0x51612f(0x163)),_0x5207ad=document[_0x51612f(0x164)](_0x51612f(0x148)),_0x3ef6d3=document['getElementById']('closeTutorialModal');_0x5207ad[_0x51612f(0x13e)](_0x51612f(0x141),()=>{const _0xf770f1=_0x51612f;_0x269ac5[_0xf770f1(0x198)]['display']=_0xf770f1(0x16f);}),_0x3ef6d3['addEventListener'](_0x51612f(0x141),()=>{const _0x867ff0=_0x51612f;_0x269ac5[_0x867ff0(0x198)][_0x867ff0(0x16d)]=_0x867ff0(0x144);}),_0x269ac5[_0x51612f(0x13e)](_0x51612f(0x141),_0x55378f=>{const _0x3590de=_0x51612f;if(_0x55378f[_0x3590de(0x13c)]===_0x269ac5)_0x269ac5[_0x3590de(0x198)][_0x3590de(0x16d)]=_0x3590de(0x144);});const _0x4d076d=(_0x1e82f3,_0x2e592a,_0x2c3091)=>{const _0x5a56ed=_0x51612f;_0x1e82f3[_0x5a56ed(0x152)]=_0x5a56ed(0x19c)+_0x2c3091+_0x5a56ed(0x17e),_0x2e592a&&_0x2e592a[_0x5a56ed(0x196)]>0x0?(_0x2e592a['forEach'](_0x4010fe=>_0x1e82f3['add'](new Option(_0x4010fe[_0x5a56ed(0x17c)],_0x4010fe['id']))),_0x1e82f3['disabled']=![]):(_0x1e82f3['innerHTML']=_0x5a56ed(0x1b1),_0x1e82f3[_0x5a56ed(0x182)]=!![]);},_0x172d3a=_0x3a0bed=>{const _0x2b174c=_0x51612f;_0x53e10a[_0x2b174c(0x198)][_0x2b174c(0x16d)]=_0x3a0bed===_0x2b174c(0x194)?'block':'none',_0x3a7cbc[_0x2b174c(0x198)][_0x2b174c(0x16d)]=_0x3a0bed===_0x2b174c(0x165)?_0x2b174c(0x192):'none',_0x3a0bed===_0x2b174c(0x194)?(_0x1f2149[_0x2b174c(0x1a4)]='',_0x5e17e0[_0x2b174c(0x198)]['display']=_0x2b174c(0x144),_0x4587f6[_0x2b174c(0x198)][_0x2b174c(0x16d)]=_0x4b6ca4[_0x2b174c(0x1a4)]?_0x2b174c(0x192):_0x2b174c(0x144)):(_0x4b6ca4[_0x2b174c(0x1a4)]='',_0x4587f6['style']['display']=_0x2b174c(0x144),_0x5e17e0[_0x2b174c(0x198)][_0x2b174c(0x16d)]=_0x1f2149['value']?_0x2b174c(0x192):'none');},_0x2d9521=()=>{const _0xfebc7b=_0x51612f,_0x1eae12=_0x4b6ca4[_0xfebc7b(0x1a4)];if(!_0x1eae12){_0x4587f6[_0xfebc7b(0x198)][_0xfebc7b(0x16d)]=_0xfebc7b(0x144);return;}let _0x44ed88=_0x17da42[_0xfebc7b(0x137)][_0x46f42d]?.[_0x1eae12]||[];const _0x28434b=_0x17da42['mataPelajaran'][_0xfebc7b(0x18a)](_0x3fe1ba=>_0x3fe1ba['id']===_0x1eae12);document[_0xfebc7b(0x164)](_0xfebc7b(0x178))[_0xfebc7b(0x1a5)]=_0xfebc7b(0x185)+_0x28434b[_0xfebc7b(0x17c)],document[_0xfebc7b(0x164)](_0xfebc7b(0x14e))['innerHTML']='';for(let _0xb7869c=0x0;_0xb7869c<0xa;_0xb7869c++){const _0x1cac20=_0x44ed88[_0xb7869c]?_0x44ed88[_0xb7869c][_0xfebc7b(0x135)]:'';document['getElementById'](_0xfebc7b(0x14e))[_0xfebc7b(0x152)]+='<div\x20class=\x22tp-input-group\x22><label\x20for=\x22tp-'+_0xb7869c+_0xfebc7b(0x175)+(_0xb7869c+0x1)+_0xfebc7b(0x142)+_0xb7869c+_0xfebc7b(0x160)+_0x1cac20+_0xfebc7b(0x1a7)+(_0xb7869c+0x1)+_0xfebc7b(0x138);}_0x4587f6[_0xfebc7b(0x198)][_0xfebc7b(0x16d)]=_0xfebc7b(0x192);};document[_0x51612f(0x164)]('formTP')[_0x51612f(0x13e)]('submit',async _0x210c42=>{const _0x2bc949=_0x51612f;_0x210c42[_0x2bc949(0x1a9)]();const _0x1ecaa2=_0x4b6ca4[_0x2bc949(0x1a4)];if(!_0x1ecaa2){await showModal(_0x2bc949(0x19b),'Pilih\x20mata\x20pelajaran\x20terlebih\x20dahulu!');return;}const _0x2a7b3e=Array['from'](document[_0x2bc949(0x172)](_0x2bc949(0x1a8)))[_0x2bc949(0x156)]((_0x158a9e,_0x3b79e0)=>({'id':_0x2bc949(0x15e)+_0x46f42d+'-'+_0x1ecaa2+'-'+(_0x3b79e0+0x1),'deskripsi':_0x158a9e[_0x2bc949(0x1a4)][_0x2bc949(0x184)]()}))[_0x2bc949(0x154)](_0x3b77f4=>_0x3b77f4[_0x2bc949(0x135)]);if(!_0x17da42[_0x2bc949(0x137)][_0x46f42d])_0x17da42[_0x2bc949(0x137)][_0x46f42d]={};_0x17da42[_0x2bc949(0x137)][_0x46f42d][_0x1ecaa2]=_0x2a7b3e,saveData(_0x17da42),await showModal('Berhasil',_0x2bc949(0x176));});const _0x396d9c=()=>{const _0x1279fb=_0x51612f,_0x5f8685=_0x1f2149['value'];if(!_0x5f8685){_0x5e17e0[_0x1279fb(0x198)]['display']=_0x1279fb(0x144);return;}_0x3d122b=JSON[_0x1279fb(0x17d)](JSON[_0x1279fb(0x140)](_0x17da42[_0x1279fb(0x191)][_0x5f8685]||{}));const _0x41af72=_0x17da42[_0x1279fb(0x177)]['find'](_0x332257=>_0x332257['id']===_0x5f8685);document[_0x1279fb(0x164)](_0x1279fb(0x179))[_0x1279fb(0x1a5)]=_0x1279fb(0x197)+_0x41af72[_0x1279fb(0x17c)],_0x4a671d[_0x1279fb(0x152)]='';for(const [_0x33c412,_0x529afc]of Object[_0x1279fb(0x169)](_0x17da42[_0x1279fb(0x181)])){const _0x574269=_0x3d122b[_0x33c412]||[];_0x4a671d[_0x1279fb(0x152)]+=_0x1279fb(0x199)+_0x33c412+_0x1279fb(0x195)+_0x529afc[_0x1279fb(0x17c)]+_0x1279fb(0x1af)+_0x33c412+'\x22>'+_0x574269[_0x1279fb(0x196)]+_0x1279fb(0x1ae)+_0x529afc[_0x1279fb(0x16b)][_0x1279fb(0x196)]+_0x1279fb(0x139)+_0x33c412+_0x1279fb(0x190);}_0x5e17e0[_0x1279fb(0x198)]['display']=_0x1279fb(0x192);},_0x11a4a1=_0x3da74b=>{const _0x4bb442=_0x51612f,_0x46a37f=_0x17da42[_0x4bb442(0x181)][_0x3da74b],_0x30c89f=_0x3d122b[_0x3da74b]||[];_0x1097b0['textContent']=_0x4bb442(0x162)+_0x46a37f[_0x4bb442(0x17c)],_0x47c192[_0x4bb442(0x152)]='',_0x221bb4['innerHTML']='',_0x46a37f[_0x4bb442(0x16b)][_0x4bb442(0x14f)](_0x500043=>{const _0xdef70b=_0x4bb442,_0x1d20c9=_0x30c89f[_0xdef70b(0x180)](_0x500043);_0x47c192[_0xdef70b(0x152)]+=_0xdef70b(0x170)+_0x500043+'\x22\x20'+(_0x1d20c9?_0xdef70b(0x18d):'')+_0xdef70b(0x17f)+_0x500043+_0xdef70b(0x159);}),_0x46a37f[_0x4bb442(0x16b)][_0x4bb442(0x14f)]((_0x6af16a,_0x16f16c)=>{const _0x1833f9=_0x4bb442;_0x221bb4[_0x1833f9(0x152)]+=_0x1833f9(0x13b)+_0x6af16a+_0x1833f9(0x19a)+_0x16f16c+_0x1833f9(0x1ac)+_0x16f16c+_0x1833f9(0x15c);}),_0x422409[_0x4bb442(0x151)]['dimensiKey']=_0x3da74b,_0x422409[_0x4bb442(0x198)]['display']=_0x4bb442(0x16f);};_0x237fdd[_0x51612f(0x13e)](_0x51612f(0x19e),_0x113770=>{const _0x3f0aca=_0x51612f;_0x113770[_0x3f0aca(0x1a9)]();const _0x3116a3=_0x422409[_0x3f0aca(0x151)][_0x3f0aca(0x187)],_0x48919e=_0xa217de['value'][_0x3f0aca(0x184)]();_0x48919e&&_0x3116a3&&(_0x17da42[_0x3f0aca(0x181)][_0x3116a3][_0x3f0aca(0x16b)][_0x3f0aca(0x1ad)](_0x48919e),saveData(_0x17da42),_0xa217de[_0x3f0aca(0x1a4)]='',_0x11a4a1(_0x3116a3));}),_0x221bb4[_0x51612f(0x13e)]('click',async _0x37c320=>{const _0x904a5f=_0x51612f,_0x4a0051=_0x37c320[_0x904a5f(0x13c)]['closest'](_0x904a5f(0x18c));if(!_0x4a0051)return;const _0x53c555=_0x422409[_0x904a5f(0x151)]['dimensiKey'];if(!_0x53c555)return;const _0x30ca39=parseInt(_0x4a0051[_0x904a5f(0x151)][_0x904a5f(0x18f)],0xa),_0x192ca6=_0x17da42[_0x904a5f(0x181)][_0x53c555][_0x904a5f(0x16b)];if(_0x4a0051['classList'][_0x904a5f(0x1aa)](_0x904a5f(0x19d))){const _0x75a5fc=_0x192ca6[_0x30ca39],_0x31eb00=prompt(_0x904a5f(0x1a0),_0x75a5fc);_0x31eb00&&_0x31eb00[_0x904a5f(0x184)]()!==_0x75a5fc&&(_0x192ca6[_0x30ca39]=_0x31eb00[_0x904a5f(0x184)](),saveData(_0x17da42),_0x11a4a1(_0x53c555));}if(_0x4a0051[_0x904a5f(0x16a)][_0x904a5f(0x1aa)](_0x904a5f(0x15d))){const _0xf23afa=await showModal(_0x904a5f(0x19f),_0x904a5f(0x1a2),!![]);_0xf23afa&&(_0x192ca6[_0x904a5f(0x146)](_0x30ca39,0x1),saveData(_0x17da42),_0x11a4a1(_0x53c555));}}),_0x17b802['addEventListener']('click',()=>{const _0x3755ec=_0x51612f,_0x3730be=_0x422409[_0x3755ec(0x151)][_0x3755ec(0x187)],_0x3c8578=_0x47c192['querySelectorAll'](_0x3755ec(0x1ab));_0x3d122b[_0x3730be]=Array['from'](_0x3c8578)[_0x3755ec(0x156)](_0x43bdf1=>_0x43bdf1[_0x3755ec(0x1a4)]);const _0x436fae=_0x17da42[_0x3755ec(0x181)][_0x3730be][_0x3755ec(0x16b)]['length'];document[_0x3755ec(0x164)]('summary-'+_0x3730be)[_0x3755ec(0x1a5)]=_0x3d122b[_0x3730be][_0x3755ec(0x196)]+'\x20dari\x20'+_0x436fae+_0x3755ec(0x174),_0x422409[_0x3755ec(0x198)][_0x3755ec(0x16d)]=_0x3755ec(0x144);}),_0x12d33f[_0x51612f(0x13e)](_0x51612f(0x141),async()=>{const _0x58f44a=_0x51612f,_0x4e94de=_0x1f2149['value'];if(!_0x4e94de){await showModal(_0x58f44a(0x19b),_0x58f44a(0x167));return;}_0x17da42[_0x58f44a(0x191)][_0x4e94de]=_0x3d122b,saveData(_0x17da42),await showModal(_0x58f44a(0x15b),_0x58f44a(0x18e));}),_0x4d076d(_0x4b6ca4,_0x17da42[_0x51612f(0x15a)],_0x51612f(0x166)),_0x4d076d(_0x1f2149,_0x17da42[_0x51612f(0x177)],_0x51612f(0x149)),_0x650e6[_0x51612f(0x14f)](_0x1a2243=>_0x1a2243[_0x51612f(0x13e)](_0x51612f(0x147),_0x9c6216=>_0x172d3a(_0x9c6216['target'][_0x51612f(0x1a4)]))),_0x4b6ca4[_0x51612f(0x13e)](_0x51612f(0x147),_0x2d9521),_0x1f2149[_0x51612f(0x13e)]('change',_0x396d9c),_0x4a671d[_0x51612f(0x13e)](_0x51612f(0x141),_0x45f1c4=>{const _0x106999=_0x51612f,_0x392eca=_0x45f1c4['target'][_0x106999(0x150)](_0x106999(0x13a));if(_0x392eca)_0x11a4a1(_0x392eca[_0x106999(0x151)][_0x106999(0x187)]);}),_0x172d3a(document[_0x51612f(0x193)](_0x51612f(0x1a3))['value']);}));function _0x7c65(_0x9ef0d,_0x3b3dda){const _0x415c9c=_0x415c();return _0x7c65=function(_0x7c6535,_0x901a76){_0x7c6535=_0x7c6535-0x135;let _0x44cc3d=_0x415c9c[_0x7c6535];return _0x44cc3d;},_0x7c65(_0x9ef0d,_0x3b3dda);}function _0x415c(){const _0x36f93e=['simpanKokuTp','Kelola:\x20','tutorialModal','getElementById','koku','Pilih\x20Mata\x20Pelajaran','Pilih\x20kegiatan\x20kokurikuler\x20terlebih\x20dahulu!','dimensiInputsWrapper','entries','classList','tujuan','mapelSelectorContainer','display','140BNKIzX','flex','<div\x20class=\x22tp-checkbox-group\x22><label><input\x20type=\x22checkbox\x22\x20class=\x22dimensi-tp-checkbox\x22\x20value=\x22','2272323wuxVBo','querySelectorAll','tpContainer','\x20tujuan\x20terpilih','\x22>TP\x20','Tujuan\x20Pembelajaran\x20Mapel\x20telah\x20disimpan!','kokurikuler','judulInputTp','judulInputKoku','13pXfeqK','managementList','nama','parse','\x20--</option>','><span>','includes','dimensiKokurikuler','disabled','92dqoNad','trim','Input\x20TP\x20untuk:\x20','678670YjtZsi','dimensiKey','kokuTpContainer','infoDasar','find','dimensiModal','button','checked','Pilihan\x20Dimensi\x20dan\x20Tujuan\x20Kokurikuler\x20telah\x20disimpan!','index','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg><use\x20href=\x22#icon-edit\x22/></svg><span>Pilih\x20&\x20Kelola</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','tujuanKokurikuler','block','querySelector','mapel','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22dimensi-name\x22>','length','Pilih\x20Dimensi\x20untuk:\x20','style','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22dimensi-row\x22\x20id=\x22row-','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x20edit-tp-btn\x22\x20data-index=\x22','Error','<option\x20value=\x22\x22>--\x20','edit-tp-btn','submit','Konfirmasi','Edit\x20tujuan:','190420MpXNZh','Yakin\x20ingin\x20menghapus\x20tujuan\x20ini\x20secara\x20permanen?','input[name=\x22tp_choice\x22]:checked','value','textContent','pilihMapel','\x22\x20placeholder=\x22Deskripsi\x20Tujuan\x20Pembelajaran\x20ke-','#tpInputsWrapper\x20.tp-input','preventDefault','contains','.dimensi-tp-checkbox:checked','\x22><svg><use\x20href=\x22#icon-edit\x22/></svg></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x20danger\x20delete-tp-btn\x22\x20data-index=\x22','push','\x20dari\x20','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22dimensi-summary\x22\x20id=\x22summary-','4834YTUhWf','<option\x20value=\x22\x22>Input\x20data\x20di\x20halaman\x20lain\x20dahulu</option>','11259408SexrCW','deskripsi','selectionCheckboxes','tujuanPembelajaran','\x22></div>','\x20tujuan\x20terpilih</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-sm\x20edit-dimensi-btn\x22\x20data-dimensi-key=\x22','.edit-dimensi-btn','<div\x20class=\x22manage-tp-item\x22><p>','target','5968782oEZzhf','addEventListener','30OvMNgY','stringify','click',':</label><input\x20type=\x22text\x22\x20id=\x22tp-','input[name=\x22tp_choice\x22]','none','addTpForm','splice','change','tutorialSiswaButton','Pilih\x20Kegiatan\x20Kokurikuler','22bQZYxI','newTpInput','6492kpewYu','DOMContentLoaded','tpInputsWrapper','forEach','closest','dataset','innerHTML','pilihKoku','filter','kokuSelectorContainer','map','kelasAktif','8AzamgL','</span></label></div>','mataPelajaran','Berhasil','\x22><svg><use\x20href=\x22#icon-trash\x22/></svg></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','delete-tp-btn','tp-','tutupDimensiModal','\x22\x20class=\x22tp-input\x22\x20value=\x22'];_0x415c=function(){return _0x36f93e;};return _0x415c();}
+ 
+    </script>
+</body>
+</html>
