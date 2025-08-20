@@ -5,130 +5,202 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
-    <title>CETAK NISN</title>
-    <<style>
-        :root {
-    --card-height: 300px;
-    --card-width: calc(var(--card-height) / 1.5);
-  }
-*{
-    box-sizing: border-box;
-}
-body {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #191c29;
-  }
-  .card {
-    width: var(--card-width);
-    height: var(--card-height);
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    padding: 0 36px;
-    perspective: 2500px;
-    margin: 0 50px;
-  }
-.cover-image{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.wrapper{
-    transition: all 0.5s;
-    position: absolute;
-    width: 100%;
-    z-index: -1;
-}
-.card:hover .wrapper{
-    transform: perspective(900px) translateY(-5%) rotateX(25deg) translateZ(0);
-    box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, 0.75);
-    -webkit-box-shadow:2px 35px 32px -8px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow:2px 35px 32px -8px rgba(0, 0, 0, 0.75);
-}
-.wrapper::before,
-.wrapper::after{
-    content: "";
-    opacity: 0;
-    width: 100%;
-    height: 80px;
-    transition: all 0.5s;
-    position: absolute;
-    left: 0;
-}
-.wrapper::before{
-    top: 0;
-    height: 100%;
-    background-image: linear-gradient(
-        to top,
-        transparent 46%,
-        rgba(12, 13, 19, 0.5)68%,
-        rgba(12, 13, 19) 97%
-    );
-}
-.wrapper::after{
-    bottom: 0;
-    opacity: 1;
-    background-image: linear-gradient(
-        to bottom,
-        transparent 46%,
-        rgba(12, 13, 19, 0.5) 68%,
-        rgba(12, 13, 19)97%
-    );
-}
-.card:hover .wrapper::before,
-.wrapper::after{
-    opacity: 1;
-}
-.card:hover .wrapper::after{
-    height: 120px;
-}
-.title {
-    width: 100%;
-    transition: transform 0.5s;
-  }
-  .card:hover .title {
-    transform: translate3d(0%, -50px, 100px);
-  }
-  .character {
-    width: 100%;
-    opacity: 0;
-    transition: all 0.5s;
-    position: absolute;
-    z-index: -1;
-  }
-  .card:hover .character {
-    opacity: 1;
-    transform: translate3d(0%, -30%, 80px);
-  }
-  
-    </style>
+    <title>CETAK NISN - Tampilan Baru</title>
+<style>
+    :root {
+        /* PERUBAHAN DI SINI: Kartu dikecilkan sedikit */
+        --card-height: 260px; 
+        --card-width: calc(var(--card-height) * 1.5);
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #101010;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+    }
+    
+    /* --- Animasi Latar Belakang (Tidak berubah) --- */
+    .background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+    .bubbles {
+        position: relative;
+        display: flex;
+    }
+    .bubbles span {
+        position: relative;
+        width: 30px;
+        height: 30px;
+        background: #4fc3dc;
+        margin: 0 4px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 10px #4fc3dc44, 0 0 50px #4fc3dc, 0 0 100px #4fc3dc;
+        animation: animate 15s linear infinite;
+        animation-duration: calc(125s / var(--i));
+    }
+    .bubbles span:nth-child(even) {
+        background: #ff2d75;
+        box-shadow: 0 0 0 10px #ff2d7544, 0 0 50px #ff2d75, 0 0 100px #ff2d75;
+    }
+    @keyframes animate {
+        0% { transform: translateY(100vh) scale(0); }
+        100% { transform: translateY(-10vh) scale(1); }
+    }
+    /* --- Akhir Animasi Latar Belakang --- */
 
+    .container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap; 
+        justify-content: center;
+        align-items: center;
+        gap: 80px;
+        /* PERUBAHAN DI SINI: Menurunkan posisi kartu sedikit */
+        margin-top: 80px; 
+    }
+
+    .card {
+        width: var(--card-width);
+        height: var(--card-height);
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        padding: 0 36px;
+        perspective: 2500px;
+        border-radius: 20px;
+        transition: all 0.5s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    .cover-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 20px;
+    }
+
+    .wrapper {
+        transition: all 0.5s;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        border-radius: 20px;
+    }
+
+    .card:hover .wrapper {
+        transform: perspective(900px) translateY(-5%) rotateX(25deg) translateZ(0);
+        box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, 0.75);
+    }
+
+    .wrapper::before,
+    .wrapper::after {
+        content: "";
+        opacity: 0;
+        width: 100%;
+        height: 80px;
+        transition: all 0.5s;
+        position: absolute;
+        left: 0;
+        border-radius: 20px;
+    }
+
+    .wrapper::before {
+        top: 0;
+        height: 100%;
+        background-image: linear-gradient(to top, transparent 46%, rgba(12, 13, 19, 0.5) 68%, rgba(12, 13, 19) 97%);
+    }
+
+    .wrapper::after {
+        bottom: 0;
+        opacity: 1;
+        background-image: linear-gradient(to bottom, transparent 46%, rgba(12, 13, 19, 0.5) 68%, rgba(12, 13, 19) 97%);
+    }
+
+    .card:hover .wrapper::before,
+    .card:hover .wrapper::after {
+        opacity: 1;
+    }
+
+    .card:hover .wrapper::after {
+        height: 120px;
+    }
+
+    .title {
+        width: 50%;
+        transition: transform 0.5s;
+    }
+
+    .card:hover .title {
+        transform: translate3d(0%, -50px, 100px);
+    }
+
+    .character {
+        width: 80%;
+        opacity: 0;
+        transition: all 0.5s;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .card:hover .character {
+        opacity: 1;
+        transform: translate3d(0%, -25%, 80px);
+    }
+</style>
 </head>
 <body>
-    <a href="nisnborongan">
-        <div class="card">
-            <div class="wrapper">
-                <img src="https://ggayane.github.io/css-experiments/cards/dark_rider-cover.jpg" class="cover-image" />
-            </div>
-            <img src="https://lh3.googleusercontent.com/d/1VbzQXVU7BYn25Ukm0LQsaYjScKthMpdi" class="title" />
-            <img src="https://lh3.googleusercontent.com/d/1TFoJt29QZ7ECknL_C99rKHyDQYhSHrZF" class="character" />
+    <div class="background">
+        <div class="bubbles">
+            <script>
+                // Menambahkan gelembung secara dinamis
+                for (let i = 1; i <= 40; i++) {
+                    document.write(`<span style="--i:${Math.floor(Math.random() * 20) + 10}"></span>`);
+                }
+            </script>
         </div>
-    </a>
+    </div>
 
-    <a href="nisnsatuan">
-        <div class="card">
-            <div class="wrapper">
-                <img src="https://ggayane.github.io/css-experiments/cards/force_mage-cover.jpg" class="cover-image" />
+    <div class="container">
+        <a href="nisnborongan">
+            <div class="card">
+                <div class="wrapper">
+                    <img src="https://lh3.googleusercontent.com/d/1GsNh-yhZt8YaE5ks1wuwRvKRrXHge5nE" class="cover-image" />
+                </div>
+                <img src="https://lh3.googleusercontent.com/d/1VbzQXVU7BYn25Ukm0LQsaYjScKthMpdi" class="title" />
+                <img src="https://lh3.googleusercontent.com/d/1WHBrKlyY7crbJaf7neNJ9Kev2a5hj85h" class="character" />
             </div>
-            <img src="https://lh3.googleusercontent.com/d/1bf-UZkjnue318w5tkPTKfet86GpQzERh" class="title" />
-            <img src="https://lh3.googleusercontent.com/d/1TFoJt29QZ7ECknL_C99rKHyDQYhSHrZF" class="character" />
-        </div>
-    </a>
+        </a>
+
+        <a href="nisnsatuan">
+            <div class="card">
+                <div class="wrapper">
+                    <img src="https://lh3.googleusercontent.com/d/1GsNh-yhZt8YaE5ks1wuwRvKRrXHge5nE" class="cover-image" />
+                </div>
+                <img src="https://lh3.googleusercontent.com/d/1bf-UZkjnue318w5tkPTKfet86GpQzERh" class="title" />
+                <img src="https://lh3.googleusercontent.com/d/1WHBrKlyY7crbJaf7neNJ9Kev2a5hj85h" class="character" />
+            </div>
+        </a>
+    </div>
 </body>
 </html>
