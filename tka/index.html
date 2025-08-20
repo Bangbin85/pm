@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Bintang Adhi Permana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">	
+    <!-- SwiperJS for 3D Slider -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #111827; /* Dark background */
+            color: #e5e7eb;
+        }
+
+        /* -- Canvas untuk Partikel -- */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* -- Efek Glassmorphism -- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        /* -- Animasi Saat Scroll -- */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* -- Styling Timeline Baru -- */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(59, 130, 246, 0.3);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3.5rem;
+            top: 5px;
+            width: 1rem;
+            height: 1rem;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            border: 3px solid #111827;
+            transition: all 0.3s ease;
+        }
+        .timeline-item:hover::before {
+            transform: scale(1.3);
+            background-color: #60a5fa;
+        }
+
+        /* -- Styling Modal -- */
+        #product-modal.hidden {
+            display: none;
+        }
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 300ms, transform 300ms;
+        }
+
+        /* -- Styling 3D Slider -- */
+        .swiper {
+            width: 100%;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 320px;
+            height: 320px;
+        }
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #60a5fa;
+        }
+        .swiper-pagination-bullet-active {
+            background: #60a5fa;
+        }
+        
+        /* -- Styling Lightbox -- */
+        #lightbox.hidden {
+            display: none;
+        }
+
+        /* -- STYLING KHUSUS UNTUK PRINT -- */
+        @media print {
+            /* Sembunyikan semua elemen web */
+            header, footer, #particle-canvas, #web-content, #product-modal, #lightbox {
+                display: none !important;
+            }
+            
+            /* Tampilkan hanya layout cetak */
+            #print-layout {
+                display: block !important;
+            }
+            
+            /* Atur ulang body untuk cetak */
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* Atur ulang font */
+            p, ul, li, div {
+                font-size: 9pt !important;
+                line-height: 1.4;
+            }
+            h1 { font-size: 22pt !important; }
+            h2 { font-size: 14pt !important; }
+            h3 { font-size: 11pt !important; }
+
+            /* Atur ulang warna teks agar terbaca di kertas putih */
+            .print-text-primary { color: #1f2937 !important; }
+            .print-text-secondary { color: #4b5563 !important; }
+            
+            /* Hindari elemen terpotong antar halaman */
+            .print-section, .print-card {
+                break-inside: avoid;
+            }
+        }
+        
+    </style>
+</head>
+<body class="w-full">
+
+    <!-- ================================================== -->
+    <!--  KONTEN UNTUK TAMPILAN WEB (INTERAKTIF)             -->
+    <!-- ================================================== -->
+    <div id="web-content">
+        <!-- HERO SECTION DENGAN PARTIKEL -->
+        <header class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+            <canvas id="particle-canvas"></canvas>
+            <div class="relative z-10 p-4 scroll-reveal">
+                <img src="http://lh3.googleusercontent.com/d/1QHVbK_TkBo00jcaxdxD5XWmOPV2DTD3o" alt="Foto Profil" class="w-36 h-36 rounded-full mx-auto border-4 border-blue-500 shadow-lg mb-4" onerror="this.onerror=null;this.src='https://placehold.co/150x150/374151/e5e7eb?text=BAP';">
+                <h1 class="text-5xl md:text-6xl font-bold text-white tracking-tight">Bintang Adhi Permana</h1>
+                <p class="text-xl md:text-2xl text-blue-300 mt-2">Guru & Pengembang Pendidikan</p>
+                <div class="mt-6 flex justify-center space-x-5">
+                    <a href="https://wa.me/6281310051985" target="_blank" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-whatsapp fa-2x"></i></a>
+                    <a href="https://www.facebook.com/bintang.a.permana.1/" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-instagram fa-2x"></i></a>
+                    <a href="#" id="download-pdf" title="Unduh sebagai PDF" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fas fa-file-pdf fa-2x"></i></a>
+                </div>
+            </div>
+        </header>
+
+        <!-- KONTEN UTAMA WEB -->
+        <main class="container mx-auto p-4 md:p-8 space-y-16">
+            <!-- TENTANG SAYA -->
+            <section class="scroll-reveal text-center max-w-3xl mx-auto">
+                 <h2 class="text-3xl font-bold text-center mb-6 text-blue-400">Tentang Saya</h2>
+                 <p class="text-gray-300 leading-relaxed">
+                    Bintang Adhi Permana adalah seorang pendidik dan pengembang yang berdedikasi tinggi, dengan hasrat untuk memajukan dunia pendidikan Indonesia. Dengan latar belakang yang kuat sebagai guru Sekolah Dasar, ia memadukan pengalaman praktis di kelas dengan keahlian teknis dalam analisis data, pengembangan kurikulum, dan pembuatan aplikasi pendidikan. Kontribusinya yang luas, mulai dari menulis buku ajar hingga mengembangkan sistem rapor digital, mencerminkan komitmennya untuk menciptakan solusi inovatif yang memberdayakan guru dan siswa di seluruh negeri.
+                 </p>
+            </section>
+            
+            <!-- GALERI FOTO -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-2 text-blue-400">Galeri Foto</h2>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+                      <div class="swiper-slide">
+                        <img src="http://lh3.googleusercontent.com/d/1TFoJt29QZ7ECknL_C99rKHyDQYhSHrZF" alt="Profil 1" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="http://lh3.googleusercontent.com/d/1nGQtWx09aa1fxIzxNt20R8Zq-fZymYqf" alt="Profil 2" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="http://lh3.googleusercontent.com/d/1bxvjRTwH4nKQIqZMyJoOuoplZN8kROh4" alt="Profil 3" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="http://lh3.googleusercontent.com/d/11foKCh8c9raIzBMv6B4k1MJ6YKlTN59r" alt="Profil 4" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="http://lh3.googleusercontent.com/d/19COp7PM3HluixA1Qm14BM67kuuJP1r6p" alt="Profil 5" />
+                      </div>
+                      <div class="swiper-slide">
+                        <img src="http://lh3.googleusercontent.com/d/1iHjTNDzzEYA5eICGSVHupG_faK0WfE8L" alt="Profil 6" />
+                      </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </section>
+
+            <!-- PENGALAMAN MENGAJAR -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Pengalaman Mengajar</h2>
+                <div class="timeline max-w-2xl mx-auto">
+                    <div class="timeline-item">
+                        <p class="font-semibold text-lg text-gray-100">SDN Lubang Buaya 01</p>
+                        <p class="text-sm text-gray-400">2021 - Sekarang</p>
+                    </div>
+                    <div class="timeline-item">
+                        <p class="font-semibold text-lg text-gray-100">SDN Lubang Buaya 13</p>
+                        <p class="text-sm text-gray-400">2014 - 2021</p>
+                    </div>
+                    <div class="timeline-item">
+                        <p class="font-semibold text-lg text-gray-100">SDN Kalideres 12 Pagi</p>
+                        <p class="text-sm text-gray-400">2011 - 2014</p>
+                    </div>
+                    <div class="timeline-item">
+                        <p class="font-semibold text-lg text-gray-100">SDN Kebon Manggis 14 Pagi</p>
+                        <p class="text-sm text-gray-400">2007 - 2010</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- PERAN & KONTRIBUSI -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Peran & Kontribusi</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Analis Data</h3>
+                        <p class="text-gray-400 text-sm mb-2">2024 - Sekarang</p>
+                        <ul class="list-disc list-inside text-gray-300 text-sm">
+                            <li>Direktorat PAUD, SD, SMP, SMA</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Pengembang Kurikulum</h3>
+                        <p class="text-gray-400 text-sm mb-2">2019 - Sekarang</p>
+                        <p class="text-gray-300 text-sm">PKLK Disdik DKI Jakarta</p>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Pengembang Erapor SD</h3>
+                         <p class="text-gray-400 text-sm mb-2">2019 - Sekarang</p>
+                        <p class="text-gray-300 text-sm">Direktorat SD Kemendikdasmen</p>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Sekretaris Kwartir Ranting</h3>
+                        <p class="text-gray-400 text-sm mb-2">2020 - Sekarang</p>
+                        <p class="text-gray-300 text-sm">Kwarran Cipayung, Jakarta Timur</p>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Penulis Buku</h3>
+                        <p class="text-gray-400 text-sm mb-2">2022 - 2023</p>
+                        <ul class="list-disc list-inside text-gray-300 text-sm">
+                            <li>Pancasila - Erlangga</li>
+                            <li>Matematika - Erlangga</li>
+                            <li>Koding Ka - Puskurbuk</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-6 tilt-card">
+                        <h3 class="font-bold text-xl text-white mb-2">Penulis Modul Ajar</h3>
+                        <ul class="list-disc list-inside text-gray-300 text-sm">
+                            <li>Direktorat SD Kemendikdasmen</li>
+                            <li>Direktorat Guru dan Tenaga Kependidikan</li>
+                            <li>Pusat Kurikulum dan Pembelajaran</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PENDIDIKAN -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Pendidikan</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <div class="glass-card p-6 flex items-center space-x-4">
+                        <i class="fas fa-graduation-cap text-blue-400 text-3xl"></i>
+                        <div>
+                            <p class="font-semibold text-lg text-white">S2 - Penelitian dan Evaluasi Pendidikan</p>
+                            <p class="text-sm text-gray-400">Universitas Prof. DR. Hamka Jakarta</p>
+                        </div>
+                    </div>
+                     <div class="glass-card p-6 flex items-center space-x-4">
+                        <i class="fas fa-graduation-cap text-blue-400 text-3xl"></i>
+                        <div>
+                            <p class="font-semibold text-lg text-white">S1 - PGSD</p>
+                            <p class="text-sm text-gray-400">Universitas Negeri Jakarta</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PRODUK & KARYA -->
+            <section class="scroll-reveal">
+                <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Produk & Karya</h2>
+                <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Produk akan dimasukkan di sini oleh JavaScript -->
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center p-8 mt-16 border-t border-gray-800">
+            <p class="text-gray-500">&copy; 2024 Bintang Adhi Permana. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- ================================================== -->
+    <!--  KONTEN KHUSUS UNTUK CETAK (TIDAK TAMPIL DI WEB)   -->
+    <!-- ================================================== -->
+    <div id="print-layout" class="hidden p-8">
+        <!-- Header Cetak -->
+        <div class="text-center mb-8">
+            <h1 class="font-bold print-text-primary">Bintang Adhi Permana</h1>
+            <p class="print-text-secondary">Guru & Pengembang Pendidikan</p>
+            <p class="print-text-secondary text-xs mt-1">
+                <i class="fab fa-whatsapp"></i> 6281310051985
+            </p>
+        </div>
+
+        <!-- Kontainer 2 Kolom -->
+        <div class="grid grid-cols-2 gap-8">
+            <!-- Kolom Kiri -->
+            <div class="space-y-6">
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Tentang Saya</h2>
+                    <p class="print-text-secondary">
+                        Seorang pendidik dan pengembang yang berdedikasi, memadukan pengalaman di kelas dengan keahlian teknis dalam analisis data, pengembangan kurikulum, dan pembuatan aplikasi untuk memajukan pendidikan Indonesia.
+                    </p>
+                </section>
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Pendidikan</h2>
+                    <div class="print-card mb-2">
+                        <h3 class="font-semibold print-text-primary">S2 - Penelitian dan Evaluasi Pendidikan</h3>
+                        <p class="print-text-secondary">Universitas Prof. DR. Hamka Jakarta</p>
+                    </div>
+                    <div class="print-card">
+                        <h3 class="font-semibold print-text-primary">S1 - PGSD</h3>
+                        <p class="print-text-secondary">Universitas Negeri Jakarta</p>
+                    </div>
+                </section>
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Produk & Karya</h2>
+                    <ul class="list-disc list-inside print-text-secondary space-y-1">
+                        <li>Modul Ajar Matematika (Kelas 1, 2, 5)</li>
+                        <li>Modul Ajar Pancasila (Kelas 5)</li>
+                        <li>Konten Game Interaktif (Kelas 1)</li>
+                        <li>Buku Nilai Kokurikuler</li>
+                        <li>Aplikasi Rapor SD & Buku Induk</li>
+                        <li>Berbagai Video Pembelajaran</li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- Kolom Kanan -->
+            <div class="space-y-6">
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Pengalaman Mengajar</h2>
+                    <div class="space-y-2">
+                        <div>
+                            <h3 class="font-semibold print-text-primary">SDN Lubang Buaya 01</h3>
+                            <p class="print-text-secondary">2021 - Sekarang</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">SDN Lubang Buaya 13</h3>
+                            <p class="print-text-secondary">2014 - 2021</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">SDN Kalideres 12 Pagi</h3>
+                            <p class="print-text-secondary">2011 - 2014</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">SDN Kebon Manggis 14 Pagi</h3>
+                            <p class="print-text-secondary">2007 - 2010</p>
+                        </div>
+                    </div>
+                </section>
+                <section class="print-section">
+                    <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Peran & Kontribusi</h2>
+                    <div class="space-y-2">
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Analis Data (2024 - Sekarang)</h3>
+                            <p class="print-text-secondary">Direktorat PAUD, SD, SMP, SMA</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Pengembang Kurikulum (2019 - Sekarang)</h3>
+                            <p class="print-text-secondary">PKLK Disdik DKI Jakarta</p>
+                        </div>
+                         <div>
+                            <h3 class="font-semibold print-text-primary">Pengembang Erapor SD (2019 - Sekarang)</h3>
+                            <p class="print-text-secondary">Direktorat SD Kemendikdasmen</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Sekretaris Kwartir Ranting (2020 - Sekarang)</h3>
+                            <p class="print-text-secondary">Kwarran Cipayung, Jakarta Timur</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Penulis Buku (2022 - 2023)</h3>
+                            <p class="print-text-secondary">Pancasila & Matematika (Erlangga), Koding Ka (Puskurbuk)</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold print-text-primary">Penulis Modul Ajar</h3>
+                            <p class="print-text-secondary">Direktorat SD, GTK, & Puskurla Kemendikdasmen</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================== -->
+    <!--  MODAL UNTUK DETAIL PRODUK                         -->
+    <!-- ================================================== -->
+    <div id="product-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div id="modal-content" class="glass-card p-8 rounded-2xl max-w-lg w-full relative modal-enter">
+            <button id="modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+            <h3 id="modal-title" class="text-2xl font-bold text-white mb-4"></h3>
+            <p id="modal-description" class="text-gray-300 mb-6"></p>
+            <a id="modal-link" href="#" target="_blank" class="inline-block bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                Lihat Detail <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- ================================================== -->
+    <!--  LIGHTBOX UNTUK GALERI FOTO                        -->
+    <!-- ================================================== -->
+    <div id="lightbox" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+        <button id="lightbox-close" class="absolute top-6 right-6 text-white text-4xl opacity-80 hover:opacity-100">&times;</button>
+        <img id="lightbox-img" src="" alt="Tampilan diperbesar" class="max-w-full max-h-full object-contain transform transition-transform duration-300 scale-95">
+    </div>
+
+
+    <!-- SwiperJS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        // --- SCRIPT PARTIKEL ---
+        const canvas = document.getElementById('particle-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particlesArray;
+
+            class Particle {
+                constructor(x, y, directionX, directionY, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.directionX = directionX;
+                    this.directionY = directionY;
+                    this.size = size;
+                    this.color = color;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+                update() {
+                    if (this.x > canvas.width || this.x < 0) {
+                        this.directionX = -this.directionX;
+                    }
+                    if (this.y > canvas.height || this.y < 0) {
+                        this.directionY = -this.directionY;
+                    }
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                    this.draw();
+                }
+            }
+
+            function init() {
+                particlesArray = [];
+                let numberOfParticles = (canvas.height * canvas.width) / 9000;
+                for (let i = 0; i < numberOfParticles; i++) {
+                    let size = (Math.random() * 2) + 1;
+                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                    let directionX = (Math.random() * .4) - .2;
+                    let directionY = (Math.random() * .4) - .2;
+                    let color = 'rgba(59, 130, 246, 0.5)';
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, innerWidth, innerHeight);
+                for (let i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+            }
+
+            init();
+            animate();
+
+            window.addEventListener('resize', () => {
+                canvas.width = innerWidth;
+                canvas.height = innerHeight;
+                init();
+            });
+        }
+
+        // --- SCRIPT ANIMASI SCROLL ---
+        const scrollElements = document.querySelectorAll(".scroll-reveal");
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                }
+            });
+        }, { threshold: 0.1 });
+
+        scrollElements.forEach(el => {
+            observer.observe(el);
+        });
+
+        // --- SCRIPT EFEK 3D TILT PADA KARTU ---
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const { width, height } = rect;
+                const rotateX = (y / height - 0.5) * -15; // Invert Y-axis for natural feel
+                const rotateY = (x / width - 0.5) * 15;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            });
+        });
+
+        // --- SCRIPT PRODUK, MODAL, & LIGHTBOX ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Data Produk
+            const products = [
+                { title: 'Modul Ajar Matematika Kls 1', description: 'Modul pembelajaran komprehensif untuk matematika tingkat dasar kelas 1.', link: '#' },
+                { title: 'Modul Ajar Matematika Kls 2', description: 'Melanjutkan pondasi matematika dasar dengan materi yang interaktif untuk kelas 2.', link: '#' },
+                { title: 'Modul Ajar Matematika Kls 5', description: 'Materi matematika untuk tingkat lanjut yang menantang dan sesuai kurikulum untuk kelas 5.', link: '#' },
+                { title: 'Modul Ajar Pancasila Kls 5', description: 'Pembelajaran mendalam mengenai nilai-nilai luhur Pancasila untuk siswa kelas 5.', link: '#' },
+                { title: 'Konten Game Interaktif Kls 1', description: 'Media belajar inovatif berbasis permainan untuk meningkatkan engagement siswa kelas 1.', link: '#' },
+                { title: 'Buku Nilai Kokurikuler', description: 'Alat bantu praktis bagi guru untuk melakukan penilaian kegiatan kokurikuler siswa.', link: '#' },
+                { title: 'Aplikasi Rapor SD', description: 'Aplikasi digital untuk mempermudah proses rekapitulasi dan pencetakan rapor Sekolah Dasar.', link: '#' },
+                { title: 'Aplikasi Buku Induk', description: 'Solusi digitalisasi untuk manajemen data administrasi siswa di sekolah.', link: '#' },
+                { title: 'Video Pembelajaran 1', description: 'Konten video edukatif yang menarik untuk membantu pemahaman siswa terhadap materi pelajaran.', link: '#' },
+                { title: 'Video Pembelajaran 2', description: 'Seri lanjutan dari konten video edukatif dengan topik yang lebih beragam.', link: '#' },
+                { title: 'Buku Matematika Erlangga', description: 'Buku teks pelajaran Matematika yang diterbitkan oleh Erlangga.', link: '#' },
+                { title: 'Buku Pancasila Erlangga', description: 'Buku teks pelajaran Pancasila yang diterbitkan oleh Erlangga.', link: '#' }
+            ];
+
+            const productListContainer = document.getElementById('product-list');
+            const modal = document.getElementById('product-modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalLink = document.getElementById('modal-link');
+            const modalCloseBtn = document.getElementById('modal-close');
+
+            // Generate product cards
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'glass-card product-card p-5 flex items-center justify-center text-center cursor-pointer';
+                card.innerHTML = `<p class="font-semibold text-white">${product.title}</p>`;
+                card.addEventListener('click', () => openModal(product));
+                productListContainer.appendChild(card);
+            });
+
+            function openModal(product) {
+                modalTitle.textContent = product.title;
+                modalDescription.textContent = product.description;
+                modalLink.href = product.link;
+                modal.classList.remove('hidden');
+                modalContent.classList.remove('modal-exit', 'modal-exit-active');
+                modalContent.classList.add('modal-enter-active');
+            }
+
+            function closeModal() {
+                modalContent.classList.remove('modal-enter-active');
+                modalContent.classList.add('modal-exit-active');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Lightbox Logic
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxClose = document.getElementById('lightbox-close');
+            const galleryImages = document.querySelectorAll('.swiper-slide img');
+
+            galleryImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    lightbox.classList.remove('hidden');
+                    lightboxImg.src = img.src;
+                    // Animate in
+                    setTimeout(() => lightboxImg.classList.add('scale-100'), 50);
+                });
+            });
+
+            function closeLightbox() {
+                // Animate out
+                lightboxImg.classList.remove('scale-100');
+                setTimeout(() => {
+                    lightbox.classList.add('hidden');
+                    lightboxImg.src = ''; // Clear src
+                }, 300);
+            }
+
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+        });
+
+        // --- SCRIPT 3D SLIDER ---
+        var swiper = new Swiper(".mySwiper", {
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            loop: true,
+            coverflowEffect: {
+              rotate: 50,
+              stretch: 0,
+              depth: 100,
+              modifier: 1,
+              slideShadows: true,
+            },
+            pagination: {
+              el: ".swiper-pagination",
+            },
+        });
+
+
+        // --- SCRIPT UNTUK CETAK ---
+        document.getElementById('download-pdf').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.print();
+        });
+    </script>
+</body>
+</html>

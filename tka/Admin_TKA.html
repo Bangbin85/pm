@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - TKA</title>
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root { --primary-color: #007bff; --success-color: #28a745; --danger-color: #dc3545; --warning-color: #ffc107; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f4f7f6; margin: 20px; color: #333; }
+        .container { max-width: 1400px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); display: none; }
+        h1, h2 { color: #0056b3; text-align: center; }
+        label { font-weight: bold; margin-bottom: 5px; display: block; color: #555; }
+        select, input[type="text"], input[type="url"], input[type="password"], textarea, input[type="file"] { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s; }
+        select:focus, input:focus, textarea:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); outline: none; }
+        button, .btn { color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 500; margin-left: 10px; transition: all 0.2s ease-in-out; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+        button:hover, .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        button:disabled { background-color: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-primary { background-color: #007bff; } .btn-success { background-color: #28a745; } .btn-whatsapp { background-color: #25D366; } .btn-warning { background-color: #ffc107; color: #212529; } .btn-danger { background-color: #dc3545; } .btn-secondary { background-color: #6c757d; }
+        .controls { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-bottom: 2px; flex-wrap: wrap; }
+        .controls .control-group { display: flex; align-items: center; gap: 5px; }
+        .controls select { max-width: 250px; margin-bottom: 0; }
+        .table-wrapper { max-height: 65vh; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 8px; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; font-size: 14px; vertical-align: top; }
+        th { background-color: #007bff; color: white; position: sticky; top: 0; z-index: 2; }
+        .action-btn { width: 35px; height: 35px; padding: 0; margin-right: 5px; font-size: 14px; }
+        .icon-only-btn { width: 40px; height: 40px; padding: 0; font-size: 18px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); animation: fadeIn 0.3s ease-in-out; }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 0; border: none; width: 80%; border-radius: 10px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); overflow: hidden; animation: slideIn 0.4s ease-out; }
+        .modal-header { padding: 18px 25px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { margin: 0; font-size: 1.6em; color: #343a40; }
+        .modal-body { padding: 25px; max-height: 65vh; overflow-y: auto; }
+        .modal-footer { padding: 15px 25px; text-align: right; border-top: 1px solid #e9ecef; background-color: #f8f9fa; }
+        .close-btn { color: #6c757d; font-size: 32px; font-weight: bold; cursor: pointer; transition: color 0.2s; } .close-btn:hover, .close-btn:focus { color: #343a40; }
+        .custom-modal .modal-content { max-width: 480px; margin: 10% auto; } .custom-modal .modal-header h2 { color: white; } .custom-modal .modal-header .close-btn { color: white; opacity: 0.8; } .custom-modal .modal-header.success { background-color: #28a745; } .custom-modal .modal-header.error { background-color: #dc3545; } .custom-modal .modal-header.info { background-color: #0d6efd; } .custom-modal .modal-header.confirm { background-color: #ffc107; } .custom-modal .modal-header.confirm h2, .custom-modal .modal-header.confirm .close-btn { color: #212529; } .custom-modal .modal-body { font-size: 1.1em; line-height: 1.6; text-align: center; } .custom-modal .modal-footer { display: flex; justify-content: center; gap: 15px; }
+        .option-group { border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; margin-bottom: 15px; background: #fdfdfd; }
+        .hidden-inputs { display: none; }
+        .inline-group { display: flex; gap: 15px; align-items: flex-end; }
+        .inline-group .form-item { flex: 1; }
+        .form-item-shrink { flex: 0 0 350px; }
+        .pgk-group { display:flex; align-items:center; gap:15px; }
+        .pgk-group input[type="checkbox"] { width:20px; height:20px; flex-shrink:0; }
+        #password-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(10, 25, 47, 0.85); backdrop-filter: blur(10px); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease-out; }
+        .password-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); padding: 40px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; }
+        .password-box h2 { color: #fff; margin-bottom: 25px; }
+        .glow-input { width: 90%; padding: 15px; background: transparent; border: 2px solid rgba(0, 191, 255, 0.5); border-radius: 8px; color: #fff; font-size: 1.1em; text-align: center; transition: all 0.3s ease; }
+        .glow-input::placeholder { color: rgba(255, 255, 255, 0.6); }
+        .glow-input:focus { outline: none; border-color: #00bfff; box-shadow: 0 0 15px rgba(0, 191, 255, 0.8), 0 0 25px rgba(0, 191, 255, 0.6); }
+        #password-error { color: #ff4d4d; height: 20px; margin-top: 15px; font-weight: bold; }
+        .password-actions { display: flex; gap: 15px; margin-top: 20px; }
+        .password-actions .btn { flex: 1; margin-left: 0; }
+        .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; } @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        .template-content { display: none; }
+        .template-content.active { display: block; }
+        .controls .btn-primary { background-color: #007bff; }
+        .controls .btn-secondary { background-color: #6c757d; }
+        .mr-2 { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <div id="password-modal">
+        <div class="password-box">
+            <h2>Autentikasi Diperlukan</h2>
+            <form id="password-form">
+                <input type="password" id="password-input" class="glow-input" placeholder="MASUKAN PASSWORD">
+                <p id="password-error"></p>
+                <div class="password-actions">
+                    <a href="SiswaTKA" class="btn btn-secondary">SISWA</a>
+                    <button type="submit" class="btn btn-primary">MASUK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container" id="main-container">
+        <h1>Admin Panel TKA</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+				<select id="sheetSelector" style="width: 400px;">
+					<option value="">Pilih Ujian</option>
+					<option value="TKA1">TKA1</option>
+					<option value="TKA2">TKA2</option>
+					<option value="TKA3">TKA3</option>
+					<option value="TKA4">TKA4</option>
+					<option value="TKA5">TKA5</option>
+				</select>	
+            </div>
+             <div class="control-group">
+                <button class="btn-primary" id="btn-template-soal"><i class="fas fa-book"></i></button>
+                <button class="btn-secondary" id="btn-template-peserta"><i class="fas fa-user"></i></button>
+                <button class="btn-secondary" id="btn-template-nilai"><i class="fas fa-eye"></i></button>
+                <a href="https://wa.me/6281310051985" target="_blank" class="btn btn-whatsapp icon-only-btn" title="Hubungi via WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+        </div>
+
+        <div id="soal-content" class="template-content active">
+             <div class="controls">
+                <h2>Template Soal</h2>
+                <div class="control-group">
+                    <select id="filterTypeSoal"></select>
+                    <button id="showFormBtn" class="btn-success"><i class="fas fa-plus mr-2"></i></button>
+                </div>
+            </div>
+            <div id="loader-soal" style="display: none; text-align:center; padding:20px;">Memuat data soal...</div>
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead><tr><th>Aksi</th><th>No</th><th>TYPE SOAL</th><th>PERTANYAAN</th><th>IMAGE_URL</th><th>OPTION1</th><th>ANSWER1</th><th>OPTION2</th><th>ANSWER2</th><th>OPTION3</th><th>ANSWER3</th><th>OPTION4</th><th>ANSWER4</th><th>OPTION5</th><th>ANSWER5</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="peserta-content" class="template-content">
+            <div class="controls">
+                <h2>Template Peserta</h2>
+                <div class="control-group">
+                    <select id="filterPesertaSekolah"></select>
+                    <button id="showUploadModalBtn" class="btn-success" title="Upload dari Excel"><i class="fas fa-file-excel"></i></button>
+                    <button id="showPesertaFormBtn" class="btn-success"><i class="fas fa-user-plus mr-2"></i></button>
+                    <button id="deleteAllPesertaBtn" class="btn-danger" title="Hapus Semua Peserta"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+            <div id="loader-peserta" style="display: none; text-align:center; padding:20px;">Memuat data peserta...</div>
+            <div class="table-wrapper">
+                <table id="pesertaTable">
+                    <thead><tr><th>Aksi</th><th>No</th><th>Nama Siswa</th><th>NISN</th><th>Sekolah</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="nilai-content" class="template-content">
+            <div class="controls">
+                 <h2>Template Nilai Siswa</h2>
+                 <div class="control-group">
+                    <select id="filterNilaiSekolah"></select>
+                    <button id="refreshNilaiBtn" class="btn-primary"><i class="fas fa-sync-alt mr-2"></i></button>
+                    <button id="downloadNilaiBtn" class="btn-success" title="Download Nilai (Excel)"><i class="fas fa-file-excel"></i></button>
+                </div>
+            </div>
+            <div id="loader-nilai" style="display: none; text-align:center; padding:20px;">Memuat data nilai...</div>
+            <div class="table-wrapper">
+                <table id="nilaiTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div id="soalModal" class="modal"> <div class="modal-content"> <div class="modal-header"><h2 id="formTitle"></h2><span class="close-btn" id="mainFormCloseBtn">×</span></div> <div class="modal-body"> <form id="soalForm"> <input type="hidden" id="rowIndex" name="rowIndex"> <div><label for="typeSoal">TIPE SOAL</label><select id="typeSoal" name="typeSoal" required><option value="">-- Pilih Tipe Soal --</option><option value="pilihan-ganda">Pilihan Ganda</option><option value="pilihan-ganda-kompleks">Pilihan Ganda Kompleks</option><option value="benar-salah">Benar Salah</option><option value="menjodohkan">Menjodohkan</option></select></div> <div><label for="pertanyaan">PERTANYAAN</label><textarea id="pertanyaan" name="pertanyaan" rows="3" required></textarea></div> <div><label for="imageUrl">IMAGE_URL (Opsional)</label><input type="url" id="imageUrl" name="imageUrl"></div> <div id="options-and-answers-area"></div> <div class="hidden-inputs"> <input type="text" name="option1" id="option1"><input type="text" name="option2" id="option2"><input type="text" name="option3" id="option3"><input type="text" name="option4" id="option4"><input type="text" name="option5" id="option5"> <input type="text" name="answer1" id="answer1"><input type="text" name="answer2" id="answer2"><input type="text" name="answer3" id="answer3"><input type="text" name="answer4" id="answer4"><input type="text" name="answer5" id="answer5"> </div> <div class="modal-footer"> <button type="submit" id="saveBtn" class="btn-primary">Simpan</button> <button type="button" id="cancelBtn" class="btn-secondary">Batal</button> </div> </form> </div> </div> </div>
+    <div id="alertModal" class="modal custom-modal"> <div class="modal-content"><div class="modal-header" id="alertModalHeader"><h2 id="alertModalTitle"></h2><span class="close-btn" id="alertModalCloseBtn">×</span></div><div class="modal-body"><p id="alertModalMessage"></p></div><div class="modal-footer"><button id="alertModalOkBtn" class="btn-primary">OK</button></div></div> </div>
+    <div id="confirmModal" class="modal custom-modal"> <div class="modal-content"><div class="modal-header confirm"><h2>Konfirmasi Tindakan</h2><span class="close-btn" id="confirmModalCloseBtn">×</span></div><div class="modal-body"><p id="confirmModalMessage"></p></div><div class="modal-footer"><button id="confirmModalYesBtn" class="btn-danger">Ya, Lanjutkan</button><button id="confirmModalNoBtn" class="btn-secondary">Batal</button></div></div> </div>
+    
+    <div id="pesertaModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+             <div class="modal-header"><h2 id="pesertaFormTitle">Form Peserta</h2><span class="close-btn" id="pesertaFormCloseBtn">×</span></div>
+            <div class="modal-body">
+                <form id="pesertaForm">
+                    <input type="hidden" id="pesertaRowIndex" name="rowIndex">
+                    <div><label for="namaSiswa">Nama Siswa</label><input type="text" id="namaSiswa" name="namaSiswa" required></div>
+                    <div><label for="nisn">NISN</label><input type="text" id="nisn" name="nisn" required></div>
+                    <div><label for="sekolah">Sekolah</label><input type="text" id="sekolah" name="sekolah" required></div>
+                    <div class="modal-footer">
+                        <button type="submit" id="savePesertaBtn" class="btn-primary">Simpan Peserta</button>
+                        <button type="button" id="cancelPesertaBtn" class="btn-secondary">Batal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="uploadExcelModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Upload Data Peserta dari Excel</h2>
+                <span class="close-btn" id="uploadModalCloseBtn">×</span>
+            </div>
+            <div class="modal-body">
+                <p>Gunakan format file Excel (.xlsx) dengan header kolom: <strong>Nama Siswa</strong>, <strong>NISN</strong>, dan <strong>Sekolah</strong>.</p>
+                <a href="#" id="downloadFormatBtn" class="btn btn-secondary" style="margin-left:0; margin-bottom: 20px;"><i class="fas fa-download mr-2"></i> Download Format Excel</a>
+                <hr style="margin: 20px 0;">
+                <label for="excelFile"><strong>Cari File Excel:</strong></label>
+                <input type="file" id="excelFile" accept=".xlsx, .xls">
+            </div>
+            <div class="modal-footer">
+                 <button type="button" id="cancelUploadBtn" class="btn-secondary">Batal</button>
+                <button id="uploadExcelBtn" class="btn-primary"><i class="fas fa-upload mr-2"></i> Upload Excel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="deleteAllPesertaModal" class="modal custom-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header error">
+                <h2>Hapus Semua Peserta</h2>
+                <span class="close-btn" id="deleteAllCloseBtn">×</span>
+            </div>
+            <div class="modal-body">
+                <p><strong>PERINGATAN:</strong> Tindakan ini akan menghapus <strong>semua</strong> data peserta dari ujian yang dipilih dan tidak dapat diurungkan.</p>
+                <label for="deletePasswordInput" style="text-align:center; margin-top:15px;">Untuk konfirmasi, masukkan password:</label>
+                <input type="password" id="deletePasswordInput" placeholder="••••••••••" style="text-align: center; margin-bottom: 0;">
+                <p id="deletePasswordError" style="color: red; height: 15px; margin-top: 5px; font-weight:bold;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelDeleteAllBtn" class="btn-secondary">Batal</button>
+                <button id="confirmDeleteAllBtn" class="btn-danger">Ya, Hapus Semua Data</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzq2I4VIXFBE5ubdyB0nZ7IYztveZQqkYiX2XFj3aTWy5fGHU2IL8EQ3I47T1Fy4_wY/exec';
+    
+    const soalForm = document.getElementById('soalForm');
+    const pesertaForm = document.getElementById('pesertaForm');
+    const typeSoalSelect = document.getElementById('typeSoal');
+    const optionsContainer = document.getElementById('options-and-answers-area');
+    let currentSoalData = [];
+    let currentSiswaData = [];
+    let activeTemplate = 'soal';
+    
+    function getEl(id) { return document.getElementById(id); }
+
+    function showAlert(message, type = 'info') {
+        const titleMap = { success: 'Berhasil', error: 'Terjadi Kesalahan', info: 'Informasi' };
+        getEl('alertModalTitle').textContent = titleMap[type] || 'Notifikasi';
+        getEl('alertModalMessage').innerHTML = message;
+        const header = getEl('alertModalHeader');
+        header.className = 'modal-header'; header.classList.add(type);
+        const alertModal = getEl('alertModal'); alertModal.style.display = 'block';
+        const okBtn = getEl('alertModalOkBtn'); const closeBtn = getEl('alertModalCloseBtn');
+        function closeHandler() { alertModal.style.display = 'none'; okBtn.removeEventListener('click', closeHandler); closeBtn.removeEventListener('click', closeHandler); window.removeEventListener('click', windowClickHandler); }
+        function windowClickHandler(event) { if (event.target == alertModal) closeHandler(); }
+        okBtn.onclick = closeHandler; closeBtn.onclick = closeHandler; window.addEventListener('click', windowClickHandler);
+    }
+    function showConfirm(message) {
+        return new Promise(resolve => {
+            const confirmModal = getEl('confirmModal'); getEl('confirmModalMessage').innerHTML = message; confirmModal.style.display = 'block';
+            const yesBtn = getEl('confirmModalYesBtn'); const noBtn = getEl('confirmModalNoBtn'); const closeBtn = getEl('confirmModalCloseBtn');
+            function cleanupAndResolve(value) { confirmModal.style.display = 'none'; yesBtn.onclick = null; noBtn.onclick = null; closeBtn.onclick = null; window.removeEventListener('click', windowClickHandler); resolve(value); }
+            const windowClickHandler = (event) => { if (event.target == confirmModal) cleanupAndResolve(false); };
+            yesBtn.onclick = () => cleanupAndResolve(true); noBtn.onclick = () => cleanupAndResolve(false); closeBtn.onclick = () => cleanupAndResolve(false); window.addEventListener('click', windowClickHandler);
+        });
+    }
+
+    function updateFormUI(type, data = {}) {
+        optionsContainer.innerHTML = '';
+        let uiHtml = '';
+        const getVal = (obj, key, fallback = '') => obj && obj[key] ? obj[key] : fallback;
+
+        switch (type) {
+            case 'pilihan-ganda':
+                let correctAnswerText = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (getVal(data, `ANSWER${i}`)) {
+                        correctAnswerText = getVal(data, `ANSWER${i}`).trim();
+                        break; 
+                    }
+                }
+
+                for (let i = 1; i <= 5; i++) { uiHtml += `<div class="option-group"><label>OPTION ${i}</label><input type="text" id="ui-option${i}" value="${getVal(data, `OPTION${i}`)}"></div>`; }
+                uiHtml += `<div class="option-group"><label>Kunci Jawaban (Pilih Satu):</label>`;
+                for (let i = 1; i <= 5; i++) {
+                    const optionText = getVal(data, `OPTION${i}`).trim();
+                    const isChecked = (correctAnswerText !== '' && optionText !== '' && correctAnswerText === optionText);
+                    uiHtml += `<label style="display:inline-block; margin-right:15px;"><input type="radio" name="jawaban" value="${i}" ${isChecked ? 'checked' : ''}> Opsi ${i}</label>`;
+                }
+                uiHtml += `</div>`;
+                break;
+            case 'pilihan-ganda-kompleks':
+                for (let i = 1; i <= 5; i++) {
+                    const optionText = getVal(data, `OPTION${i}`);
+                    const answerText = getVal(data, `ANSWER${i}`);
+                    const isChecked = (answerText !== '' && optionText !== '' && answerText === optionText);
+                    uiHtml += `<div class="option-group pgk-group"><input type="checkbox" id="ui-check${i}" value="${i}" ${isChecked ? 'checked' : ''}><div class="form-item"><label for="ui-option${i}">OPTION ${i}</label><input type="text" id="ui-option${i}" value="${optionText}"></div></div>`;
+                }
+                break;
+            case 'benar-salah':
+                for (let i = 1; i <= 5; i++) {
+                    const currentAnswer = getVal(data, `ANSWER${i}`);
+                    uiHtml += `<div class="option-group"><label>Pernyataan ${i}</label><div class="inline-group"><div class="form-item"><input type="text" id="ui-option${i}" placeholder="Isi pernyataan di sini..." value="${getVal(data, `OPTION${i}`)}"></div><div class="form-item-shrink"><select id="ui-answer${i}"><option value="">-- Jawaban --</option><option value="Benar" ${currentAnswer === 'Benar' ? 'selected' : ''}>Benar</option><option value="Salah" ${currentAnswer === 'Salah' ? 'selected' : ''}>Salah</option></select></div></div></div>`;
+                }
+                break;
+            case 'menjodohkan':
+                for (let i = 1; i <= 5; i++) {
+                    uiHtml += `<div class="option-group"><div class="inline-group"><div class="form-item"><label for="ui-option${i}">OPTION ${i}</label><input type="text" id="ui-option${i}" value="${getVal(data, `OPTION${i}`)}"></div><div class="form-item"><label for="ui-answer${i}">ANSWER ${i} (Pasangan)</label><input type="text" id="ui-answer${i}" value="${getVal(data, `ANSWER${i}`)}"></div></div></div>`;
+                }
+                break;
+        }
+        optionsContainer.innerHTML = uiHtml;
+    }
+    
+    function collectAnswers() {
+        const type = typeSoalSelect.value;
+        for (let i = 1; i <= 5; i++) { getEl(`option${i}`).value = ''; getEl(`answer${i}`).value = ''; }
+        for (let i = 1; i <= 5; i++) { const ui_option = getEl(`ui-option${i}`); if (ui_option) getEl(`option${i}`).value = ui_option.value; }
+        
+        switch(type) {
+            case 'pilihan-ganda':
+                const radio = document.querySelector('input[name="jawaban"]:checked');
+                if (radio) {
+                    const selectedIndex = radio.value;
+                    const optionText = getEl(`ui-option${selectedIndex}`).value;
+                    getEl(`answer${selectedIndex}`).value = optionText; 
+                }
+                break;
+            case 'pilihan-ganda-kompleks':
+                for (let i = 1; i <= 5; i++) {
+                    const checkbox = getEl(`ui-check${i}`);
+                    if (checkbox && checkbox.checked) getEl(`answer${i}`).value = getEl(`ui-option${i}`).value;
+                }
+                break;
+            case 'benar-salah': case 'menjodohkan':
+                for (let i = 1; i <= 5; i++) { const ui_answer = getEl(`ui-answer${i}`); if (ui_answer) getEl(`answer${i}`).value = ui_answer.value; }
+                break;
+        }
+    }
+    
+    async function postData(data) {
+        try {
+            const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+            const result = await res.json();
+            if (result.success) return result;
+            else throw new Error(result.message);
+        } catch (error) { showAlert(`Terjadi kesalahan: ${error.message}`, 'error'); return null; }
+    }
+
+    function showForm(mode = 'add', data = {}, index = -1) { 
+        soalForm.reset();
+        getEl('rowIndex').value = '';
+        optionsContainer.innerHTML = '';
+        
+        if (mode === 'edit') {
+            getEl('formTitle').textContent = `Edit Soal No. ${index + 1}`;
+            getEl('rowIndex').value = index + 2;
+            getEl('typeSoal').value = data.TYPE_SOAL;
+            getEl('pertanyaan').value = data.PERTANYAAN;
+            getEl('imageUrl').value = data.IMAGE_URL;
+            updateFormUI(data.TYPE_SOAL, data);
+        } else {
+            getEl('formTitle').textContent = 'Tambah Soal Baru';
+            updateFormUI(getEl('typeSoal').value);
+        }
+        getEl('soalModal').style.display = 'block';
+    }
+    
+    async function handleSave(event) {
+        event.preventDefault();
+        collectAnswers();
+        getEl('saveBtn').disabled = true;
+        getEl('saveBtn').textContent = 'Menyimpan...';
+        const formData = new FormData(soalForm);
+        const data = Object.fromEntries(formData.entries());
+        data.sheetName = getEl('sheetSelector').value;
+        data.action = data.rowIndex ? 'update' : 'create';
+        
+        const result = await postData(data);
+        if (result) {
+            getEl('soalModal').style.display = 'none';
+            await fetchData();
+            showAlert(result.message, 'success');
+        }
+        getEl('saveBtn').disabled = false;
+        getEl('saveBtn').textContent = 'Simpan';
+    }
+
+    async function fetchData() {
+        const templateButtons = {
+            soal: getEl('btn-template-soal'),
+            peserta: getEl('btn-template-peserta'),
+            nilai: getEl('btn-template-nilai')
+        };
+        Object.values(templateButtons).forEach(btn => btn.classList.replace('btn-primary', 'btn-secondary'));
+        if(templateButtons[activeTemplate]) {
+            templateButtons[activeTemplate].classList.replace('btn-secondary', 'btn-primary');
+        }
+
+        if (activeTemplate === 'soal') { await fetchSoalData(); }
+        else { await fetchSiswaData(); }
+    }
+    
+    async function fetchSoalData() {
+        getEl('loader-soal').style.display = 'block';
+        getEl('dataTable').querySelector('tbody').innerHTML = '';
+        try {
+            const sheetName = getEl('sheetSelector').value;
+            const res = await fetch(`${APPS_SCRIPT_URL}?action=read&sheetName=${sheetName}`);
+            const result = await res.json(); if (result.error) throw new Error(result.error);
+            currentSoalData = result.data;
+            displayData(currentSoalData);
+        } catch (error) { showAlert(`Gagal mengambil data soal: ${error.message}`, 'error');
+        } finally { getEl('loader-soal').style.display = 'none'; }
+    }
+    
+    function displayData(data) {
+        const tableBody = getEl('dataTable').querySelector('tbody');
+        const filter = getEl('filterTypeSoal');
+        const selectedValue = filter.value;
+        
+        const types = ['Semua Tipe', ...new Set(data.map(item => item.TYPE_SOAL).filter(Boolean))];
+        filter.innerHTML = types.map(type => `<option value="${type}">${type}</option>`).join('');
+        filter.value = selectedValue || 'Semua Tipe';
+        
+        const currentFilterValue = filter.value;
+        tableBody.innerHTML = '';
+        if (!data || data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="15" style="text-align:center;">Tidak ada data soal.</td></tr>`;
+            return;
+        }
+
+        let displayedDataCount = 0;
+        data.forEach((rowData, index) => {
+            if (currentFilterValue === 'Semua Tipe' || rowData.TYPE_SOAL === currentFilterValue) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td><button class="edit-btn btn-warning action-btn" data-type="soal" data-index="${index}"><i class="fas fa-pencil-alt"></i></button><button class="delete-btn btn-danger action-btn" data-type="soal" data-index="${index}"><i class="fas fa-trash-alt"></i></button></td><td>${index + 1}</td><td>${rowData.TYPE_SOAL || ''}</td><td>${rowData.PERTANYAAN || ''}</td><td>${rowData.IMAGE_URL || ''}</td><td>${rowData.OPTION1 || ''}</td><td>${rowData.ANSWER1 || ''}</td><td>${rowData.OPTION2 || ''}</td><td>${rowData.ANSWER2 || ''}</td><td>${rowData.OPTION3 || ''}</td><td>${rowData.ANSWER3 || ''}</td><td>${rowData.OPTION4 || ''}</td><td>${rowData.ANSWER4 || ''}</td><td>${rowData.OPTION5 || ''}</td><td>${rowData.ANSWER5 || ''}</td>`;
+                tableBody.appendChild(row);
+                displayedDataCount++;
+            }
+        });
+
+        if (displayedDataCount === 0 && data.length > 0) {
+             tableBody.innerHTML = `<tr><td colspan="15" style="text-align:center;">Tidak ada data soal yang cocok dengan filter.</td></tr>`;
+        }
+    }
+
+    async function handleDelete(index) {
+        const rowData = currentSoalData[index];
+        const confirmed = await showConfirm(`Yakin ingin menghapus soal no. ${index + 1}:<br>"<i>${rowData.PERTANYAAN}</i>"?`);
+        if (!confirmed) return;
+        getEl('loader-soal').style.display = 'block';
+        const result = await postData({ action: 'delete', sheetName: getEl('sheetSelector').value, rowIndex: index + 2 });
+        if (result) { await fetchData(); showAlert(result.message, 'success'); }
+        getEl('loader-soal').style.display = 'none';
+    }
+    
+    function showPesertaForm(mode = 'add', data = {}, index = -1) {
+        pesertaForm.reset();
+        getEl('pesertaRowIndex').value = '';
+        if (mode === 'edit') {
+            getEl('pesertaFormTitle').textContent = `Edit Peserta No. ${index + 1}`;
+            getEl('pesertaRowIndex').value = index + 2;
+            getEl('namaSiswa').value = data['Nama Siswa'];
+            getEl('nisn').value = data['NISN'];
+            getEl('sekolah').value = data['Sekolah'];
+        } else {
+            getEl('pesertaFormTitle').textContent = 'Tambah Peserta Baru';
+        }
+        getEl('pesertaModal').style.display = 'block';
+    }
+    function hidePesertaForm() { getEl('pesertaModal').style.display = 'none'; pesertaForm.reset(); }
+
+    async function handleSavePeserta(event) {
+        event.preventDefault();
+        getEl('savePesertaBtn').disabled = true;
+        getEl('savePesertaBtn').textContent = 'Menyimpan...';
+        const formData = new FormData(pesertaForm);
+        const data = Object.fromEntries(formData.entries());
+        data.sheetName = getEl('sheetSelector').value;
+        data.action = data.rowIndex ? 'updateSiswa' : 'createSiswa';
+        const result = await postData(data);
+        if (result) {
+            hidePesertaForm();
+            await fetchData();
+            showAlert(result.message, 'success');
+        }
+        getEl('savePesertaBtn').disabled = false;
+        getEl('savePesertaBtn').textContent = 'Simpan Peserta';
+    }
+    
+    async function fetchSiswaData() {
+        getEl('loader-peserta').style.display = 'block';
+        getEl('pesertaTable').querySelector('tbody').innerHTML = '';
+        getEl('loader-nilai').style.display = 'block';
+        getEl('nilaiTable').innerHTML = '';
+        try {
+            const sheetName = getEl('sheetSelector').value;
+            const res = await fetch(`${APPS_SCRIPT_URL}?action=getSiswa&sheetName=${sheetName}`);
+            const result = await res.json();
+            if (result.error) throw new Error(result.error);
+            currentSiswaData = result.data;
+            displaySiswaData(currentSiswaData);
+            displayNilaiData(currentSiswaData);
+        } catch (error) {
+            showAlert(`Gagal mengambil data peserta: ${error.message}`, 'error');
+        } finally {
+            getEl('loader-peserta').style.display = 'none';
+            getEl('loader-nilai').style.display = 'none';
+        }
+    }
+
+    function displaySiswaData(data) {
+        const tableBody = getEl('pesertaTable').querySelector('tbody');
+        const filter = getEl('filterPesertaSekolah');
+        const selectedValue = filter.value;
+
+        const schools = ['Semua Sekolah', ...new Set(data.map(item => item['Sekolah']).filter(Boolean))];
+        filter.innerHTML = schools.map(school => `<option value="${school}">${school}</option>`).join('');
+        filter.value = selectedValue || 'Semua Sekolah';
+
+        const currentFilterValue = filter.value;
+        tableBody.innerHTML = '';
+        if (!data || data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Tidak ada data peserta.</td></tr>`;
+            return;
+        }
+        
+        let displayedDataCount = 0;
+        data.forEach((rowData, index) => {
+            if (currentFilterValue === 'Semua Sekolah' || rowData['Sekolah'] === currentFilterValue) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td><button class="edit-btn btn-warning action-btn" data-type="peserta" data-index="${index}"><i class="fas fa-user-edit"></i></button><button class="delete-btn btn-danger action-btn" data-type="peserta" data-index="${index}"><i class="fas fa-user-times"></i></button></td><td>${index + 1}</td><td>${rowData['Nama Siswa'] || ''}</td><td>${rowData['NISN'] || ''}</td><td>${rowData['Sekolah'] || ''}</td>`;
+                tableBody.appendChild(row);
+                displayedDataCount++;
+            }
+        });
+
+        if(displayedDataCount === 0 && data.length > 0){
+             tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Tidak ada data peserta yang cocok dengan filter.</td></tr>`;
+        }
+    }
+
+    async function handleDeletePeserta(index) {
+        const rowData = currentSiswaData[index];
+        const confirmed = await showConfirm(`Yakin ingin menghapus peserta:<br>"<i>${rowData['Nama Siswa']}</i>" dari sekolah "<i>${rowData['Sekolah']}</i>"?`);
+        if (!confirmed) return;
+        getEl('loader-peserta').style.display = 'block';
+        const result = await postData({ action: 'deleteSiswa', sheetName: getEl('sheetSelector').value, rowIndex: index + 2 });
+        if (result) {
+            await fetchData();
+            showAlert(result.message, 'success');
+        }
+        getEl('loader-peserta').style.display = 'none';
+    }
+    
+    function displayNilaiData(data) {
+        const table = getEl('nilaiTable');
+        const filter = getEl('filterNilaiSekolah');
+        const selectedValue = filter.value;
+
+        const schools = ['Semua Sekolah', ...new Set(data.map(item => item['Sekolah']).filter(Boolean))];
+        filter.innerHTML = schools.map(school => `<option value="${school}">${school}</option>`).join('');
+        filter.value = selectedValue || 'Semua Sekolah';
+        
+        const currentFilterValue = filter.value;
+        const filteredData = data.filter(item => currentFilterValue === 'Semua Sekolah' || item['Sekolah'] === currentFilterValue);
+
+        table.innerHTML = '';
+
+        if (!filteredData || filteredData.length === 0) {
+            table.innerHTML = '<thead><tr><th>Informasi</th></tr></thead><tbody><tr><td>Tidak ada data nilai untuk ditampilkan.</td></tr></tbody>';
+            return;
+        }
+
+        const allPossibleHeaders = new Set();
+        filteredData.forEach(rowData => {
+            Object.keys(rowData).forEach(key => {
+                if (key !== 'nama' && key !== 'nisn' && key !== 'sekolah') {
+                    allPossibleHeaders.add(key);
+                }
+            });
+        });
+
+        const headersToShow = Array.from(allPossibleHeaders).filter(header => {
+            return filteredData.some(student => student[header] !== undefined && student[header] !== null && student[header] !== '');
+        });
+        
+        const baseHeaders = ["Nama Siswa", "NISN", "Sekolah", "Skor Akhir"];
+        const questionHeaders = headersToShow
+            .filter(h => !baseHeaders.includes(h))
+            .sort((a, b) => {
+                const numA = parseInt(a.match(/\d+/) ? a.match(/\d+/)[0] : '0');
+                const numB = parseInt(b.match(/\d+/) ? b.match(/\d+/)[0] : '0');
+                if (numA !== numB) return numA - numB;
+                return a.localeCompare(b);
+            });
+
+        const sortedHeaders = [...baseHeaders.filter(h => headersToShow.includes(h)), ...questionHeaders];
+
+
+        let headerHtml = '<tr>';
+        sortedHeaders.forEach(h => headerHtml += `<th>${h}</th>`);
+        headerHtml += '</tr>';
+        
+        let bodyHtml = '';
+        filteredData.forEach(rowData => {
+            let rowHtml = '<tr>';
+            sortedHeaders.forEach(header => {
+                const cellValue = rowData[header] !== undefined ? rowData[header] : '';
+                rowHtml += `<td>${cellValue}</td>`;
+            });
+            rowHtml += '</tr>';
+            bodyHtml += rowHtml;
+        });
+
+        table.innerHTML = `<thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody>`;
+    }
+    
+    function switchTemplate(templateName) {
+        activeTemplate = templateName;
+        document.querySelectorAll('.template-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(`${templateName}-content`).classList.add('active');
+        fetchData();
+    }
+    
+    // --- FUNGSI DIPERBARUI: Nama file download format dinamis ---
+    function handleDownloadFormat(e) {
+        e.preventDefault();
+        const sheetName = getEl('sheetSelector').value;
+        if (!sheetName) {
+            showAlert('Pilih ujian terlebih dahulu untuk mengunduh format.', 'error');
+            return;
+        }
+
+        const sampleData = [{ "Nama Siswa": "Contoh Nama", "NISN": "1234567890", "Sekolah": "Contoh Sekolah" }];
+        const worksheet = XLSX.utils.json_to_sheet(sampleData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Bangbin Peserta");
+        
+        const fileName = `Bangbin_Upload_Peserta_${sheetName}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+    }
+
+    async function handleExcelUpload() {
+        const fileInput = getEl('excelFile');
+        const file = fileInput.files[0];
+        if (!file) {
+            showAlert('Silakan pilih file Excel terlebih dahulu.', 'error');
+            return;
+        }
+
+        const uploadBtn = getEl('uploadExcelBtn');
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengunggah...';
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const students = XLSX.utils.sheet_to_json(worksheet);
+
+                if (students.length === 0) {
+                    showAlert('File Excel kosong atau tidak memiliki data.', 'error');
+                    return;
+                }
+
+                const result = await postData({
+                    action: 'bulkCreateSiswa',
+                    sheetName: getEl('sheetSelector').value,
+                    students: students
+                });
+
+                if (result) {
+                    getEl('uploadExcelModal').style.display = 'none';
+                    fileInput.value = '';
+                    await fetchData();
+                    showAlert(result.message, 'success');
+                }
+            } catch (err) {
+                showAlert('Gagal memproses file Excel: ' + err.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-upload mr-2"></i> Upload Excel';
+            }
+        };
+        reader.onerror = () => {
+             showAlert('Gagal membaca file.', 'error');
+             uploadBtn.disabled = false;
+             uploadBtn.innerHTML = '<i class="fas fa-upload mr-2"></i> Upload Excel';
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    async function handleDeleteAllPeserta() {
+        const passwordInput = getEl('deletePasswordInput');
+        const passwordError = getEl('deletePasswordError');
+        const confirmBtn = getEl('confirmDeleteAllBtn');
+        const correctPassword = 'BANGBIN123';
+
+        passwordError.textContent = '';
+        if (passwordInput.value !== correctPassword) {
+            passwordError.textContent = 'Password salah!';
+            return;
+        }
+        
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menghapus...';
+
+        try {
+            const result = await postData({
+                action: 'deleteAllSiswa',
+                sheetName: getEl('sheetSelector').value
+            });
+
+            if (result) {
+                getEl('deleteAllPesertaModal').style.display = 'none';
+                passwordInput.value = '';
+                await fetchData();
+                showAlert(result.message, 'success');
+            }
+        } finally {
+             confirmBtn.disabled = false;
+             confirmBtn.textContent = 'Ya, Hapus Semua Data';
+        }
+    }
+
+    // --- FUNGSI DIPERBARUI: Nama file download nilai sudah dinamis (tidak ada perubahan kode, hanya konfirmasi) ---
+    function handleDownloadNilai() {
+        const sheetName = getEl('sheetSelector').value;
+        if (!sheetName) {
+            showAlert('Pilih ujian terlebih dahulu.', 'error');
+            return;
+        }
+
+        const filter = getEl('filterNilaiSekolah');
+        const currentFilterValue = filter.value;
+        const filteredData = currentSiswaData.filter(item => currentFilterValue === 'Semua Sekolah' || item['Sekolah'] === currentFilterValue);
+
+        if (!filteredData || filteredData.length === 0) {
+            showAlert('Tidak ada data nilai untuk diunduh.', 'info');
+            return;
+        }
+
+        const allPossibleHeaders = new Set();
+        filteredData.forEach(rowData => {
+            Object.keys(rowData).forEach(key => {
+                if (key !== 'nama' && key !== 'nisn' && key !== 'sekolah') {
+                    allPossibleHeaders.add(key);
+                }
+            });
+        });
+        const headersToShow = Array.from(allPossibleHeaders).filter(header => filteredData.some(student => student[header] !== undefined && student[header] !== null && student[header] !== ''));
+        const baseHeaders = ["Nama Siswa", "NISN", "Sekolah", "Skor Akhir"];
+        const questionHeaders = headersToShow
+            .filter(h => !baseHeaders.includes(h))
+            .sort((a, b) => {
+                const numA = parseInt(a.match(/\d+/) ? a.match(/\d+/)[0] : '0');
+                const numB = parseInt(b.match(/\d+/) ? b.match(/\d+/)[0] : '0');
+                if (numA !== numB) return numA - numB;
+                return a.localeCompare(b);
+            });
+        const sortedHeaders = [...baseHeaders.filter(h => headersToShow.includes(h)), ...questionHeaders];
+        
+        const title = [`HASIL UJIAN ${sheetName.toUpperCase()}`];
+        const headerRow = sortedHeaders;
+        const dataRows = filteredData.map(row => sortedHeaders.map(header => row[header] !== undefined ? row[header] : ''));
+
+        const excelData = [
+            title,
+            [], 
+            headerRow,
+            ...dataRows
+        ];
+
+        const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+
+        const colWidths = headerRow.map((h, i) => {
+            let maxLen = h.toString().length;
+            dataRows.forEach(row => {
+                const cellContent = row[i] ? row[i].toString() : '';
+                if (cellContent.length > maxLen) {
+                    maxLen = cellContent.length;
+                }
+            });
+            return { wch: maxLen + 2 }; 
+        });
+        worksheet['!cols'] = colWidths;
+        
+        const merge = { s: { r: 0, c: 0 }, e: { r: 0, c: sortedHeaders.length - 1 } };
+        worksheet['!merges'] = [merge];
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Bangbin Nilai");
+        
+        const fileName = `Bangbin_Nilai_Siswa_${sheetName}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+    }
+
+
+    function initializeApp() {
+        getEl('main-container').style.display = 'block';
+        
+        getEl('btn-template-soal').addEventListener('click', () => switchTemplate('soal'));
+        getEl('btn-template-peserta').addEventListener('click', () => switchTemplate('peserta'));
+        getEl('btn-template-nilai').addEventListener('click', () => switchTemplate('nilai'));
+        getEl('sheetSelector').addEventListener('change', fetchData);
+        
+        getEl('showFormBtn').addEventListener('click', () => showForm('add'));
+        soalForm.addEventListener('submit', handleSave);
+        typeSoalSelect.addEventListener('change', () => updateFormUI(typeSoalSelect.value));
+        getEl('dataTable').addEventListener('click', e => {
+            const btn = e.target.closest('.action-btn[data-type="soal"]'); if (!btn) return;
+            const index = parseInt(btn.dataset.index);
+            if (btn.classList.contains('edit-btn')) showForm('edit', currentSoalData[index], index);
+            if (btn.classList.contains('delete-btn')) handleDelete(index);
+        });
+        getEl('cancelBtn').addEventListener('click', () => getEl('soalModal').style.display = 'none');
+        getEl('mainFormCloseBtn').addEventListener('click', () => getEl('soalModal').style.display = 'none');
+
+        getEl('showPesertaFormBtn').addEventListener('click', () => showPesertaForm('add'));
+        pesertaForm.addEventListener('submit', handleSavePeserta);
+        getEl('pesertaTable').addEventListener('click', e => {
+            const btn = e.target.closest('.action-btn[data-type="peserta"]'); if (!btn) return;
+            const index = parseInt(btn.dataset.index);
+            if (btn.classList.contains('edit-btn')) showForm('edit', currentSiswaData[index], index);
+            if (btn.classList.contains('delete-btn')) handleDeletePeserta(index);
+        });
+        getEl('cancelPesertaBtn').addEventListener('click', hidePesertaForm);
+        getEl('pesertaFormCloseBtn').addEventListener('click', hidePesertaForm);
+        
+        getEl('refreshNilaiBtn').addEventListener('click', fetchData);
+        
+        getEl('filterTypeSoal').addEventListener('change', () => displayData(currentSoalData));
+        getEl('filterPesertaSekolah').addEventListener('change', () => displaySiswaData(currentSiswaData));
+        getEl('filterNilaiSekolah').addEventListener('change', () => displayNilaiData(currentSiswaData));
+
+        const uploadModal = getEl('uploadExcelModal');
+        getEl('showUploadModalBtn').addEventListener('click', () => uploadModal.style.display = 'block');
+        getEl('uploadModalCloseBtn').addEventListener('click', () => uploadModal.style.display = 'none');
+        getEl('cancelUploadBtn').addEventListener('click', () => uploadModal.style.display = 'none');
+        getEl('downloadFormatBtn').addEventListener('click', handleDownloadFormat);
+        getEl('uploadExcelBtn').addEventListener('click', handleExcelUpload);
+        
+        const deleteAllModal = getEl('deleteAllPesertaModal');
+        getEl('deleteAllPesertaBtn').addEventListener('click', () => {
+            getEl('deletePasswordInput').value = '';
+            getEl('deletePasswordError').textContent = '';
+            deleteAllModal.style.display = 'block'
+        });
+        getEl('deleteAllCloseBtn').addEventListener('click', () => deleteAllModal.style.display = 'none');
+        getEl('cancelDeleteAllBtn').addEventListener('click', () => deleteAllModal.style.display = 'none');
+        getEl('confirmDeleteAllBtn').addEventListener('click', handleDeleteAllPeserta);
+        
+        getEl('downloadNilaiBtn').addEventListener('click', handleDownloadNilai);
+
+        fetchData();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const passwordModal = getEl('password-modal'); const passwordForm = getEl('password-form'); const passwordInput = getEl('password-input'); const passwordError = getEl('password-error'); const correctPassword = 'BANGBIN123';
+        if (passwordModal) passwordModal.style.display = 'flex';
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (passwordInput.value === correctPassword) { passwordModal.style.opacity = '0'; setTimeout(() => { passwordModal.style.display = 'none'; initializeApp(); }, 500); } 
+            else { passwordError.textContent = 'Password Salah!'; passwordInput.classList.add('shake'); passwordInput.value = ''; setTimeout(() => { passwordInput.classList.remove('shake'); passwordError.textContent = ''; }, 1000); }
+        });
+    });
+    </script>
+</body>
+</html>
