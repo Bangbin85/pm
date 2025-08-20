@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
-    <title>CETAK NISN - Tampilan Baru</title>
+    <title>CETAK NISN</title>
 <style>
     :root {
         /* PERUBAHAN DI SINI: Kartu dikecilkan sedikit */
@@ -163,9 +163,39 @@
         z-index: -1;
     }
 
-    .card:hover .character {
+    /* Karakter 1: Muncul pertama, posisi di tengah (normal) */
+    .card:hover .character:nth-of-type(1) {
         opacity: 1;
-        transform: translate3d(0%, -25%, 80px);
+        transform: translate3d(0, -25%, 80px);
+        transition-delay: 0s;
+    }
+
+    /* Karakter 2: Muncul kedua, di atas karakter tengah */
+    .card:hover .character:nth-of-type(2) {
+        opacity: 1;
+        transform: translate3d(0, -50%, 75px);
+        transition-delay: 0.15s; 
+    }
+
+    /* Karakter 3: Muncul kedua, di kiri karakter tengah */
+    .card:hover .character:nth-of-type(3) {
+        opacity: 1;
+        transform: translate3d(-25%, -25%, 75px) rotate(-25deg);
+        transition-delay: 0.15s;
+    }
+    
+    /* Karakter 4: Muncul kedua, di kanan karakter tengah */
+    .card:hover .character:nth-of-type(4) {
+        opacity: 1;
+        transform: translate3d(25%, -25%, 75px) rotate(25deg);
+        transition-delay: 0.15s;
+    }
+    
+    /* Karakter 5: Muncul kedua, di bawah karakter tengah */
+    .card:hover .character:nth-of-type(5) {
+        opacity: 1;
+        transform: translate3d(0, 0%, 75px);
+        transition-delay: 0.15s;
     }
 </style>
 </head>
@@ -182,15 +212,19 @@
     </div>
 
     <div class="container">
-        <a href="nisnborongan">
-            <div class="card">
-                <div class="wrapper">
-                    <img src="https://lh3.googleusercontent.com/d/1GsNh-yhZt8YaE5ks1wuwRvKRrXHge5nE" class="cover-image" />
-                </div>
-                <img src="https://lh3.googleusercontent.com/d/1VbzQXVU7BYn25Ukm0LQsaYjScKthMpdi" class="title" />
-                <img src="https://lh3.googleusercontent.com/d/1WHBrKlyY7crbJaf7neNJ9Kev2a5hj85h" class="character" />
-            </div>
-        </a>
+		<a href="nisnborongan">
+			<div class="card">
+				<div class="wrapper">
+					<img src="https://lh3.googleusercontent.com/d/1GsNh-yhZt8YaE5ks1wuwRvKRrXHge5nE" class="cover-image" />
+				</div>
+				<img src="https://lh3.googleusercontent.com/d/1VbzQXVU7BYn25Ukm0LQsaYjScKthMpdi" class="title" />
+				<img src="https://lh3.googleusercontent.com/d/1WHBrKlyY7crbJaf7neNJ9Kev2a5hj85h" class="character" />
+				<img src="https://lh3.googleusercontent.com/d/1WHBrKlyY7crbJaf7neNJ9Kev2a5hj85h" class="character" />
+				<img src="https://lh3.googleusercontent.com/d/1WHBrKlyY7crbJaf7neNJ9Kev2a5hj85h" class="character" />
+				<img src="https://lh3.googleusercontent.com/d/1WHBrKlyY7crbJaf7neNJ9Kev2a5hj85h" class="character" />
+				<img src="https://lh3.googleusercontent.com/d/1WHBrKlyY7crbJaf7neNJ9Kev2a5hj85h" class="character" />
+			</div>
+		</a>
 
         <a href="nisnsatuan">
             <div class="card">
