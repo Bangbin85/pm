@@ -35,7 +35,7 @@
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-        /* Modal Styles */
+        /* [MODIFIED] Modal Styles with Animation */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -49,7 +49,7 @@
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
         }
         .modal-overlay.visible {
             opacity: 1;
@@ -58,14 +58,17 @@
         .modal-content {
             background: white;
             padding: 2rem;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem; /* Slightly more rounded */
             width: 90%;
             max-width: 600px;
-            transform: scale(0.9);
-            transition: transform 0.3s;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
         .modal-overlay.visible .modal-content {
-            transform: scale(1);
+            transform: translateY(0) scale(1);
+            opacity: 1;
         }
 
         /* Scrollable Table Body */
@@ -133,7 +136,7 @@
                             <label for="deskripsi_hebat" class="block text-sm font-medium text-slate-600 mb-1">Deskripsi Bila Semua Terbiasa</label>
                             <textarea id="deskripsi_hebat" rows="2" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>
-                         <!-- [MODIFIED] Container for Password and Phone -->
+                         <!-- Container for Password and Phone -->
                         <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="password_sekolah" class="block text-sm font-medium text-slate-600 mb-1">Password Aplikasi</label>
@@ -147,7 +150,7 @@
                                     </span>
                                 </div>
                             </div>
-                            <!-- [NEW] Phone Input Field -->
+                            <!-- Phone Input Field -->
                             <div>
                                 <label for="phone_sekolah" class="block text-sm font-medium text-slate-600 mb-1">Phone</label>
                                 <input type="tel" id="phone_sekolah" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 628123456789" required>
@@ -345,6 +348,7 @@
                 </div>
 
                 <div class="space-y-6 text-slate-700 leading-relaxed max-h-[60vh] overflow-y-auto pr-4">
+                    <!-- Tutorial content remains the same -->
                     <div>
                         <h4 class="font-bold text-lg mb-2">1. Halaman Data Sekolah</h4>
                         <p>Ini adalah halaman pertama yang harus Anda isi. Semua data di sini akan digunakan sebagai kop surat pada laporan PDF dan acuan untuk penilaian.</p>
@@ -463,7 +467,7 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 id="modal-title" class="text-xl font-bold text-slate-700">Input Ceklis</h3>
-                <button onclick="closeCeklisModal()" class="text-slate-500 hover:text-slate-800">&times;</button>
+                <button onclick="closeCeklisModal()" class="text-slate-500 hover:text-slate-800 text-2xl font-bold">&times;</button>
             </div>
             <div id="modal-body" class="space-y-4"></div>
             <div class="flex justify-end gap-4 mt-6 border-t pt-4">
@@ -478,7 +482,7 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 class="text-xl font-bold text-slate-700">Impor Data Siswa dari Excel</h3>
-                <button onclick="closeImportModal()" class="text-slate-500 hover:text-slate-800">&times;</button>
+                <button onclick="closeImportModal()" class="text-slate-500 hover:text-slate-800 text-2xl font-bold">&times;</button>
             </div>
             <div class="space-y-4">
                 <p class="text-sm text-slate-600">Unggah file Excel (.xlsx, .xls) dengan format dua kolom: <strong>Induk</strong> dan <strong>Nama Siswa</strong>. Baris pertama harus berisi header tersebut.</p>
@@ -502,7 +506,7 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 class="text-xl font-bold text-slate-700">Edit Data Siswa</h3>
-                <button onclick="closeEditSiswaModal()" class="text-slate-500 hover:text-slate-800">&times;</button>
+                <button onclick="closeEditSiswaModal()" class="text-slate-500 hover:text-slate-800 text-2xl font-bold">&times;</button>
             </div>
             <form id="form-edit-siswa">
                 <input type="hidden" id="edit-siswa-id">
@@ -524,6 +528,21 @@
         </div>
     </div>
 
+    <!-- [NEW] Modal for Generic Messages -->
+    <div id="message-modal" class="modal-overlay">
+        <div class="modal-content max-w-sm">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 id="message-modal-title" class="text-xl font-bold text-slate-700">Informasi</h3>
+                <button onclick="closeMessageModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold">&times;</button>
+            </div>
+            <p id="message-modal-body" class="text-slate-600 my-6"></p>
+            <div class="flex justify-end">
+                <button onclick="closeMessageModal()" class="w-full bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors duration-300">OK</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // --- GLOBAL VARIABLES & CONSTANTS ---
         const pages = document.querySelectorAll('.page');
@@ -535,6 +554,22 @@
         const importModal = document.getElementById('import-modal');
         const loginModal = document.getElementById('login-modal');
         const editSiswaModal = document.getElementById('edit-siswa-modal');
+        // [NEW] Message Modal elements
+        const messageModal = document.getElementById('message-modal');
+        const messageModalTitle = document.getElementById('message-modal-title');
+        const messageModalBody = document.getElementById('message-modal-body');
+
+        // [NEW] Function to show generic message modal
+        function showMessageModal(title, message) {
+            messageModalTitle.textContent = title;
+            messageModalBody.textContent = message;
+            messageModal.classList.add('visible');
+        }
+
+        // [NEW] Function to close generic message modal
+        function closeMessageModal() {
+            messageModal.classList.remove('visible');
+        }
 
         // --- NAVIGATION ---
         function showPage(pageId) {
@@ -609,15 +644,13 @@
             persen_capaian: document.getElementById('persen_capaian'),
             deskripsi_hebat: document.getElementById('deskripsi_hebat'),
             password_sekolah: document.getElementById('password_sekolah'),
-            phone_sekolah: document.getElementById('phone_sekolah'), // [MODIFIED] Added phone input
+            phone_sekolah: document.getElementById('phone_sekolah'),
         };
         
-        // [NEW] Function to send data to Google Sheets
         async function sendDataToSheet() {
             const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZBAXr5jwofR7FmZH9D3dmSesDs-e51huwwg_H2yLTLnh-ed0Gt-f9f6cWewPKsavJ/exec';
             const formData = new FormData();
             
-            // Append data to form
             formData.append('nama_guru', document.getElementById('nama_guru').value);
             formData.append('nama_sekolah', document.getElementById('nama_sekolah').value);
             formData.append('password', document.getElementById('password_sekolah').value);
@@ -630,14 +663,13 @@
                 });
                 if (response.ok) {
                     console.log('Data successfully sent to Google Sheet.');
-                    // You can add a non-alert success message here if needed
                 } else {
                     console.error('Error sending data to Google Sheet:', response.statusText);
-                    alert('Gagal mengirim data ke Spreadsheet. Cek konsol untuk detail.');
+                    showMessageModal('Gagal', 'Gagal mengirim data ke Spreadsheet. Cek konsol untuk detail.');
                 }
             } catch (error) {
                 console.error('Error sending data to Google Sheet:', error);
-                alert('Gagal mengirim data ke Spreadsheet. Cek koneksi internet dan konsol untuk detail.');
+                showMessageModal('Gagal', 'Gagal mengirim data ke Spreadsheet. Cek koneksi internet dan konsol untuk detail.');
             }
         }
 
@@ -647,10 +679,9 @@
             for (const key in inputSekolah) dataSekolah[key] = inputSekolah[key].value;
             localStorage.setItem('dataSekolah', JSON.stringify(dataSekolah));
             
-            // [MODIFIED] Call the function to send data to the spreadsheet
             sendDataToSheet();
 
-            alert('Data sekolah berhasil disimpan di aplikasi dan sedang dikirim ke spreadsheet!');
+            showMessageModal('Sukses', 'Berhasil!');
             updateTableHeaders();
         });
 
@@ -674,14 +705,14 @@
             const induk = indukSiswaInput.value;
             const nama = namaSiswaInput.value.trim();
             if (siswaDb.some(siswa => siswa.induk === induk)) {
-                alert('Nomor Induk sudah terdaftar.');
+                showMessageModal('Peringatan', 'Nomor Induk sudah terdaftar.');
                 return;
             }
             siswaDb.push({ id: Date.now(), induk, nama });
             setDb('siswaDb', siswaDb);
             formSiswa.reset();
             renderTabelSiswa();
-            alert('Siswa berhasil ditambahkan!');
+            showMessageModal('Sukses', 'Siswa berhasil ditambahkan!');
         });
         function renderTabelSiswa() {
             const siswaDb = getDb('siswaDb');
@@ -728,7 +759,7 @@
             const isDuplicate = siswaDb.some(s => s.induk === induk && s.id !== id);
 
             if (isDuplicate) {
-                alert('Nomor Induk sudah digunakan oleh siswa lain.');
+                showMessageModal('Peringatan', 'Nomor Induk sudah digunakan oleh siswa lain.');
                 return;
             }
 
@@ -779,7 +810,7 @@
         function openCeklisModal(induk, nama) {
             const tanggal = inputTanggal.value;
             if (!tanggal) {
-                alert('Pilih tanggal terlebih dahulu!');
+                showMessageModal('Peringatan', 'Pilih tanggal terlebih dahulu!');
                 return;
             }
             modalTitle.textContent = `Ceklis untuk: ${nama}`;
@@ -807,7 +838,7 @@
         }
 
         function closeCeklisModal(event) {
-            if (event && event.target !== modal) return;
+            if (event && event.target !== modal && !modal.contains(event.target)) return;
             modal.classList.remove('visible');
         }
 
@@ -856,7 +887,7 @@
             const selectedSiswa = rekapSiswaFilter.value;
 
             const filteredRekap = rekapDb.filter(data => {
-                const isSiswaMatch = selectedSiswa === 'semua' || data.namaSiswa === selectedSiswa;
+                const isSiswaMatch = selectedSiswa === 'semua' || !selectedSiswa || data.namaSiswa === selectedSiswa;
                 const isTanggalMatch = (!tanggalMulai || data.tanggal >= tanggalMulai) && (!tanggalAkhir || data.tanggal <= tanggalAkhir);
                 return isSiswaMatch && isTanggalMatch;
             });
@@ -882,7 +913,7 @@
              if (confirm('PERINGATAN! Anda akan menghapus SEMUA data rekap. Aksi ini tidak dapat dibatalkan. Lanjutkan?')) {
                 setDb('rekapDb', []);
                 renderTabelRekap();
-                alert('Semua data rekap telah dihapus.');
+                showMessageModal('Sukses', 'Semua data rekap telah dihapus.');
             }
         }
         
@@ -893,11 +924,11 @@
             const tanggalAkhir = document.getElementById('nilai-tanggal-akhir').value;
 
             if (!selectedSiswa || !tanggalMulai || !tanggalAkhir) {
-                alert('Silakan pilih siswa dan tentukan rentang tanggal mulai dan akhir.');
+                showMessageModal('Peringatan', 'Silakan pilih siswa dan tentukan rentang tanggal mulai dan akhir.');
                 return;
             }
             if (selectedSiswa === 'semua') {
-                alert('Fitur penilaian akhir hanya untuk perorangan. Silakan pilih satu siswa.');
+                showMessageModal('Informasi', 'Fitur penilaian akhir hanya untuk perorangan. Silakan pilih satu siswa.');
                 return;
             }
 
@@ -909,7 +940,7 @@
             );
 
             if (filteredData.length === 0) {
-                alert('Tidak ditemukan data untuk siswa dan rentang tanggal yang dipilih.');
+                showMessageModal('Informasi', 'Tidak ditemukan data untuk siswa dan rentang tanggal yang dipilih.');
                 document.getElementById('hasil-penilaian-container').style.display = 'none';
                 return;
             }
@@ -1004,7 +1035,7 @@
         
         function downloadLaporanNilaiPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'pt', 'a4'); // Portrait mode
+            const doc = new jsPDF('p', 'pt', 'a4');
             const sekolahData = JSON.parse(localStorage.getItem('dataSekolah')) || {};
             const selectedSiswa = document.getElementById('nilai-filter-siswa').value;
             const tanggalMulai = document.getElementById('nilai-tanggal-mulai').value;
@@ -1012,7 +1043,7 @@
             const deskripsiTeks = document.getElementById('deskripsi-penilaian-teks').textContent;
 
             if (!selectedSiswa || selectedSiswa === 'semua' || !document.getElementById('body-tabel-nilai-akhir').innerHTML) {
-                alert('Tampilkan penilaian untuk satu siswa terlebih dahulu sebelum mengunduh.');
+                showMessageModal('Peringatan', 'Tampilkan penilaian untuk satu siswa terlebih dahulu sebelum mengunduh.');
                 return;
             }
 
@@ -1052,7 +1083,7 @@
             doc.setFont('helvetica', 'normal');
             const splitDeskripsi = doc.splitTextToSize(deskripsiTeks, doc.internal.pageSize.getWidth() - 80);
             doc.text(splitDeskripsi, 40, finalY);
-            finalY += (splitDeskripsi.length * 12) + 20; // Adjust space after description
+            finalY += (splitDeskripsi.length * 12) + 20;
 
             const pageWidth = doc.internal.pageSize.getWidth();
             const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1079,7 +1110,7 @@
         function downloadExcelTemplate() {
             const defaultSiswa = getDb('siswaDb').map(s => ({ Induk: s.induk, 'Nama Siswa': s.nama }));
             const worksheet = XLSX.utils.json_to_sheet(defaultSiswa);
-            worksheet['!cols'] = [{wch:15}, {wch:40}]; // Set column widths
+            worksheet['!cols'] = [{wch:15}, {wch:40}];
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Siswa');
             XLSX.writeFile(workbook, 'template_siswa.xlsx');
@@ -1087,7 +1118,7 @@
         function handleExcelImport() {
             const input = document.getElementById('excel-file-input');
             if (!input.files.length) {
-                alert('Silakan pilih file Excel terlebih dahulu!');
+                showMessageModal('Peringatan', 'Silakan pilih file Excel terlebih dahulu!');
                 return;
             }
             const file = input.files[0];
@@ -1118,8 +1149,8 @@
                 setDb('siswaDb', siswaDb);
                 renderTabelSiswa();
                 closeImportModal();
-                alert(`${addedCount} siswa berhasil diimpor. ${skippedCount} siswa dilewati (data kosong atau duplikat).`);
-                input.value = ''; // Reset file input
+                showMessageModal('Sukses', `${addedCount} siswa berhasil diimpor. ${skippedCount} siswa dilewati (data kosong atau duplikat).`);
+                input.value = '';
             };
             reader.readAsArrayBuffer(file);
         }
@@ -1153,7 +1184,7 @@
             }
 
             if (!confirm('PERINGATAN! Merestore data akan menimpa semua data yang ada saat ini. Aksi ini tidak dapat dibatalkan. Lanjutkan?')) {
-                event.target.value = ''; // Reset file input
+                event.target.value = '';
                 return;
             }
 
@@ -1165,16 +1196,16 @@
                         localStorage.setItem('dataSekolah', JSON.stringify(restoredData.dataSekolah));
                         setDb('siswaDb', restoredData.siswaDb);
                         setDb('rekapDb', restoredData.rekapDb);
-                        alert('Data berhasil direstore! Aplikasi akan dimuat ulang.');
-                        location.reload();
+                        showMessageModal('Sukses', 'Data berhasil direstore! Aplikasi akan dimuat ulang.');
+                        setTimeout(() => location.reload(), 1500); // Wait for user to see modal
                     } else {
-                        alert('File backup tidak valid atau formatnya salah.');
+                        showMessageModal('Gagal', 'File backup tidak valid atau formatnya salah.');
                     }
                 } catch (error) {
-                    alert('Gagal membaca file backup. Pastikan file tersebut adalah file JSON yang valid.');
+                    showMessageModal('Gagal', 'Gagal membaca file backup. Pastikan file tersebut adalah file JSON yang valid.');
                     console.error("Restore error:", error);
                 } finally {
-                    event.target.value = ''; // Reset file input
+                    event.target.value = '';
                 }
             };
             reader.readAsText(file);
@@ -1183,8 +1214,8 @@
         function resetAplikasi() {
             if (confirm('PERINGATAN! Anda akan mereset seluruh aplikasi ke pengaturan awal. Semua data yang telah Anda masukkan akan hilang. Aksi ini tidak dapat dibatalkan. Lanjutkan?')) {
                 localStorage.clear();
-                alert('Aplikasi berhasil direset. Aplikasi akan dimuat ulang.');
-                location.reload();
+                showMessageModal('Sukses', 'Aplikasi berhasil direset. Aplikasi akan dimuat ulang.');
+                setTimeout(() => location.reload(), 1500); // Wait for user to see modal
             }
         }
 
@@ -1221,11 +1252,18 @@
 
             if (passwordInput === correctPassword) {
                 loginModal.classList.remove('visible');
-                document.getElementById('app-container').style.display = 'block';
-                loadDataSekolah();
-                updateTableHeaders();
-                showPage('sekolah');
+                setTimeout(() => {
+                    document.getElementById('app-container').style.display = 'block';
+                    loadDataSekolah();
+                    updateTableHeaders();
+                    showPage('sekolah');
+                }, 300); // Wait for modal to fade out
             } else {
+                const loginContent = loginModal.querySelector('.modal-content');
+                loginContent.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    loginContent.style.animation = '';
+                }, 500);
                 document.getElementById('login-error').style.display = 'block';
             }
         }
@@ -1256,4 +1294,3 @@
     </script>
 </body>
 </html>
-
