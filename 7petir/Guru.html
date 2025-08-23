@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Guru Modern</title>
+    <title>Guru</title>
     
     <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.js"></script>
-
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -134,7 +135,7 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwi8uMAqm4FLiqIx21Zsggan2eNghURRpXz7-OEf1C1aJfSDOKhM4ViSMotGjwNCsen/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbw5XpjOUCcK1rJmqXXcQusQAALtL_Ced2wrfjmwWls2OUdqBrrcosTdvDmpCKPp0BJU0g/exec';
         const namaKelasSpan = document.getElementById('nama-kelas');
         const tableHead = document.querySelector("#laporanSiswaTable thead");
         const tableBody = document.querySelector("#laporanSiswaTable tbody");
@@ -505,7 +506,7 @@
             const kelas = sessionStorage.getItem('guruKelas') || '';
             const tanggalCetak = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
             const namaGuru = sessionStorage.getItem('guruName') || 'Guru';
-            const nipGuru = sessionStorage.getItem('guruNip') || 'NIP Tidak Tersedia';
+            const nipGuru = sessionStorage.getItem('guruNip') || '081310051985';
             const page_width = doc.internal.pageSize.getWidth();
             const namaKepsek = schoolInfo['Nama Kepala Sekolah'] || 'Nama Kepala Sekolah';
             const nipKepsek = schoolInfo['NIP Kepala Sekolah'] || 'NIP. .......................';
@@ -624,8 +625,9 @@
         document.getElementById('logoutButton').addEventListener('click', function(e) {
             e.preventDefault();
             sessionStorage.clear();
-            showMessage('Anda telah berhasil logout.', 'Logout', () => { window.location.href = 'index.html'; });
+            showMessage('Anda telah berhasil logout.', 'Logout', () => { window.location.href = './'; });
         });
     </script>
 </body>
+
 </html>
