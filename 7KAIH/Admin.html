@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin</title>
+    <title>ADMIN</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -503,6 +503,23 @@
                         <p>Memuat data sekolah...</p>
                     </div>
                 </div>
+
+                <div class="settings-card">
+                    <h3><i class="fas fa-database"></i> Backup & Restore Data</h3>
+                    <p>Simpan semua data sistem (Admin, Guru, Siswa, dan semua rekap kelas) ke dalam satu file. Anda dapat memulihkannya kapan saja.</p>
+                    
+                    <button class="btn-add" style="width:100%; background-color: var(--info-color);" onclick="backupData(this)"><i class="fas fa-download"></i> Backup Semua Data</button>
+
+                    <hr class="settings-separator">
+
+                     <h4 style="font-weight: 500; margin-bottom: 10px;"><i class="fas fa-upload" style="margin-right: 10px; font-size: 1rem; color: var(--text-color);"></i>Pulihkan Data</h4>
+                    <p style="color: var(--danger-color); font-weight: 500;">PERINGATAN: Memulihkan data akan MENGHAPUS dan MENGGANTI semua data yang ada saat ini dengan data dari file backup.</p>
+                    <div class="form-group">
+                        <label for="restoreFile">Pilih File Backup (.json):</label>
+                        <input type="file" id="restoreFile" accept=".json" style="padding: 5px;">
+                    </div>
+                    <button class="btn-add" style="width:100%; background-color: var(--danger-color); margin-top: auto;" onclick="restoreData(this)"><i class="fas fa-cloud-upload-alt"></i> Pulihkan Sekarang</button>
+                </div>
                 
                 <div class="settings-card">
                     <h3><i class="fas fa-award"></i> Pengaturan Predikat</h3>
@@ -662,7 +679,7 @@
 
     <script>
         // ===================================================================================
-        // ALL JAVASCRIPT LOGIC IS PRESERVED AS IS, WITHOUT ANY MODIFICATION.
+        // ALL JAVASCRIPT LOGIC
         // ===================================================================================
         
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwi8uMAqm4FLiqIx21Zsggan2eNghURRpXz7-OEf1C1aJfSDOKhM4ViSMotGjwNCsen/exec';
@@ -697,6 +714,115 @@
             loadAllUserData();
         };
 
+        // ========================================================================
+        // FUNGSI BARU: BACKUP DAN RESTORE
+        // ========================================================================
+
+        function backupData(button) {
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mem-backup...';
+
+            fetch(`${scriptURL}?action=backupAllData`)
+                .then(response => response.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        const dataStr = JSON.stringify(res.data, null, 2);
+                        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                        const url = window.URL.createObjectURL(dataBlob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        const date = new Date().toISOString().slice(0, 10);
+                        a.download = `backup_7KAIH_${date}.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+                        showMessage('Backup berhasil diunduh.', 'Sukses');
+                    } else {
+                        throw new Error(res.message);
+                    }
+                })
+                .catch(error => {
+                    showMessage(`Gagal membuat backup: ${error.message}`, 'Error');
+                })
+                .finally(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                });
+        }
+
+        function restoreData(button) {
+            const fileInput = document.getElementById('restoreFile');
+            if (fileInput.files.length === 0) {
+                showMessage('Silakan pilih file backup (.json) terlebih dahulu.', 'Peringatan');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    
+                    showMessage(
+                        'Anda yakin ingin memulihkan data? TINDAKAN INI AKAN MENGHAPUS SEMUA DATA LAMA DAN MENGGANTINYA DENGAN DATA DARI FILE BACKUP. Tindakan ini tidak dapat diurungkan.',
+                        'Konfirmasi Pemulihan Data',
+                        'confirm',
+                        () => { // onConfirm action
+                            const originalText = button.innerHTML;
+                            button.disabled = true;
+                            fileInput.disabled = true;
+                            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memulihkan...';
+
+                            const payload = {
+                                action: 'restoreAllData',
+                                data: jsonData
+                            };
+
+                            fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+                                .then(response => response.json())
+                                .then(res => {
+                                    if (res.status === 'success') {
+                                        showMessage(res.message, 'Pemulihan Berhasil', 'alert', () => {
+                                            // Muat ulang semua data untuk me-refresh tampilan
+                                            loadGlobalSettings();
+                                            loadAllUserData();
+                                        });
+                                    } else {
+                                        throw new Error(res.message);
+                                    }
+                                })
+                                .catch(error => {
+                                    showMessage(`Gagal memulihkan data: ${error.message}`, 'Error');
+                                })
+                                .finally(() => {
+                                    button.disabled = false;
+                                    fileInput.disabled = false;
+                                    button.innerHTML = originalText;
+                                    fileInput.value = ''; // Reset file input
+                                });
+                        }
+                    );
+
+                } catch (error) {
+                    showMessage(`File backup tidak valid atau rusak: ${error.message}`, 'Error');
+                }
+            };
+            
+            reader.onerror = function() {
+                 showMessage('Gagal membaca file.', 'Error');
+            };
+
+            reader.readAsText(file);
+        }
+
+        // ========================================================================
+        // FUNGSI LAMA (TIDAK DIUBAH)
+        // ========================================================================
+        
         function downloadTableAsPDF(tableId, title) {
             try {
                 const jsPDF = window.jspdf.jsPDF;
@@ -1032,7 +1158,7 @@
             e.preventDefault();
             sessionStorage.clear();
             showMessage('Anda telah berhasil logout.', 'Logout Berhasil', 'alert', () => {
-                window.location.href = 'index.html';
+                window.location.href = './';
             });
         });
 
@@ -1045,13 +1171,13 @@
             
             if (type === 'confirm') {
                 const yesButton = document.createElement('button');
-                yesButton.textContent = 'Ya';
+                yesButton.textContent = 'Ya, Lanjutkan';
                 yesButton.className = 'btn-delete';
                 yesButton.onclick = () => { if (onConfirm) onConfirm(); closeModal('messageModal'); };
                 buttonsDiv.appendChild(yesButton);
 
                 const noButton = document.createElement('button');
-                noButton.textContent = 'Tidak';
+                noButton.textContent = 'Batal';
                 noButton.style.backgroundColor = '#6c757d';
                 noButton.onclick = () => closeModal('messageModal');
                 buttonsDiv.appendChild(noButton);
@@ -1488,5 +1614,4 @@
         }
     </script>
 </body>
-
 </html>
