@@ -229,7 +229,7 @@
             const nomorInduk = sessionStorage.getItem('nomorIndukSiswa');
             if (!nomorInduk) {
                 showMessage('Sesi tidak valid. Anda harus login sebagai Siswa untuk mengakses halaman ini.', 'Akses Ditolak', () => {
-                    window.location.href = 'index.html';
+                    window.location.href = './';
                 });
                 return;
             }
@@ -322,4 +322,5 @@
         });
     </script>
 </body>
+
 </html>
