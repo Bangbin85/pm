@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halaman Siswa</title>
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
+    
+    <title>ANAK HEBAT</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
         .header { background-color: #28a745; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -199,7 +201,7 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwi8uMAqm4FLiqIx21Zsggan2eNghURRpXz7-OEf1C1aJfSDOKhM4ViSMotGjwNCsen/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbw5XpjOUCcK1rJmqXXcQusQAALtL_Ced2wrfjmwWls2OUdqBrrcosTdvDmpCKPp0BJU0g/exec';
         let currentStudentData = {};
         const messageModal = document.getElementById('messageModal');
         let onModalConfirm = null;
@@ -262,7 +264,7 @@
             sessionStorage.removeItem('isSiswaLoggedIn');
             sessionStorage.removeItem('nomorIndukSiswa');
             showMessage('Anda telah berhasil logout.', 'Logout', () => {
-                 window.location.href = 'index.html';
+                 window.location.href = './';
             });
         });
 
@@ -322,4 +324,5 @@
         });
     </script>
 </body>
+
 </html>
