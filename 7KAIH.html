@@ -1030,61 +1030,74 @@
 
         // --- PDF EXPORT ---
         function downloadRekapPDF() {
-            // ... (fungsi ini tetap sama seperti sebelumnya)
-        }
-        
-        function downloadLaporanNilaiPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'pt', 'a4');
+            const doc = new jsPDF('l', 'pt', 'a4');
             const sekolahData = JSON.parse(localStorage.getItem('dataSekolah')) || {};
-            const selectedSiswa = document.getElementById('nilai-filter-siswa').value;
-            const tanggalMulai = document.getElementById('nilai-tanggal-mulai').value;
-            const tanggalAkhir = document.getElementById('nilai-tanggal-akhir').value;
-            const deskripsiTeks = document.getElementById('deskripsi-penilaian-teks').textContent;
+            const rekapDb = getDb('rekapDb');
+            const currentFields = generateFields();
+            const tanggalMulai = document.getElementById('rekap-tanggal-mulai').value;
+            const tanggalAkhir = document.getElementById('rekap-tanggal-akhir').value;
+            const selectedSiswa = rekapSiswaFilter.value;
 
-            if (!selectedSiswa || selectedSiswa === 'semua' || !document.getElementById('body-tabel-nilai-akhir').innerHTML) {
-                showMessageModal('Peringatan', 'Tampilkan penilaian untuk satu siswa terlebih dahulu sebelum mengunduh.');
-                return;
-            }
+            const filteredRekap = rekapDb.filter(data => {
+                const isSiswaMatch = selectedSiswa === 'semua' || data.namaSiswa === selectedSiswa;
+                const isTanggalMatch = (!tanggalMulai || data.tanggal >= tanggalMulai) && (!tanggalAkhir || data.tanggal <= tanggalAkhir);
+                return isSiswaMatch && isTanggalMatch;
+            });
+
+            if (filteredRekap.length === 0) return alert('Tidak ada data rekap untuk diunduh.');
+            filteredRekap.sort((a, b) => (a.namaSiswa + a.tanggal).localeCompare(b.namaSiswa + b.tanggal));
 
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
-            doc.text('LAPORAN PENILAIAN AKHIR SISWA', doc.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
+            doc.text('REKAPITULASI KEGIATAN SISWA', doc.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
             
             doc.setFontSize(11);
             doc.setFont('helvetica', 'normal');
             doc.text(`NAMA SEKOLAH : ${sekolahData.nama_sekolah || ''}`, 40, 70);
             doc.text(`KELAS         : ${sekolahData.kelas || ''}`, 40, 85);
-            doc.text(`NAMA SISWA    : ${selectedSiswa}`, 40, 100);
-            doc.text(`PERIODE       : ${tanggalMulai} s/d ${tanggalAkhir}`, 40, 115);
+            
+            let startY = 100;
+            if (selectedSiswa !== 'semua') {
+                doc.text(`NAMA SISWA    : ${selectedSiswa}`, 40, startY);
+                startY += 15;
+            }
 
-            const head = [['Kategori', 'Capaian']];
-            const body = [];
-            document.querySelectorAll('#body-tabel-nilai-akhir tr').forEach(tr => {
-                const kategori = tr.cells[0].textContent;
-                const capaian = tr.cells[1].textContent;
-                body.push([kategori, capaian]);
-            });
+            let tanggalRekap = "Seluruh Data";
+            if (tanggalMulai && tanggalAkhir) tanggalRekap = `${tanggalMulai} s/d ${tanggalAkhir}`;
+            else if (tanggalMulai) tanggalRekap = `Mulai ${tanggalMulai}`;
+            else if (tanggalAkhir) tanggalRekap = `Sampai ${tanggalAkhir}`;
+            doc.text(`PERIODE       : ${tanggalRekap}`, 40, startY);
+
+            const ibadahHeaders = Array.from({ length: getJumlahIbadah() }, (_, i) => `I${i + 1}`);
+            const otherHeaders = ['BP', 'TC', 'OR', 'B', 'BM', 'MB'];
+            const allCheckHeaders = [...ibadahHeaders, ...otherHeaders];
+            
+            let head, body;
+            if (selectedSiswa === 'semua') {
+                head = [['No', 'Induk', 'Nama Siswa', ...allCheckHeaders]];
+                body = filteredRekap.map((data, index) => {
+                    const row = [ index + 1, data.induk, data.namaSiswa ];
+                    currentFields.forEach(field => row.push(data[field] ? 'V' : ''));
+                    return row;
+                });
+            } else {
+                head = [['No', 'Tanggal', ...allCheckHeaders]];
+                body = filteredRekap.map((data, index) => {
+                    const row = [ index + 1, data.tanggal ];
+                    currentFields.forEach(field => row.push(data[field] ? 'V' : ''));
+                    return row;
+                });
+            }
 
             doc.autoTable({
-                head: head, body: body, startY: 140, theme: 'grid',
+                head: head, body: body, startY: startY + 20, theme: 'grid',
                 headStyles: { fillColor: [41, 128, 185], halign: 'center' },
-                styles: { fontSize: 10, cellPadding: 5 },
-                columnStyles: { 0: { halign: 'left' }, 1: { halign: 'center' } }
+                styles: { fontSize: 8, cellPadding: 3, halign: 'center' },
+                columnStyles: { 2: { halign: 'left', cellWidth: selectedSiswa === 'semua' ? 150 : 'auto' } }
             });
 
-            let finalY = doc.lastAutoTable.finalY + 20;
-            
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Deskripsi Capaian:', 40, finalY);
-            finalY += 15;
-
-            doc.setFont('helvetica', 'normal');
-            const splitDeskripsi = doc.splitTextToSize(deskripsiTeks, doc.internal.pageSize.getWidth() - 80);
-            doc.text(splitDeskripsi, 40, finalY);
-            finalY += (splitDeskripsi.length * 12) + 20;
-
+            const finalY = doc.lastAutoTable.finalY + 40;
             const pageWidth = doc.internal.pageSize.getWidth();
             const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -1096,8 +1109,93 @@
             doc.text('Guru Kelas', pageWidth - 40, finalY + 20, { align: 'right' });
             doc.text(sekolahData.nama_guru || '(Nama Guru)', pageWidth - 40, finalY + 80, { align: 'right' });
             doc.text(`NIP: ${sekolahData.nip_guru || '(NIP Guru)'}`, pageWidth - 40, finalY + 95, { align: 'right' });
-            doc.save(`laporan_nilai_${selectedSiswa.replace(' ','_')}_${new Date().toISOString().slice(0,10)}.pdf`);
+            doc.save(`rekap_ceklis_${selectedSiswa === 'semua' ? 'semua_siswa' : selectedSiswa.replace(' ','_')}_${new Date().toISOString().slice(0,10)}.pdf`);
         }
+        
+function downloadLaporanNilaiPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'pt', 'a4');
+    const sekolahData = JSON.parse(localStorage.getItem('dataSekolah')) || {};
+    const selectedSiswa = document.getElementById('nilai-filter-siswa').value;
+    const tanggalMulai = document.getElementById('nilai-tanggal-mulai').value;
+    const tanggalAkhir = document.getElementById('nilai-tanggal-akhir').value;
+    const deskripsiTeks = document.getElementById('deskripsi-penilaian-teks').textContent;
+
+    if (!selectedSiswa || selectedSiswa === 'semua' || !document.getElementById('body-tabel-nilai-akhir').innerHTML) {
+        showMessageModal('Peringatan', 'Tampilkan penilaian untuk satu siswa terlebih dahulu sebelum mengunduh.');
+        return;
+    }
+
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('LAPORAN PENILAIAN AKHIR SISWA', doc.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+
+    // --- PERBAIKAN DIMULAI DI SINI ---
+    // 1. Tentukan posisi X untuk label dan nilai
+    const labelX = 40;
+    const valueX = 120; // Posisi X untuk titik dua (:)
+
+    // 2. Cetak label dan nilai secara terpisah
+    doc.text('NAMA SEKOLAH', labelX, 70);
+    doc.text(`: ${sekolahData.nama_sekolah || ''}`, valueX, 70);
+
+    doc.text('KELAS', labelX, 85);
+    doc.text(`: ${sekolahData.kelas || ''}`, valueX, 85);
+
+    doc.text('NAMA SISWA', labelX, 100);
+    doc.text(`: ${selectedSiswa}`, valueX, 100);
+
+    doc.text('PERIODE', labelX, 115);
+    doc.text(`: ${tanggalMulai} s/d ${tanggalAkhir}`, valueX, 115);
+    // --- PERBAIKAN SELESAI ---
+
+    const head = [['Kategori', 'Capaian']];
+    const body = [];
+    document.querySelectorAll('#body-tabel-nilai-akhir tr').forEach(tr => {
+        const kategori = tr.cells[0].textContent;
+        const capaian = tr.cells[1].textContent;
+        body.push([kategori, capaian]);
+    });
+
+    doc.autoTable({
+        head: head, body: body, startY: 140, theme: 'grid',
+        headStyles: { fillColor: [41, 128, 185], halign: 'center' },
+        styles: { fontSize: 10, cellPadding: 5 },
+        columnStyles: { 0: { halign: 'left' }, 1: { halign: 'center' } }
+    });
+
+    let finalY = doc.lastAutoTable.finalY + 20;
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Deskripsi Capaian:', 40, finalY);
+    finalY += 15;
+
+    doc.setFont('helvetica', 'normal');
+    const splitDeskripsi = doc.splitTextToSize(deskripsiTeks, doc.internal.pageSize.getWidth() - 80);
+    doc.text(splitDeskripsi, 40, finalY);
+    finalY += (splitDeskripsi.length * 12) + 20;
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    doc.setFontSize(10);
+    // Tanda tangan Kepala Sekolah di kiri bawah
+    doc.text('Kepala Sekolah', 40, finalY + 20);
+    doc.text(sekolahData.nama_kepsek || '(Nama Kepsek)', 40, finalY + 80);
+    doc.text(`NIP: ${sekolahData.nip_kepsek || '(NIP Kepsek)'}`, 40, finalY + 95);
+
+    // Tanda tangan Guru Kelas dan Tanggal di kanan bawah
+    doc.text(`Jakarta, ${today}`, pageWidth - 40, finalY, { align: 'right' });
+    doc.text('Guru Kelas', pageWidth - 40, finalY + 20, { align: 'right' });
+    doc.text(sekolahData.nama_guru || '(Nama Guru)', pageWidth - 40, finalY + 80, { align: 'right' });
+    doc.text(`NIP: ${sekolahData.nip_guru || '(NIP Guru)'}`, pageWidth - 40, finalY + 95, { align: 'right' });
+    
+    doc.save(`laporan_nilai_${selectedSiswa.replace(' ','_')}_${new Date().toISOString().slice(0,10)}.pdf`);
+}
         
         // --- EXCEL IMPORT/EXPORT ---
         function openImportModal() {
@@ -1112,8 +1210,8 @@
             const worksheet = XLSX.utils.json_to_sheet(defaultSiswa);
             worksheet['!cols'] = [{wch:15}, {wch:40}];
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Siswa');
-            XLSX.writeFile(workbook, 'template_siswa.xlsx');
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Bangbin Siswa');
+            XLSX.writeFile(workbook, 'bangbin_siswa.xlsx');
         }
         function handleExcelImport() {
             const input = document.getElementById('excel-file-input');
@@ -1294,3 +1392,4 @@
     </script>
 </body>
 </html>
+
