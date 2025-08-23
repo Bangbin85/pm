@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guru</title>
+	<link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
+    <title>GURU</title>
     
     <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.js"></script>
-    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -135,7 +135,7 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbw5XpjOUCcK1rJmqXXcQusQAALtL_Ced2wrfjmwWls2OUdqBrrcosTdvDmpCKPp0BJU0g/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwi8uMAqm4FLiqIx21Zsggan2eNghURRpXz7-OEf1C1aJfSDOKhM4ViSMotGjwNCsen/exec';
         const namaKelasSpan = document.getElementById('nama-kelas');
         const tableHead = document.querySelector("#laporanSiswaTable thead");
         const tableBody = document.querySelector("#laporanSiswaTable tbody");
@@ -175,7 +175,7 @@
         }
         
         if (sessionStorage.getItem('isGuruLoggedIn') !== 'true') {
-            showMessage('Anda harus login sebagai Guru untuk mengakses halaman ini.', 'Akses Ditolak', () => { window.location.href = 'index.html'; });
+            showMessage('Anda harus login sebagai Guru untuk mengakses halaman ini.', 'Akses Ditolak', () => { window.location.href = './'; });
         }
         
         window.onload = function() {
@@ -506,7 +506,7 @@
             const kelas = sessionStorage.getItem('guruKelas') || '';
             const tanggalCetak = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
             const namaGuru = sessionStorage.getItem('guruName') || 'Guru';
-            const nipGuru = sessionStorage.getItem('guruNip') || '081310051985';
+            const nipGuru = sessionStorage.getItem('guruNip') || 'NIP Tidak Tersedia';
             const page_width = doc.internal.pageSize.getWidth();
             const namaKepsek = schoolInfo['Nama Kepala Sekolah'] || 'Nama Kepala Sekolah';
             const nipKepsek = schoolInfo['NIP Kepala Sekolah'] || 'NIP. .......................';
@@ -554,13 +554,21 @@
 
         function openEditModal(rowIndexInSheet) {
             const rowIndexInArray = fullData.findIndex(row => fullData.indexOf(row) === rowIndexInSheet - 1);
-            if(rowIndexInArray === -1) return;
-            
-            const formGrid = document.getElementById('edit-form-grid');
-            formGrid.innerHTML = '';
-            const headers = fullData[0];
-            const data = fullData[rowIndexInArray + 1];
-            document.getElementById('editRowIndex').value = rowIndexInSheet;
+			const arrayIndex = rowIndexInSheet - 1;
+
+			// Validasi untuk memastikan index tidak keluar dari rentang array
+			if (arrayIndex < 1 || arrayIndex >= fullData.length) {
+				console.error("Invalid row index provided:", rowIndexInSheet);
+				showMessage('Indeks data tidak valid, tidak dapat mengedit.', 'Error');
+				return;
+			}
+
+			const formGrid = document.getElementById('edit-form-grid');
+			formGrid.innerHTML = '';
+			const headers = fullData[0];
+			// Ambil data dari array menggunakan index yang sudah benar
+			const data = fullData[arrayIndex];
+			document.getElementById('editRowIndex').value = rowIndexInSheet;
 
             for(let i = 1; i < headers.length; i++) { 
                 const formGroup = document.createElement('div');
@@ -609,18 +617,61 @@
             closeModal('editModal');
         }
 
-        function deleteData(rowIndex) {
-            if (!confirm('Apakah Anda yakin ingin menghapus data ini secara permanen?')) return;
-            const payload = { action: 'deleteData', kelas: sessionStorage.getItem('guruKelas'), rowIndex: rowIndex };
-            fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
-                .then(response => response.json())
-                .then(res => {
-                    if (res.status === 'success') {
-                        showMessage('Data berhasil dihapus!', 'Sukses', () => location.reload());
-                    } else { throw new Error(res.message); }
-                })
-                .catch(error => showMessage(`Gagal menghapus: ${error.message}`, 'Error'));
+		function deleteData(rowIndex) {
+			// Logika untuk melakukan penghapusan data
+			const performDelete = () => {
+				const payload = { action: 'deleteData', kelas: sessionStorage.getItem('guruKelas'), rowIndex: rowIndex };
+				fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+					.then(response => response.json())
+					.then(res => {
+						if (res.status === 'success') {
+							showMessage('Data berhasil dihapus!', 'Sukses', () => location.reload());
+						} else { throw new Error(res.message); }
+					})
+					.catch(error => showMessage(`Gagal menghapus: ${error.message}`, 'Error'));
+			};
+
+			// Panggil modal konfirmasi
+			showConfirmationModal(
+				'Apakah Anda yakin ingin menghapus data ini secara permanen? Tindakan ini tidak dapat diurungkan.',
+				'Konfirmasi Hapus Data',
+				performDelete // Kirim fungsi performDelete sebagai callback
+			);
+		}
+
+			function showConfirmationModal(message, title, onConfirm) {
+            document.getElementById('messageModalTitle').textContent = title;
+            document.getElementById('messageModalText').textContent = message;
+
+            const buttonContainer = document.getElementById('messageModalButtons');
+            buttonContainer.innerHTML = ''; // Kosongkan tombol yang ada
+
+            // Buat Tombol Konfirmasi (Ya)
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'action-btn delete'; // Beri style merah
+            confirmBtn.innerHTML = '<i class="fas fa-check"></i> Ya, Hapus';
+            confirmBtn.onclick = function() {
+                closeModal('messageModal');
+                if (onConfirm) {
+                    onConfirm(); // Jalankan aksi jika dikonfirmasi
+                }
+            };
+
+            // Buat Tombol Batal
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn';
+            cancelBtn.innerHTML = '<i class="fas fa-times"></i> Batal';
+            cancelBtn.style.marginLeft = '10px';
+            cancelBtn.onclick = function() {
+                closeModal('messageModal');
+            };
+
+            buttonContainer.appendChild(cancelBtn);
+            buttonContainer.appendChild(confirmBtn);
+
+            document.getElementById('messageModal').classList.add('show');
         }
+
 
         document.getElementById('logoutButton').addEventListener('click', function(e) {
             e.preventDefault();
@@ -629,5 +680,4 @@
         });
     </script>
 </body>
-
 </html>
