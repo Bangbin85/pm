@@ -175,7 +175,7 @@
         }
         
         if (sessionStorage.getItem('isGuruLoggedIn') !== 'true') {
-            showMessage('Anda harus login sebagai Guru untuk mengakses halaman ini.', 'Akses Ditolak', () => { window.location.href = 'index.html'; });
+            showMessage('Anda harus login sebagai Guru untuk mengakses halaman ini.', 'Akses Ditolak', () => { window.location.href = './'; });
         }
         
         window.onload = function() {
@@ -676,8 +676,9 @@
         document.getElementById('logoutButton').addEventListener('click', function(e) {
             e.preventDefault();
             sessionStorage.clear();
-            showMessage('Anda telah berhasil logout.', 'Logout', () => { window.location.href = 'index.html'; });
+            showMessage('Anda telah berhasil logout.', 'Logout', () => { window.location.href = './'; });
         });
     </script>
 </body>
+
 </html>
