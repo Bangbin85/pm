@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Siswa</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
+        .header { background-color: #28a745; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header a { color: white; padding: 10px 15px; text-decoration: none; background-color: rgba(255,255,255,0.2); border-radius: 5px; transition: background-color 0.3s;}
+        .header a:hover { background-color: rgba(255,255,255,0.4); }
+        .container { padding: 20px; max-width: 800px; margin: auto; }
+        .welcome-card { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; margin-bottom: 20px;}
+        .welcome-card h2 { margin-top: 0; color: #0056b3; }
+        .profile-container { background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px;}
+        .profile-container h3 { border-bottom: 2px solid #28a745; padding-bottom: 10px; margin-top: 0; }
+        .info-item { display: flex; padding: 12px 0; border-bottom: 1px solid #eee; font-size: 16px; }
+        .info-label { font-weight: bold; color: #555; width: 150px; flex-shrink: 0; }
+        .activity-form-container { background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .activity-form-container h3 { border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-top: 0; color: #0056b3; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input[type="text"], .form-group input[type="time"], .form-group input[type="date"], .form-group select, .form-group textarea {
+            width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .checkbox-group label { margin-right: 15px; font-weight: normal;}
+        .submit-button { background-color: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; transition: background-color 0.3s; }
+        .submit-button:hover { background-color: #0056b3; }
+        .submit-button:disabled { background-color: #a0c7e4; cursor: not-allowed; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); padding-top: 60px; }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 400px; border-radius: 8px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .modal-content h3 { margin-top: 0; }
+        .modal-content .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .modal-content .close:hover, .modal-content .close:focus { color: black; text-decoration: none; cursor: pointer; }
+        #messageModalButtons { margin-top: 20px; }
+        #messageModalButtons button { padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background-color: #007bff; color: white; }
+        
+        .ibadah-form-group {
+            display: none; /* Sembunyikan semua dropdown ibadah secara default */
+        }
+
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Halaman Siswa</h1>
+        <a href="#" id="logoutButton">Logout</a>
+    </div>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h2>Selamat Datang, <span id="nama-siswa-display">Memuat...</span>!</h2>
+            <p>Silakan isi laporan kegiatan harian Anda pada formulir di bawah ini.</p>
+        </div>
+        <div class="profile-container">
+            <h3>Data Diri Siswa</h3>
+            <div id="studentInfoContainer"><p>Memuat data...</p></div>
+        </div>
+        <div class="activity-form-container">
+            <h3>Laporan Kegiatan Harian</h3>
+            <form id="activityForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tanggalKegiatan">Tanggal Kegiatan</label>
+                        <input type="date" id="tanggalKegiatan" required>
+                    </div>
+                    <div></div>
+
+                    <div class="form-group full-width">
+                        <label>Laporan Ibadah Harian</label>
+                        <div class="form-grid">
+                            <div class="form-group ibadah-form-group" id="ibadah-container-1">
+                                <label for="ibadah1">Ibadah 1</label>
+                                <select id="ibadah1">
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                </select>
+                            </div>
+                            <div class="form-group ibadah-form-group" id="ibadah-container-2">
+                                <label for="ibadah2">Ibadah 2</label>
+                                <select id="ibadah2">
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                </select>
+                            </div>
+                            <div class="form-group ibadah-form-group" id="ibadah-container-3">
+                                <label for="ibadah3">Ibadah 3</label>
+                                <select id="ibadah3">
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                </select>
+                            </div>
+                            <div class="form-group ibadah-form-group" id="ibadah-container-4">
+                                <label for="ibadah4">Ibadah 4</label>
+                                <select id="ibadah4">
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                </select>
+                            </div>
+                             <div class="form-group ibadah-form-group" id="ibadah-container-5">
+                                <label for="ibadah5">Ibadah 5</label>
+                                <select id="ibadah5">
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                </select>
+                            </div>
+                            <div class="form-group ibadah-form-group" id="ibadah-container-6">
+                                <label for="ibadah6">Ibadah 6</label>
+                                <select id="ibadah6">
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                </select>
+                            </div>
+                            <div class="form-group ibadah-form-group" id="ibadah-container-7">
+                                <label for="ibadah7">Ibadah 7</label>
+                                <select id="ibadah7">
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bangunPagi">Jam Bangun Pagi</label>
+                        <input type="time" id="bangunPagi" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tidurCepat">Jam Tidur Cepat</label>
+                        <input type="time" id="tidurCepat" required>
+                    </div>
+                     <div class="form-group">
+                        <label for="olahraga">Kegiatan Olahraga</label>
+                        <input type="text" id="olahraga" placeholder="Contoh: Lari pagi 15 menit">
+                    </div>
+                     <div class="form-group">
+                        <label>Makanan Sehat</label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="makananKarbo" value="Karbo"><label for="makananKarbo">Karbo</label>
+                            <input type="checkbox" id="makananSayur" value="Sayur/Buah"><label for="makananSayur">Sayur/Buah</label>
+                            <input type="checkbox" id="makananSusu" value="Susu"><label for="makananSusu">Susu</label>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="belajarTempat">Tempat Belajar</label>
+                        <input type="text" id="belajarTempat" placeholder="Contoh: Di rumah, di perpustakaan">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="belajarApa">Materi yang Dipelajari</label>
+                        <textarea id="belajarApa" placeholder="Contoh: Membaca buku Sejarah Bab 3"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="bermasyarakat">Kegiatan Bermasyarakat</label>
+                        <textarea id="bermasyarakat" placeholder="Contoh: Membantu ibu membersihkan rumah"></textarea>
+                    </div>
+                </div>
+                <button type="submit" id="submitActivity" class="submit-button">Simpan Laporan</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="messageModalTitle">Pemberitahuan</h3>
+            <p id="messageModalText"></p>
+            <div id="messageModalButtons">
+                 <button onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwi8uMAqm4FLiqIx21Zsggan2eNghURRpXz7-OEf1C1aJfSDOKhM4ViSMotGjwNCsen/exec';
+        let currentStudentData = {};
+        const messageModal = document.getElementById('messageModal');
+        let onModalConfirm = null;
+
+        function showMessage(message, title = 'Pemberitahuan', onConfirm = null) {
+            document.getElementById('messageModalTitle').textContent = title;
+            document.getElementById('messageModalText').textContent = message;
+            onModalConfirm = onConfirm;
+            messageModal.style.display = 'block';
+        }
+
+        function closeModal() {
+            messageModal.style.display = 'none';
+            if (onModalConfirm) {
+                onModalConfirm();
+                onModalConfirm = null; 
+            }
+        }
+        
+        window.onclick = event => {
+            if (event.target == messageModal) {
+                closeModal();
+            }
+        }
+
+        function loadIbadahDropdownOptions() {
+            fetch(`${scriptURL}?action=getIbadahDropdowns`)
+                .then(response => response.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        const settings = res.data.settings;
+                        const allOptions = res.data.options;
+
+                        for (let i = 1; i <= 7; i++) {
+                            const container = document.getElementById(`ibadah-container-${i}`);
+                            if (settings[i-1] === true) {
+                                container.style.display = 'block';
+                                const select = document.getElementById(`ibadah${i}`);
+                                const options = allOptions[`ibadah${i}`] || [];
+                                
+                                options.forEach(optionText => {
+                                    const option = document.createElement('option');
+                                    option.value = optionText;
+                                    option.textContent = optionText;
+                                    select.appendChild(option);
+                                });
+                            } 
+                        }
+                    } else {
+                        console.error('Gagal memuat opsi dropdown ibadah:', res.message);
+                    }
+                })
+                .catch(error => console.error('Error Jaringan saat memuat dropdown:', error));
+        }
+
+        window.onload = function() {
+            const nomorInduk = sessionStorage.getItem('nomorIndukSiswa');
+            if (!nomorInduk) {
+                showMessage('Sesi tidak valid. Anda harus login sebagai Siswa untuk mengakses halaman ini.', 'Akses Ditolak', () => {
+                    window.location.href = 'index.html';
+                });
+                return;
+            }
+
+            loadIbadahDropdownOptions();
+
+            fetch(`${scriptURL}?action=getSiswaDataByInduk&induk=${nomorInduk}`)
+                .then(response => response.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        currentStudentData = res.data;
+                        document.getElementById('nama-siswa-display').textContent = currentStudentData.nama;
+                        const container = document.getElementById('studentInfoContainer');
+                        container.innerHTML = `
+                            <div class="info-item"><div class="info-label">Nama Lengkap</div>: ${currentStudentData.nama}</div>
+                            <div class="info-item"><div class="info-label">Nomor Induk</div>: ${currentStudentData.induk}</div>
+                            <div class="info-item"><div class="info-label">Kelas</div>: ${currentStudentData.kelas}</div>
+                            <div class="info-item"><div class="info-label">Agama</div>: ${currentStudentData.agama}</div>
+                        `;
+                    } else {
+                         showMessage('Gagal memuat data siswa: ' + res.message, 'Error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading student info:', error);
+                    showMessage('Terjadi kesalahan saat menghubungi server.', 'Error');
+                });
+        };
+
+        document.getElementById('logoutButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            sessionStorage.removeItem('isSiswaLoggedIn');
+            sessionStorage.removeItem('nomorIndukSiswa');
+            showMessage('Anda telah berhasil logout.', 'Logout', () => {
+                 window.location.href = 'index.html';
+            });
+        });
+
+        document.getElementById('activityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitButton = document.getElementById('submitActivity');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Menyimpan...';
+
+            const ibadahValues = [];
+            for (let i = 1; i <= 7; i++) {
+                ibadahValues.push(document.getElementById('ibadah' + i).value);
+            }
+
+            const values = [
+                document.getElementById('tanggalKegiatan').value,
+                ...ibadahValues,
+                document.getElementById('bangunPagi').value,
+                document.getElementById('tidurCepat').value,
+                document.getElementById('olahraga').value,
+                document.getElementById('belajarTempat').value, 
+                document.getElementById('belajarApa').value, 
+                document.getElementById('makananKarbo').checked ? 'Karbo' : '',
+                document.getElementById('makananSayur').checked ? 'SB' : '',
+                document.getElementById('makananSusu').checked ? 'Protein' : '',
+                document.getElementById('bermasyarakat').value
+            ];
+            
+            const payload = {
+                action: 'submitDailyActivity',
+                className: currentStudentData.kelas,
+                studentName: currentStudentData.nama,
+                values: values
+            };
+
+            fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+                .then(response => response.json())
+                .then(result => {
+                    if(result.status === 'success') {
+                        showMessage('Laporan harian berhasil disimpan!', 'Sukses', () => {
+                            document.getElementById('activityForm').reset();
+                        });
+                    } else {
+                        showMessage('Gagal menyimpan laporan. Error: ' + result.message, 'Gagal');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    showMessage('Terjadi kesalahan. Gagal menyimpan laporan.', 'Error');
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Simpan Laporan';
+                });
+        });
+    </script>
+</body>
+</html>
