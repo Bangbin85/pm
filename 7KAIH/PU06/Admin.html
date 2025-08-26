@@ -755,7 +755,7 @@
                     'Anda harus login sebagai Admin untuk mengakses halaman ini.', 
                     'Akses Ditolak', 
                     'alert', 
-                    () => { window.location.href = 'index.html'; }
+                    () => { window.location.href = './'; }
                 );
                 return;
             }
@@ -1280,7 +1280,7 @@
             e.preventDefault();
             sessionStorage.clear();
             showMessage('Anda telah berhasil logout.', 'Logout Berhasil', 'alert', () => {
-                window.location.href = 'index.html';
+                window.location.href = './';
             });
         });
 
@@ -1738,3 +1738,4 @@
 </body>
 
 </html>
+
