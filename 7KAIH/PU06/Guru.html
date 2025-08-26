@@ -135,7 +135,7 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwi8uMAqm4FLiqIx21Zsggan2eNghURRpXz7-OEf1C1aJfSDOKhM4ViSMotGjwNCsen/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwaRmnSQSe7-7xiLV6M1WIMB82UfHrZv57qoI00E_4jTIDHVRR5dk_RSr4Dz96PoOVzcA/exec';
         const namaKelasSpan = document.getElementById('nama-kelas');
         const tableHead = document.querySelector("#laporanSiswaTable thead");
         const tableBody = document.querySelector("#laporanSiswaTable tbody");
@@ -175,7 +175,7 @@
         }
         
         if (sessionStorage.getItem('isGuruLoggedIn') !== 'true') {
-            showMessage('Anda harus login sebagai Guru untuk mengakses halaman ini.', 'Akses Ditolak', () => { window.location.href = 'index.html'; });
+            showMessage('Anda harus login sebagai Guru untuk mengakses halaman ini.', 'Akses Ditolak', () => { window.location.href = './'; });
         }
         
         window.onload = function() {
@@ -676,8 +676,9 @@
         document.getElementById('logoutButton').addEventListener('click', function(e) {
             e.preventDefault();
             sessionStorage.clear();
-            showMessage('Anda telah berhasil logout.', 'Logout', () => { window.location.href = 'index.html'; });
+            showMessage('Anda telah berhasil logout.', 'Logout', () => { window.location.href = './'; });
         });
     </script>
 </body>
+
 </html>
