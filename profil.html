@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">
+    <title>BANGBIN</title>
+    <style>
+/* General Styling */
+:root {
+    --primary-color: #5A67D8; /* Indigo */
+    --secondary-color: #EDF2F7; /* Gray 100 */
+    --text-dark: #2D3748; /* Gray 800 */
+    --text-light: #718096; /* Gray 500 */
+    --background-color: #F7FAFC; /* Gray 50 */
+    --card-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.2);
+    --transition-speed: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+/* Profile Container */
+.profile-container {
+    display: flex;
+    max-width: 1100px;
+    width: 100%;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Profile Left Section */
+.profile-left {
+    width: 35%;
+    padding: 3rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Updated Background */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://lh3.googleusercontent.com/d/1tFGMHXxFlkz5Ij0nHbxddt4aF-MfnTio');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.profile-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(45, 55, 72, 0.5); /* Dark overlay for text readability */
+    z-index: 1;
+}
+
+.profile-left > * {
+    z-index: 2; /* Ensure content is above the overlay */
+}
+
+
+.profile-image-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+    transition: transform var(--transition-speed) ease;
+}
+
+.profile-image-container:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white; /* Text color changed for readability */
+}
+
+.profile-title {
+    font-size: 1rem;
+    color: #E2E8F0; /* Lighter text color */
+    margin-bottom: 1.5rem;
+}
+
+.social-links {
+    margin-bottom: 2rem;
+}
+
+.social-links a {
+    color: #CBD5E0; /* Lighter icon color */
+    font-size: 1.5rem;
+    margin: 0 0.75rem;
+    transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+
+.social-links a:hover {
+    color: white;
+    transform: translateY(-3px);
+}
+
+.contact-button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.contact-button:hover {
+    background-color: #434190;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(90, 103, 216, 0.7);
+}
+
+/* Profile Right Section */
+.profile-right {
+    width: 65%;
+    padding: 3rem;
+}
+
+.content-section {
+    margin-bottom: 2.5rem;
+    animation: fadeInContent 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.content-section:nth-child(1) { animation-delay: 0.2s; }
+.content-section:nth-child(2) { animation-delay: 0.4s; }
+.content-section:nth-child(3) { animation-delay: 0.6s; }
+
+
+@keyframes fadeInContent {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.profile-right h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.profile-right h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: var(--primary-color);
+    border-radius: 3px;
+}
+
+.about-me p {
+    line-height: 1.6;
+    color: var(--text-light);
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.skill-item {
+    background-color: var(--secondary-color);
+    padding: 0.75rem;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.skill-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px -5px rgba(0,0,0,0.1);
+}
+
+.skill-item i {
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+}
+
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.portfolio-item {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.portfolio-item img {
+    width: 100%;
+    display: block;
+    transition: transform var(--transition-speed) ease;
+}
+
+.portfolio-item:hover img {
+    transform: scale(1.1);
+}
+
+.portfolio-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    color: white;
+    padding: 2rem 1rem 1rem;
+    transform: translateY(100%);
+    transition: transform var(--transition-speed) ease-in-out;
+}
+
+.portfolio-item:hover .portfolio-overlay {
+    transform: translateY(0);
+}
+
+.portfolio-overlay h3 {
+    margin-bottom: 0.25rem;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .profile-container {
+        flex-direction: column;
+    }
+    .profile-left, .profile-right {
+        width: 100%;
+    }
+    .profile-right {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 1rem;
+    }
+    .profile-name {
+        font-size: 1.5rem;
+    }
+    .profile-right {
+        padding: 1.5rem;
+    }
+}
+        
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="profile-container">
+        <!-- Bagian Kiri -->
+        <div class="profile-left">
+            <div class="profile-image-container">
+                <!-- URL foto profil Anda telah diperbarui -->
+                <img src="https://lh3.googleusercontent.com/d/1ivUN8B8xdd4R8Kef_-wEqNx56_eeUv4w" alt="Foto Profil" class="profile-image">
+            </div>
+            <h1 class="profile-name">BINTANG ADHI PERMANA</h1>
+            <p class="profile-title">Guru</p>
+            <div class="social-links">
+                <a href="https://wa.me/6281310051985" target="_blank" aria-label="whatsapp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://www.youtube.com/@Bangbin_1" target="_blank" aria-label="youtube"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.facebook.com/bintang.a.permana.1/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+            <a href="https://wa.me/6281310051985" class="contact-button">Hubungi Saya</a>
+        </div>
+
+        <!-- Bagian Kanan -->
+        <div class="profile-right">
+            <div class="content-section about-me">
+                <h2>Tentang Saya</h2>
+                <p>
+                    Halo! Saya Bintang Adhi Permana, adalah seorang guru yang bersemangat dengan keahlian dalam menciptakan lingkungan belajar yang modern dan interaktif. Saya senang memecahkan masalah kompleks dan mengubah ide menjadi kenyataan dalam dunia pendidikan.
+                </p>
+            </div>
+
+            <div class="content-section skills">
+                <h2>Keahlian Utama</h2>
+                <div class="skills-grid">
+                    <div class="skill-item"><i class="fas fa-chalkboard-teacher"></i> Mengajar Kreatif</div>
+                    <div class="skill-item"><i class="fas fa-laptop-code"></i> Teknologi Pendidikan</div>
+                    <div class="skill-item"><i class="fas fa-users"></i> Manajemen Kelas</div>
+                    <div class="skill-item"><i class="fas fa-lightbulb"></i> Pengembangan Kurikulum</div>
+                    <div class="skill-item"><i class="fas fa-comments"></i> Komunikasi Efektif</div>
+                    <div class="skill-item"><i class="fas fa-brain"></i> Psikologi Belajar</div>
+                </div>
+            </div>
+
+            <div class="content-section portfolio">
+                <h2>DONASI</h2>
+                <div class="portfolio-grid">
+                    <!-- Proyek A diperbarui -->
+                    <div class="portfolio-item">
+                        <img src="https://placehold.co/400x250/0065A8/FFFFFF?text=BNI" alt="BNI">
+                        <div class="portfolio-overlay">
+                            <h3>BNI</h3>
+                            <p>a.n BINTANG ADHI PERMANA<br>0430267613</p>
+                        </div>
+                    </div>
+                    <!-- Proyek B diperbarui -->
+                    <div class="portfolio-item">
+                        <img src="https://placehold.co/400x250/4C2A85/FFFFFF?text=E-Wallets" alt="E-Wallets">
+                        <div class="portfolio-overlay">
+                            <h3>OVO / Gopay / ShopeePay</h3>
+                            <p>081310051985</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
