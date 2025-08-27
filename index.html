@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">	
-    <!-- SwiperJS for 3D Slider -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         body {
@@ -90,7 +89,7 @@
         }
 
         /* -- Styling Modal -- */
-        #product-modal.hidden {
+        #product-modal.hidden, #payment-modal.hidden {
             display: none;
         }
         .modal-enter {
@@ -146,7 +145,7 @@
         /* -- STYLING KHUSUS UNTUK PRINT -- */
         @media print {
             /* Sembunyikan semua elemen web */
-            header, footer, #particle-canvas, #web-content, #product-modal, #lightbox {
+            header, footer, #particle-canvas, #web-content, #product-modal, #lightbox, #payment-modal {
                 display: none !important;
             }
             
@@ -186,19 +185,18 @@
 </head>
 <body class="w-full">
 
-    <!-- ================================================== -->
-    <!--  KONTEN UNTUK TAMPILAN WEB (INTERAKTIF)             -->
-    <!-- ================================================== -->
     <div id="web-content">
-        <!-- HERO SECTION DENGAN PARTIKEL -->
         <header class="relative h-screen flex items-center justify-center text-center overflow-hidden">
             <canvas id="particle-canvas"></canvas>
             <div class="relative z-10 p-4 scroll-reveal">
                 <img src="https://lh3.googleusercontent.com/d/1QHVbK_TkBo00jcaxdxD5XWmOPV2DTD3o" alt="Foto Profil" class="w-36 h-36 rounded-full mx-auto border-4 border-blue-500 shadow-lg mb-4" onerror="this.onerror=null;this.src='https://placehold.co/150x150/374151/e5e7eb?text=BAP';">
                 <h1 class="text-5xl md:text-6xl font-bold text-white tracking-tight">Bintang Adhi Permana</h1>
                 <p class="text-xl md:text-2xl text-blue-300 mt-2">Guru & Pengembang Pendidikan</p>
-                <div class="mt-6 flex justify-center space-x-5">
+                <div class="mt-6 flex justify-center space-x-5 items-center">
                     <a href="https://wa.me/6281310051985" target="_blank" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-whatsapp fa-2x"></i></a>
+                    <a href="#" id="open-payment-modal" title="Pembayaran & Donasi" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300">
+                        <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/2560px-BNI_logo.svg.png" alt="BNI" class="h-6">
+                    </a>
                     <a href="https://www.facebook.com/bintang.a.permana.1/" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-facebook fa-2x"></i></a>
                     <a href="#" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fab fa-instagram fa-2x"></i></a>
                     <a href="#" id="download-pdf" title="Unduh sebagai PDF" class="text-gray-300 hover:text-white transform hover:scale-125 transition-transform duration-300"><i class="fas fa-file-pdf fa-2x"></i></a>
@@ -206,17 +204,14 @@
             </div>
         </header>
 
-        <!-- KONTEN UTAMA WEB -->
         <main class="container mx-auto p-4 md:p-8 space-y-16">
-            <!-- TENTANG SAYA -->
             <section class="scroll-reveal text-center max-w-3xl mx-auto">
                  <h2 class="text-3xl font-bold text-center mb-6 text-blue-400">Tentang Saya</h2>
                  <p class="text-gray-300 leading-relaxed">
-                    Bintang Adhi Permana adalah seorang pendidik dan pengembang yang berdedikasi tinggi, dengan hasrat untuk memajukan dunia pendidikan Indonesia. Dengan latar belakang yang kuat sebagai guru Sekolah Dasar, ia memadukan pengalaman praktis di kelas dengan keahlian teknis dalam analisis data, pengembangan kurikulum, dan pembuatan aplikasi pendidikan. Kontribusinya yang luas, mulai dari menulis buku ajar hingga mengembangkan sistem rapor digital, mencerminkan komitmennya untuk menciptakan solusi inovatif yang memberdayakan guru dan siswa di seluruh negeri.
+                     Bintang Adhi Permana adalah seorang pendidik dan pengembang yang berdedikasi tinggi, dengan hasrat untuk memajukan dunia pendidikan Indonesia. Dengan latar belakang yang kuat sebagai guru Sekolah Dasar, ia memadukan pengalaman praktis di kelas dengan keahlian teknis dalam analisis data, pengembangan kurikulum, dan pembuatan aplikasi pendidikan. Kontribusinya yang luas, mulai dari menulis buku ajar hingga mengembangkan sistem rapor digital, mencerminkan komitmennya untuk menciptakan solusi inovatif yang memberdayakan guru dan siswa di seluruh negeri.
                  </p>
             </section>
             
-            <!-- GALERI FOTO -->
             <section class="scroll-reveal">
                 <h2 class="text-3xl font-bold text-center mb-2 text-blue-400">Galeri Foto</h2>
                 <div class="swiper mySwiper">
@@ -244,7 +239,6 @@
                 </div>
             </section>
 
-            <!-- PENGALAMAN MENGAJAR -->
             <section class="scroll-reveal">
                 <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Pengalaman Mengajar</h2>
                 <div class="timeline max-w-2xl mx-auto">
@@ -267,8 +261,7 @@
                 </div>
             </section>
 
-             <!-- PERAN & KONTRIBUSI -->
-            <section class="scroll-reveal">
+             <section class="scroll-reveal">
                 <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Peran & Kontribusi</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="glass-card p-6 tilt-card">
@@ -313,7 +306,6 @@
                 </div>
             </section>
             
-            <!-- PENDIDIKAN -->
             <section class="scroll-reveal">
                 <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Pendidikan</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -334,25 +326,19 @@
                 </div>
             </section>
             
-            <!-- PRODUK & KARYA -->
             <section class="scroll-reveal">
                 <h2 class="text-3xl font-bold text-center mb-10 text-blue-400">Produk & Karya</h2>
                 <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Produk akan dimasukkan di sini oleh JavaScript -->
-                </div>
+                    </div>
             </section>
         </main>
 
         <footer class="text-center p-8 mt-16 border-t border-gray-800">
-            <p class="text-gray-500">&copy; 2024 Bintang Adhi Permana. All rights reserved.</p>
+            <p class="text-gray-500">© 2024 Bintang Adhi Permana. All rights reserved.</p>
         </footer>
     </div>
 
-    <!-- ================================================== -->
-    <!--  KONTEN KHUSUS UNTUK CETAK (TIDAK TAMPIL DI WEB)   -->
-    <!-- ================================================== -->
     <div id="print-layout" class="hidden p-8">
-        <!-- Header Cetak -->
         <div class="text-center mb-8">
             <h1 class="font-bold print-text-primary">Bintang Adhi Permana</h1>
             <p class="print-text-secondary">Guru & Pengembang Pendidikan</p>
@@ -361,9 +347,7 @@
             </p>
         </div>
 
-        <!-- Kontainer 2 Kolom -->
         <div class="grid grid-cols-2 gap-8">
-            <!-- Kolom Kiri -->
             <div class="space-y-6">
                 <section class="print-section">
                     <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Tentang Saya</h2>
@@ -395,7 +379,6 @@
                 </section>
             </div>
 
-            <!-- Kolom Kanan -->
             <div class="space-y-6">
                 <section class="print-section">
                     <h2 class="font-bold border-b pb-1 mb-2 print-text-primary">Pengalaman Mengajar</h2>
@@ -451,9 +434,39 @@
         </div>
     </div>
 
-    <!-- ================================================== -->
-    <!--  MODAL UNTUK DETAIL PRODUK                         -->
-    <!-- ================================================== -->
+    <div id="payment-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div id="payment-modal-content" class="glass-card p-8 rounded-2xl max-w-sm w-full relative modal-enter">
+            <button id="payment-modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+            <div class="text-center mb-6">
+                <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/2560px-BNI_logo.svg.png" alt="BNI Logo" class="h-8 mx-auto mb-4">
+                <p class="text-lg font-semibold text-white">Bintang Adhi Permana</p>
+            </div>
+
+            <div class="mb-6">
+                <p class="text-sm text-gray-400 mb-1">BNI (Bank Negara Indonesia)</p>
+                <div class="flex items-center bg-gray-900/50 rounded-lg p-3">
+                    <p id="bni-account" class="flex-grow text-lg font-mono text-blue-300">0430267613</p>
+                    <button class="copy-btn ml-4 text-gray-400 hover:text-white" data-copy-target="bni-account" title="Salin Nomor Rekening">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm text-gray-400 mb-1">OVO / ShopeePay / GoPay</p>
+                <div class="flex items-center bg-gray-900/50 rounded-lg p-3">
+                    <p id="ewallet-number" class="flex-grow text-lg font-mono text-blue-300">081310051985</p>
+                    <button class="copy-btn ml-4 text-gray-400 hover:text-white" data-copy-target="ewallet-number" title="Salin Nomor Telepon">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div id="product-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
         <div id="modal-content" class="glass-card p-8 rounded-2xl max-w-lg w-full relative modal-enter">
             <button id="modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
@@ -467,16 +480,12 @@
         </div>
     </div>
     
-    <!-- ================================================== -->
-    <!--  LIGHTBOX UNTUK GALERI FOTO                        -->
-    <!-- ================================================== -->
     <div id="lightbox" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 transition-opacity duration-300">
-        <button id="lightbox-close" class="absolute top-6 right-6 text-white text-4xl opacity-80 hover:opacity-100">&times;</button>
+        <button id="lightbox-close" class="absolute top-6 right-6 text-white text-4xl opacity-80 hover:opacity-100">×</button>
         <img id="lightbox-img" src="" alt="Tampilan diperbesar" class="max-w-full max-h-full object-contain transform transition-transform duration-300 scale-95">
     </div>
 
 
-    <!-- SwiperJS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         // --- SCRIPT PARTIKEL ---
@@ -579,9 +588,8 @@
             });
         });
 
-        // --- SCRIPT PRODUK, MODAL, & LIGHTBOX ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Data Produk
+            // --- SCRIPT PRODUK, MODAL, & LIGHTBOX ---
             const products = [
                 { title: 'Modul Ajar Matematika Kls 1', description: 'Modul pembelajaran komprehensif untuk matematika tingkat dasar kelas 1.', link: '#' },
                 { title: 'Modul Ajar Matematika Kls 2', description: 'Melanjutkan pondasi matematika dasar dengan materi yang interaktif untuk kelas 2.', link: '#' },
@@ -605,7 +613,6 @@
             const modalLink = document.getElementById('modal-link');
             const modalCloseBtn = document.getElementById('modal-close');
 
-            // Generate product cards
             products.forEach(product => {
                 const card = document.createElement('div');
                 card.className = 'glass-card product-card p-5 flex items-center justify-center text-center cursor-pointer';
@@ -648,17 +655,15 @@
                 img.addEventListener('click', () => {
                     lightbox.classList.remove('hidden');
                     lightboxImg.src = img.src;
-                    // Animate in
                     setTimeout(() => lightboxImg.classList.add('scale-100'), 50);
                 });
             });
 
             function closeLightbox() {
-                // Animate out
                 lightboxImg.classList.remove('scale-100');
                 setTimeout(() => {
                     lightbox.classList.add('hidden');
-                    lightboxImg.src = ''; // Clear src
+                    lightboxImg.src = ''; 
                 }, 300);
             }
 
@@ -668,6 +673,59 @@
                     closeLightbox();
                 }
             });
+
+            // === SCRIPT MODAL PEMBAYARAN (BARU) ===
+            const openPaymentModalBtn = document.getElementById('open-payment-modal');
+            const paymentModal = document.getElementById('payment-modal');
+            const paymentModalContent = document.getElementById('payment-modal-content');
+            const paymentModalCloseBtn = document.getElementById('payment-modal-close');
+            const copyBtns = document.querySelectorAll('.copy-btn');
+
+            function openPaymentModal() {
+                paymentModal.classList.remove('hidden');
+                paymentModalContent.classList.remove('modal-exit', 'modal-exit-active');
+                paymentModalContent.classList.add('modal-enter-active');
+            }
+
+            function closePaymentModal() {
+                paymentModalContent.classList.remove('modal-enter-active');
+                paymentModalContent.classList.add('modal-exit-active');
+                setTimeout(() => {
+                    paymentModal.classList.add('hidden');
+                }, 300);
+            }
+
+            openPaymentModalBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openPaymentModal();
+            });
+
+            paymentModalCloseBtn.addEventListener('click', closePaymentModal);
+            paymentModal.addEventListener('click', (e) => {
+                if (e.target === paymentModal) {
+                    closePaymentModal();
+                }
+            });
+
+            // Copy to clipboard functionality
+            copyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.dataset.copyTarget;
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        navigator.clipboard.writeText(targetElement.innerText).then(() => {
+                            const originalIcon = btn.innerHTML;
+                            btn.innerHTML = '<i class="fas fa-check text-green-400"></i>'; // Feedback
+                            setTimeout(() => {
+                                btn.innerHTML = originalIcon; // Revert back
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Gagal menyalin: ', err);
+                        });
+                    }
+                });
+            });
+            // === END SCRIPT MODAL PEMBAYARAN ===
         });
 
         // --- SCRIPT 3D SLIDER ---
@@ -678,14 +736,14 @@
             slidesPerView: "auto",
             loop: true,
             coverflowEffect: {
-              rotate: 50,
-              stretch: 0,
-              depth: 100,
-              modifier: 1,
-              slideShadows: true,
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true,
             },
             pagination: {
-              el: ".swiper-pagination",
+                el: ".swiper-pagination",
             },
         });
 
