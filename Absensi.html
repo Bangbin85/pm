@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABSENSI</title>
+    <title>ABSENSI INTERAKTIF</title>
     
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,12 +34,18 @@
 
         /* Animation for page content */
         .page-content {
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Keyframe for nav link active animation */
+        @keyframes nav-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         /* Styling for the active navigation link */
@@ -47,83 +53,120 @@
             color: #2563eb; /* blue-600 */
             background-color: #eff6ff; /* blue-50 */
         }
+        .nav-link.active i {
+            animation: nav-bounce 0.4s ease-in-out;
+        }
         
         /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #a8a8a8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #777; }
 
         /* Modal transition */
-        .modal {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .modal-content {
-            transition: transform 0.3s ease;
-        }
+        .modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-content { transition: transform 0.3s ease; }
         
         /* Toast Notification */
-        #toast {
-            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        #toast { transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out; }
+
+        /* Enhanced button styles */
+        .btn {
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        /* Input focus styles */
+        input[type="text"]:focus, input[type="date"]:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Loading Spinner */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #f0f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        .spinner {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 8px solid #e0e0e0;
+            border-top-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body class="antialiased text-slate-800">
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
 
     <div class="flex flex-col min-h-screen">
         <!-- Main Content -->
         <main class="flex-1 p-4 md:p-8 pb-24 overflow-y-auto">
             
             <!-- Umum Page -->
-            <section id="umum" class="page-content">
+            <section id="umum" class="page-content hidden">
                 <h2 class="text-3xl font-bold mb-6 text-slate-700">Data Umum</h2>
-                <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6 transition-shadow duration-300 hover:shadow-2xl">
                     <form id="formPengaturan">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="namaSekolah" class="block text-slate-600 mb-2 font-medium">Nama Sekolah</label>
-                                <input type="text" id="namaSekolah" class="w-full p-2 border rounded-lg bg-slate-50">
+                                <input type="text" id="namaSekolah" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300">
                             </div>
                             <div>
                                 <label for="namaKepsek" class="block text-slate-600 mb-2 font-medium">Nama Kepala Sekolah</label>
-                                <input type="text" id="namaKepsek" class="w-full p-2 border rounded-lg bg-slate-50">
+                                <input type="text" id="namaKepsek" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300">
                             </div>
                             <div>
                                 <label for="nipKepsek" class="block text-slate-600 mb-2 font-medium">NIP Kepala Sekolah</label>
-                                <input type="text" id="nipKepsek" class="w-full p-2 border rounded-lg bg-slate-50">
+                                <input type="text" id="nipKepsek" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300">
                             </div>
                              <div>
                                 <label for="namaGuru" class="block text-slate-600 mb-2 font-medium">Nama Guru</label>
-                                <input type="text" id="namaGuru" class="w-full p-2 border rounded-lg bg-slate-50">
+                                <input type="text" id="namaGuru" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300">
                             </div>
                             <div>
                                 <label for="nipGuru" class="block text-slate-600 mb-2 font-medium">NIP Guru</label>
-                                <input type="text" id="nipGuru" class="w-full p-2 border rounded-lg bg-slate-50">
+                                <input type="text" id="nipGuru" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300">
                             </div>
                             <div>
                                 <label for="kelas" class="block text-slate-600 mb-2 font-medium">Kelas</label>
-                                <input type="text" id="kelas" class="w-full p-2 border rounded-lg bg-slate-50">
+                                <input type="text" id="kelas" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300">
                             </div>
                              <div>
                                 <label for="semester" class="block text-slate-600 mb-2 font-medium">Tahun Ajar</label>
-                                <input type="text" id="semester" class="w-full p-2 border rounded-lg bg-slate-50">
+                                <input type="text" id="semester" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300">
                             </div>
                              <div>
                                 <label for="tempatCetak" class="block text-slate-600 mb-2 font-medium">Tempat</label>
-                                <input type="text" id="tempatCetak" class="w-full p-2 border rounded-lg bg-slate-50">
+                                <input type="text" id="tempatCetak" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300">
                             </div>
                         </div>
                         <div class="mt-6 text-right">
-                             <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 flex items-center ml-auto">
+                             <button type="submit" class="btn bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center ml-auto">
                                 <i class="fas fa-save mr-2"></i> Simpan Data
                             </button>
                         </div>
@@ -131,16 +174,16 @@
                 </div>
 
                 <h2 class="text-2xl font-bold mb-4 text-slate-700">Manajemen Data</h2>
-                <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6 transition-shadow duration-300 hover:shadow-2xl">
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                         <button id="btnBackup" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300 flex items-center justify-center">
+                         <button id="btnBackup" class="btn bg-green-600 text-white px-4 py-2 rounded-lg flex items-center justify-center">
                             <i class="fas fa-download mr-2"></i> Backup Data
                         </button>
-                        <button id="btnRestore" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center">
+                        <button id="btnRestore" class="btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center">
                             <i class="fas fa-upload mr-2"></i> Restore Data
                         </button>
                         <input type="file" id="restoreFileInput" class="hidden" accept=".json">
-                        <button id="btnReset" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300 flex items-center justify-center">
+                        <button id="btnReset" class="btn bg-red-600 text-white px-4 py-2 rounded-lg flex items-center justify-center">
                             <i class="fas fa-sync-alt mr-2"></i> Reset Aplikasi
                         </button>
                     </div>
@@ -148,7 +191,7 @@
 
                 <h2 class="text-2xl font-bold mb-4 text-slate-700">Ringkasan</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4 transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 transform hover:scale-105 transition-transform duration-300">
                         <div class="bg-blue-100 p-4 rounded-full flex items-center justify-center w-16 h-16">
                             <i class="fas fa-users text-2xl text-blue-600"></i>
                         </div>
@@ -157,7 +200,7 @@
                             <p id="totalSiswa" class="text-2xl font-bold">0</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4 transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 transform hover:scale-105 transition-transform duration-300">
                         <div class="bg-yellow-100 p-4 rounded-full flex items-center justify-center w-16 h-16">
                             <i class="fas fa-calendar-day text-2xl text-yellow-600"></i>
                         </div>
@@ -166,7 +209,7 @@
                             <p id="absenHariIni" class="text-2xl font-bold">0</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4 transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 transform hover:scale-105 transition-transform duration-300">
                         <div class="bg-green-100 p-4 rounded-full flex items-center justify-center w-16 h-16">
                            <i class="fas fa-list-ol text-2xl text-green-600"></i>
                         </div>
@@ -183,15 +226,15 @@
                 <div class="flex flex-wrap gap-2 justify-between items-center mb-6">
                     <h2 class="text-3xl font-bold text-slate-700">Data Siswa</h2>
                     <div class="flex gap-2">
-                        <button id="btnImporSiswa" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300 flex items-center">
+                        <button id="btnImporSiswa" class="btn bg-green-600 text-white px-4 py-2 rounded-lg flex items-center">
                             <i class="fas fa-file-excel mr-2"></i> Impor Siswa
                         </button>
-                        <button id="btnTambahSiswa" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 flex items-center">
+                        <button id="btnTambahSiswa" class="btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
                             <i class="fas fa-plus mr-2"></i> Tambah Siswa
                         </button>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="bg-white p-6 rounded-xl shadow-lg transition-shadow duration-300 hover:shadow-2xl">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead>
@@ -213,22 +256,22 @@
             <!-- Absensi Page -->
             <section id="absensi" class="page-content hidden">
                 <h2 class="text-3xl font-bold mb-6 text-slate-700">Input Ketidakhadiran</h2>
-                <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="bg-white p-6 rounded-xl shadow-lg transition-shadow duration-300 hover:shadow-2xl">
                     <div class="mb-4">
-                        <label for="tanggalAbsen" class="block text-slate-600 mb-2">Tanggal</label>
-                        <input type="date" id="tanggalAbsen" class="w-full p-2 border rounded-lg">
+                        <label for="tanggalAbsen" class="block text-slate-600 mb-2 font-medium">Tanggal</label>
+                        <input type="date" id="tanggalAbsen" class="w-full p-2 border rounded-lg transition-all duration-300">
                     </div>
 
                     <!-- Form Input Absensi -->
                     <div id="formAbsensi" class="mb-6">
                          <div class="mb-4">
-                            <label for="pilihSiswa" class="block text-slate-600 mb-2">Pilih Siswa</label>
-                            <select id="pilihSiswa" class="w-full p-2 border rounded-lg bg-slate-50"></select>
+                            <label for="pilihSiswa" class="block text-slate-600 mb-2 font-medium">Pilih Siswa</label>
+                            <select id="pilihSiswa" class="w-full p-2 border rounded-lg bg-slate-50 transition-all duration-300"></select>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-center gap-4">
-                            <button data-status="Sakit" class="btn-absen flex-1 bg-yellow-500 text-white px-4 py-3 rounded-lg shadow-md hover:bg-yellow-600 transition-colors text-lg font-semibold">Sakit</button>
-                            <button data-status="Izin" class="btn-absen flex-1 bg-blue-500 text-white px-4 py-3 rounded-lg shadow-md hover:bg-blue-600 transition-colors text-lg font-semibold">Izin</button>
-                            <button data-status="Alpha" class="btn-absen flex-1 bg-red-500 text-white px-4 py-3 rounded-lg shadow-md hover:bg-red-600 transition-colors text-lg font-semibold">Alpha</button>
+                            <button data-status="Sakit" class="btn-absen btn flex-1 bg-yellow-500 text-white px-4 py-3 rounded-lg text-lg font-semibold">Sakit</button>
+                            <button data-status="Izin" class="btn-absen btn flex-1 bg-blue-500 text-white px-4 py-3 rounded-lg text-lg font-semibold">Izin</button>
+                            <button data-status="Alpha" class="btn-absen btn flex-1 bg-red-500 text-white px-4 py-3 rounded-lg text-lg font-semibold">Alpha</button>
                         </div>
                     </div>
 
@@ -257,21 +300,21 @@
             <!-- Rekap Page -->
             <section id="rekap" class="page-content hidden">
                 <h2 class="text-3xl font-bold mb-6 text-slate-700">Rekap Absensi</h2>
-                 <div class="bg-white p-6 rounded-xl shadow-md">
+                 <div class="bg-white p-6 rounded-xl shadow-lg transition-shadow duration-300 hover:shadow-2xl">
                     <div class="flex flex-wrap gap-4 mb-4 items-end">
                         <div class="flex-1 min-w-[150px]">
-                            <label for="filterBulanMulai" class="block text-slate-600 mb-2">Dari Bulan</label>
-                            <select id="filterBulanMulai" class="w-full p-2 border rounded-lg"></select>
+                            <label for="filterBulanMulai" class="block text-slate-600 mb-2 font-medium">Dari Bulan</label>
+                            <select id="filterBulanMulai" class="w-full p-2 border rounded-lg transition-all duration-300"></select>
                         </div>
                         <div class="flex-1 min-w-[150px]">
-                            <label for="filterBulanSelesai" class="block text-slate-600 mb-2">Sampai Bulan</label>
-                            <select id="filterBulanSelesai" class="w-full p-2 border rounded-lg"></select>
+                            <label for="filterBulanSelesai" class="block text-slate-600 mb-2 font-medium">Sampai Bulan</label>
+                            <select id="filterBulanSelesai" class="w-full p-2 border rounded-lg transition-all duration-300"></select>
                         </div>
                         <div class="flex-1 min-w-[150px]">
-                            <label for="filterTahun" class="block text-slate-600 mb-2">Tahun</label>
-                            <select id="filterTahun" class="w-full p-2 border rounded-lg"></select>
+                            <label for="filterTahun" class="block text-slate-600 mb-2 font-medium">Tahun</label>
+                            <select id="filterTahun" class="w-full p-2 border rounded-lg transition-all duration-300"></select>
                         </div>
-                        <button id="downloadPdfBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300 flex items-center">
+                        <button id="downloadPdfBtn" class="btn bg-red-600 text-white px-4 py-2 rounded-lg flex items-center">
                             <i class="fas fa-file-pdf mr-2"></i> Download PDF
                         </button>
                     </div>
@@ -297,20 +340,20 @@
 
         <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-t-lg border-t flex justify-around z-10">
-            <a href="#" class="nav-link flex-1 flex flex-col items-center justify-center p-3 text-slate-600 hover:bg-blue-50" data-target="umum">
-                <i class="fas fa-home text-xl mb-1"></i>
+            <a href="#" class="nav-link flex-1 flex flex-col items-center justify-center p-3 text-slate-600 hover:bg-blue-50 transition-colors duration-300" data-target="umum">
+                <i class="fas fa-home text-xl mb-1 transition-transform duration-300"></i>
                 <span class="text-xs">Umum</span>
             </a>
-            <a href="#" class="nav-link flex-1 flex flex-col items-center justify-center p-3 text-slate-600 hover:bg-blue-50" data-target="data-siswa">
-                <i class="fas fa-users text-xl mb-1"></i>
+            <a href="#" class="nav-link flex-1 flex flex-col items-center justify-center p-3 text-slate-600 hover:bg-blue-50 transition-colors duration-300" data-target="data-siswa">
+                <i class="fas fa-users text-xl mb-1 transition-transform duration-300"></i>
                 <span class="text-xs">Siswa</span>
             </a>
-            <a href="#" class="nav-link flex-1 flex flex-col items-center justify-center p-3 text-slate-600 hover:bg-blue-50" data-target="absensi">
-                <i class="fas fa-clipboard-list text-xl mb-1"></i>
+            <a href="#" class="nav-link flex-1 flex flex-col items-center justify-center p-3 text-slate-600 hover:bg-blue-50 transition-colors duration-300" data-target="absensi">
+                <i class="fas fa-clipboard-list text-xl mb-1 transition-transform duration-300"></i>
                 <span class="text-xs">Absensi</span>
             </a>
-            <a href="#" class="nav-link flex-1 flex flex-col items-center justify-center p-3 text-slate-600 hover:bg-blue-50" data-target="rekap">
-                <i class="fas fa-chart-bar text-xl mb-1"></i>
+            <a href="#" class="nav-link flex-1 flex flex-col items-center justify-center p-3 text-slate-600 hover:bg-blue-50 transition-colors duration-300" data-target="rekap">
+                <i class="fas fa-chart-bar text-xl mb-1 transition-transform duration-300"></i>
                 <span class="text-xs">Rekap</span>
             </a>
         </nav>
@@ -321,7 +364,7 @@
         <div class="modal-content bg-white p-8 rounded-xl shadow-2xl w-full max-w-md transform scale-95">
             <div class="flex justify-between items-center mb-6">
                 <h3 id="modalTitle" class="text-2xl font-bold">Tambah Siswa</h3>
-                <button id="closeModal" class="text-slate-500 hover:text-slate-800">
+                <button id="closeModal" class="text-slate-500 hover:text-slate-800 transition-transform duration-200 hover:scale-125">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
@@ -329,18 +372,18 @@
                 <input type="hidden" id="siswaId">
                 <div class="mb-4">
                     <label for="nis" class="block text-slate-600 mb-2">NIS</label>
-                    <input type="text" id="nis" class="w-full p-2 border rounded-lg" required>
+                    <input type="text" id="nis" class="w-full p-2 border rounded-lg transition-all duration-300" required>
                 </div>
                 <div class="mb-4">
                     <label for="nama" class="block text-slate-600 mb-2">Nama</label>
-                    <input type="text" id="nama" class="w-full p-2 border rounded-lg" required>
+                    <input type="text" id="nama" class="w-full p-2 border rounded-lg transition-all duration-300" required>
                 </div>
                 <div class="mb-6">
                     <label for="kelasSiswa" class="block text-slate-600 mb-2">Kelas</label>
-                    <input type="text" id="kelasSiswa" class="w-full p-2 border rounded-lg" required>
+                    <input type="text" id="kelasSiswa" class="w-full p-2 border rounded-lg transition-all duration-300" required>
                 </div>
                 <div class="flex justify-end">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300">Simpan</button>
+                    <button type="submit" class="btn bg-blue-600 text-white px-6 py-2 rounded-lg">Simpan</button>
                 </div>
             </form>
         </div>
@@ -351,13 +394,13 @@
         <div class="modal-content bg-white p-8 rounded-xl shadow-2xl w-full max-w-md transform scale-95">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold">Impor Data Siswa</h3>
-                <button id="closeImportModal" class="text-slate-500 hover:text-slate-800">
+                <button id="closeImportModal" class="text-slate-500 hover:text-slate-800 transition-transform duration-200 hover:scale-125">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
             <div>
                 <p class="text-slate-600 mb-4">Unggah file Excel (.xlsx) untuk mengimpor data siswa. Pastikan format file sesuai dengan contoh.</p>
-                <button id="downloadFormatBtn" class="w-full mb-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300 flex items-center justify-center">
+                <button id="downloadFormatBtn" class="btn w-full mb-4 bg-green-600 text-white px-4 py-2 rounded-lg flex items-center justify-center">
                     <i class="fas fa-download mr-2"></i> Download Format
                 </button>
                 <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
@@ -369,7 +412,7 @@
                     <p id="fileName" class="text-sm text-slate-600 mt-2"></p>
                 </div>
                 <div class="flex justify-end mt-6">
-                    <button id="importBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 disabled:bg-slate-400 disabled:cursor-not-allowed" disabled>Impor</button>
+                    <button id="importBtn" class="btn bg-blue-600 text-white px-6 py-2 rounded-lg disabled:bg-slate-400 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none" disabled>Impor</button>
                 </div>
             </div>
         </div>
@@ -381,8 +424,8 @@
             <h3 id="confirmTitle" class="text-xl font-bold mb-4">Apakah Anda yakin?</h3>
             <p id="confirmMessage" class="text-slate-600 mb-6">Data yang dihapus tidak dapat dikembalikan.</p>
             <div class="flex justify-center gap-4">
-                <button id="confirmCancel" class="bg-slate-200 text-slate-800 px-6 py-2 rounded-lg hover:bg-slate-300 transition-colors">Batal</button>
-                <button id="confirmOk" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">Hapus</button>
+                <button id="confirmCancel" class="btn bg-slate-200 text-slate-800 px-6 py-2 rounded-lg">Batal</button>
+                <button id="confirmOk" class="btn bg-red-600 text-white px-6 py-2 rounded-lg">Hapus</button>
             </div>
         </div>
     </div>
@@ -404,8 +447,8 @@
                 namaGuru: 'Bintang Adhi Permana',
                 nipGuru: '6281310051985',
                 kelas: '5',
-                semester: '2025/2026',
-                tempatCetak: 'Jakarta'
+                semester: '2025/2026', // UPDATED
+                tempatCetak: 'Jakarta' // UPDATED
             };
 
             const defaultSiswa = [
@@ -510,10 +553,10 @@
                         <td class="p-4">${s.nama}</td>
                         <td class="p-4">${s.kelas}</td>
                         <td class="p-4 text-center">
-                            <button class="text-blue-500 hover:text-blue-700 p-2 edit-btn" data-id="${s.id}">
+                            <button class="text-blue-500 hover:text-blue-700 p-2 transition-transform duration-200 hover:scale-125 edit-btn" data-id="${s.id}">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
-                            <button class="text-red-500 hover:text-red-700 p-2 hapus-btn" data-id="${s.id}">
+                            <button class="text-red-500 hover:text-red-700 p-2 transition-transform duration-200 hover:scale-125 hapus-btn" data-id="${s.id}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
@@ -559,7 +602,7 @@
                                 <td class="p-4">${siswa.nama}</td>
                                 <td class="p-4">${absen.keterangan}</td>
                                 <td class="p-4 text-center">
-                                    <button class="text-red-500 hover:text-red-700 p-2 hapus-absen-btn" data-id="${absen.id}">
+                                    <button class="text-red-500 hover:text-red-700 p-2 transition-transform duration-200 hover:scale-125 hapus-absen-btn" data-id="${absen.id}">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
@@ -965,8 +1008,15 @@
             };
 
             // --- INITIALIZATION & EVENT LISTENERS ---
-            saveState(); // Save initial default state if local storage is empty
-            switchPage('umum');
+            window.addEventListener('load', () => {
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    saveState(); // Save initial default state if local storage is empty
+                    switchPage('absensi'); // UPDATED: Start on absensi page
+                }, 500); // Match CSS transition duration
+            });
 
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -989,11 +1039,13 @@
             document.getElementById('siswaForm').addEventListener('submit', handleSiswaFormSubmit);
 
             document.getElementById('tabelSiswa').addEventListener('click', (e) => {
-                if (e.target.closest('.edit-btn')) {
-                    handleEditSiswa(e.target.closest('.edit-btn').dataset.id);
+                const editBtn = e.target.closest('.edit-btn');
+                const hapusBtn = e.target.closest('.hapus-btn');
+                if (editBtn) {
+                    handleEditSiswa(editBtn.dataset.id);
                 }
-                if (e.target.closest('.hapus-btn')) {
-                    handleHapusSiswa(e.target.closest('.hapus-btn').dataset.id);
+                if (hapusBtn) {
+                    handleHapusSiswa(hapusBtn.dataset.id);
                 }
             });
             
@@ -1004,8 +1056,9 @@
             document.getElementById('formAbsensi').addEventListener('click', handleAbsenButtonClick);
             
             document.getElementById('tabelAbsenHariIni').addEventListener('click', (e) => {
-                if (e.target.closest('.hapus-absen-btn')) {
-                    handleHapusAbsen(e.target.closest('.hapus-absen-btn').dataset.id);
+                const hapusBtn = e.target.closest('.hapus-absen-btn');
+                if (hapusBtn) {
+                    handleHapusAbsen(hapusBtn.dataset.id);
                 }
             });
             
