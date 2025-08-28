@@ -395,19 +395,23 @@
             modalKonfirmasiBatal.addEventListener('click', hideKonfirmasiModal);
 
             // --- SISTEM NAVIGASI HALAMAN ---
-            const tampilkanHalaman = (halamanId) => {
-                pages.forEach(page => {
-                    if (page.id !== halamanId) {
-                        page.classList.add('hidden');
-                    }
-                });
-                const halamanAktif = document.getElementById(halamanId);
-                if (halamanAktif) {
-                    halamanAktif.classList.remove('hidden');
-                    halamanAktif.classList.add('fade-in');
-                }
-                pelajaranAktif = null; // Reset pelajaran aktif saat ganti halaman utama
-            };
+    const tampilkanHalaman = (halamanId) => {
+        pages.forEach(page => {
+            if (page.id !== halamanId) {
+                page.classList.add('hidden');
+            }
+        });
+        const halamanAktif = document.getElementById(halamanId);
+        if (halamanAktif) {
+            halamanAktif.classList.remove('hidden');
+            halamanAktif.classList.add('fade-in');
+        }
+        
+        // HANYA reset jika halaman yang dituju BUKAN halaman tabel
+        if (halamanId !== 'halaman-tabel') {
+            pelajaranAktif = null;
+        }
+    };
 
 
             // --- DATA DEFAULT ---
@@ -871,3 +875,4 @@
     </script>
 </body>
 </html>
+
