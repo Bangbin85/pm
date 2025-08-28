@@ -149,11 +149,11 @@ const Database = (() => {
                                 tujuan: 'Mengenal karakter dan peran Ir. Soekarno sebagai perumus Pancasila.',
                                 materi: 'Tokoh Perumus Pancasila',
                                 kriteria: [
-                                    'Belum mengenal tokoh Ir. Soekarno.',
-                                    'Pernah mendengar nama Ir. Soekarno tetapi tidak tahu perannya.',
-                                    'Mengetahui Ir. Soekarno sebagai Presiden pertama dengan bimbingan.',
-                                    'Dapat menceritakan secara singkat peran Ir. Soekarno dalam perumusan Pancasila.',
-                                    'Dapat menjelaskan karakter positif dari Ir. Soekarno yang bisa diteladani.',
+                                    '0-50',
+                                    '51-70',
+                                    '71-80',
+                                    '81-90',
+                                    '91-100',
                                     ''
                                 ],
                                 highlightIndex: 3
@@ -718,7 +718,7 @@ const Database = (() => {
 
     const getDefaultData = () => ({
         info: {
-            namaSekolah: 'SDN Lubang Buaya 01', kelas: '5', fase: 'C', tahunAjaran: '2025/2026', phone: '628131051985',
+            namaSekolah: 'SDN Lubang Buaya 01', kelas: '4', fase: 'B', tahunAjaran: '2025/2026', phone: '628131051985',
             namaKepsek: 'Dr. Bangbin, EdD', nipKepsek: '123456789', namaGuru: 'Bintang Adhi Permana', nipGuru: '6281310051985'
         },
         pelajaran: [
