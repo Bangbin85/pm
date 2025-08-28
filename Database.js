@@ -4,42 +4,116 @@ const Database = (() => {
 
 
     const defaultCurriculum = {
-        // --- KELAS 1 (FASE A) ---
+        // --- KELAS 1 (FASE A) --- (DIPERBARUI DENGAN TUJUAN PEMBELAJARAN)
         'kelas_1': {
             'Pendidikan Pancasila': {
                 headers: ['Belum Terlihat', 'Mulai Terlihat', 'Berkembang', 'Sesuai Harapan', 'Sangat Berkembang', ''],
                 rows: [{
-                    capaian: 'Peserta didik dapat mengenal simbol-simbol sila Pancasila dan menceritakan contoh penerapan sila Pancasila dalam kehidupan sehari-hari.',
+                    capaian: 'Pancasila\nMengenal bendera negara, lagu kebangsaan, simbol dan sila-sila Pancasila dalam lambang negara Garuda Pancasila dan simbol Pancasila beserta sila-sila Pancasila; menerapkan nilai-nilai Pancasila di lingkungan keluarga.',
                     tujuanList: [{
-                        tujuan: 'Menyebutkan bunyi 5 sila Pancasila secara urut.',
-                        materi: 'Bunyi Sila Pancasila',
-                        kriteria: [
-                            'Belum mampu menyebutkan bunyi sila Pancasila meskipun dengan bimbingan.',
-                            'Mampu menyebutkan 1-2 bunyi sila Pancasila dengan bimbingan penuh.',
-                            'Mampu menyebutkan 3-4 bunyi sila Pancasila secara urut dengan sedikit bimbingan.',
-                            'Mampu menyebutkan 5 bunyi sila Pancasila secara urut dan lancar tanpa bimbingan.',
-                            'Mampu menyebutkan 5 bunyi sila Pancasila secara urut dan acak, serta memasangkan dengan simbolnya.',
-                            ''
-                        ],
-                        highlightIndex: 2
+                        tujuan: 'Menyebutkan 5 simbol sila Pancasila.',
+                        materi: 'Simbol Sila Pancasila',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Memasangkan simbol dengan bunyi sila Pancasila yang sesuai.',
+                        materi: 'Simbol dan Bunyi Sila',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'UUD Negara Republik Indonesia Tahun 1945\nMengenal aturan di lingkungan keluarga; menunjukkan dan menceritakan mematuhi aturan di lingkungan keluarga.',
+                    tujuanList: [{
+                        tujuan: 'Memberikan contoh aturan yang ada di rumah.',
+                        materi: 'Aturan di Rumah',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menjelaskan akibat jika tidak mematuhi aturan di rumah.',
+                        materi: 'Konsekuensi Aturan',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Bhinneka Tunggal Ika\nMengenal semboyan Bhinneka Tunggal Ika; mengidentifikasi dan menghargai identitas dirinya sesuai dengan jenis kelamin, hobi, bahasa, serta agama dan kepercayaan di lingkungan sekitar.',
+                    tujuanList: [{
+                        tujuan: 'Menjelaskan arti semboyan Bhinneka Tunggal Ika.',
+                        materi: 'Semboyan Negara',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menyebutkan contoh keragaman teman di kelas (misal: agama, hobi).',
+                        materi: 'Keragaman Teman',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Negara Kesatuan Republik Indonesia\nMengenal lingkungan tempat tinggal (RT, RW, desa atau kelurahan, dan kecamatan) sebagai bagian dari wilayah Negara Kesatuan Republik Indonesia; menunjukkan perilaku bekerja sama di lingkungan sekitar.',
+                    tujuanList: [{
+                        tujuan: 'Menyebutkan nama RT dan RW di lingkungan tempat tinggalnya.',
+                        materi: 'Lingkungan Sekitar',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Memberikan contoh kegiatan kerja bakti di lingkungan rumah.',
+                        materi: 'Kerja Sama',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
                     }]
                 }]
             },
             'Bahasa Indonesia': {
                 headers: ['Belum Terlihat', 'Mulai Terlihat', 'Berkembang', 'Sesuai Harapan', 'Sangat Berkembang', ''],
                 rows: [{
-                    capaian: 'Peserta didik mampu bersikap menjadi pendengar yang penuh perhatian, menunjukkan minat dengan mengidentifikasi dan menyebutkan kembali informasi pada teks lisan sederhana.',
+                    capaian: 'Menyimak\nMemahami ide pokok suatu informasi dari teks nonsastra berbentuk teks aural (teks yang dibacakan dan/atau didengarkan); dan memahami isi teks sastra berbentuk teks aural.',
                     tujuanList: [{
-                        tujuan: 'Menyebutkan kembali informasi penting dari dongeng yang dibacakan guru.',
-                        materi: 'Informasi Teks Lisan',
-                        kriteria: [
-                            'Belum menunjukkan fokus saat mendengarkan dan tidak dapat menyebutkan informasi apapun.',
-                            'Dapat menyebutkan 1 informasi (misal: nama tokoh) dengan bantuan pertanyaan pemantik.',
-                            'Dapat menyebutkan beberapa informasi penting (tokoh, tempat) secara mandiri.',
-                            'Dapat menyebutkan kembali informasi-informasi penting secara runtut.',
-                            'Dapat menceritakan kembali isi dongeng dengan bahasanya sendiri secara lengkap.',
-                            ''
-                        ],
+                        tujuan: 'Menjawab pertanyaan sederhana (apa, siapa, di mana) berdasarkan teks yang didengarkan.',
+                        materi: 'Informasi dari Teks Lisan',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menyebutkan kembali tokoh utama dalam cerita yang didengarkan.',
+                        materi: 'Identifikasi Tokoh',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Membaca dan Memirsa\nMembaca kata-kata baru dengan fasih dari bacaan dan/atau tayangan yang dipirsa; dan memahami ide pokok, ide pendukung, pesan, dan informasi dalam teks sastra dan nonsastra berbentuk cetak dan/atau elektronik.',
+                    tujuanList: [{
+                        tujuan: 'Membaca suku kata dan kata sederhana dengan lancar.',
+                        materi: 'Membaca Lancar',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menemukan informasi penting dari sebuah gambar atau tayangan video pendek.',
+                        materi: 'Pemahaman Visual',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Berbicara dan Mempresentasikan\nMenyajikan pendapat dengan pilihan kata dan sikap tubuh/gestur yang sesuai, menggunakan volume dan intonasi yang tepat sesuai konteks; menanggapi diskusi sesuai tata cara; dan menceritakan kembali isi dan/atau informasi dari berbagai tipe teks yang dibaca, dipirsa, atau didengar.',
+                    tujuanList: [{
+                        tujuan: 'Memperkenalkan diri dengan menyebutkan nama lengkap dan panggilan.',
+                        materi: 'Perkenalan Diri',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Bertanya tentang sesuatu menggunakan kata tanya "apa".',
+                        materi: 'Kalimat Tanya',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Menulis\nMenulis berbagai tipe teks sederhana dengan rangkaian kalimat yang beragam; dan menggunakan kaidah kebahasaan dan kosakata baru yang memiliki makna denotatif untuk menulis teks sesuai dengan konteks.',
+                    tujuanList: [{
+                        tujuan: 'Menulis namanya sendiri dengan benar.',
+                        materi: 'Menulis Nama',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menyalin kalimat sederhana dengan rapi.',
+                        materi: 'Menulis Rapi',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
                         highlightIndex: 3
                     }]
                 }]
@@ -47,24 +121,232 @@ const Database = (() => {
             'Matematika': {
                 headers: ['Belum Terlihat', 'Mulai Terlihat', 'Berkembang', 'Sesuai Harapan', 'Sangat Berkembang', ''],
                 rows: [{
-                    capaian: 'Peserta didik dapat melakukan operasi penjumlahan dan pengurangan menggunakan benda-benda konkret dan gambar sampai dengan 20.',
+                    capaian: 'Bilangan\nMemiliki pemahaman dan intuisi bilangan (number sense) pada bilangan cacah sampai 100; membaca, menulis, membandingkan, dan mengurutkan bilangan; menentukan dan menggunakan nilai tempat; melakukan komposisi dan dekomposisi bilangan cacah sampai 100.\nMelakukan dan menyelesaikan masalah operasi bilangan penjumlahan dan pengurangan bilangan cacah sampai 20 menggunakan benda-benda konkret dan gambar.',
                     tujuanList: [{
-                        tujuan: 'Menyelesaikan soal penjumlahan bilangan 1 sampai 10.',
-                        materi: 'Penjumlahan Bilangan',
-                        kriteria: [
-                            'Belum dapat melakukan operasi hitung penjumlahan meski dengan benda konkret.',
-                            'Dapat menghitung penjumlahan dengan bantuan benda konkret.',
-                            'Dapat menghitung penjumlahan dengan bantuan gambar atau garis bilangan.',
-                            'Dapat menghitung penjumlahan bilangan 1-10 secara susun pendek tanpa bantuan alat.',
-                            'Dapat menghitung penjumlahan secara mental (di luar kepala) dan menyelesaikan soal cerita sederhana.',
-                            ''
-                        ],
-                        highlightIndex: 2
+                        tujuan: 'Membaca dan menulis bilangan cacah sampai dengan 100',
+                        materi: 'Membaca dan menulis bilangan cacah',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menyelesaikan soal penjumlahan dan pengurangan sampai dengan 20.',
+                        materi: 'Penjumlahan dan Pengurangan',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Pengukuran\nMengukur, membandingkan, dan mengurutkan panjang, berat, dan durasi waktu menggunakan satuan tidak baku.',
+                    tujuanList: [{
+                        tujuan: 'Membandingkan panjang benda menggunakan istilah "lebih panjang" dan "lebih pendek".',
+                        materi: 'Perbandingan Panjang',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Mengurutkan benda dari yang paling ringan ke paling berat.',
+                        materi: 'Perbandingan Berat',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Geometri\nMengenal dan mendeskripsikan ciri-ciri berbagai bentuk bangun datar (segiempat, segitiga, segienam, dan lingkaran); dan menyusun pengubinan dari berbagai bentuk bangun datar.',
+                    tujuanList: [{
+                        tujuan: 'Menyebutkan nama-nama bangun datar (persegi, segitiga, lingkaran).',
+                        materi: 'Bangun Datar',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Mengelompokkan benda berdasarkan bentuk bangun datarnya.',
+                        materi: 'Klasifikasi Bangun Datar',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Analisis Data dan Peluang\nMengurutkan, membandingkan, dan menyajikan data dari banyak benda dengan menggunakan turus dan piktogram.',
+                    tujuanList: [{
+                        tujuan: 'Membaca data sederhana dalam bentuk gambar (piktogram).',
+                        materi: 'Membaca Piktogram',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Membuat turus berdasarkan jumlah benda.',
+                        materi: 'Menggunakan Turus',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
                     }]
                 }]
             }
         },
-        // --- KELAS 3 (FASE B) ---
+        // --- KELAS 2 (FASE A) --- (DIPERBARUI DENGAN TUJUAN PEMBELAJARAN)
+        'kelas_2': {
+            'Pendidikan Pancasila': {
+                headers: ['Belum Terlihat', 'Mulai Terlihat', 'Berkembang', 'Sesuai Harapan', 'Sangat Berkembang', ''],
+                rows: [{
+                    capaian: 'Pancasila\nMenjelaskan makna sila-sila Pancasila dan menceritakan contoh penerapan sila Pancasila di lingkungan keluarga dan sekolah.',
+                    tujuanList: [{
+                        tujuan: 'Menjelaskan makna simbol sila pertama Pancasila.',
+                        materi: 'Makna Sila Pancasila',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Memberikan contoh penerapan sila kedua Pancasila di sekolah.',
+                        materi: 'Penerapan Sila Pancasila',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'UUD Negara Republik Indonesia Tahun 1945\nMengidentifikasi aturan di lingkungan keluarga dan sekolah; menceritakan contoh sikap mematuhi dan tidak mematuhi aturan di lingkungan keluarga dan sekolah.',
+                    tujuanList: [{
+                        tujuan: 'Mengidentifikasi aturan yang berlaku di sekolah.',
+                        materi: 'Aturan di Sekolah',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Membedakan contoh sikap yang mematuhi dan tidak mematuhi aturan.',
+                        materi: 'Sikap Terhadap Aturan',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Bhinneka Tunggal Ika\nMemberikan contoh dan menceritakan perilaku yang menghargai keberagaman suku bangsa, sosial, dan budaya di lingkungan sekitar.',
+                    tujuanList: [{
+                        tujuan: 'Menyebutkan keragaman suku bangsa teman di kelas.',
+                        materi: 'Keragaman Suku Bangsa',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menceritakan contoh sikap menghargai teman yang berbeda budaya.',
+                        materi: 'Sikap Menghargai Keragaman',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Negara Kesatuan Republik Indonesia\nMenyebutkan contoh perilaku bekerja sama dalam keberagaman di lingkungan sekitar.',
+                    tujuanList: [{
+                        tujuan: 'Memberikan contoh kerja sama yang dilakukan di sekolah.',
+                        materi: 'Kerja Sama di Sekolah',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menjelaskan manfaat dari kegiatan kerja sama.',
+                        materi: 'Manfaat Kerja Sama',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }]
+            },
+            'Bahasa Indonesia': {
+                headers: ['Belum Terlihat', 'Mulai Terlihat', 'Berkembang', 'Sesuai Harapan', 'Sangat Berkembang', ''],
+                rows: [{
+                    capaian: 'Menyimak\nMemahami ide pokok suatu informasi dari teks nonsastra berbentuk teks aural (teks yang dibacakan dan/atau didengarkan); dan memahami isi teks sastra berbentuk teks aural.',
+                    tujuanList: [{
+                        tujuan: 'Menyebutkan tokoh-tokoh dalam cerita yang didengarkan.',
+                        materi: 'Tokoh Cerita',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menemukan ide pokok pada paragraf sederhana yang didengarkan.',
+                        materi: 'Ide Pokok Lisan',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Membaca dan Memirsa\nMembaca kata-kata baru dengan fasih dari bacaan dan/atau tayangan yang dipirsa; dan memahami ide pokok, ide pendukung, pesan, dan informasi dalam teks sastra dan nonsastra berbentuk cetak dan/atau elektronik.',
+                    tujuanList: [{
+                        tujuan: 'Menjelaskan makna dari kata baru yang ditemukan dalam bacaan.',
+                        materi: 'Kosakata Baru',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menentukan pesan moral dari sebuah dongeng yang dibaca.',
+                        materi: 'Pesan Moral Dongeng',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Berbicara dan Mempresentasikan\nMenyajikan pendapat dengan pilihan kata dan sikap tubuh/gestur yang sesuai, menggunakan volume dan intonasi yang tepat sesuai konteks; menanggapi diskusi sesuai tata cara; dan menceritakan kembali isi dan/atau informasi dari berbagai tipe teks yang dibaca, dipirsa, atau didengar.',
+                    tujuanList: [{
+                        tujuan: 'Menceritakan kembali isi dongeng yang dibaca dengan kalimat sederhana.',
+                        materi: 'Menceritakan Kembali',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Memberikan pendapat sederhana tentang suatu topik dengan intonasi yang jelas.',
+                        materi: 'Memberi Pendapat',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Menulis\nMenulis berbagai tipe teks sederhana dengan rangkaian kalimat yang beragam; dan menggunakan kaidah kebahasaan dan kosakata baru yang memiliki makna denotatif untuk menulis teks sesuai dengan konteks.',
+                    tujuanList: [{
+                        tujuan: 'Menulis kalimat sederhana menggunakan huruf kapital dan tanda titik.',
+                        materi: 'Penggunaan Ejaan',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Membuat sebuah paragraf pendek berdasarkan gambar.',
+                        materi: 'Menulis Paragraf',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }]
+            },
+            'Matematika': {
+                headers: ['Belum Terlihat', 'Mulai Terlihat', 'Berkembang', 'Sesuai Harapan', 'Sangat Berkembang', ''],
+                rows: [{
+                    capaian: 'Bilangan\nMemiliki pemahaman dan intuisi bilangan (number sense) pada bilangan cacah sampai 1.000; membaca, menulis, membandingkan, dan mengurutkan bilangan; menentukan dan menggunakan nilai tempat; melakukan komposisi dan dekomposisi bilangan cacah sampai 1.000.\nMelakukan dan menyelesaikan masalah operasi bilangan penjumlahan dan pengurangan bilangan cacah sampai 100; melakukan dan menyelesaikan masalah operasi perkalian dan pembagian bilangan cacah yang hasilnya sampai 100.',
+                    tujuanList: [{
+                        tujuan: 'Menentukan nilai tempat (satuan, puluhan, ratusan) pada bilangan.',
+                        materi: 'Nilai Tempat',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menyelesaikan soal perkalian dan pembagian bilangan sampai 100.',
+                        materi: 'Perkalian dan Pembagian',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Pengukuran\nMengukur, membandingkan, dan mengurutkan panjang, berat, dan durasi waktu menggunakan satuan baku (cm, m, kg, g, jam, menit).',
+                    tujuanList: [{
+                        tujuan: 'Mengukur panjang benda dengan satuan baku sentimeter (cm).',
+                        materi: 'Pengukuran Panjang',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Membaca jam analog dan digital yang menunjukkan waktu tepat (jarum panjang di angka 12).',
+                        materi: 'Membaca Jam',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Geometri\nMengenal dan mendeskripsikan ciri-ciri berbagai bentuk bangun datar (segiempat, segitiga, segienam, dan lingkaran) dan bangun ruang (balok, kubus, kerucut, dan bola); dan menyusun pengubinan dari berbagai bentuk bangun datar.',
+                    tujuanList: [{
+                        tujuan: 'Menyebutkan ciri-ciri bangun ruang kubus dan balok.',
+                        materi: 'Ciri-ciri Bangun Ruang',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menghitung jumlah sisi, sudut, dan titik sudut pada bangun datar.',
+                        materi: 'Unsur Bangun Datar',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }, {
+                    capaian: 'Analisis Data dan Peluang\nMengurutkan, membandingkan, menyajikan, dan menganalisis data dari banyak benda dengan menggunakan turus, piktogram, dan diagram batang (skala satu satuan).',
+                    tujuanList: [{
+                        tujuan: 'Membaca data pada diagram batang sederhana.',
+                        materi: 'Diagram Batang',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }, {
+                        tujuan: 'Menyajikan data dalam bentuk piktogram.',
+                        materi: 'Membuat Piktogram',
+                        kriteria: ['0-50', '51-70', '71-80', '81-90', '91-100', ''],
+                        highlightIndex: 3
+                    }]
+                }]
+            }
+        },
+        // --- KELAS 3 (FASE B) --- (DATA ASLI)
         'kelas_3': {
             'Ilmu Pengetahuan Alam dan Sosial': {
                 headers: ['Perlu Bimbingan', 'Cukup', 'Baik', 'Sangat Baik', 'Istimewa', ''],
@@ -124,7 +406,7 @@ const Database = (() => {
                 }]
             }
         },
-        // --- KELAS 4 (FASE B) ---
+        // --- KELAS 4 (FASE B) --- (DATA ASLI)
         'kelas_4': {
             'Pendidikan Pancasila': {
                 headers: ['Perlu Bimbingan', 'Cukup', 'Baik', 'Sangat Baik', 'Istimewa', ''],
@@ -384,47 +666,114 @@ const Database = (() => {
                     }
                 ]
             },
+            'Pendidikan Agama Islam dan Budi Pekerti': {
+                headers: ['Perlu Bimbingan', 'Cukup', 'Baik', 'Sangat Baik', 'Istimewa', ''],
+                rows: [
+                    {
+                        capaian: 'Peserta didik memahami definisi iman kepada rasul-rasul Allah, mengenal nama-nama rasul ulul azmi, dan meneladani sifat-sifat utama mereka dalam kehidupan sehari-hari.',
+                        tujuanList: [
+                            {
+                                tujuan: 'Menyebutkan nama-nama rasul ulul azmi.',
+                                materi: 'Iman Kepada Rasul Allah',
+                                kriteria: [
+                                    'Belum mampu menyebutkan satu pun nama rasul ulul azmi.',
+                                    'Mampu menyebutkan 1-2 nama rasul ulul azmi dengan bimbingan.',
+                                    'Mampu menyebutkan 3-4 nama rasul ulul azmi secara acak.',
+                                    'Mampu menyebutkan 5 nama rasul ulul azmi secara urut dan benar.',
+                                    'Mampu menyebutkan 5 nama rasul ulul azmi beserta satu mukjizat utamanya.',
+                                    ''
+                                ],
+                                highlightIndex: 2
+                            },
+                             {
+                                tujuan: 'Menjelaskan sifat wajib rasul (siddiq, amanah, tabligh, fathanah).',
+                                materi: 'Sifat-sifat Rasul',
+                                kriteria: [
+                                    'Belum mengenal sifat-sifat wajib rasul.',
+                                    'Dapat menyebutkan 1-2 sifat wajib rasul, tetapi belum memahami artinya.',
+                                    'Dapat menyebutkan 4 sifat wajib rasul, namun kesulitan menjelaskan artinya.',
+                                    'Dapat menyebutkan dan menjelaskan arti dari 4 sifat wajib rasul dengan benar.',
+                                    'Dapat menyebutkan, menjelaskan, dan memberikan contoh penerapan sifat rasul dalam kehidupan sehari-hari.',
+                                    ''
+                                ],
+                                highlightIndex: 3
+                            }
+                        ]
+                    },
+                    {
+                        capaian: 'Peserta didik dapat mempraktikkan tata cara wudu dan salat fardu dengan benar, memahami bacaan-bacaan pokok dalam salat, serta membiasakan sikap disiplin dan khusyuk.',
+                        tujuanList: [
+                            {
+                                tujuan: 'Mempraktikkan gerakan wudu secara tertib.',
+                                materi: 'Tata Cara Wudu',
+                                kriteria: [
+                                    'Belum hafal urutan gerakan wudu.',
+                                    'Mampu mempraktikkan sebagian besar gerakan wudu, namun urutannya masih terbolak-balik.',
+                                    'Mampu mempraktikkan gerakan wudu secara tertib, namun ada 1-2 gerakan yang terlewat.',
+                                    'Mampu mempraktikkan seluruh gerakan wudu dengan tertib dan benar.',
+                                    'Mampu mempraktikkan wudu dengan sempurna dan memahami sunah-sunahnya.',
+                                    ''
+                                ],
+                                highlightIndex: 2
+                            }
+                        ]
+                    }
+                ]
+            },
             'Matematika': {
                 headers: ['Perlu Bimbingan', 'Cukup', 'Baik', 'Sangat Baik', 'Istimewa', ''],
                 rows: [
                     { 
-                        capaian: 'Bilangan: Memiliki pemahaman dan intuisi bilangan (number sense) pada bilangan cacah sampai 10.000; membaca, menulis, membandingkan, dan mengurutkan bilangan; menentukan dan menggunakan nilai tempat; melakukan komposisi dan dekomposisi bilangan cacah sampai 10.000. Murid dapat melakukan dan menyelesaikan masalah operasi bilangan penjumlahan dan pengurangan bilangan cacah sampai 1.000; melakukan dan menyelesaikan masalah operasi perkalian dan pembagian bilangan cacah sampai 100 dengan bantuan benda konkret, gambar dan simbol; mengenal kelipatan dan faktor. Murid dapat melakukan perbandingan dan pengurutan pecahan dengan pembilang satu dan antar pecahan dengan penyebut yang sama; mengenal dan dapat menerapkan pecahan senilai, memiliki intuisi pecahan dan desimal, serta dapat menentukan pecahan sebagai desimal dan persen.',
+                        capaian: 'Bilangan: Memiliki pemahaman dan intuisi bilangan (number sense) pada bilangan cacah sampai 10.000; membaca, menulis, membandingkan, dan mengurutkan bilangan; menentukan dan menggunakan nilai tempat; melakukan komposisi dan dekomposisi bilangan cacah sampai 10.000. Murid dapat melakukan dan menyelesaikan masalah operasi bilangan penjumlahan dan pengurangan bilangan cacah sampai 1.000; melakukan dan menyelesaikan masalah operasi perkalian dan pembagian bilangan cacah dengan bilangan satu angka atau dua angka; melakukan dan menyelesaikan masalah operasi hitung campuran bilangan cacah yang hasilnya sampai 1000; melakukan dan menyelesaikan masalah terkait kelipatan, faktor, kelipatan persekutuan terkecil (KPK) dan faktor persekutuan terbesar (FPB). Murid dapat memahami dan membandingkan pecahan; melakukan dan menyelesaikan masalah operasi penjumlahan dan pengurangan pecahan dengan penyebut yang sama.',
                         tujuanList: [
                             {
-                                tujuan: 'Menentukan nilai tempat bilangan cacah sampai 10.000.',
-                                materi: 'Nilai Tempat',
+                                tujuan: 'Membaca dan menulis bilangan cacah sampai 10.000.',
+                                materi: 'Bilangan Cacah 10.000',
                                 kriteria: [
-                                    'Belum memahami konsep nilai tempat.',
-                                    'Dapat menentukan nilai tempat satuan dan puluhan.',
-                                    'Dapat menentukan nilai tempat sampai ratusan.',
-                                    'Dapat menentukan nilai tempat sampai ribuan dengan benar.',
-                                    'Dapat menguraikan sebuah bilangan berdasarkan nilai tempatnya (dekomposisi).',
+                                    'Masih kesulitan membaca bilangan ratusan.',
+                                    'Mampu membaca dan menulis bilangan sampai 1.000.',
+                                    'Mampu membaca dan menulis bilangan sampai 10.000, kadang masih terjadi kesalahan nilai tempat.',
+                                    'Mampu membaca dan menulis bilangan cacah sampai 10.000 dengan benar dan lancar.',
+                                    'Mampu membaca, menulis, dan menguraikan bilangan sampai 10.000 berdasarkan nilai tempatnya.',
                                     ''
                                 ],
                                 highlightIndex: 2
                             },
                             {
-                                tujuan: 'Menyelesaikan soal pembagian bilangan cacah sampai 100.',
-                                materi: 'Operasi Pembagian',
+                                tujuan: 'Menyelesaikan operasi perkalian dengan bilangan satu angka.',
+                                materi: 'Operasi Perkalian',
                                 kriteria: [
-                                    'Belum memahami konsep pembagian sebagai pengurangan berulang.',
-                                    'Mampu menyelesaikan soal pembagian dengan bantuan benda konkret.',
-                                    'Mampu menyelesaikan soal pembagian dengan cara pengurangan berulang.',
-                                    'Mampu menyelesaikan soal pembagian dengan cara porogapit (susun ke bawah).',
-                                    'Mampu menyelesaikan soal cerita yang berkaitan dengan pembagian secara tepat.',
+                                    'Belum memahami konsep perkalian sebagai penjumlahan berulang.',
+                                    'Mampu menyelesaikan perkalian dengan bantuan benda konkret atau gambar.',
+                                    'Mampu menyelesaikan perkalian dengan cara penjumlahan berulang.',
+                                    'Mampu menyelesaikan perkalian dengan cara bersusun pendek dengan benar.',
+                                    'Hafal perkalian 1-10 dan mampu menggunakannya untuk menyelesaikan soal cerita.',
                                     ''
                                 ],
                                 highlightIndex: 2
                             },
                             {
-                                tujuan: 'Mengurutkan pecahan berpenyebut sama.',
-                                materi: 'Pecahan',
+                                tujuan: 'Menentukan KPK dan FPB dari dua bilangan.',
+                                materi: 'KPK dan FPB',
+                                kriteria: [
+                                    'Belum memahami konsep kelipatan dan faktor.',
+                                    'Mampu menentukan kelipatan dan faktor dari satu bilangan.',
+                                    'Mampu menentukan KPK atau FPB dari dua bilangan, tetapi belum keduanya.',
+                                    'Mampu menentukan KPK dan FPB dari dua bilangan menggunakan pohon faktor.',
+                                    'Mampu menyelesaikan soal cerita yang berkaitan dengan KPK dan FPB.',
+                                    ''
+                                ],
+                                highlightIndex: 2
+                            },
+                            {
+                                tujuan: 'Menyelesaikan penjumlahan pecahan berpenyebut sama.',
+                                materi: 'Penjumlahan Pecahan',
                                 kriteria: [
                                     'Belum mengenal konsep pecahan.',
-                                    'Dapat membaca lambang pecahan, tetapi belum bisa membandingkan.',
-                                    'Dapat membandingkan dua pecahan berpenyebut sama dengan bantuan gambar.',
-                                    'Dapat mengurutkan 3-4 pecahan berpenyebut sama dari yang terkecil atau terbesar.',
-                                    'Dapat mengurutkan pecahan berpenyebut sama dan meletakkannya pada garis bilangan.',
+                                    'Mengenal bentuk pecahan, tetapi belum bisa melakukan operasi hitung.',
+                                    'Mampu menjumlahkan pecahan berpenyebut sama dengan bantuan gambar.',
+                                    'Mampu menjumlahkan pecahan berpenyebut sama tanpa alat bantu.',
+                                    'Mampu menjumlahkan dan menyederhanakan hasil penjumlahan pecahan.',
                                     ''
                                 ],
                                 highlightIndex: 2
@@ -432,61 +781,30 @@ const Database = (() => {
                         ]
                     },
                     { 
-                        capaian: 'Aljabar: Menemukan nilai yang tidak diketahui dalam kalimat matematika yang melibatkan penjumlahan dan pengurangan pada bilangan cacah sampai 100, dengan menggunakan sifat-sifat bilangan dan operasinya. Murid dapat mengidentifikasi, meniru, dan mengembangkan pola gambar atau objek sederhana dan pola bilangan membesar dan mengecil yang dapat melibatkan penjumlahan dan pengurangan pada bilangan cacah sampai 100.',
-                        tujuanList: [
-                            {
-                                tujuan: 'Menemukan bilangan yang tidak diketahui dalam kalimat penjumlahan (contoh: 25 + n = 40).',
-                                materi: 'Kalimat Matematika',
-                                kriteria: [
-                                    'Belum memahami konsep kalimat matematika terbuka.',
-                                    'Mencoba-coba angka secara acak.',
-                                    'Dapat menemukan bilangan dengan cara menghitung maju.',
-                                    'Dapat menemukan bilangan dengan menggunakan operasi hitung invers (pengurangan).',
-                                    'Dapat membuat sendiri kalimat matematika dan menyelesaikannya.',
-                                    ''
-                                ],
-                                highlightIndex: 2
-                            },
-                            {
-                                tujuan: 'Mengembangkan pola gambar atau objek sederhana.',
-                                materi: 'Pola Gambar',
-                                kriteria: [
-                                    'Belum dapat mengenali pola gambar.',
-                                    'Dapat meniru pola gambar yang ada.',
-                                    'Dapat melanjutkan pola gambar untuk 1-2 urutan berikutnya.',
-                                    'Dapat melanjutkan pola gambar yang lebih kompleks (misal: melibatkan 2 atribut seperti bentuk dan warna).',
-                                    'Dapat menciptakan pola gambar sendiri dan menjelaskan aturannya kepada teman.',
-                                    ''
-                                ],
-                                highlightIndex: 2
-                            }
-                        ]
-                    },
-                    { 
-                        capaian: 'Pengukuran: Mengukur panjang dan berat benda menggunakan satuan baku; menentukan hubungan antar-satuan baku panjang (cm, m) dan antar-satuan berat (g, kg); serta mengukur dan mengestimasi luas dan volume menggunakan satuan tidak baku dan satuan baku berupa bilangan cacah.',
+                        capaian: 'Pengukuran: Mengukur, membandingkan, dan mengestimasi panjang, berat, luas, dan volume menggunakan satuan baku.',
                         tujuanList: [
                             {
                                 tujuan: 'Mengukur panjang benda menggunakan penggaris (satuan cm).',
-                                materi: 'Mengukur Panjang',
+                                materi: 'Pengukuran Panjang',
                                 kriteria: [
                                     'Belum bisa menggunakan penggaris.',
-                                    'Memegang penggaris dengan benar tetapi memulai pengukuran tidak dari angka 0.',
-                                    'Dapat mengukur panjang benda dengan meletakkan ujung benda di angka 0 dengan bimbingan.',
-                                    'Dapat mengukur panjang benda dengan penggaris secara mandiri dan akurat.',
-                                    'Dapat mengestimasi panjang benda terlebih dahulu sebelum mengukurnya.',
+                                    'Dapat meletakkan benda di penggaris, tetapi salah membaca skala.',
+                                    'Dapat mengukur panjang benda, tetapi titik awal tidak selalu tepat di angka 0.',
+                                    'Dapat mengukur panjang benda menggunakan penggaris dengan benar.',
+                                    'Dapat mengukur dan membandingkan panjang beberapa benda dengan tepat.',
                                     ''
                                 ],
                                 highlightIndex: 2
                             },
                             {
-                                tujuan: 'Mengestimasi luas permukaan benda menggunakan satuan tidak baku (misal: buku, ubin).',
-                                materi: 'Mengukur Luas',
+                                tujuan: 'Menentukan luas persegi dan persegi panjang menggunakan petak satuan.',
+                                materi: 'Pengukuran Luas',
                                 kriteria: [
                                     'Belum memahami konsep luas.',
-                                    'Menutupi permukaan benda dengan satuan tidak baku secara tidak beraturan.',
-                                    'Menutupi permukaan benda dengan rapi tetapi belum bisa menghitung jumlahnya.',
-                                    'Dapat menutupi dan menghitung luas permukaan benda dengan satuan tidak baku.',
-                                    'Dapat membandingkan luas dua benda menggunakan satuan tidak baku yang sama.',
+                                    'Menghitung luas dengan membilang satu per satu petak satuan dengan bimbingan.',
+                                    'Menghitung luas dengan membilang satu per satu petak satuan secara mandiri.',
+                                    'Mampu menghitung luas persegi dan persegi panjang dengan mengalikan panjang sisinya.',
+                                    'Mampu menyelesaikan soal cerita yang berkaitan dengan luas bangun datar.',
                                     ''
                                 ],
                                 highlightIndex: 2
@@ -494,30 +812,30 @@ const Database = (() => {
                         ]
                     },
                     { 
-                        capaian: 'Geometri: Mendeskripsikan ciri berbagai bentuk bangun datar (segiempat, segitiga, segi banyak); menyusun (komposisi) dan mengurai (dekomposisi) berbagai bangun datar dengan lebih dari satu cara jika memungkinkan.',
+                        capaian: 'Geometri: Membandingkan karakteristik antar bangun datar (segiempat, segitiga, segibanyak); mengidentifikasi dan menggambar sudut (siku-siku, lancip, tumpul).',
                         tujuanList: [
                             {
-                                tujuan: 'Menyebutkan ciri-ciri bangun datar segitiga.',
-                                materi: 'Ciri-ciri Bangun Datar',
+                                tujuan: 'Mengidentifikasi jenis-jenis sudut (siku-siku, lancip, tumpul).',
+                                materi: 'Jenis-jenis Sudut',
                                 kriteria: [
-                                    'Belum mengenal bangun segitiga.',
-                                    'Dapat menunjuk bangun segitiga di antara bangun lainnya.',
-                                    'Dapat menyebutkan bahwa segitiga memiliki 3 sisi.',
-                                    'Dapat menyebutkan ciri-cirinya (3 sisi, 3 sudut).',
-                                    'Dapat membedakan jenis segitiga berdasarkan panjang sisinya (sama sisi, sama kaki, sembarang).',
+                                    'Belum mengenal istilah sudut.',
+                                    'Dapat menunjukkan sudut siku-siku pada benda di sekitar.',
+                                    'Dapat membedakan sudut siku-siku, lancip, dan tumpul dengan bantuan gambar.',
+                                    'Dapat mengidentifikasi dan menamai jenis-jenis sudut dengan benar.',
+                                    'Dapat menggambar ketiga jenis sudut dengan menggunakan busur derajat.',
                                     ''
                                 ],
                                 highlightIndex: 2
                             },
                             {
-                                tujuan: 'Menyusun sebuah bangun datar baru dari beberapa potongan bangun datar (komposisi).',
-                                materi: 'Komposisi Bangun Datar',
+                                tujuan: 'Menyebutkan sifat-sifat persegi dan persegi panjang.',
+                                materi: 'Sifat Bangun Datar',
                                 kriteria: [
-                                    'Belum bisa menyusun potongan bangun datar.',
-                                    'Dapat menyusun 2 potongan segitiga menjadi persegi dengan bimbingan.',
-                                    'Dapat menyusun beberapa potongan bangun datar secara mandiri menjadi bentuk yang tidak beraturan.',
-                                    'Dapat menyusun beberapa potongan bangun datar menjadi sebuah bentuk baru yang bermakna (misal: rumah, roket).',
-                                    'Dapat merancang dan membuat sebuah gambar utuh dari berbagai potongan bangun datar (tagram).',
+                                    'Belum dapat membedakan persegi dan persegi panjang.',
+                                    'Dapat menyebutkan 1-2 sifat dari persegi atau persegi panjang.',
+                                    'Dapat menyebutkan beberapa sifat dari persegi dan persegi panjang.',
+                                    'Dapat membedakan sifat-sifat persegi dan persegi panjang dengan jelas.',
+                                    'Dapat membandingkan sifat-sifat beberapa bangun segiempat (persegi, persegi panjang, jajargenjang).',
                                     ''
                                 ],
                                 highlightIndex: 2
@@ -525,30 +843,17 @@ const Database = (() => {
                         ]
                     },
                     { 
-                        capaian: 'Analisis Data dan Peluang: Mengurutkan, membandingkan, menyajikan, menganalisis dan menginterpretasi data dalam bentuk tabel, diagram gambar, piktogram, dan diagram batang (skala satu satuan).',
+                        capaian: 'Analisis Data dan Peluang: Mengurutkan, membandingkan, menyajikan, dan menganalisis data dalam bentuk tabel, diagram gambar, piktogram, dan diagram batang (skala satu satuan).',
                         tujuanList: [
                             {
-                                tujuan: 'Menyajikan data dalam bentuk tabel.',
-                                materi: 'Menyajikan Data (Tabel)',
+                                tujuan: 'Membaca data yang disajikan dalam bentuk diagram batang.',
+                                materi: 'Diagram Batang',
                                 kriteria: [
-                                    'Belum bisa mengelompokkan data.',
-                                    'Dapat mengelompokkan data dengan bimbingan (misal: buah apel, buah jeruk).',
-                                    'Dapat menghitung (turus/tally) jumlah setiap kelompok data.',
-                                    'Dapat menyajikan data dalam tabel sederhana dengan benar.',
-                                    'Dapat membuat tabel dari data acak dan memberinya judul yang sesuai.',
-                                    ''
-                                ],
-                                highlightIndex: 2
-                            },
-                            {
-                                tujuan: 'Menentukan data terbanyak dan paling sedikit dari sebuah piktogram.',
-                                materi: 'Membaca Piktogram',
-                                kriteria: [
-                                    'Belum memahami cara membaca piktogram.',
-                                    'Memahami bahwa gambar mewakili jumlah, tetapi salah menghitung.',
-                                    'Dapat menghitung jumlah data dari piktogram dengan benar.',
-                                    'Dapat menentukan data yang paling banyak dan paling sedikit.',
-                                    'Dapat mengurutkan data dari yang paling sedikit hingga paling banyak berdasarkan piktogram.',
+                                    'Belum bisa membaca diagram batang.',
+                                    'Mampu membaca judul dan label sumbu pada diagram batang.',
+                                    'Mampu membaca tinggi batang untuk menemukan frekuensi data tertentu.',
+                                    'Mampu membaca dan membandingkan data yang disajikan dalam diagram batang.',
+                                    'Mampu menyimpulkan informasi dari diagram batang (misal: data tertinggi, terendah).',
                                     ''
                                 ],
                                 highlightIndex: 2
@@ -561,43 +866,97 @@ const Database = (() => {
                 headers: ['Perlu Bimbingan', 'Cukup', 'Baik', 'Sangat Baik', 'Istimewa', ''],
                 rows: [
                     { 
-                        capaian: 'Menjelaskan bentuk dan fungsi pancaindra; menganalisis siklus hidup makhluk hidup dan upaya pelestariannya; menghasilkan solusi untuk masalah yang berkaitan dengan pelestarian sumber daya alam sebagai upaya mitigasi perubahan iklim; menyimpulkan proses perubahan wujud zat; menjelaskan sumber dan bentuk energi, serta proses perubahan bentuk energi dalam kehidupan sehari-hari; membedakan jenis gaya dan pengaruhnya terhadap arah, gerak, dan bentuk benda; menjelaskan peran, tugas, dan tanggung jawab serta interaksi sosial yang terjadi di sekitar tempat tinggal dan sekolah; mengenali letak kabupaten/kota dan provinsi tempat tinggalnya dengan menggunakan peta konvensional/digital; mengklasifikasikan ragam bentang alam dan keterkaitannya dengan profesi masyarakat, ragam budaya melestarikannya; serta upaya menganalisis untuk sejarah masyarakat di lingkungan tempat tinggal; menjelaskan nilai mata uang dan fungsinya, serta cara mengelola keuangan secara bijak.',
+                        capaian: 'Makhluk hidup dan lingkungannya: Mendeskripsikan bagian tubuh dan fungsi dari makhluk hidup; mengidentifikasi kebutuhan makhluk hidup untuk dapat bertahan hidup; mendeskripsikan perubahan wujud benda (padat, cair, dan gas); mengidentifikasi sumber dan bentuk energi serta manfaatnya dalam kehidupan sehari-hari.',
                         tujuanList: [
                             {
-                                tujuan: 'Menganalisis siklus hidup kupu-kupu.',
-                                materi: 'Siklus Hidup Makhluk Hidup',
+                                tujuan: 'Menjelaskan fungsi akar, batang, dan daun pada tumbuhan.',
+                                materi: 'Bagian Tubuh Tumbuhan',
                                 kriteria: [
-                                    'Belum mengenal siklus hidup.',
-                                    'Dapat menyebutkan 1-2 tahapan siklus hidup kupu-kupu secara acak.',
-                                    'Dapat menyebutkan 3-4 tahapan siklus hidup kupu-kupu secara urut dengan bimbingan.',
-                                    'Dapat mengurutkan dan menjelaskan setiap tahapan siklus hidup kupu-kupu.',
-                                    'Dapat membandingkan siklus hidup kupu-kupu dengan hewan lain.',
+                                    'Belum dapat menyebutkan bagian tubuh tumbuhan.',
+                                    'Dapat menyebutkan bagian tubuh tumbuhan, tetapi belum tahu fungsinya.',
+                                    'Dapat menyebutkan fungsi dari satu atau dua bagian tumbuhan.',
+                                    'Dapat menjelaskan fungsi akar, batang, dan daun dengan benar.',
+                                    'Dapat menjelaskan hubungan antara bentuk dan fungsi pada bagian tubuh tumbuhan.',
                                     ''
                                 ],
                                 highlightIndex: 2
                             },
                             {
-                                tujuan: 'Memberikan contoh perubahan bentuk energi dalam kehidupan sehari-hari.',
-                                materi: 'Perubahan Bentuk Energi',
+                                tujuan: 'Mengidentifikasi sumber-sumber energi alternatif.',
+                                materi: 'Sumber Energi',
                                 kriteria: [
-                                    'Belum memahami bahwa energi dapat berubah bentuk.',
-                                    'Dapat menyebutkan 1 contoh perubahan energi dengan bantuan (misal: kipas angin).',
-                                    'Dapat menyebutkan 1-2 contoh perubahan bentuk energi secara mandiri.',
-                                    'Dapat menjelaskan perubahan energi yang terjadi pada beberapa alat elektronik (misal: dari listrik ke gerak, cahaya, atau panas).',
-                                    'Dapat membuat bagan sederhana tentang perubahan bentuk energi pada sebuah alat.',
+                                    'Belum mengenal konsep energi.',
+                                    'Dapat menyebutkan contoh sumber energi (misal: matahari, listrik).',
+                                    'Dapat menyebutkan contoh sumber energi alternatif dengan bimbingan.',
+                                    'Dapat menyebutkan beberapa contoh sumber energi alternatif (angin, air, matahari).',
+                                    'Dapat menjelaskan keuntungan menggunakan sumber energi alternatif.',
+                                    ''
+                                ],
+                                highlightIndex: 2
+                            }
+                        ]
+                    },
+                    { 
+                        capaian: 'Zat dan perubahannya: Mendeskripsikan perubahan wujud benda (padat, cair, dan gas).',
+                        tujuanList: [
+                            {
+                                tujuan: 'Memberikan contoh peristiwa mencair dan membeku dalam kehidupan sehari-hari.',
+                                materi: 'Perubahan Wujud Benda',
+                                kriteria: [
+                                    'Belum memahami konsep perubahan wujud.',
+                                    'Dapat memberikan 1 contoh peristiwa mencair atau membeku.',
+                                    'Dapat memberikan contoh peristiwa mencair dan membeku.',
+                                    'Dapat menjelaskan proses terjadinya mencair dan membeku.',
+                                    'Dapat memberikan contoh dan menjelaskan proses perubahan wujud lainnya (menguap, mengembun).',
+                                    ''
+                                ],
+                                highlightIndex: 2
+                            }
+                        ]
+                    },
+                    { 
+                        capaian: 'Bumi dan antariksa: Mendeskripsikan terjadinya siklus air dan mengaitkannya dengan pentingnya menjaga ketersediaan air; mendeskripsikan kenampakan permukaan bumi (daratan dan perairan).',
+                        tujuanList: [
+                            {
+                                tujuan: 'Menggambarkan skema siklus air sederhana.',
+                                materi: 'Siklus Air',
+                                kriteria: [
+                                    'Belum memahami dari mana datangnya hujan.',
+                                    'Dapat menyebutkan salah satu tahapan siklus air (misal: penguapan).',
+                                    'Dapat menyebutkan beberapa tahapan siklus air, tetapi belum urut.',
+                                    'Dapat menggambarkan dan menjelaskan tahapan siklus air (penguapan, pengembunan, presipitasi) secara sederhana.',
+                                    'Dapat mengaitkan kegiatan manusia (misal: penebangan hutan) dengan terganggunya siklus air.',
+                                    ''
+                                ],
+                                highlightIndex: 2
+                            }
+                        ]
+                    },
+                    { 
+                        capaian: 'Keruangan dan konektivitas: Menjelaskan posisi dan perannya sebagai bagian dari keluarga, sekolah, dan lingkungan sekitar; mengidentifikasi dan mendeskripsikan keragaman sosial, ekonomi, budaya, dan suku bangsa yang ada di lingkungan sekitar; mengenal sejarah perkembangan wilayahnya dan menceritakan potensi sumber daya alam yang ada di wilayahnya serta kaitannya dengan kebutuhan hidup masyarakatnya.',
+                        tujuanList: [
+                            {
+                                tujuan: 'Mengidentifikasi keragaman budaya (misal: tarian, pakaian adat) di Indonesia.',
+                                materi: 'Keragaman Budaya',
+                                kriteria: [
+                                    'Belum mengetahui adanya keragaman budaya di Indonesia.',
+                                    'Dapat menyebutkan 1-2 contoh tarian atau pakaian adat.',
+                                    'Dapat menyebutkan beberapa contoh keragaman budaya dari berbagai provinsi.',
+                                    'Dapat menyebutkan nama budaya beserta daerah asalnya dengan benar.',
+                                    'Dapat menjelaskan pentingnya melestarikan keragaman budaya sebagai kekayaan bangsa.',
                                     ''
                                 ],
                                 highlightIndex: 2
                             },
                             {
-                                tujuan: 'Mengidentifikasi profesi masyarakat berdasarkan bentang alam tempat tinggalnya.',
-                                materi: 'Bentang Alam dan Profesi',
+                                tujuan: 'Menjelaskan kegiatan ekonomi masyarakat berdasarkan sumber daya alam di wilayahnya.',
+                                materi: 'Kegiatan Ekonomi',
                                 kriteria: [
-                                    'Belum bisa mengaitkan profesi dengan bentang alam.',
-                                    'Dapat menyebutkan 1 profesi di daerah pantai (nelayan) dengan bimbingan.',
-                                    'Dapat menyebutkan beberapa profesi di daerah pantai atau pegunungan.',
-                                    'Dapat membedakan profesi yang khas di daerah pantai dan pegunungan.',
-                                    'Dapat menjelaskan alasan mengapa suatu profesi banyak ditemukan di bentang alam tertentu.',
+                                    'Belum memahami hubungan antara SDA dan kegiatan ekonomi.',
+                                    'Dapat menyebutkan contoh kegiatan ekonomi (misal: bertani, nelayan).',
+                                    'Dapat menyebutkan contoh SDA di wilayahnya.',
+                                    'Dapat menghubungkan jenis SDA dengan kegiatan ekonomi masyarakat sekitar (misal: laut -> nelayan).',
+                                    'Dapat menganalisis potensi SDA dan memprediksi kegiatan ekonomi yang sesuai.',
                                     ''
                                 ],
                                 highlightIndex: 2
@@ -607,40 +966,40 @@ const Database = (() => {
                 ]
             }
         },
-        // --- KELAS 5 (FASE C) ---
+        // --- KELAS 5 (FASE C) --- (DATA ASLI)
         'kelas_5': {
             'Matematika': {
-                headers: ['Prastruktural', 'Dasar', 'Cakap', 'Mahir', 'Sangat Mahir', ''],
+                headers: ['Perlu Bimbingan', 'Cukup', 'Baik', 'Sangat Baik', 'Istimewa', ''],
                 rows: [{
-                    capaian: 'Peserta didik dapat menunjukkan pemahaman mengenai pecahan dan melakukan operasi penjumlahan dan pengurangan antar pecahan dengan penyebut yang berbeda.',
+                    capaian: 'Peserta didik dapat melakukan operasi penjumlahan, pengurangan, perkalian, dan pembagian bilangan desimal, serta menggunakannya untuk menyelesaikan masalah.',
                     tujuanList: [{
-                        tujuan: 'Menyelesaikan operasi penjumlahan dua pecahan biasa beda penyebut.',
-                        materi: 'Penjumlahan Pecahan',
+                        tujuan: 'Menyelesaikan soal perkalian bilangan desimal (satu angka di belakang koma).',
+                        materi: 'Perkalian Desimal',
                         kriteria: [
-                            'Belum memahami konsep pecahan dan tidak dapat memulai pengerjaan.',
-                            'Memahami konsep pecahan namun belum dapat menyamakan penyebut.',
-                            'Dapat menyamakan penyebut dengan mencari KPK, namun sering melakukan kesalahan hitung.',
-                            'Dapat menyelesaikan soal penjumlahan pecahan beda penyebut dengan benar dan sistematis.',
-                            'Dapat menyelesaikan soal cerita kompleks yang melibatkan penjumlahan pecahan beda penyebut.',
+                            'Belum memahami konsep bilangan desimal.',
+                            'Mampu melakukan perkalian bilangan cacah, tetapi bingung meletakkan koma.',
+                            'Mampu menyelesaikan perkalian desimal dengan cara bersusun, kadang masih salah meletakkan koma.',
+                            'Mampu menyelesaikan perkalian bilangan desimal dengan benar dan tepat.',
+                            'Mampu menyelesaikan soal cerita yang melibatkan perkalian desimal.',
                             ''
                         ],
-                        highlightIndex: 2
+                        highlightIndex: 3
                     }]
                 }]
             },
             'Bahasa Indonesia': {
-                headers: ['Prastruktural', 'Dasar', 'Cakap', 'Mahir', 'Sangat Mahir', ''],
+                headers: ['Perlu Bimbingan', 'Cukup', 'Baik', 'Sangat Baik', 'Istimewa', ''],
                 rows: [{
-                    capaian: 'Peserta didik mampu menulis teks eksplanasi, melaporkan hasil pengamatan, dan menyajikan informasi menggunakan kosa kata yang efektif dan struktur kalimat yang tepat.',
+                    capaian: 'Peserta didik mampu menganalisis informasi berupa fakta, prosedur dengan mengidentifikasi ciri objek dan urutan proses kejadian, serta nilai-nilai dari teks narasi.',
                     tujuanList: [{
-                        tujuan: 'Menulis teks eksplanasi sederhana berdasarkan urutan sebab-akibat.',
-                        materi: 'Teks Eksplanasi',
+                        tujuan: 'Menentukan watak tokoh dan latar cerita dari teks narasi yang dibaca.',
+                        materi: 'Unsur Intrinsik Teks Narasi',
                         kriteria: [
-                            'Belum mampu menulis kalimat yang padu.',
-                            'Mampu menulis beberapa kalimat, namun belum menunjukkan struktur sebab-akibat.',
-                            'Mampu menulis teks dengan struktur awal (pernyataan umum, deretan penjelas) namun belum lengkap.',
-                            'Mampu menulis teks eksplanasi dengan struktur yang lengkap dan penggunaan konjungsi kausalitas yang tepat.',
-                            'Mampu menulis teks eksplanasi yang informatif, terstruktur, dan menggunakan kosa kata teknis yang relevan.',
+                            'Kesulitan memahami isi cerita.',
+                            'Mampu menyebutkan nama tokoh, tetapi belum bisa menentukan wataknya.',
+                            'Mampu menentukan watak tokoh atau latar cerita, tetapi belum keduanya.',
+                            'Mampu menentukan watak tokoh dan latar (tempat, waktu) cerita dengan tepat.',
+                            'Mampu menganalisis hubungan antara watak tokoh dengan alur cerita.',
                             ''
                         ],
                         highlightIndex: 3
@@ -648,73 +1007,27 @@ const Database = (() => {
                 }]
             },
             'Ilmu Pengetahuan Alam dan Sosial': {
-                headers: ['Prastruktural', 'Dasar', 'Cakap', 'Mahir', 'Sangat Mahir', ''],
-                rows: [
-                    {
-                        capaian: 'Peserta didik dapat mendeskripsikan cara kerja organ pernapasan manusia dan mengaitkannya dengan pentingnya menjaga kesehatan organ pernapasan.',
-                        tujuanList: [{
-                            tujuan: 'Mengurutkan alur pernapasan pada manusia dari hidung hingga paru-paru.',
-                            materi: 'Sistem Pernapasan Manusia',
-                            kriteria: [
-                                'Tidak dapat menyebutkan organ pernapasan utama.',
-                                'Dapat menyebutkan beberapa organ pernapasan secara acak.',
-                                'Dapat menyebutkan organ-organ pernapasan utama namun urutannya belum tepat.',
-                                'Dapat mengurutkan alur pernapasan (hidung, faring, laring, trakea, bronkus, paru-paru) dengan benar.',
-                                'Dapat mengurutkan dan menjelaskan fungsi dari setiap organ dalam alur pernapasan.',
-                                ''
-                            ],
-                            highlightIndex: 2
-                        }]
-                    },
-                    {
-                        capaian: 'Peserta didik mendeskripsikan hubungan antarmakhluk hidup dalam suatu ekosistem (rantai makanan) dan mengaitkannya dengan pentingnya menjaga keseimbangan ekosistem.',
-                        tujuanList: [
-                            {
-                                tujuan: 'Mengidentifikasi peran produsen, konsumen, dan pengurai dalam sebuah rantai makanan.',
-                                materi: 'Komponen Rantai Makanan',
-                                kriteria: [
-                                    'Belum dapat membedakan antara produsen dan konsumen.',
-                                    'Dapat memberikan 1 contoh produsen dan 1 contoh konsumen.',
-                                    'Dapat mengidentifikasi peran produsen, konsumen, dan pengurai dengan benar.',
-                                    'Dapat mengklasifikasikan beberapa makhluk hidup ke dalam peran yang sesuai dalam ekosistem.',
-                                    'Dapat menjelaskan perbedaan antara konsumen tingkat I, II, dan seterusnya.',
-                                    ''
-                                ],
-                                highlightIndex: 2
-                            },
-                            {
-                                tujuan: 'Membuat bagan rantai makanan sederhana yang terjadi di ekosistem tertentu (misal: sawah).',
-                                materi: 'Bagan Rantai Makanan',
-                                kriteria: [
-                                    'Belum mampu menggambarkan hubungan makan dan dimakan.',
-                                    'Mampu menggambar makhluk hidupnya, namun arah panah (aliran energi) masih salah.',
-                                    'Mampu membuat bagan rantai makanan sederhana (3 komponen) dengan arah panah yang benar.',
-                                    'Mampu membuat bagan rantai makanan yang lebih kompleks (minimal 4 komponen) dengan benar.',
-                                    'Mampu membuat beberapa contoh rantai makanan yang mungkin terjadi dalam satu ekosistem (jaring-jaring makanan).',
-                                    ''
-                                ],
-                                highlightIndex: 2
-                            },
-                            {
-                                tujuan: 'Memprediksi dampak yang terjadi jika salah satu komponen dalam rantai makanan tersebut punah.',
-                                materi: 'Keseimbangan Ekosistem',
-                                kriteria: [
-                                    'Belum dapat menjelaskan dampak apapun yang terjadi.',
-                                    'Dapat menjelaskan dampak secara langsung (misal: "ular akan kelaparan jika tikus hilang").',
-                                    'Dapat menjelaskan dampak langsung terhadap komponen di atas dan di bawahnya.',
-                                    'Dapat menjelaskan dampak tidak langsung yang mungkin terjadi pada komponen lain dalam rantai makanan.',
-                                    'Dapat menjelaskan dampak berantai (cascading effect) terhadap keseimbangan seluruh ekosistem.',
-                                    ''
-                                ],
-                                highlightIndex: 2
-                            }
-                        ]
-                    }
-                ]
+                headers: ['Perlu Bimbingan', 'Cukup', 'Baik', 'Sangat Baik', 'Istimewa', ''],
+                rows: [{
+                    capaian: 'Peserta didik dapat mendeskripsikan cara perkembangbiakan pada tumbuhan dan hewan, serta mengaitkannya dengan upaya pelestarian.',
+                    tujuanList: [{
+                        tujuan: 'Membedakan cara perkembangbiakan generatif dan vegetatif pada tumbuhan.',
+                        materi: 'Perkembangbiakan Tumbuhan',
+                        kriteria: [
+                            'Belum memahami cara tumbuhan berkembang biak.',
+                            'Dapat memberikan contoh tumbuhan yang berkembang biak dengan biji.',
+                            'Dapat menjelaskan salah satu cara perkembangbiakan (generatif atau vegetatif).',
+                            'Dapat menjelaskan dan membedakan perkembangbiakan generatif dan vegetatif beserta contohnya.',
+                            'Dapat mengaitkan cara perkembangbiakan dengan upaya-upaya pelestarian tumbuhan langka.',
+                            ''
+                        ],
+                        highlightIndex: 2
+                    }]
+                }]
             }
-        },
+        }
     };
-    // ===================================================================================
+
 
     const getDefaultData = () => ({
         info: {
@@ -730,97 +1043,131 @@ const Database = (() => {
         kriteria: {}
     });
 
+    /**
+     * Mengambil data dari localStorage. Jika tidak ada, buat data default.
+     * @returns {object} Data aplikasi.
+     */
     const getData = () => {
         let data = localStorage.getItem(DB_KEY);
         if (!data) {
+            console.log('Tidak ada data, membuat data default');
             data = getDefaultData();
-            data.pelajaran.forEach(p => { data.kriteria[p] = {}; });
-            simpanData(data);
+
+            // Inisialisasi properti kriteria berdasarkan daftar pelajaran
+            data.pelajaran.forEach(namaPelajaran => {
+                if (!data.kriteria[namaPelajaran]) {
+                    data.kriteria[namaPelajaran] = {};
+                }
+            });
+            simpanData(data); // Simpan struktur awal ke localStorage
             return data;
         }
         return JSON.parse(data);
     };
 
+    /**
+     * Menyimpan data ke localStorage.
+     * @param {object} data Data yang akan disimpan.
+     */
     const simpanData = (data) => {
         localStorage.setItem(DB_KEY, JSON.stringify(data));
     };
-    
+
+    /**
+     * Mendapatkan data kurikulum default untuk kelas dan pelajaran tertentu.
+     * @param {number} kelas Nomor kelas.
+     * @param {string} namaPelajaran Nama mata pelajaran.
+     * @returns {object|null} Data kurikulum atau null jika tidak ditemukan.
+     */
     const getDefaultCurriculumData = (kelas, namaPelajaran) => {
-        const kelasKey = `kelas_${kelas}`;
-        if (defaultCurriculum[kelasKey] && defaultCurriculum[kelasKey][namaPelajaran]) {
-            return defaultCurriculum[kelasKey][namaPelajaran];
+        const keyKelas = 'kelas_' + kelas;
+        if (defaultCurriculum[keyKelas] && defaultCurriculum[keyKelas][namaPelajaran]) {
+            return defaultCurriculum[keyKelas][namaPelajaran];
         }
         return null;
     };
 
+    /**
+     * Membuat backup data dan mengunduhnya sebagai file JSON.
+     * @param {function} showModalCallback Callback untuk menampilkan notifikasi.
+     */
     const backup = (showModalCallback) => {
-        try {
-            const data = localStorage.getItem(DB_KEY);
-            if (!data) {
-                showModalCallback('Tidak ada data untuk di-backup.', false);
-                return;
-            }
+        const data = localStorage.getItem(DB_KEY);
+        if (data) {
             const blob = new Blob([data], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
+            const today = new Date().toISOString().slice(0, 10);
             a.href = url;
-            const tanggal = new Date().toISOString().slice(0, 10);
-            a.download = `backup-kriteria-${tanggal}.json`;
+            a.download = `backup-kriteria-${today}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showModalCallback('Backup berhasil diunduh!');
-        } catch (error) {
-            showModalCallback('Terjadi kesalahan saat backup.', false);
-            console.error("Kesalahan Backup:", error);
+            showModalCallback('Backup berhasil diunduh.', 'success');
+        } else {
+            showModalCallback('Tidak ada data untuk di-backup.', 'danger');
         }
     };
 
+    /**
+     * Merestore data dari file JSON yang diunggah.
+     * @param {File} file File JSON yang diunggah.
+     * @param {function} showModalCallback Callback untuk menampilkan notifikasi.
+     */
     const restore = (file, showModalCallback) => {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const restoredData = JSON.parse(event.target.result);
-                if (restoredData.info && restoredData.pelajaran && restoredData.kriteria) {
-                    localStorage.setItem(DB_KEY, event.target.result);
-                    showModalCallback('Data berhasil di-restore! Halaman akan dimuat ulang.');
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    showModalCallback('File backup tidak valid.', false);
+        if (file && file.type === 'application/json') {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const restoredData = JSON.parse(e.target.result);
+                    // Validasi sederhana
+                    if (restoredData.info && restoredData.pelajaran && restoredData.kriteria) {
+                        simpanData(restoredData);
+                        showModalCallback('Restore berhasil! Halaman akan dimuat ulang.', 'success');
+                        setTimeout(() => window.location.reload(), 2000);
+                    } else {
+                        showModalCallback('File backup tidak valid.', 'danger');
+                    }
+                } catch (error) {
+                    showModalCallback('Gagal membaca file. Pastikan file backup tidak rusak.', 'danger');
                 }
-            } catch (error) {
-                showModalCallback('Gagal membaca file backup.', false);
-                console.error("Kesalahan Restore:", error);
-            }
-        };
-        reader.readAsText(file);
-    };
-
-    const resetAllData = (showModalCallback) => {
-        try {
-            localStorage.removeItem(DB_KEY);
-            showModalCallback('Semua data berhasil direset! Halaman akan dimuat ulang.');
-            setTimeout(() => window.location.reload(), 1500);
-        } catch (error) {
-            showModalCallback('Gagal mereset data.', false);
-            console.error("Kesalahan Reset Semua Data:", error);
+            };
+            reader.readAsText(file);
+        } else {
+            showModalCallback('Harap pilih file JSON yang benar.', 'warning');
         }
     };
 
+    /**
+     * Menghapus semua data dari localStorage.
+     * @param {function} showModalCallback Callback untuk menampilkan notifikasi.
+     */
+    const resetAllData = (showModalCallback) => {
+        localStorage.removeItem(DB_KEY);
+        showModalCallback('Semua data berhasil direset! Halaman akan dimuat ulang.', 'success');
+        setTimeout(() => window.location.reload(), 2000);
+    };
+
+    /**
+     * Menghapus data untuk satu pelajaran spesifik di kelas tertentu.
+     * @param {string} namaPelajaran Nama mata pelajaran.
+     * @param {number} kelas Nomor kelas.
+     * @returns {boolean} True jika berhasil, false jika gagal.
+     */
     const resetPelajaranData = (namaPelajaran, kelas) => {
         const data = getData();
-        const kelasKey = `kelas_${kelas}`;
-
-        if (data.kriteria[namaPelajaran] && data.kriteria[namaPelajaran][kelasKey]) {
-            delete data.kriteria[namaPelajaran][kelasKey];
+        const keyKelas = 'kelas_' + kelas;
+        if (data.kriteria[namaPelajaran] && data.kriteria[namaPelajaran][keyKelas]) {
+            delete data.kriteria[namaPelajaran][keyKelas];
             simpanData(data);
             return true;
         }
         return false;
     };
 
+
+    // Mengekspos fungsi-fungsi yang bisa diakses dari luar modul
     return {
         getData,
         simpanData,
