@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN PJJ</title>
+    <title>PJJ 2025</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/16rll5zsRdwTbR3nF_NmPKwY51tg4tnOn">
@@ -17,7 +17,7 @@
             --success-color: #50e3c2;
             --danger-color: #e74c3c;
             --warning-color: #f5a623;
-            --whatsapp-color: #25D366; /* <-- WARNA BARU */
+            --whatsapp-color: #25D366;
             --bg-color: #f7f9fc;
             --card-bg-color: #ffffff;
             --text-color: #333;
@@ -50,7 +50,7 @@
         .btn-icon { width: 40px; height: 40px; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
         .btn-edit { background-color: var(--warning-color); color: white; }
         .btn-delete { background-color: var(--danger-color); color: white; }
-        .btn-whatsapp { background-color: var(--whatsapp-color); color: white; font-size: 1.2rem; } /* <-- STYLE BARU */
+        .btn-whatsapp { background-color: var(--whatsapp-color); color: white; font-size: 1.2rem; }
         .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .modal.visible { opacity: 1; pointer-events: auto; }
         .modal-content { background-color: var(--card-bg-color); padding: 2.5rem; border-radius: 16px; width: 90%; max-width: 800px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.95); transition: transform 0.3s ease; }
@@ -74,13 +74,29 @@
     </style>
 </head>
 <body>
+
     <div id="loader-overlay"><div class="spinner"></div></div>
-    <div id="passwordModal" class="modal small-modal visible"></div>
+
+    <div id="passwordModal" class="modal small-modal visible">
+        <div class="modal-content">
+            <h2><i class="fas fa-lock" style="margin-right: 10px;"></i> Autentikasi</h2>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Masuk</button>
+            </form>
+            <p id="passwordError" style="color: var(--danger-color); margin-top: 1rem; display: none;">Password salah!</p>
+        </div>
+    </div>
     
     <main id="pageContent" class="app-container hidden">
         <header class="app-header">
             <h1><i class="fas fa-database" style="color: var(--primary-color);"></i> Database Pembelajaran</h1>
-            <button id="showAddModalBtn" class="btn btn-primary btn-add"><i class="fas fa-plus"></i> Tambah Data</button>
+            <button id="showAddModalBtn" class="btn btn-primary btn-add">
+                <i class="fas fa-plus"></i> Tambah Data
+            </button>
         </header>
 
         <div class="table-wrapper">
@@ -88,7 +104,8 @@
                 <thead>
                     <tr>
                         <th>Kelas</th><th>Pelajaran</th><th>Tujuan Pembelajaran</th><th>Materi</th><th>RPP</th><th>Video</th><th>Media</th>
-                        <th title="WhatsApp"><i class="fab fa-whatsapp"></i></th> <th>Aksi</th>
+                        <th title="WhatsApp"><i class="fab fa-whatsapp"></i></th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="dataTableBody"></tbody>
@@ -103,7 +120,6 @@
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycby9pCKDsubgrETJU2mciuib2mP8m7cpUFI0Vy_ky1TdKkLopCQfOmTc6rx7MTEqkJo8/exec';
         
-        // --- ALL JAVASCRIPT LOGIC (MODIFIED) ---
         const pageContent = document.getElementById('pageContent');
         const loader = document.getElementById('loader-overlay');
         const dataTableBody = document.getElementById('dataTableBody');
@@ -115,12 +131,53 @@
         const showLoader = (show) => loader.classList.toggle('visible', show);
         const showModal = (modal, show) => modal.classList.toggle('visible', show);
 
-        // ... (fungsi showNotification dan showConfirmation tidak berubah)
+        function showNotification(message, type = 'success') {
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
+            const color = type === 'success' ? 'var(--success-color)' : 'var(--danger-color)';
+            notificationModal.innerHTML = `
+                <div class="modal-content">
+                    <h2 style="color: ${color}; margin-bottom: 1rem;"><i class="fas ${icon}"></i> Notifikasi</h2>
+                    <p class="notification-message">${message}</p>
+                    <button id="notificationOkBtn" class="btn btn-primary">OK</button>
+                </div>
+            `;
+            showModal(notificationModal, true);
+            return new Promise(resolve => {
+                document.getElementById('notificationOkBtn').onclick = () => {
+                    showModal(notificationModal, false);
+                    resolve();
+                };
+            });
+        }
 
-        // Password modal (untuk mempersingkat, kontennya saya sembunyikan di sini)
-        passwordModal.innerHTML = `<div class="modal-content"><h2><i class="fas fa-lock" style="margin-right: 10px;"></i> Autentikasi</h2><form id="passwordForm"><div class="form-group"><label for="password">Password</label><input type="password" id="password" required></div><button type="submit" class="btn btn-primary">Masuk</button></form><p id="passwordError" style="color: var(--danger-color); margin-top: 1rem; display: none;">Password salah!</p></div>`;
-        document.getElementById('passwordForm').addEventListener('submit', e => { e.preventDefault(); if (document.getElementById('password').value === 'PJJ2025') { showModal(passwordModal, false); pageContent.classList.remove('hidden'); fetchData(); } else { document.getElementById('passwordError').style.display = 'block'; } });
+        function showConfirmation(message) {
+            confirmationModal.innerHTML = `
+                <div class="modal-content">
+                    <h2 style="color: var(--warning-color); margin-bottom: 1rem;"><i class="fas fa-exclamation-triangle"></i> Konfirmasi</h2>
+                    <p class="confirmation-message">${message}</p>
+                    <div class="confirmation-buttons">
+                        <button id="confirmYesBtn" class="btn" style="background-color: var(--danger-color); color: white;">Ya, Lanjutkan</button>
+                        <button id="confirmNoBtn" class="btn" style="background-color: #ccc;">Batal</button>
+                    </div>
+                </div>
+            `;
+            showModal(confirmationModal, true);
+            return new Promise(resolve => {
+                document.getElementById('confirmYesBtn').onclick = () => { showModal(confirmationModal, false); resolve(true); };
+                document.getElementById('confirmNoBtn').onclick = () => { showModal(confirmationModal, false); resolve(false); };
+            });
+        }
 
+        document.getElementById('passwordForm').addEventListener('submit', e => {
+            e.preventDefault();
+            if (document.getElementById('password').value === 'PJJ2025') {
+                showModal(passwordModal, false);
+                pageContent.classList.remove('hidden');
+                fetchData();
+            } else {
+                document.getElementById('passwordError').style.display = 'block';
+            }
+        });
 
         async function fetchData() {
             showLoader(true);
@@ -132,7 +189,6 @@
                 tableData.forEach((rowData, index) => {
                     if (rowData.every(cell => cell === "")) return;
                     
-                    // Logika untuk membuat link WhatsApp
                     const phone = rowData[8] || '';
                     let phoneCell = '<td>-</td>';
                     if (phone && String(phone).startsWith('62')) {
@@ -150,18 +206,19 @@
                     `;
                     dataTableBody.appendChild(row);
                 });
-            } catch (error) { /* ... error handling ... */ } 
-            finally { showLoader(false); }
+            } catch (error) {
+                await showNotification('Gagal memuat data. Periksa koneksi Anda.', 'error');
+            } finally {
+                showLoader(false);
+            }
         }
 
         function getFormHtml(mode, data = {}) {
             const isEdit = mode === 'edit';
             const title = isEdit ? 'Edit Data' : 'Tambah Data Baru';
             const icon = isEdit ? 'fa-edit' : 'fa-plus-circle';
-            // ... (logika options tidak berubah)
             const kelasOptions = ['1', '2', '3', '4', '5', '6'].map(n => `<option value="Kelas ${n}" ${data.Kelas === `Kelas ${n}` ? 'selected' : ''}>Kelas ${n}</option>`).join('');
-            const pelajaranOptions = ['Pendidikan Agama Islam','Pendidikan Agama Kristen','Pendidikan Agama Katholik','Pendidikan Agama Hindu','Pendidikan Agama Budha','Pendidikan Agama Konghucu','Pendidikan Pancasila','Bahasa Indonesia','Matematika','Ilmu Pengetahuan Alam dan Sosial','Seni dan Budaya','Pendidikan Jasmani Olahraga dan Kesehatan','Pendidikan Lingkungan dan Budaya Jakarta','Bahasa Inggris','Koding dan Kecerdasan Buatan','Mulok'].map(p => `<option value="${p}" ${data.Pelajaran === p ? 'selected' : ''}>${p}</option>`).join('');
-
+            const pelajaranOptions = ['Pendidikan Agama Islam','Pendidikan Agama Kristen','Pendidikan Agama Katholik','Pendidikan Agama Hindu','Pendidikan Agama Budha','Pendidikan Agama Konghucu','Pendidikan Pancasila','Bahasa Indonesia','Matematika','Ilmu Pengetahuan Alam dan Sosial','Seni dan Budaya','Pendidikan Jasmani Olahraga dan Kesehatan','Pendidikan Lingkungan dan Budaya Jakarta','Bahasa Inggris','Koding dan Kecerdasan Artifisial','Mulok'].map(p => `<option value="${p}" ${data.Pelajaran === p ? 'selected' : ''}>${p}</option>`).join('');
 
             return `
                 <div class="modal-content">
@@ -169,7 +226,7 @@
                     <h2><i class="fas ${icon}" style="color: var(--primary-color);"></i> ${title}</h2>
                     <form id="dataForm">
                         ${isEdit ? `<input type="hidden" name="rowId" value="${data.rowId}">` : ''}
-                        <div class="form-group"><label>Kelas</label><select name="Kelas" required>${kelasOptions}<option value="Lainnya">Lainnya</option></select></div>
+                        <div class="form-group"><label>Kelas</label><select name="Kelas" required>${kelasOptions}<option value="Lainnya" ${data.Kelas === 'Lainnya' ? 'selected' : ''}>Lainnya</option></select></div>
                         <div class="form-group"><label>Pelajaran</label><select name="Pelajaran" required>${pelajaranOptions}</select></div>
                         <div class="form-group full-width"><label>Tujuan Pembelajaran</label><input type="text" name="Tujuan" value="${data.Tujuan || ''}" required></div>
                         <div class="form-group full-width"><label>Materi</label><input type="text" name="Materi" value="${data.Materi || ''}" required></div>
@@ -178,7 +235,8 @@
                         <div class="form-group"><label>Link Media</label><input type="text" name="Media" value="${data.Media || ''}" required></div>
                         <div class="form-group">
                             <label>Nomor Telepon (WA)</label>
-                            <input type="text" name="Phone" value="${data.Phone || ''}" placeholder="Contoh: 628123456789"> </div>
+                            <input type="text" name="Phone" value="${data.Phone || ''}" placeholder="Contoh: 628123456789">
+                        </div>
                         <button type="submit" class="btn btn-success">${isEdit ? '<i class="fas fa-save"></i> Simpan Perubahan' : '<i class="fas fa-plus"></i> Tambah Data'}</button>
                     </form>
                 </div>
@@ -188,22 +246,58 @@
         function openDataModal(mode, rowId = null, rowData = null) {
             let data = {};
             if (mode === 'edit') {
-                data = { rowId, Kelas: rowData[1], Pelajaran: rowData[2], Tujuan: rowData[3], Materi: rowData[4], RPP: rowData[5], Video: rowData[6], Media: rowData[7], Phone: rowData[8] }; // <-- Tambah Phone
+                data = { rowId, Kelas: rowData[1], Pelajaran: rowData[2], Tujuan: rowData[3], Materi: rowData[4], RPP: rowData[5], Video: rowData[6], Media: rowData[7], Phone: rowData[8] };
             }
             dataModal.innerHTML = getFormHtml(mode, data);
             showModal(dataModal, true);
             document.getElementById('dataForm').addEventListener('submit', handleFormSubmit);
         }
 
-        // ... (fungsi showNotification, showConfirmation, handleFormSubmit, deleteData, dan event listener lainnya tetap sama)
-        // Fungsi-fungsi lain di sini
-        async function handleFormSubmit(e) { /* ... */ }
-        async function deleteData(rowId) { /* ... */ }
-        function showNotification(message, type = 'success') { /* ... */ }
-        function showConfirmation(message) { /* ... */ }
-        // Copy-paste fungsi-fungsi ini dari kode sebelumnya jika perlu.
         document.getElementById('showAddModalBtn').onclick = () => openDataModal('add');
 
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const isEdit = formData.has('rowId');
+            formData.append('action', isEdit ? 'update' : 'insert');
+
+            showLoader(true);
+            showModal(dataModal, false);
+
+            try {
+                const response = await fetch(scriptURL, { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.result !== 'success') throw new Error(result.message || 'Operasi gagal');
+                await showNotification(`Data berhasil ${isEdit ? 'diperbarui' : 'disimpan'}!`, 'success');
+                fetchData();
+            } catch (error) {
+                await showNotification(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function deleteData(rowId) {
+            const confirmed = await showConfirmation('Anda yakin ingin menghapus data ini secara permanen?');
+            if (confirmed) {
+                showLoader(true);
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('rowId', rowId);
+                try {
+                    const response = await fetch(scriptURL, { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (result.result !== 'success') throw new Error(result.message);
+                    await showNotification('Data telah berhasil dihapus.', 'success');
+                    fetchData();
+                } catch (error) {
+                    await showNotification(`Gagal menghapus data: ${error.message}`, 'error');
+                } finally {
+                    showLoader(false);
+                }
+            }
+        }
     </script>
 </body>
 </html>
