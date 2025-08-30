@@ -18,6 +18,7 @@
             --primary-color: #4a90e2;
             --whatsapp-color: #25D366;
             --excel-color: #1D6F42;
+			--user-color: red;
             --bg-color: #f7f9fc;
             --card-bg-color: #ffffff;
             --text-color: #333;
@@ -52,6 +53,7 @@
         .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .btn-primary { background-color: var(--primary-color); color: white; }
         .btn-excel { background-color: var(--excel-color); color: white; }
+		.btn-user { background-color: var(--user-color); color: white; }
         #resetFilterBtn { background-color: #7f8c8d; color: white; }
         .table-wrapper { flex-grow: 1; overflow: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--shadow); }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
@@ -136,6 +138,9 @@
             <button id="downloadExcelBtn" class="btn btn-excel" title="Download Excel">
                 <i class="fas fa-file-excel"></i>
             </button>
+            <a href="PJJ2025.html"><button class="btn btn-user" title="Download Excel">
+                <i class="fas fa-user"></i>
+            </button></a>			
         </div>
 
         <div class="table-wrapper">
@@ -405,4 +410,5 @@
     </script>
 </body>
 </html>
+
 
