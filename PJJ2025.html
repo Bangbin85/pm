@@ -191,7 +191,25 @@
                 </div>
                 <div class="form-group">
                     <label for="pelajaran">Pelajaran</label>
-                    <input type="text" id="pelajaran" name="Pelajaran" required>
+                    <select id="pelajaran" name="Pelajaran" required>
+                        <option value="">Pilih Pelajaran</option>
+                        <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
+                        <option value="Pendidikan Agama Kristen">Pendidikan Agama Kristen</option>
+                        <option value="Pendidikan Agama Katholik">Pendidikan Agama Katholik</option>
+                        <option value="Pendidikan Agama Hindu">Pendidikan Agama Hindu</option>
+                        <option value="Pendidikan Agama Budha">Pendidikan Agama Budha</option>
+                        <option value="Pendidikan Agama Konghucu">Pendidikan Agama Konghucu</option>
+                        <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="Matematika">Matematika</option>
+                        <option value="Ilmu Pengetahuan Alam dan Sosial">Ilmu Pengetahuan Alam dan Sosial</option>
+                        <option value="Seni dan Budaya">Seni dan Budaya</option>
+                        <option value="Pendidikan Jasmani Olahraga dan Kesehatan">Pendidikan Jasmani Olahraga dan Kesehatan</option>
+                        <option value="Pendidikan Lingkungan dan Budaya Jakarta">Pendidikan Lingkungan dan Budaya Jakarta</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        <option value="Koding dan Kecerdasan Buatan">Koding dan Kecerdasan Buatan</option>
+                        <option value="Mulok">Mulok</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="tujuan">Tujuan</label>
@@ -239,7 +257,25 @@
                 </div>
                 <div class="form-group">
                     <label for="editPelajaran">Pelajaran</label>
-                    <input type="text" id="editPelajaran" name="Pelajaran" required>
+                    <select id="editPelajaran" name="Pelajaran" required>
+                        <option value="">Pilih Pelajaran</option>
+                        <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
+                        <option value="Pendidikan Agama Kristen">Pendidikan Agama Kristen</option>
+                        <option value="Pendidikan Agama Katholik">Pendidikan Agama Katholik</option>
+                        <option value="Pendidikan Agama Hindu">Pendidikan Agama Hindu</option>
+                        <option value="Pendidikan Agama Budha">Pendidikan Agama Budha</option>
+                        <option value="Pendidikan Agama Konghucu">Pendidikan Agama Konghucu</option>
+                        <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="Matematika">Matematika</option>
+                        <option value="Ilmu Pengetahuan Alam dan Sosial">Ilmu Pengetahuan Alam dan Sosial</option>
+                        <option value="Seni dan Budaya">Seni dan Budaya</option>
+                        <option value="Pendidikan Jasmani Olahraga dan Kesehatan">Pendidikan Jasmani Olahraga dan Kesehatan</option>
+                        <option value="Pendidikan Lingkungan dan Budaya Jakarta">Pendidikan Lingkungan dan Budaya Jakarta</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        <option value="Koding dan Kecerdasan Buatan">Koding dan Kecerdasan Buatan</option>
+                        <option value="Mulok">Mulok</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="editTujuan">Tujuan</label>
@@ -386,7 +422,7 @@
             editModal.style.display = "block";
             document.getElementById('editRowId').value = rowId;
             document.getElementById('editKelas').value = data[1];
-            document.getElementById('editPelajaran').value = data[2];
+            document.getElementById('editPelajaran').value = data[2]; // Otomatis memilih pelajaran yang sesuai
             document.getElementById('editTujuan').value = data[3];
             document.getElementById('editMateri').value = data[4];
             document.getElementById('editRPP').value = data[5];
