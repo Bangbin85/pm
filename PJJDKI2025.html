@@ -16,6 +16,7 @@
         :root {
             --primary-color: #4a90e2;
             --whatsapp-color: #25D366;
+            --excel-color: #1D6F42;
             --bg-color: #f7f9fc;
             --card-bg-color: #ffffff;
             --text-color: #333;
@@ -29,13 +30,27 @@
         .app-container { width: 100%; height: 100vh; padding: 2rem; display: flex; flex-direction: column; }
         .app-header { margin-bottom: 1.5rem; flex-shrink: 0; }
         .app-header h1 { font-size: 2rem; color: var(--text-color); text-align: center; }
-        .filter-bar { display: flex; gap: 1.5rem; align-items: flex-end; margin-bottom: 1.5rem; padding: 1.5rem; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--shadow); flex-wrap: wrap; }
+        .filter-bar { display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; padding: 1.5rem; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--shadow); flex-wrap: wrap; }
         .filter-group { display: flex; flex-direction: column; flex-grow: 1; }
         .filter-group label { margin-bottom: 0.5rem; font-weight: 500; color: #555; }
         .filter-group select { padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; font-family: var(--font-family); background-color: #fff; }
-        .btn { border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-family); font-weight: 600; transition: all 0.2s ease; padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .btn { 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-family: var(--font-family); 
+            font-weight: 600; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            font-size: 1.2rem;
+        }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-excel { background-color: var(--excel-color); color: white; }
         #resetFilterBtn { background-color: #7f8c8d; color: white; }
         .table-wrapper { flex-grow: 1; overflow: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--shadow); }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
@@ -67,6 +82,25 @@
         .modal-filter-bar select { padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-family: var(--font-family); flex-grow: 1; }
         .chart-container { position: relative; flex-grow: 1; }
 
+        /* Footer Styles */
+        .app-footer {
+            text-align: center;
+            padding-top: 1.5rem;
+            color: #888;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 1rem;
+            flex-shrink: 0;
+        }
+        .app-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .app-footer a:hover {
+            text-decoration: underline;
+        }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -92,11 +126,14 @@
                     <option value="">Semua Pelajaran</option>
                 </select>
             </div>
-            <button id="resetFilterBtn" class="btn">
-                <i class="fas fa-undo"></i> Reset Filter
+            <button id="resetFilterBtn" class="btn" title="Reset Filter">
+                <i class="fas fa-undo"></i>
             </button>
-            <button id="showChartBtn" class="btn btn-primary">
-                <i class="fas fa-chart-bar"></i> Tampilkan Grafik
+            <button id="showChartBtn" class="btn btn-primary" title="Tampilkan Grafik">
+                <i class="fas fa-chart-bar"></i>
+            </button>
+            <button id="downloadExcelBtn" class="btn btn-excel" title="Download Excel">
+                <i class="fas fa-file-excel"></i>
             </button>
         </div>
 
@@ -111,6 +148,10 @@
                 <tbody id="dataTableBody"></tbody>
             </table>
         </div>
+        
+        <footer class="app-footer">
+            <p>Copyright &copy; 2025 Bidang SD Provinsi DKI Jakarta | <a href="https://wa.me/6281285242527" target="_blank" rel="noopener noreferrer">Hubungi Kami</a></p>
+        </footer>
     </main>
 
     <!-- Chart Modal -->
@@ -139,6 +180,7 @@
         const filterPelajaran = document.getElementById('filterPelajaran');
         const resetFilterBtn = document.getElementById('resetFilterBtn');
         const showChartBtn = document.getElementById('showChartBtn');
+        const downloadExcelBtn = document.getElementById('downloadExcelBtn');
         const chartModal = document.getElementById('chartModal');
         const modalClose = document.getElementById('modalClose');
         const chartFilterKelas = document.getElementById('chartFilterKelas');
@@ -283,6 +325,60 @@
             });
         }
 
+        function downloadExcel() {
+            const selectedKelas = filterKelas.value;
+            const selectedPelajaran = filterPelajaran.value;
+            let dataToExport = allData;
+
+            if (selectedKelas) {
+                dataToExport = dataToExport.filter(row => row[1] === selectedKelas);
+            }
+            if (selectedPelajaran) {
+                dataToExport = dataToExport.filter(row => row[2] === selectedPelajaran);
+            }
+
+            if (dataToExport.length === 0) {
+                // Menggunakan dialog kustom sebagai pengganti alert()
+                const noDataModal = document.createElement('div');
+                noDataModal.textContent = 'Tidak ada data untuk diunduh.';
+                Object.assign(noDataModal.style, {
+                    position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
+                    backgroundColor: '#ffc107', color: 'black', padding: '1rem 2rem', 
+                    borderRadius: '8px', zIndex: '4000', boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                });
+                document.body.appendChild(noDataModal);
+                setTimeout(() => { noDataModal.remove(); }, 3000);
+                return;
+            }
+
+
+            const headers = ["Kelas", "Pelajaran", "Tujuan Pembelajaran", "Materi", "RPP", "Video", "Media", "WhatsApp"];
+            
+            const formatCell = (cell) => {
+                const cellStr = String(cell == null ? "" : cell).replace(/"/g, '""');
+                return `"${cellStr}"`;
+            };
+
+            let csvContent = headers.join(",") + "\n";
+            
+            dataToExport.forEach(rowData => {
+                const rowToFormat = rowData.slice(1, 9);
+                csvContent += rowToFormat.map(formatCell).join(",") + "\n";
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "pjj_dki_2025_data.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
         async function initialize() {
             showLoader(true);
             try {
@@ -316,6 +412,8 @@
             setupChart();
         });
 
+        downloadExcelBtn.addEventListener('click', downloadExcel);
+
         modalClose.addEventListener('click', () => { chartModal.style.display = 'none'; });
         chartModal.addEventListener('click', (e) => { if (e.target === chartModal) { chartModal.style.display = 'none'; } });
         chartFilterKelas.addEventListener('change', () => { setupChart(chartFilterKelas.value); });
@@ -324,5 +422,4 @@
     </script>
 </body>
 </html>
-
 
