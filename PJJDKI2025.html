@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PJJ DKI 2025</title>
+    <title>PJJ 2025</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/16rll5zsRdwTbR3nF_NmPKwY51tg4tnOn">
@@ -14,7 +14,7 @@
     <style>
         :root {
             --primary-color: #4a90e2;
-            --whatsapp-color: #25D366; /* <-- WARNA BARU */
+            --whatsapp-color: #25D366;
             --bg-color: #f7f9fc;
             --card-bg-color: #ffffff;
             --text-color: #333;
@@ -42,7 +42,7 @@
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: #eff6ff; }
         td a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
-        td a.btn-whatsapp { color: white; font-size: 1.2rem; } /* <-- STYLE BARU */
+        td a.btn-whatsapp { color: white; font-size: 1.2rem; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; background-color: var(--whatsapp-color); text-decoration: none; }
         td a:hover { text-decoration: underline; }
         .empty-row td { text-align: center; padding: 3rem; font-size: 1.2rem; color: #999; }
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
@@ -55,15 +55,35 @@
     <div id="loader-overlay"><div class="spinner"></div></div>
     
     <main class="app-container">
-        <header class="app-header"></header>
-        <div class="filter-bar"></div>
+        <header class="app-header">
+            <h1><i class="fas fa-book-open" style="color: var(--primary-color);"></i> PJJ DKI 2025</h1>
+        </header>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label for="filterKelas"><i class="fas fa-school"></i> Filter Kelas</label>
+                <select id="filterKelas">
+                    <option value="">Semua Kelas</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterPelajaran"><i class="fas fa-book"></i> Filter Pelajaran</label>
+                <select id="filterPelajaran">
+                    <option value="">Semua Pelajaran</option>
+                </select>
+            </div>
+            <button id="resetFilterBtn" class="btn">
+                <i class="fas fa-undo"></i> Reset Filter
+            </button>
+        </div>
 
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
                         <th>Kelas</th><th>Pelajaran</th><th>Tujuan Pembelajaran</th><th>Materi</th><th>RPP</th><th>Video</th><th>Media</th>
-                        <th title="WhatsApp"><i class="fab fa-whatsapp"></i></th> </tr>
+                        <th title="WhatsApp"><i class="fab fa-whatsapp"></i></th>
+                    </tr>
                 </thead>
                 <tbody id="dataTableBody"></tbody>
             </table>
@@ -75,54 +95,107 @@
         
         const loader = document.getElementById('loader-overlay');
         const dataTableBody = document.getElementById('dataTableBody');
-        // ... (selektor filter tidak berubah)
         const filterKelas = document.getElementById('filterKelas');
         const filterPelajaran = document.getElementById('filterPelajaran');
         const resetFilterBtn = document.getElementById('resetFilterBtn');
+        
         let allData = [];
 
-        const showLoader = (show) => { loader.style.display = show ? 'flex' : 'none'; };
+        const showLoader = (show) => {
+            loader.style.display = show ? 'flex' : 'none';
+        };
 
         function renderTable(dataToRender) {
             dataTableBody.innerHTML = '';
             if (dataToRender.length === 0) {
-                // Update colspan to 8
-                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="8"><i class="fas fa-search"></i> Tidak ada data yang cocok.</td></tr>`;
+                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="8"><i class="fas fa-search" style="margin-right: 10px;"></i>Tidak ada data yang cocok dengan filter Anda.</td></tr>`;
                 return;
             }
 
             dataToRender.forEach(rowData => {
                 const row = document.createElement('tr');
                 
-                // Process columns from B to H (index 1 to 7)
                 const mainCells = rowData.slice(1, 8).map(cell => {
                     const content = String(cell);
-                    let cellContent = content.startsWith('http') ? `<a href="${content}" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> Lihat Link</a>` : content;
+                    let cellContent = content;
+                    if (content.startsWith('http')) {
+                         cellContent = `<a href="${content}" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> Lihat Link</a>`;
+                    }
                     return `<td>${cellContent}</td>`;
                 }).join('');
-
-                // Process Phone column (index 8)
+                
                 const phone = rowData[8] || '';
                 let phoneCell = '<td>-</td>';
                 if (phone && String(phone).startsWith('62')) {
-                    phoneCell = `<td><a href="https://wa.me/${phone}" target="_blank" class="btn btn-icon btn-whatsapp" title="Hubungi via WhatsApp"><i class="fab fa-whatsapp"></i></a></td>`;
+                    phoneCell = `<td><a href="https://wa.me/${phone}" target="_blank" class="btn-whatsapp" title="Hubungi via WhatsApp"><i class="fab fa-whatsapp"></i></a></td>`;
                 }
 
                 row.innerHTML = mainCells + phoneCell;
                 dataTableBody.appendChild(row);
             });
         }
-        
-        // ... (Fungsi applyFilters, populateDropdowns, initialize, dan event listener lainnya tidak berubah)
-        // Fungsi-fungsi lain di sini, tidak perlu diubah.
-        function applyFilters() { /* ... */ }
-        function populateDropdowns() { /* ... */ }
-        async function initialize() { /* ... */ }
+
+        function applyFilters() {
+            const selectedKelas = filterKelas.value;
+            const selectedPelajaran = filterPelajaran.value;
+
+            let filteredData = allData;
+
+            if (selectedKelas) {
+                filteredData = filteredData.filter(row => row[1] === selectedKelas);
+            }
+            if (selectedPelajaran) {
+                filteredData = filteredData.filter(row => row[2] === selectedPelajaran);
+            }
+            renderTable(filteredData);
+        }
+
+        function populateDropdowns() {
+            const kelasOptions = [...new Set(allData.map(row => row[1]))].sort(); 
+            const pelajaranOptions = [...new Set(allData.map(row => row[2]))].sort();
+
+            kelasOptions.forEach(kelas => {
+                const option = document.createElement('option');
+                option.value = kelas;
+                option.textContent = kelas;
+                filterKelas.appendChild(option);
+            });
+
+            pelajaranOptions.forEach(pelajaran => {
+                const option = document.createElement('option');
+                option.value = pelajaran;
+                option.textContent = pelajaran;
+                filterPelajaran.appendChild(option);
+            });
+        }
+
+        async function initialize() {
+            showLoader(true);
+            try {
+                const response = await fetch(scriptURL);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                allData = data.slice(1).filter(row => !row.every(cell => cell === ""));
+
+                renderTable(allData);
+                populateDropdowns();
+            } catch (error) {
+                console.error('Gagal mengambil data:', error);
+                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="8">Gagal memuat data. Silakan coba lagi nanti.</td></tr>`;
+            } finally {
+                showLoader(false);
+            }
+        }
+
         filterKelas.addEventListener('change', applyFilters);
         filterPelajaran.addEventListener('change', applyFilters);
-        resetFilterBtn.addEventListener('click', () => { /* ... */ });
-        
-        initialize(); // Start
+        resetFilterBtn.addEventListener('click', () => {
+            filterKelas.value = '';
+            filterPelajaran.value = '';
+            applyFilters();
+        });
+
+        initialize();
     </script>
 </body>
 </html>
