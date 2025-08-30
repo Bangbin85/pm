@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
         :root {
@@ -150,7 +151,7 @@
         </div>
         
         <footer class="app-footer">
-            <p>Copyright &copy; 2025 Bidang SD Provinsi DKI Jakarta | <a href="https://wa.me/6281285242527" target="_blank" rel="noopener noreferrer">Hubungi Kami</a></p>
+            <a href="https://wa.me/6281285242527" target="_blank" rel="noopener noreferrer"><p>Copyright &copy; 2025 Bidang SD Provinsi DKI Jakarta</p></a>
         </footer>
     </main>
 
@@ -338,7 +339,6 @@
             }
 
             if (dataToExport.length === 0) {
-                // Menggunakan dialog kustom sebagai pengganti alert()
                 const noDataModal = document.createElement('div');
                 noDataModal.textContent = 'Tidak ada data untuk diunduh.';
                 Object.assign(noDataModal.style, {
@@ -351,32 +351,15 @@
                 return;
             }
 
-
             const headers = ["Kelas", "Pelajaran", "Tujuan Pembelajaran", "Materi", "RPP", "Video", "Media", "WhatsApp"];
-            
-            const formatCell = (cell) => {
-                const cellStr = String(cell == null ? "" : cell).replace(/"/g, '""');
-                return `"${cellStr}"`;
-            };
+            const dataForSheet = dataToExport.map(rowData => rowData.slice(1, 9));
+            const worksheetData = [headers, ...dataForSheet];
 
-            let csvContent = headers.join(",") + "\n";
-            
-            dataToExport.forEach(rowData => {
-                const rowToFormat = rowData.slice(1, 9);
-                csvContent += rowToFormat.map(formatCell).join(",") + "\n";
-            });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", "pjj_dki_2025_data.csv");
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
+            const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "PJJ_Data");
+
+            XLSX.writeFile(wb, "pjj_dki_2025_data.xlsx");
         }
 
         async function initialize() {
