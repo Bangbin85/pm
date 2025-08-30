@@ -38,7 +38,12 @@
         .header-actions .btn { display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; padding: 0.75rem 1.5rem; }
         .table-wrapper { flex-grow: 1; overflow: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--shadow); }
         table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th, td { padding: 1rem 1.5rem; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+th, td { 
+    padding: 1rem 1.5rem; 
+    text-align: left; 
+    border-bottom: 1px solid var(--border-color); 
+    white-space: normal; /* <-- Perubahan di sini */
+}
         th { background-color: #f9fafb; font-weight: 600; position: sticky; top: 0; z-index: 10; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: #eff6ff; }
@@ -118,4 +123,5 @@
     </script>
 </body>
 </html>
+
 
