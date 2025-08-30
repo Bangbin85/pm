@@ -50,7 +50,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1em;
-            background-color: white; /* Ensure select has a background */
+            background-color: white;
         }
         button {
             padding: 12px 20px;
@@ -68,7 +68,7 @@
         button[type="submit"] {
             background-color: #2ecc71;
             color: white;
-            grid-column: 1 / -1; /* Span full width */
+            grid-column: 1 / -1;
         }
         button:hover {
             opacity: 0.9;
@@ -180,9 +180,12 @@
                     <label for="kelas">Kelas</label>
                     <select id="kelas" name="Kelas" required>
                         <option value="">Pilih Kelas</option>
-                        <option value="Kelas 10">Kelas 10</option>
-                        <option value="Kelas 11">Kelas 11</option>
-                        <option value="Kelas 12">Kelas 12</option>
+                        <option value="Kelas 1">Kelas 1</option>
+                        <option value="Kelas 2">Kelas 2</option>
+                        <option value="Kelas 3">Kelas 3</option>
+                        <option value="Kelas 4">Kelas 4</option>
+                        <option value="Kelas 5">Kelas 5</option>
+                        <option value="Kelas 6">Kelas 6</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
@@ -225,9 +228,12 @@
                     <label for="editKelas">Kelas</label>
                      <select id="editKelas" name="Kelas" required>
                         <option value="">Pilih Kelas</option>
-                        <option value="Kelas 10">Kelas 10</option>
-                        <option value="Kelas 11">Kelas 11</option>
-                        <option value="Kelas 12">Kelas 12</option>
+                        <option value="Kelas 1">Kelas 1</option>
+                        <option value="Kelas 2">Kelas 2</option>
+                        <option value="Kelas 3">Kelas 3</option>
+                        <option value="Kelas 4">Kelas 4</option>
+                        <option value="Kelas 5">Kelas 5</option>
+                        <option value="Kelas 6">Kelas 6</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
@@ -259,7 +265,6 @@
             </form>
         </div>
     </div>
-
 
     <script>
         // --- TIDAK ADA PERUBAHAN PADA JAVASCRIPT ---
@@ -380,7 +385,7 @@
         function openEditModal(rowId, data) {
             editModal.style.display = "block";
             document.getElementById('editRowId').value = rowId;
-            document.getElementById('editKelas').value = data[1]; // Ini akan otomatis memilih opsi yang benar
+            document.getElementById('editKelas').value = data[1];
             document.getElementById('editPelajaran').value = data[2];
             document.getElementById('editTujuan').value = data[3];
             document.getElementById('editMateri').value = data[4];
