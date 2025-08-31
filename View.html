@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualisasi Data PJJ</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" type="image/x-icon" href="https://disdik.jakarta.go.id/static/disdik/images/logo/logo.png">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50e3c2;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --bg-color: #f7f9fc;
+            --card-bg-color: #ffffff;
+            --text-color: #333;
+            --text-light-color: #888;
+            --border-color: #e0e6ed;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --font-family: 'Poppins', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .app-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+        .app-header h1 {
+            font-size: 2.2rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 0;
+        }
+        .app-header img {
+            height: 40px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .btn-admin { background-color: var(--danger-color); }
+        .btn-guru { background-color: var(--info-color); }
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--text-color);
+        }
+        .card {
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .chart-grid .chart-item {
+            background-color: #fdfdfd;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .chart-grid h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #555;
+        }
+        .chart-grid .small-chart-container {
+            height: 250px;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 500px; /* Menambahkan tinggi maksimal dan scroll vertikal */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #eff6ff;
+        }
+        td a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        td a:hover { text-decoration: underline; }
+
+        .strategi-clickable {
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 500;
+            background-color: rgba(74, 144, 226, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .strategi-clickable:hover {
+            background-color: rgba(74, 144, 226, 0.2);
+        }
+
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .spinner {
+            border: 5px solid #e0e6ed;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            position: relative;
+            animation: modal-fade-in 0.3s ease-out;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            line-height: 1;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: #333; }
+        .modal-header h2 { margin: 0 0 1rem 0; color: var(--primary-color);}
+        .modal-body p { white-space: pre-wrap; line-height: 1.7; }
+        
+        .app-footer {
+            text-align: center;
+            padding-top: 2rem;
+            color: var(--text-light-color);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+        .app-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes modal-fade-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div id="loader-overlay">
+        <div class="spinner"></div>
+        <p>Memuat Data Visualisasi...</p>
+    </div>
+    
+    <main class="app-container">
+        <header class="app-header">
+            <h1>
+                <img src="https://disdik.jakarta.go.id/static/disdik/images/logo/logo.png" alt="Logo Disdik">
+                <span>Dashboard Visualisasi</span>
+            </h1>
+            <div class="header-actions">
+                <a href="PJJ2025.html" class="btn btn-admin"><i class="fas fa-user-shield"></i> Admin</a>
+                <a href="PJJDKI2025.html" class="btn btn-guru"><i class="fas fa-chalkboard-teacher"></i> Guru</a>
+            </div>
+        </header>
+
+        <!-- Grafik Per Kelas -->
+        <div class="card">
+            <h2 class="section-title"><i class="fas fa-school"></i> Sebaran Materi per Kelas</h2>
+            <div class="chart-container">
+                <canvas id="classDistributionChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Grafik Per Pelajaran -->
+        <div class="card">
+            <h2 class="section-title"><i class="fas fa-book"></i> Sebaran Materi per Pelajaran</h2>
+            <div class="chart-grid" id="subjectChartsGrid">
+                <!-- Grafik kecil akan ditambahkan di sini oleh JavaScript -->
+            </div>
+        </div>
+
+        <!-- Tabel Rangkuman -->
+        <div class="card">
+            <h2 class="section-title"><i class="fas fa-table"></i> Rangkuman Data</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kelas</th>
+                            <th>Pelajaran</th>
+                            <th>Strategi</th>
+                            <th>RPP</th>
+                            <th>Materi</th>
+                            <th>Media</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                        <!-- Data tabel akan ditambahkan di sini oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabel Rekapitulasi Baru -->
+        <div class="card">
+            <h2 class="section-title"><i class="fas fa-chart-pie"></i> Rekapitulasi Jumlah Materi</h2>
+            <div class="table-wrapper" style="max-height: none;"> <!-- Wrapper tanpa batas tinggi -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kelas</th>
+                            <th>Pendidikan Agama</th>
+                            <th>Pendidikan Pancasila</th>
+                            <th>Bahasa Indonesia</th>
+                            <th>Matematika</th>
+                            <th>IPAS</th>
+                            <th>Seni & Budaya</th>
+                            <th>PLBJ</th>
+                            <th>Koding & AI</th>
+                            <th>Jumlah Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recapTableBody">
+                        <!-- Data rekapitulasi akan ditambahkan di sini -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer class="app-footer">
+             <a href="https://wa.me/6281285242527" target="_blank" rel="noopener noreferrer"><p>Copyright &copy; 2025 Bidang SD Provinsi DKI Jakarta</p></a>
+        </footer>
+    </main>
+
+    <!-- Modal untuk Detail Strategi -->
+    <div id="strategiModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fas fa-lightbulb"></i> Detail Strategi Pembelajaran</h2>
+            </div>
+            <div class="modal-body">
+                <p id="strategiModalText"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby9pCKDsubgrETJU2mciuib2mP8m7cpUFI0Vy_ky1TdKkLopCQfOmTc6rx7MTEqkJo8/exec';
+        
+        const loader = document.getElementById('loader-overlay');
+        const classChartCanvas = document.getElementById('classDistributionChart');
+        const subjectChartsGrid = document.getElementById('subjectChartsGrid');
+        const summaryTableBody = document.getElementById('summaryTableBody');
+        const recapTableBody = document.getElementById('recapTableBody'); // Variabel baru untuk tabel rekap
+        const strategiModal = document.getElementById('strategiModal');
+        const strategiModalText = document.getElementById('strategiModalText');
+
+        const COLORS = [
+            '#4a90e2', '#50e3c2', '#f5a623', '#e74c3c', '#8e44ad', '#f8e71c',
+            '#7ed321', '#bd10e0', '#417505', '#d0021b', '#9013fe', '#b8e986'
+        ];
+
+        function showLoader(show) {
+            loader.style.display = show ? 'flex' : 'none';
+        }
+        
+        function showModal(show) {
+            strategiModal.style.display = show ? 'flex' : 'none';
+        }
+
+        // Fungsi untuk membuat grafik distribusi per kelas
+        function renderClassChart(data) {
+            const classCounts = {};
+            data.forEach(row => {
+                const kelas = row[1];
+                if (kelas) {
+                    classCounts[kelas] = (classCounts[kelas] || 0) + 1;
+                }
+            });
+
+            const sortedClasses = Object.keys(classCounts).sort();
+            const chartLabels = sortedClasses;
+            const chartData = sortedClasses.map(kelas => classCounts[kelas]);
+
+            new Chart(classChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Jumlah Materi',
+                        data: chartData,
+                        backgroundColor: COLORS.map(color => `${color}B3`), // 70% opacity
+                        borderColor: COLORS,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Fungsi untuk membuat grafik kecil per pelajaran
+        function renderSubjectCharts(data) {
+            const subjectData = {};
+            data.forEach(row => {
+                const kelas = row[1];
+                const pelajaran = row[2];
+                if (kelas && pelajaran) {
+                    if (!subjectData[pelajaran]) {
+                        subjectData[pelajaran] = {};
+                    }
+                    subjectData[pelajaran][kelas] = (subjectData[pelajaran][kelas] || 0) + 1;
+                }
+            });
+
+            const sortedSubjects = Object.keys(subjectData).sort();
+
+            sortedSubjects.forEach((pelajaran, index) => {
+                const item = document.createElement('div');
+                item.className = 'chart-item';
+
+                const title = document.createElement('h3');
+                title.textContent = pelajaran;
+                
+                const container = document.createElement('div');
+                container.className = 'small-chart-container';
+                const canvas = document.createElement('canvas');
+                container.appendChild(canvas);
+
+                item.appendChild(title);
+                item.appendChild(container);
+                subjectChartsGrid.appendChild(item);
+
+                const labels = Object.keys(subjectData[pelajaran]).sort();
+                const chartData = labels.map(label => subjectData[pelajaran][label]);
+
+                new Chart(canvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: COLORS,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 15
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Fungsi untuk mengisi tabel rangkuman
+        function renderSummaryTable(data) {
+            summaryTableBody.innerHTML = '';
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // [Kelas, Pelajaran, Strategi, RPP, Materi, Media]
+                const kelas = row[1] || '-';
+                const pelajaran = row[2] || '-';
+                const strategiFull = row[8] || '-';
+                const rpp = row[5] || '-';
+                const materi = row[4] || '-';
+                const media = row[7] || '-';
+
+                // Ambil bagian pertama dari strategi
+                const strategiParts = strategiFull.split(':');
+                const strategiDisplay = strategiParts[0].trim();
+                
+                tr.innerHTML = `
+                    <td>${kelas}</td>
+                    <td>${pelajaran}</td>
+                    <td><span class="strategi-clickable" data-fulltext="${strategiFull.replace(/"/g, '&quot;')}">${strategiDisplay}</span></td>
+                    <td>${rpp.startsWith('http') ? `<a href="${rpp}" target="_blank">Lihat</a>` : rpp}</td>
+                    <td>${materi.startsWith('http') ? `<a href="${materi}" target="_blank">Lihat</a>` : materi}</td>
+                    <td>${media.startsWith('http') ? `<a href="${media}" target="_blank">Lihat</a>` : media}</td>
+                `;
+                summaryTableBody.appendChild(tr);
+            });
+        }
+        
+        // --- FUNGSI BARU UNTUK MEMBUAT TABEL REKAPITULASI ---
+        function renderRecapTable(data) {
+            const recapData = {};
+            const subjects = [
+                'Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 
+                'Ilmu Pengetahuan Alam dan Sosial', 'Seni dan Budaya', 
+                'Pendidikan Lingkungan dan Budaya Jakarta', 'Koding dan Kecerdasan Buatan'
+            ];
+
+            // Inisialisasi struktur data
+            const classes = [...new Set(data.map(row => row[1]))].sort();
+            classes.forEach(kelas => {
+                recapData[kelas] = {};
+                subjects.forEach(subject => {
+                    recapData[kelas][subject] = 0;
+                });
+                recapData[kelas]['Total'] = 0;
+            });
+
+            // Hitung data
+            data.forEach(row => {
+                const kelas = row[1];
+                let pelajaran = row[2];
+
+                if (pelajaran.startsWith('Pendidikan Agama')) {
+                    pelajaran = 'Pendidikan Agama';
+                }
+
+                if (recapData[kelas] && subjects.includes(pelajaran)) {
+                    recapData[kelas][pelajaran]++;
+                    recapData[kelas]['Total']++;
+                }
+            });
+
+            // Render ke tabel
+            recapTableBody.innerHTML = '';
+            classes.forEach(kelas => {
+                const tr = document.createElement('tr');
+                let rowHTML = `<td>${kelas}</td>`;
+                subjects.forEach(subject => {
+                    rowHTML += `<td>${recapData[kelas][subject]}</td>`;
+                });
+                rowHTML += `<td><strong>${recapData[kelas]['Total']}</strong></td>`;
+                tr.innerHTML = rowHTML;
+                recapTableBody.appendChild(tr);
+            });
+        }
+
+        async function initialize() {
+            showLoader(true);
+            try {
+                const response = await fetch(scriptURL);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                const cleanData = data.slice(1).filter(row => !row.every(cell => cell === "") && row[1] && row[2]);
+                
+                renderClassChart(cleanData);
+                renderSubjectCharts(cleanData);
+                renderSummaryTable(cleanData);
+                renderRecapTable(cleanData); // Panggil fungsi baru
+
+            } catch (error) {
+                console.error('Gagal mengambil data:', error);
+                subjectChartsGrid.innerHTML = '<p>Gagal memuat data. Silakan coba lagi nanti.</p>';
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // Event listener untuk modal
+        summaryTableBody.addEventListener('click', function(e) {
+            if (e.target.classList.contains('strategi-clickable')) {
+                const fullText = e.target.getAttribute('data-fulltext');
+                strategiModalText.textContent = fullText;
+                showModal(true);
+            }
+        });
+        
+        strategiModal.querySelector('.modal-close').addEventListener('click', () => showModal(false));
+        strategiModal.addEventListener('click', (e) => {
+            if (e.target === strategiModal) {
+                showModal(false);
+            }
+        });
+
+        // Panggil fungsi inisialisasi
+        initialize();
+    </script>
+</body>
+</html>
+
