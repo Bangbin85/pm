@@ -350,7 +350,7 @@
         const classChartCanvas = document.getElementById('classDistributionChart');
         const subjectChartsGrid = document.getElementById('subjectChartsGrid');
         const summaryTableBody = document.getElementById('summaryTableBody');
-        const recapTableBody = document.getElementById('recapTableBody'); // Variabel baru untuk tabel rekap
+        const recapTableBody = document.getElementById('recapTableBody');
         const strategiModal = document.getElementById('strategiModal');
         const strategiModalText = document.getElementById('strategiModalText');
 
@@ -494,17 +494,27 @@
             });
         }
         
-        // --- FUNGSI BARU UNTUK MEMBUAT TABEL REKAPITULASI ---
+        // Fungsi untuk membuat tabel rekapitulasi
         function renderRecapTable(data) {
             const recapData = {};
+            // Menggunakan header tabel yang disingkat
             const subjects = [
                 'Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 
-                'Ilmu Pengetahuan Alam dan Sosial', 'Seni dan Budaya', 
-                'Pendidikan Lingkungan dan Budaya Jakarta', 'Bahasa Inggris', 'Koding dan Kecerdasan Artifisial'
+                'IPAS', 'Seni & Budaya', 'PLBJ', 'B. Inggris', 'KKA'
             ];
 
+            // Peta untuk mengubah nama panjang dari data ke nama pendek di header
+            const subjectMap = {
+                'Ilmu Pengetahuan Alam dan Sosial': 'IPAS',
+                'Seni dan Budaya': 'Seni & Budaya',
+                'Pendidikan Lingkungan dan Budaya Jakarta': 'PLBJ',
+                'Bahasa Inggris': 'B. Inggris',
+                'Koding dan Kecerdasan Artifisial': 'KKA',
+                'KKA': 'KKA' // Menangani jika data sudah disingkat
+            };
+
             // Inisialisasi struktur data
-            const classes = [...new Set(data.map(row => row[1]))].sort();
+            const classes = [...new Set(data.map(row => row[1]))].filter(Boolean).sort();
             classes.forEach(kelas => {
                 recapData[kelas] = {};
                 subjects.forEach(subject => {
@@ -518,8 +528,13 @@
                 const kelas = row[1];
                 let pelajaran = row[2];
 
+                if (!kelas) return; // Lewati baris tanpa kelas
+
+                // Normalisasi nama pelajaran
                 if (pelajaran.startsWith('Pendidikan Agama')) {
                     pelajaran = 'Pendidikan Agama';
+                } else if (subjectMap[pelajaran]) {
+                    pelajaran = subjectMap[pelajaran];
                 }
 
                 if (recapData[kelas] && subjects.includes(pelajaran)) {
@@ -528,18 +543,43 @@
                 }
             });
 
-            // Render ke tabel
+            // Render baris data ke tabel
             recapTableBody.innerHTML = '';
             classes.forEach(kelas => {
                 const tr = document.createElement('tr');
                 let rowHTML = `<td>${kelas}</td>`;
                 subjects.forEach(subject => {
-                    rowHTML += `<td>${recapData[kelas][subject]}</td>`;
+                    rowHTML += `<td>${recapData[kelas][subject] || 0}</td>`;
                 });
-                rowHTML += `<td><strong>${recapData[kelas]['Total']}</strong></td>`;
+                rowHTML += `<td><strong>${recapData[kelas]['Total'] || 0}</strong></td>`;
                 tr.innerHTML = rowHTML;
                 recapTableBody.appendChild(tr);
             });
+
+            // Hitung dan render baris total
+            const totals = {};
+            subjects.forEach(subject => totals[subject] = 0);
+            totals['Total'] = 0;
+
+            classes.forEach(kelas => {
+                subjects.forEach(subject => {
+                    totals[subject] += recapData[kelas][subject] || 0;
+                });
+                totals['Total'] += recapData[kelas]['Total'] || 0;
+            });
+
+            const totalRow = document.createElement('tr');
+            totalRow.style.fontWeight = 'bold';
+            totalRow.style.backgroundColor = '#f9fafb';
+            totalRow.style.borderTop = '2px solid #ccc';
+            
+            let totalRowHTML = `<td>Total</td>`;
+            subjects.forEach(subject => {
+                totalRowHTML += `<td>${totals[subject]}</td>`;
+            });
+            totalRowHTML += `<td>${totals['Total']}</td>`;
+            totalRow.innerHTML = totalRowHTML;
+            recapTableBody.appendChild(totalRow);
         }
 
         async function initialize() {
@@ -553,7 +593,7 @@
                 renderClassChart(cleanData);
                 renderSubjectCharts(cleanData);
                 renderSummaryTable(cleanData);
-                renderRecapTable(cleanData); // Panggil fungsi baru
+                renderRecapTable(cleanData);
 
             } catch (error) {
                 console.error('Gagal mengambil data:', error);
