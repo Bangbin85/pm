@@ -9,7 +9,7 @@
 	<link rel="icon" type="image/x-icon" href="https://disdik.jakarta.go.id/static/disdik/images/logo/logo.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
@@ -74,16 +74,19 @@
         .spinner { border: 5px solid #e0e6ed; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         
         /* Modal Styles */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 2rem; }
-        .modal-content { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 900px; max-height: 90vh; position: relative; display: flex; flex-direction: column; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 1rem; }
+        .modal-content { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 950px; max-height: 95vh; position: relative; display: flex; flex-direction: column; overflow-y: auto; }
         .modal-close { position: absolute; top: 1rem; right: 1rem; font-size: 2rem; line-height: 1; color: #888; cursor: pointer; transition: color 0.2s; }
         .modal-close:hover { color: #333; }
         .modal-header { text-align: center; margin-bottom: 1rem; }
         .modal-header h2 { margin: 0; }
-        .modal-filter-bar { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
-        .modal-filter-bar label { font-weight: 500; }
+        .modal-filter-bar { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .modal-filter-bar:last-of-type { border-bottom: none; }
+        .modal-filter-bar label { font-weight: 500; white-space: nowrap; }
         .modal-filter-bar select { padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-family: var(--font-family); flex-grow: 1; }
-        .chart-container { position: relative; flex-grow: 1; }
+        .chart-container { position: relative; width: 100%; height: 320px; margin-bottom: 2rem; }
+        .chart-container:last-child { margin-bottom: 0; }
+
 
         /* Footer Styles */
         .app-footer {
@@ -160,19 +163,28 @@
         </footer>
     </main>
 
-    <!-- Chart Modal -->
     <div id="chartModal" class="modal-overlay">
         <div class="modal-content">
             <span id="modalClose" class="modal-close">&times;</span>
             <div class="modal-header">
-                 <h2 id="chartTitle">Visualisasi Data</h2>
+                 <h2>Visualisasi Data</h2>
             </div>
             <div class="modal-filter-bar">
-                <label for="chartFilterKelas"><i class="fas fa-filter"></i> Tampilkan berdasarkan Kelas:</label>
+                <label for="chartFilterKelas"><i class="fas fa-filter"></i> Filter Grafik Atas:</label>
                 <select id="chartFilterKelas"></select>
             </div>
             <div class="chart-container">
+                <h3 id="chartTitle" style="text-align:center; margin-bottom: 1rem;"></h3>
                 <canvas id="classSubjectChart"></canvas>
+            </div>
+            <br><br>
+            <div class="modal-filter-bar">
+                <label for="chartFilterPelajaran"><i class="fas fa-filter"></i> Filter Grafik Bawah:</label>
+                <select id="chartFilterPelajaran"></select>
+            </div>
+            <div class="chart-container">
+                <h3 id="subjectChartTitle" style="text-align:center; margin-bottom: 1rem;"></h3>
+                <canvas id="subjectDistributionChart"></canvas>
             </div>
         </div>
     </div>
@@ -189,11 +201,15 @@
         const downloadExcelBtn = document.getElementById('downloadExcelBtn');
         const chartModal = document.getElementById('chartModal');
         const modalClose = document.getElementById('modalClose');
+        
         const chartFilterKelas = document.getElementById('chartFilterKelas');
+        const chartFilterPelajaran = document.getElementById('chartFilterPelajaran');
         const chartTitle = document.getElementById('chartTitle');
+        const subjectChartTitle = document.getElementById('subjectChartTitle');
         
         let allData = [];
         let classChart = null;
+        let subjectChart = null;
 
         const showLoader = (show) => {
             loader.style.display = show ? 'flex' : 'none';
@@ -258,7 +274,7 @@
             });
         }
 
-        function populateChartDropdown() {
+        function populateChartDropdowns() {
             chartFilterKelas.innerHTML = '<option value="">Semua Kelas</option>';
             const kelasOptions = [...new Set(allData.map(row => row[1]))].sort();
             kelasOptions.forEach(kelas => {
@@ -266,21 +282,29 @@
                     const option = document.createElement('option');
                     option.value = kelas;
                     option.textContent = kelas;
-                    chartFilterKelas.appendChild(option);
+                    chartFilterKelas.appendChild(option.cloneNode(true));
+                }
+            });
+
+            chartFilterPelajaran.innerHTML = '<option value="">Semua Pelajaran</option>';
+            const pelajaranOptions = [...new Set(allData.map(row => row[2]))].sort();
+            pelajaranOptions.forEach(pelajaran => {
+                if(pelajaran) {
+                    const option = document.createElement('option');
+                    option.value = pelajaran;
+                    option.textContent = pelajaran;
+                    chartFilterPelajaran.appendChild(option);
                 }
             });
         }
 
         function setupChart(selectedKelas = '') {
-            if (classChart) {
-                classChart.destroy();
-            }
+            if (classChart) classChart.destroy();
 
             let chartLabels = [];
             let chartData = [];
             
             if (!selectedKelas) {
-                // Tampilkan jumlah materi per kelas (tampilan default)
                 chartTitle.textContent = 'Grafik Jumlah Materi per Kelas';
                 const classLessonCounts = {};
                 allData.forEach(row => {
@@ -292,7 +316,6 @@
                 chartLabels = sortedClasses;
                 chartData = sortedClasses.map(kelas => classLessonCounts[kelas]);
             } else {
-                // Tampilkan jumlah materi per pelajaran untuk kelas yang dipilih
                 chartTitle.textContent = `Grafik Materi Pelajaran untuk Kelas ${selectedKelas}`;
                 const subjectCounts = {};
                 const filtered = allData.filter(row => row[1] === selectedKelas);
@@ -306,7 +329,7 @@
                 chartData = sortedSubjects.map(subject => subjectCounts[subject]);
             }
 
-            const backgroundColors = chartLabels.map(() => `rgba(${Math.floor(Math.random() * 200) + 55}, ${Math.floor(Math.random() * 200) + 55}, ${Math.floor(Math.random() * 200) + 55}, 0.7)`);
+            const backgroundColors = chartLabels.map(() => `rgba(74, 144, 226, 0.7)`);
             const borderColors = backgroundColors.map(color => color.replace('0.7', '1'));
 
             const ctx = document.getElementById('classSubjectChart').getContext('2d');
@@ -314,24 +337,128 @@
                 type: 'bar',
                 data: {
                     labels: chartLabels,
-                    datasets: [{
-                        label: 'Jumlah Materi',
-                        data: chartData,
-                        backgroundColor: backgroundColors,
-                        borderColor: borderColors,
-                        borderWidth: 1
-                    }]
+                    datasets: [{ label: 'Jumlah Materi', data: chartData, backgroundColor: backgroundColors, borderColor: borderColors, borderWidth: 1 }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
                     plugins: { legend: { display: false } }
                 }
             });
         }
 
-        function downloadExcel() {
+        function setupSubjectChart(selectedPelajaran = '') {
+            if (subjectChart) subjectChart.destroy();
+            
+            const allUsedClasses = [...new Set(allData.map(row => row[1]))].sort();
+
+            if (selectedPelajaran) {
+                // Tampilkan satu pelajaran di semua kelas
+                subjectChartTitle.textContent = `Distribusi Pelajaran "${selectedPelajaran}" per Kelas`;
+                const classCounts = {};
+                allUsedClasses.forEach(cls => { classCounts[cls] = 0; });
+
+                allData.filter(row => row[2] === selectedPelajaran).forEach(row => {
+                    const kelas = row[1];
+                    if (kelas) classCounts[kelas]++;
+                });
+
+                const chartLabels = allUsedClasses;
+                const chartData = allUsedClasses.map(cls => classCounts[cls]);
+
+                const ctx = document.getElementById('subjectDistributionChart').getContext('2d');
+                subjectChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: `Jumlah Materi ${selectedPelajaran}`,
+                            data: chartData,
+                            backgroundColor: `rgba(29, 111, 66, 0.7)`,
+                            borderColor: `rgba(29, 111, 66, 1)`,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } }
+                });
+
+            } else {
+                // Tampilkan semua pelajaran di semua kelas (stacked)
+                subjectChartTitle.textContent = 'Grafik Distribusi Semua Pelajaran per Kelas';
+                const allSubjects = [...new Set(allData.map(row => row[2]))].sort();
+                const subjectClassCounts = {};
+
+                allSubjects.forEach(subject => {
+                    subjectClassCounts[subject] = {};
+                    allUsedClasses.forEach(cls => { subjectClassCounts[subject][cls] = 0; });
+                });
+
+                allData.forEach(row => {
+                    const kelas = row[1];
+                    const pelajaran = row[2];
+                    if (kelas && pelajaran) subjectClassCounts[pelajaran][kelas]++;
+                });
+                
+                const datasets = allSubjects.map(subject => {
+                    return {
+                        label: subject,
+                        data: allUsedClasses.map(cls => subjectClassCounts[subject][cls]),
+                        backgroundColor: `rgba(${Math.floor(Math.random() * 150) + 50}, ${Math.floor(Math.random() * 150) + 50}, ${Math.floor(Math.random() * 150) + 50}, 0.7)`,
+                    };
+                });
+
+                const ctx = document.getElementById('subjectDistributionChart').getContext('2d');
+                subjectChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: allUsedClasses, datasets: datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } },
+                        plugins: { legend: { position: 'top' } }
+                    }
+                });
+            }
+        }
+
+        async function initialize() {
+            showLoader(true);
+            try {
+                const response = await fetch(scriptURL);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                allData = data.slice(1).filter(row => !row.every(cell => cell === "") && row[1] && row[2]);
+                renderTable(allData);
+                populateDropdowns();
+            } catch (error) {
+                console.error('Gagal mengambil data:', error);
+                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="8">Gagal memuat data. Silakan coba lagi nanti.</td></tr>`;
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // Event Listeners
+        filterKelas.addEventListener('change', applyFilters);
+        filterPelajaran.addEventListener('change', applyFilters);
+        resetFilterBtn.addEventListener('click', () => {
+            filterKelas.value = '';
+            filterPelajaran.value = '';
+            applyFilters();
+        });
+
+        showChartBtn.addEventListener('click', () => {
+            chartModal.style.display = 'flex';
+            populateChartDropdowns();
+            chartFilterKelas.value = '';
+            chartFilterPelajaran.value = '';
+            setupChart();
+            setupSubjectChart(); 
+        });
+
+        // downloadExcelBtn tidak diubah
+        downloadExcelBtn.addEventListener('click', () => {
             const selectedKelas = filterKelas.value;
             const selectedPelajaran = filterPelajaran.value;
             let dataToExport = allData;
@@ -365,50 +492,15 @@
             XLSX.utils.book_append_sheet(wb, ws, "PJJ_Data");
 
             XLSX.writeFile(wb, "pjj_dki_2025_data.xlsx");
-        }
-
-        async function initialize() {
-            showLoader(true);
-            try {
-                const response = await fetch(scriptURL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                allData = data.slice(1).filter(row => !row.every(cell => cell === "") && row[1]);
-                renderTable(allData);
-                populateDropdowns();
-            } catch (error) {
-                console.error('Gagal mengambil data:', error);
-                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="8">Gagal memuat data. Silakan coba lagi nanti.</td></tr>`;
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        // Event Listeners
-        filterKelas.addEventListener('change', applyFilters);
-        filterPelajaran.addEventListener('change', applyFilters);
-        resetFilterBtn.addEventListener('click', () => {
-            filterKelas.value = '';
-            filterPelajaran.value = '';
-            applyFilters();
         });
-
-        showChartBtn.addEventListener('click', () => {
-            chartModal.style.display = 'flex';
-            populateChartDropdown();
-            chartFilterKelas.value = '';
-            setupChart();
-        });
-
-        downloadExcelBtn.addEventListener('click', downloadExcel);
 
         modalClose.addEventListener('click', () => { chartModal.style.display = 'none'; });
         chartModal.addEventListener('click', (e) => { if (e.target === chartModal) { chartModal.style.display = 'none'; } });
+        
         chartFilterKelas.addEventListener('change', () => { setupChart(chartFilterKelas.value); });
+        chartFilterPelajaran.addEventListener('change', () => { setupSubjectChart(chartFilterPelajaran.value); });
 
         initialize();
     </script>
 </body>
 </html>
-
-
