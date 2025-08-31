@@ -9,7 +9,7 @@
 	<link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/16rll5zsRdwTbR3nF_NmPKwY51tg4tnOn">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
         :root {
@@ -33,17 +33,12 @@
         .app-container { width: 100%; height: 100vh; padding: 2rem; display: flex; flex-direction: column; transition: opacity 0.5s ease-in-out; }
         .app-container.hidden { opacity: 0; pointer-events: none; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-shrink: 0; }
-        .app-header h1 { font-size: 2rem; color: var(--text-color); display: flex; align-items: center; } /* Modified */
+        .app-header h1 { font-size: 2rem; color: var(--text-color); }
         .header-actions { display: flex; align-items: center; gap: 1rem; }
         .header-actions .btn { display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; padding: 0.75rem 1.5rem; }
         .table-wrapper { flex-grow: 1; overflow: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--shadow); }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-th, td { 
-    padding: 1rem 1.5rem; 
-    text-align: left; 
-    border-bottom: 1px solid var(--border-color); 
-    white-space: normal; /* <-- Perubahan di sini */
-}
+        table { width: 100%; border-collapse: collapse; min-width: 1350px; } /* Lebar minimum disesuaikan */
+		th, td { padding: 1rem 1.5rem; text-align: left; border-bottom: 1px solid var(--border-color); white-space: normal; }
         th { background-color: #f9fafb; font-weight: 600; position: sticky; top: 0; z-index: 10; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: #eff6ff; }
@@ -68,8 +63,9 @@ th, td {
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: 1 / -1; }
         label { margin-bottom: 0.5rem; font-weight: 500; }
-        input, select { padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; font-family: var(--font-family); }
-        input:focus, select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); }
+        input, select, textarea { padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; font-family: var(--font-family); }
+        textarea { resize: vertical; min-height: 100px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); }
         form .btn { grid-column: 1 / -1; padding: 1rem; font-size: 1rem; }
         .small-modal .modal-content { max-width: 450px; }
         .small-modal form { grid-template-columns: 1fr; }
@@ -87,12 +83,9 @@ th, td {
     
     <main id="pageContent" class="app-container hidden">
         <header class="app-header">
-            <h1>
-                <img src="https://disdik.jakarta.go.id/static/disdik/images/logo/logo.png" alt="Logo Disdik" style="height: 40px; margin-right: 15px;">
-                Database Pembelajaran
-            </h1>
+            <h1><i class="fas fa-database" style="color: var(--primary-color);"></i> Database Pembelajaran</h1>
             <div class="header-actions">
-                <a href="PJJ2025.html" class="btn btn-info">
+                <a href="PJJDKI2025.html" class="btn btn-info">
                     <i class="fas fa-chalkboard-teacher"></i> Guru
                 </a>
                 <button id="showAddModalBtn" class="btn btn-primary">
@@ -106,7 +99,7 @@ th, td {
                 <thead>
                     <tr>
                         <th>Kelas</th><th>Pelajaran</th><th>Tujuan Pembelajaran</th><th>Materi</th><th>RPP</th><th>Video</th><th>Media</th>
-                        <th title="WhatsApp"><i class="fab fa-whatsapp"></i></th> <th>Aksi</th>
+                        <th>Strategi</th> <th title="WhatsApp"><i class="fab fa-whatsapp"></i></th> <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="dataTableBody"></tbody>
@@ -119,10 +112,212 @@ th, td {
     <div id="confirmationModal" class="modal small-modal"></div>
 
     <script>
-    function _0x3eea(){const _0xae4d10=['\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22modal-content\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20style=\x22color:\x20','\x22\x20target=\x22_blank\x22\x20class=\x22btn\x20btn-icon\x20btn-whatsapp\x22\x20title=\x22','block','remove','join','map','display','passwordForm','<i\x20class=\x22fas\x20fa-plus\x22></i>\x20Tambah\x20Data','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22modal-content\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22close-button\x22\x20onclick=\x22showModal(dataModal,\x20false)\x22>×</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2><i\x20class=\x22fas\x20','fa-plus-circle',')\x27><i\x20class=\x22fas\x20fa-trash-alt\x22></i></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<form\x20id=\x22dataForm\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</form>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','fa-edit','\x22\x20required></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x22><label>Link\x20Media</label><input\x20type=\x22text\x22\x20name=\x22Media\x22\x20value=\x22','Kelas\x20','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22modal-content\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20style=\x22color:\x20var(--warning-color);\x20margin-bottom:\x201rem;\x22><i\x20class=\x22fas\x20fa-exclamation-triangle\x22></i>\x20Konfirmasi</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22confirmation-message\x22>','createElement','454148djQIfe','<option\x20value=\x22Lainnya\x22>Lainnya</option></select></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x22><label>Pelajaran</label><select\x20name=\x22Pelajaran\x22\x20required>','result','passwordError','append','Seni\x20dan\x20Budaya',')\x27><i\x20class=\x22fas\x20fa-pencil-alt\x22></i></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-icon\x20btn-delete\x22\x20onclick=\x27deleteData(','6XShTYw','Pendidikan\x20Jasmani\x20Olahraga\x20dan\x20Kesehatan','json','\x22><i\x20class=\x22fab\x20fa-whatsapp\x22></i></a></td>','Mulok','Operasi\x20gagal','Gagal\x20menghapus\x20data:\x20','Bahasa\x20Indonesia','1276772vurWcw','add','<i\x20class=\x22fas\x20fa-save\x22></i>\x20Simpan\x20Perubahan','confirmYesBtn','\x22\x20placeholder=\x22Contoh:\x20628123456789\x22>\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22submit\x22\x20class=\x22btn\x20btn-success\x22>','http','<div\x20class=\x22modal-content\x22><h2><i\x20class=\x22fas\x20fa-lock\x22\x20style=\x22margin-right:\x2010px;\x22></i>\x20Autentikasi</h2><form\x20id=\x22passwordForm\x22><div\x20class=\x22form-group\x22><label\x20for=\x22password\x22>Password</label><input\x20type=\x22password\x22\x20id=\x22password\x22\x20required></div><button\x20type=\x22submit\x22\x20class=\x22btn\x20btn-primary\x22>Masuk</button></form><p\x20id=\x22passwordError\x22\x20style=\x22color:\x20var(--danger-color);\x20margin-top:\x201rem;\x20display:\x20none;\x22>Password\x20salah!</p></div>','showAddModalBtn','Koding\x20dan\x20Kecerdasan\x20Artifisial','style','Bahasa\x20Inggris','</select></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x20full-width\x22><label>Tujuan\x20Pembelajaran</label><input\x20type=\x22text\x22\x20name=\x22Tujuan\x22\x20value=\x22','onclick','stringify','fa-check-circle','has','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22notificationOkBtn\x22\x20class=\x22btn\x20btn-primary\x22>OK</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','addEventListener','Data\x20telah\x20berhasil\x20dihapus.','3699900NJBAlW','<td>-</td>','704AcWXlN','<input\x20type=\x22hidden\x22\x20name=\x22rowId\x22\x20value=\x22','hidden','rowId','action','Ilmu\x20Pengetahuan\x20Alam\x20dan\x20Sosial','notificationModal','var(--success-color)','366uggmbV','>Kelas\x20','Pendidikan\x20Agama\x20Budha','11538SAlFUj','fa-times-circle','Materi','\x22\x20required></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x22><label>Link\x20RPP</label><input\x20type=\x22text\x22\x20name=\x22RPP\x22\x20value=\x22','every','Data\x20berhasil\x20','23105kIOqYe','dataForm','preventDefault','\x22\x20required></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x20full-width\x22><label>Materi</label><input\x20type=\x22text\x22\x20name=\x22Materi\x22\x20value=\x22','Pelajaran','message','insert','diperbarui','Pendidikan\x20Agama\x20Islam','\x22></i>\x20Notifikasi</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22notification-message\x22>','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22confirmation-buttons\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22confirmYesBtn\x22\x20class=\x22btn\x22\x20style=\x22background-color:\x20var(--danger-color);\x20color:\x20white;\x22>Ya,\x20Lanjutkan</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22confirmNoBtn\x22\x20class=\x22btn\x22\x20style=\x22background-color:\x20#ccc;\x22>Batal</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','26MwTBBJ','Pendidikan\x20Agama\x20Katholik','PJJ2025','\x22\x20required></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x22><label>Link\x20Video</label><input\x20type=\x22text\x22\x20name=\x22Video\x22\x20value=\x22','visible','appendChild','Media','Tujuan','pageContent','classList','toggle','submit','Tambah\x20Data\x20Baru','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','error','\x22\x20target=\x22_blank\x22>Lihat\x20Link</a>','Video','success','startsWith','<a\x20href=\x22','dataTableBody','440DaaoPV','\x22\x20required></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label>Nomor\x20Telepon\x20(WA)</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20name=\x22Phone\x22\x20value=\x22','\x22\x20style=\x22color:\x20var(--primary-color);\x22></i>\x20','Pendidikan\x20Lingkungan\x20dan\x20Budaya\x20Jakarta','Pendidikan\x20Agama\x20Hindu','42bhESEc','dataModal','var(--danger-color)','</td>','innerHTML','</option>','14810NFTOiU','value','POST','Kelas','slice','delete','RPP','edit','target','confirmationModal','<td><a\x20href=\x22https://wa.me/','getElementById','selected',';\x20margin-bottom:\x201rem;\x22><i\x20class=\x22fas\x20'];_0x3eea=function(){return _0xae4d10;};return _0x3eea();}const _0x12953b=_0x4945;(function(_0x680b65,_0x40a00d){const _0x5ae289=_0x4945,_0x56492b=_0x680b65();while(!![]){try{const _0x2d088a=parseInt(_0x5ae289(0xf9))/0x1*(-parseInt(_0x5ae289(0xdf))/0x2)+parseInt(_0x5ae289(0x127))/0x3*(-parseInt(_0x5ae289(0x120))/0x4)+-parseInt(_0x5ae289(0xd4))/0x5*(-parseInt(_0x5ae289(0xcb))/0x6)+-parseInt(_0x5ae289(0x12f))/0x7+parseInt(_0x5ae289(0xf4))/0x8*(parseInt(_0x5ae289(0xce))/0x9)+parseInt(_0x5ae289(0xff))/0xa*(-parseInt(_0x5ae289(0xc3))/0xb)+parseInt(_0x5ae289(0xc1))/0xc;if(_0x2d088a===_0x40a00d)break;else _0x56492b['push'](_0x56492b['shift']());}catch(_0x956473){_0x56492b['push'](_0x56492b['shift']());}}}(_0x3eea,0x2610c));const scriptURL='https://script.google.com/macros/s/AKfycby9pCKDsubgrETJU2mciuib2mP8m7cpUFI0Vy_ky1TdKkLopCQfOmTc6rx7MTEqkJo8/exec',pageContent=document[_0x12953b(0x10a)](_0x12953b(0xe7)),loader=document[_0x12953b(0x10a)]('loader-overlay'),dataTableBody=document['getElementById'](_0x12953b(0xf3)),passwordModal=document[_0x12953b(0x10a)]('passwordModal'),dataModal=document[_0x12953b(0x10a)](_0x12953b(0xfa)),notificationModal=document['getElementById'](_0x12953b(0xc9)),confirmationModal=document[_0x12953b(0x10a)](_0x12953b(0x108)),showLoader=_0xd6d9d2=>loader[_0x12953b(0xe8)]['toggle'](_0x12953b(0xe3),_0xd6d9d2),showModal=(_0x575a74,_0x501049)=>_0x575a74['classList'][_0x12953b(0xe9)](_0x12953b(0xe3),_0x501049);function _0x4945(_0x5c7191,_0x341b43){const _0x3eea1e=_0x3eea();return _0x4945=function(_0x494574,_0x267e53){_0x494574=_0x494574-0xc0;let _0x6aa89b=_0x3eea1e[_0x494574];return _0x6aa89b;},_0x4945(_0x5c7191,_0x341b43);}function showNotification(_0x491603,_0x5d5919='success'){const _0x9a555e=_0x12953b,_0x433729=_0x5d5919==='success'?_0x9a555e(0x13d):_0x9a555e(0xcf),_0x56c23f=_0x5d5919===_0x9a555e(0xf0)?_0x9a555e(0xca):_0x9a555e(0xfb);return notificationModal['innerHTML']=_0x9a555e(0x10d)+_0x56c23f+_0x9a555e(0x10c)+_0x433729+_0x9a555e(0xdd)+_0x491603+_0x9a555e(0x13f),showModal(notificationModal,!![]),new Promise(_0x236c66=>{const _0xdbcbbe=_0x9a555e;document['getElementById']('notificationOkBtn')[_0xdbcbbe(0x13b)]=()=>{showModal(notificationModal,![]),_0x236c66();};});}function showConfirmation(_0x231bdc){const _0x18f721=_0x12953b;return confirmationModal[_0x18f721(0xfd)]=_0x18f721(0x11e)+_0x231bdc+_0x18f721(0xde),showModal(confirmationModal,!![]),new Promise(_0x50ebe5=>{const _0x2ddacc=_0x18f721;document[_0x2ddacc(0x10a)](_0x2ddacc(0x132))[_0x2ddacc(0x13b)]=()=>{showModal(confirmationModal,![]),_0x50ebe5(!![]);},document[_0x2ddacc(0x10a)]('confirmNoBtn')[_0x2ddacc(0x13b)]=()=>{showModal(confirmationModal,![]),_0x50ebe5(![]);};});}passwordModal[_0x12953b(0xfd)]=_0x12953b(0x135),document[_0x12953b(0x10a)](_0x12953b(0x114))[_0x12953b(0x140)](_0x12953b(0xea),_0x4e821a=>{const _0x2e9cb7=_0x12953b;_0x4e821a[_0x2e9cb7(0xd6)](),document['getElementById']('password')[_0x2e9cb7(0x100)]===_0x2e9cb7(0xe1)?(showModal(passwordModal,![]),pageContent[_0x2e9cb7(0xe8)][_0x2e9cb7(0x110)](_0x2e9cb7(0xc5)),fetchData()):document[_0x2e9cb7(0x10a)](_0x2e9cb7(0x123))[_0x2e9cb7(0x138)][_0x2e9cb7(0x113)]=_0x2e9cb7(0x10f);});async function fetchData(){const _0x44ada3=_0x12953b;showLoader(!![]);try{const _0x5f060b=await fetch(scriptURL),_0x513101=await _0x5f060b[_0x44ada3(0x129)](),_0x1db5d7=_0x513101[_0x44ada3(0x103)](0x1);dataTableBody[_0x44ada3(0xfd)]='',_0x1db5d7['forEach']((_0x4fd94e,_0x5d9ae0)=>{const _0x1941d3=_0x44ada3;if(_0x4fd94e[_0x1941d3(0xd2)](_0x4314da=>_0x4314da===''))return;const _0x204372=_0x4fd94e[0x8]||'';let _0x46fd46=_0x1941d3(0xc2);_0x204372&&String(_0x204372)[_0x1941d3(0xf1)]('62')&&(_0x46fd46=_0x1941d3(0x109)+_0x204372+_0x1941d3(0x10e)+_0x204372+_0x1941d3(0x12a));const _0x359f57=document[_0x1941d3(0x11f)]('tr');_0x359f57[_0x1941d3(0xfd)]=_0x1941d3(0xec)+_0x4fd94e[_0x1941d3(0x103)](0x1,0x8)[_0x1941d3(0x112)](_0x44f807=>'<td>'+(String(_0x44f807)[_0x1941d3(0xf1)](_0x1941d3(0x134))?_0x1941d3(0xf2)+_0x44f807+_0x1941d3(0xee):_0x44f807)+_0x1941d3(0xfc))[_0x1941d3(0x111)]('')+_0x1941d3(0xec)+_0x46fd46+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-icon\x20btn-edit\x22\x20onclick=\x27openDataModal(\x22edit\x22,\x20'+(_0x5d9ae0+0x2)+',\x20'+JSON[_0x1941d3(0x13c)](_0x4fd94e)+_0x1941d3(0x126)+(_0x5d9ae0+0x2)+_0x1941d3(0x118),dataTableBody[_0x1941d3(0xe4)](_0x359f57);});}catch(_0x2e681b){await showNotification('Gagal\x20memuat\x20data.\x20Periksa\x20koneksi\x20Anda.',_0x44ada3(0xed));}finally{showLoader(![]);}}function getFormHtml(_0x442e65,_0x354a40={}){const _0x47a83f=_0x12953b,_0x3f9399=_0x442e65===_0x47a83f(0x106),_0x49dfff=_0x3f9399?'Edit\x20Data':_0x47a83f(0xeb),_0x1c5a07=_0x3f9399?_0x47a83f(0x11b):_0x47a83f(0x117),_0x3fbe16=['1','2','3','4','5','6'][_0x47a83f(0x112)](_0x458f6d=>'<option\x20value=\x22Kelas\x20'+_0x458f6d+'\x22\x20'+(_0x354a40[_0x47a83f(0x102)]===_0x47a83f(0x11d)+_0x458f6d?_0x47a83f(0x10b):'')+_0x47a83f(0xcc)+_0x458f6d+_0x47a83f(0xfe))[_0x47a83f(0x111)](''),_0x3d5761=[_0x47a83f(0xdc),'Pendidikan\x20Agama\x20Kristen',_0x47a83f(0xe0),_0x47a83f(0xf8),_0x47a83f(0xcd),'Pendidikan\x20Agama\x20Konghucu','Pendidikan\x20Pancasila',_0x47a83f(0x12e),'Matematika',_0x47a83f(0xc8),_0x47a83f(0x125),_0x47a83f(0x128),_0x47a83f(0xf7),_0x47a83f(0x139),_0x47a83f(0x137),_0x47a83f(0x12b)][_0x47a83f(0x112)](_0x3894f5=>'<option\x20value=\x22'+_0x3894f5+'\x22\x20'+(_0x354a40[_0x47a83f(0xd8)]===_0x3894f5?_0x47a83f(0x10b):'')+'>'+_0x3894f5+_0x47a83f(0xfe))[_0x47a83f(0x111)]('');return _0x47a83f(0x116)+_0x1c5a07+_0x47a83f(0xf6)+_0x49dfff+_0x47a83f(0x119)+(_0x3f9399?_0x47a83f(0xc4)+_0x354a40[_0x47a83f(0xc6)]+'\x22>':'')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x22><label>Kelas</label><select\x20name=\x22Kelas\x22\x20required>'+_0x3fbe16+_0x47a83f(0x121)+_0x3d5761+_0x47a83f(0x13a)+(_0x354a40[_0x47a83f(0xe6)]||'')+_0x47a83f(0xd7)+(_0x354a40[_0x47a83f(0xd0)]||'')+_0x47a83f(0xd1)+(_0x354a40[_0x47a83f(0x105)]||'')+_0x47a83f(0xe2)+(_0x354a40[_0x47a83f(0xef)]||'')+_0x47a83f(0x11c)+(_0x354a40[_0x47a83f(0xe5)]||'')+_0x47a83f(0xf5)+(_0x354a40['Phone']||'')+_0x47a83f(0x133)+(_0x3f9399?_0x47a83f(0x131):_0x47a83f(0x115))+_0x47a83f(0x11a);}function openDataModal(_0x25560e,_0x2371f7=null,_0x25c4ce=null){const _0x5c6f8f=_0x12953b;let _0x20c2bb={};_0x25560e==='edit'&&(_0x20c2bb={'rowId':_0x2371f7,'Kelas':_0x25c4ce[0x1],'Pelajaran':_0x25c4ce[0x2],'Tujuan':_0x25c4ce[0x3],'Materi':_0x25c4ce[0x4],'RPP':_0x25c4ce[0x5],'Video':_0x25c4ce[0x6],'Media':_0x25c4ce[0x7],'Phone':_0x25c4ce[0x8]}),dataModal[_0x5c6f8f(0xfd)]=getFormHtml(_0x25560e,_0x20c2bb),showModal(dataModal,!![]),document[_0x5c6f8f(0x10a)](_0x5c6f8f(0xd5))['addEventListener'](_0x5c6f8f(0xea),handleFormSubmit);}document['getElementById'](_0x12953b(0x136))['onclick']=()=>openDataModal(_0x12953b(0x130));async function handleFormSubmit(_0x1ce142){const _0xb5fbdc=_0x12953b;_0x1ce142[_0xb5fbdc(0xd6)]();const _0x59c619=_0x1ce142[_0xb5fbdc(0x107)],_0x2760c0=new FormData(_0x59c619),_0x43959a=_0x2760c0[_0xb5fbdc(0x13e)](_0xb5fbdc(0xc6));_0x2760c0['append'](_0xb5fbdc(0xc7),_0x43959a?'update':_0xb5fbdc(0xda)),showModal(dataModal,![]),showLoader(!![]);try{const _0x4c3fac=await fetch(scriptURL,{'method':_0xb5fbdc(0x101),'body':_0x2760c0}),_0x4683bf=await _0x4c3fac[_0xb5fbdc(0x129)]();if(_0x4683bf[_0xb5fbdc(0x122)]!==_0xb5fbdc(0xf0))throw new Error(_0x4683bf[_0xb5fbdc(0xd9)]||_0xb5fbdc(0x12c));await fetchData(),await showNotification(_0xb5fbdc(0xd3)+(_0x43959a?_0xb5fbdc(0xdb):'disimpan')+'!',_0xb5fbdc(0xf0));}catch(_0x403e67){showLoader(![]),await showNotification('Error:\x20'+_0x403e67[_0xb5fbdc(0xd9)],'error');}}async function deleteData(_0x242b57){const _0x289445=_0x12953b,_0x317d9c=await showConfirmation('Anda\x20yakin\x20ingin\x20menghapus\x20data\x20ini\x20secara\x20permanen?');if(_0x317d9c){showLoader(!![]);const _0x10d0f4=new FormData();_0x10d0f4['append'](_0x289445(0xc7),_0x289445(0x104)),_0x10d0f4[_0x289445(0x124)](_0x289445(0xc6),_0x242b57);try{const _0x483100=await fetch(scriptURL,{'method':_0x289445(0x101),'body':_0x10d0f4}),_0x416f6a=await _0x483100[_0x289445(0x129)]();if(_0x416f6a[_0x289445(0x122)]!==_0x289445(0xf0))throw new Error(_0x416f6a['message']);await showNotification(_0x289445(0xc0),_0x289445(0xf0)),await fetchData();}catch(_0x20daf3){showLoader(![]),await showNotification(_0x289445(0x12d)+_0x20daf3[_0x289445(0xd9)],_0x289445(0xed));}}}
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby9pCKDsubgrETJU2mciuib2mP8m7cpUFI0Vy_ky1TdKkLopCQfOmTc6rx7MTEqkJo8/exec';
+        
+        const pageContent = document.getElementById('pageContent');
+        const loader = document.getElementById('loader-overlay');
+        const dataTableBody = document.getElementById('dataTableBody');
+        const passwordModal = document.getElementById('passwordModal');
+        const dataModal = document.getElementById('dataModal');
+        const notificationModal = document.getElementById('notificationModal');
+        const confirmationModal = document.getElementById('confirmationModal');
+        
+        const showLoader = (show) => loader.classList.toggle('visible', show);
+        const showModal = (modal, show) => modal.classList.toggle('visible', show);
+
+        function showNotification(message, type = 'success') {
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
+            const color = type === 'success' ? 'var(--success-color)' : 'var(--danger-color)';
+            notificationModal.innerHTML = `
+                <div class="modal-content">
+                    <h2 style="color: ${color}; margin-bottom: 1rem;"><i class="fas ${icon}"></i> Notifikasi</h2>
+                    <p class="notification-message">${message}</p>
+                    <button id="notificationOkBtn" class="btn btn-primary">OK</button>
+                </div>
+            `;
+            showModal(notificationModal, true);
+            return new Promise(resolve => {
+                document.getElementById('notificationOkBtn').onclick = () => {
+                    showModal(notificationModal, false);
+                    resolve();
+                };
+            });
+        }
+
+        function showConfirmation(message) {
+            confirmationModal.innerHTML = `
+                <div class="modal-content">
+                    <h2 style="color: var(--warning-color); margin-bottom: 1rem;"><i class="fas fa-exclamation-triangle"></i> Konfirmasi</h2>
+                    <p class="confirmation-message">${message}</p>
+                    <div class="confirmation-buttons">
+                        <button id="confirmYesBtn" class="btn" style="background-color: var(--danger-color); color: white;">Ya, Lanjutkan</button>
+                        <button id="confirmNoBtn" class="btn" style="background-color: #ccc;">Batal</button>
+                    </div>
+                </div>
+            `;
+            showModal(confirmationModal, true);
+            return new Promise(resolve => {
+                document.getElementById('confirmYesBtn').onclick = () => { showModal(confirmationModal, false); resolve(true); };
+                document.getElementById('confirmNoBtn').onclick = () => { showModal(confirmationModal, false); resolve(false); };
+            });
+        }
+
+        passwordModal.innerHTML = `<div class="modal-content"><h2><i class="fas fa-lock" style="margin-right: 10px;"></i> Autentikasi</h2><form id="passwordForm"><div class="form-group"><label for="password">Password</label><input type="password" id="password" required></div><button type="submit" class="btn btn-primary">Masuk</button></form><p id="passwordError" style="color: var(--danger-color); margin-top: 1rem; display: none;">Password salah!</p></div>`;
+        document.getElementById('passwordForm').addEventListener('submit', e => { e.preventDefault(); if (document.getElementById('password').value === 'PJJ2025') { showModal(passwordModal, false); pageContent.classList.remove('hidden'); fetchData(); } else { document.getElementById('passwordError').style.display = 'block'; } });
+
+
+        async function fetchData() {
+            showLoader(true);
+            try {
+                const response = await fetch(scriptURL);
+                const data = await response.json();
+                const tableData = data.slice(1);
+                dataTableBody.innerHTML = '';
+                tableData.forEach((rowData, index) => {
+                    if (rowData.every(cell => cell === "")) return;
+                    
+                    // PERUBAHAN: Phone sekarang di indeks 9
+                    const phone = rowData[9] || '';
+                    let phoneCell = '<td>-</td>';
+                    if (phone && String(phone).startsWith('62')) {
+                        phoneCell = `<td><a href="https://wa.me/${phone}" target="_blank" class="btn btn-icon btn-whatsapp" title="${phone}"><i class="fab fa-whatsapp"></i></a></td>`;
+                    }
+                    
+                    const row = document.createElement('tr');
+                    // PERUBAHAN: Tampilkan data hingga kolom ke-8 (Strategi)
+                    row.innerHTML = `
+                        ${rowData.slice(1, 9).map(cell => `<td>${String(cell).startsWith('http') ? `<a href="${cell}" target="_blank">Lihat Link</a>` : cell}</td>`).join('')}
+                        ${phoneCell}
+                        <td class="actions">
+                            <button class="btn btn-icon btn-edit" onclick='openDataModal("edit", ${index + 2}, ${JSON.stringify(rowData)})'><i class="fas fa-pencil-alt"></i></button>
+                            <button class="btn btn-icon btn-delete" onclick='deleteData(${index + 2})'><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                    dataTableBody.appendChild(row);
+                });
+            } catch (error) { 
+                await showNotification('Gagal memuat data. Periksa koneksi Anda.', 'error');
+            } 
+            finally { showLoader(false); }
+        }
+
+        function getFormHtml(mode, data = {}) {
+            const isEdit = mode === 'edit';
+            const title = isEdit ? 'Edit Data' : 'Tambah Data Baru';
+            const icon = isEdit ? 'fa-edit' : 'fa-plus-circle';
+            
+            // --- LOGIKA BARU UNTUK MEMBACA DATA STRATEGI ---
+            let strategiPilihan = '';
+            let strategiTeks = '';
+            if (data.Strategi) {
+                const parts = String(data.Strategi).split(': ');
+                strategiPilihan = parts[0];
+                strategiTeks = parts.slice(1).join(': ');
+            }
+            const strategiOptions = ['PJJ', 'Hybrid', 'Tatap Muka'].map(o => `<option value="${o}" ${strategiPilihan === o ? 'selected' : ''}>${o}</option>`).join('');
+            // --- AKHIR LOGIKA BARU ---
+
+            const kelasOptions = ['1', '2', '3', '4', '5', '6'].map(n => `<option value="Kelas ${n}" ${data.Kelas === `Kelas ${n}` ? 'selected' : ''}>Kelas ${n}</option>`).join('');
+            const pelajaranOptions = ['Pendidikan Agama Islam','Pendidikan Agama Kristen','Pendidikan Agama Katholik','Pendidikan Agama Hindu','Pendidikan Agama Budha','Pendidikan Agama Konghucu','Pendidikan Pancasila','Bahasa Indonesia','Matematika','Ilmu Pengetahuan Alam dan Sosial','Seni dan Budaya','Pendidikan Jasmani Olahraga dan Kesehatan','Pendidikan Lingkungan dan Budaya Jakarta','Bahasa Inggris','Koding dan Kecerdasan Buatan','Mulok'].map(p => `<option value="${p}" ${data.Pelajaran === p ? 'selected' : ''}>${p}</option>`).join('');
+
+
+            return `
+                <div class="modal-content">
+                    <button class="close-button" onclick="showModal(dataModal, false)">×</button>
+                    <h2><i class="fas ${icon}" style="color: var(--primary-color);"></i> ${title}</h2>
+                    <form id="dataForm">
+                        ${isEdit ? `<input type="hidden" name="rowId" value="${data.rowId}">` : ''}
+                        <div class="form-group"><label>Kelas</label><select name="Kelas" required>${kelasOptions}<option value="Lainnya">Lainnya</option></select></div>
+                        <div class="form-group"><label>Pelajaran</label><select name="Pelajaran" required>${pelajaranOptions}</select></div>
+                        <div class="form-group full-width"><label>Tujuan Pembelajaran</label><input type="text" name="Tujuan" value="${data.Tujuan || ''}" required></div>
+                        <div class="form-group full-width"><label>Materi</label><input type="text" name="Materi" value="${data.Materi || ''}" required></div>
+                        
+                        <div class="form-group full-width">
+                            <label>Strategi Pembelajaran</label>
+                            <select name="StrategiPilihan" required style="margin-bottom: 1rem;">${strategiOptions}</select>
+                            <textarea name="StrategiTeks" placeholder="Jelaskan strategi pembelajaran secara singkat..." required>${strategiTeks}</textarea>
+                        </div>
+                        
+                        <div class="form-group"><label>Link RPP</label><input type="text" name="RPP" value="${data.RPP || ''}" required></div>
+                        <div class="form-group"><label>Link Video</label><input type="text" name="Video" value="${data.Video || ''}" required></div>
+                        <div class="form-group"><label>Link Media</label><input type="text" name="Media" value="${data.Media || ''}" required></div>
+                        <div class="form-group">
+                            <label>Nomor Telepon (WA)</label>
+                            <input type="text" name="Phone" value="${data.Phone || ''}" placeholder="Contoh: 628123456789">
+                        </div>
+                        <button type="submit" class="btn btn-success">${isEdit ? '<i class="fas fa-save"></i> Simpan Perubahan' : '<i class="fas fa-plus"></i> Tambah Data'}</button>
+                    </form>
+                </div>
+            `;
+        }
+        
+        function openDataModal(mode, rowId = null, rowData = null) {
+            let data = {};
+            if (mode === 'edit') {
+                // PERUBAHAN: Menyesuaikan indeks kolom
+                data = { 
+                    rowId, 
+                    Kelas: rowData[1], 
+                    Pelajaran: rowData[2], 
+                    Tujuan: rowData[3], 
+                    Materi: rowData[4], 
+                    RPP: rowData[5], 
+                    Video: rowData[6], 
+                    Media: rowData[7], 
+                    Strategi: rowData[8], // <-- Data baru
+                    Phone: rowData[9]    // <-- Indeks bergeser
+                };
+            }
+            dataModal.innerHTML = getFormHtml(mode, data);
+            showModal(dataModal, true);
+            document.getElementById('dataForm').addEventListener('submit', handleFormSubmit);
+        }
+
+        document.getElementById('showAddModalBtn').onclick = () => openDataModal('add');
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const isEdit = formData.has('rowId');
+            formData.append('action', isEdit ? 'update' : 'insert');
+
+            showLoader(true);
+            showModal(dataModal, false);
+
+            try {
+                const response = await fetch(scriptURL, { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.result !== 'success') throw new Error(result.message || 'Operasi gagal');
+                await showNotification(`Data berhasil ${isEdit ? 'diperbarui' : 'disimpan'}!`, 'success');
+                fetchData();
+            } catch (error) {
+                await showNotification(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function deleteData(rowId) {
+            const confirmed = await showConfirmation('Anda yakin ingin menghapus data ini secara permanen?');
+            if (confirmed) {
+                showLoader(true);
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('rowId', rowId);
+                try {
+                    const response = await fetch(scriptURL, { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (result.result !== 'success') throw new Error(result.message);
+                    await showNotification('Data telah berhasil dihapus.', 'success');
+                    fetchData();
+                } catch (error) {
+                    await showNotification(`Gagal menghapus data: ${error.message}`, 'error');
+                } finally {
+                    showLoader(false);
+                }
+            }
+        }
     </script>
 </body>
 </html>
-
-
-
