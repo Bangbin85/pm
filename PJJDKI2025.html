@@ -56,13 +56,13 @@
 		.btn-user { background-color: var(--user-color); color: white; }
         #resetFilterBtn { background-color: #7f8c8d; color: white; }
         .table-wrapper { flex-grow: 1; overflow: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--shadow); }
-        /* PERUBAHAN: Lebar minimum tabel ditambah untuk mengakomodasi kolom baru */
         table { width: 100%; border-collapse: collapse; min-width: 1250px; }
         th, td { 
 			padding: 1rem 1.5rem; 
 			text-align: left; 
 			border-bottom: 1px solid var(--border-color); 
 			white-space: normal;
+            vertical-align: middle;
 		}
         th { background-color: #f9fafb; font-weight: 600; position: sticky; top: 0; z-index: 10; }
         tr:last-child td { border-bottom: none; }
@@ -71,11 +71,22 @@
         td a.btn-whatsapp { color: white; font-size: 1.2rem; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; background-color: var(--whatsapp-color); text-decoration: none; }
         td a:hover { text-decoration: underline; }
         .empty-row td { text-align: center; padding: 3rem; font-size: 1.2rem; color: #999; }
+        
+        .strategi-clickable {
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 500;
+            display: inline-block;
+        }
+        .strategi-clickable:hover {
+            text-decoration: underline;
+        }
+
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
         .spinner { border: 5px solid #e0e6ed; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 1rem; }
-        .modal-content { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 950px; max-height: 95vh; position: relative; display: flex; flex-direction: column; overflow-y: auto; }
+        .modal-content { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 800px; max-height: 95vh; position: relative; display: flex; flex-direction: column; overflow-y: auto; }
         .modal-close { position: absolute; top: 1rem; right: 1rem; font-size: 2rem; line-height: 1; color: #888; cursor: pointer; transition: color 0.2s; }
         .modal-close:hover { color: #333; }
         .modal-header { text-align: center; margin-bottom: 1rem; }
@@ -172,6 +183,8 @@
             </div>
         </div>
     </div>
+    
+    <div id="viewModal" class="modal-overlay"></div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycby9pCKDsubgrETJU2mciuib2mP8m7cpUFI0Vy_ky1TdKkLopCQfOmTc6rx7MTEqkJo8/exec';
@@ -185,6 +198,7 @@
         const downloadExcelBtn = document.getElementById('downloadExcelBtn');
         const chartModal = document.getElementById('chartModal');
         const modalClose = document.getElementById('modalClose');
+        const viewModal = document.getElementById('viewModal');
         
         const chartFilterKelas = document.getElementById('chartFilterKelas');
         const chartFilterPelajaran = document.getElementById('chartFilterPelajaran');
@@ -199,31 +213,54 @@
             loader.style.display = show ? 'flex' : 'none';
         };
 
+        function truncateText(text, wordLimit) {
+            if (!text) return '';
+            const words = text.split(' ');
+            if (words.length > wordLimit) {
+                return words.slice(0, wordLimit).join(' ') + '...';
+            }
+            return text;
+        }
+
+        function showStrategiModal(fullText) {
+            viewModal.innerHTML = `
+                <div class="modal-content">
+                    <span class="modal-close" onclick="viewModal.style.display = 'none'">&times;</span>
+                    <div class="modal-header">
+                        <h2>Detail Strategi Pembelajaran</h2>
+                    </div>
+                    <p style="white-space: pre-wrap; line-height: 1.6; padding: 0 1rem;">${fullText}</p>
+                </div>
+            `;
+            viewModal.style.display = 'flex';
+        }
+
+
         function renderTable(dataToRender) {
             dataTableBody.innerHTML = '';
             if (dataToRender.length === 0) {
-                // PERUBAHAN: Menyesuaikan colspan menjadi 9
                 dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="9"><i class="fas fa-search" style="margin-right: 10px;"></i>Tidak ada data yang cocok dengan filter Anda.</td></tr>`;
                 return;
             }
             dataToRender.forEach(rowData => {
                 const row = document.createElement('tr');
-                // PERUBAHAN: Mengambil data hingga kolom ke-9 (rowData.slice(1, 9))
-                const mainCells = rowData.slice(1, 9).map(cell => {
+                
+                const firstCells = rowData.slice(1, 8).map(cell => {
                     const content = String(cell);
-                    let cellContent = content;
-                    if (content.startsWith('http')) {
-                         cellContent = `<a href="${content}" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> Lihat Link</a>`;
-                    }
-                    return `<td>${cellContent}</td>`;
+                    return `<td>${content.startsWith('http') ? `<a href="${content}" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> Lihat Link</a>` : content}</td>`;
                 }).join('');
-                // PERUBAHAN: Nomor telepon sekarang berada di indeks ke-9
+
+                const strategiText = rowData[8] || '';
+                const truncatedStrategi = truncateText(strategiText, 10);
+                const strategiCell = `<td><span class="strategi-clickable" onclick='showStrategiModal(${JSON.stringify(strategiText)})'>${truncatedStrategi || '-'}</span></td>`;
+                
                 const phone = rowData[9] || '';
                 let phoneCell = '<td>-</td>';
                 if (phone && String(phone).startsWith('62')) {
                     phoneCell = `<td><a href="https://wa.me/${phone}" target="_blank" class="btn-whatsapp" title="Hubungi via WhatsApp"><i class="fab fa-whatsapp"></i></a></td>`;
                 }
-                row.innerHTML = mainCells + phoneCell;
+
+                row.innerHTML = firstCells + strategiCell + phoneCell;
                 dataTableBody.appendChild(row);
             });
         }
@@ -261,7 +298,6 @@
             });
         }
 
-        // --- Tidak ada perubahan pada fungsi-fungsi Chart ---
         function populateChartDropdowns() {
             chartFilterKelas.innerHTML = '<option value="">Semua Kelas</option>';
             const kelasOptions = [...new Set(allData.map(row => row[1]))].sort();
@@ -288,7 +324,6 @@
 
         function setupChart(selectedKelas = '') {
             if (classChart) classChart.destroy();
-
             let chartLabels = [];
             let chartData = [];
             
@@ -338,7 +373,6 @@
 
         function setupSubjectChart(selectedPelajaran = '') {
             if (subjectChart) subjectChart.destroy();
-            
             const allUsedClasses = [...new Set(allData.map(row => row[1]))].sort();
 
             if (selectedPelajaran) {
@@ -407,7 +441,6 @@
                 });
             }
         }
-        // --- Akhir dari fungsi Chart ---
 
         async function initialize() {
             showLoader(true);
@@ -426,7 +459,6 @@
             }
         }
 
-        // Event Listeners
         filterKelas.addEventListener('change', applyFilters);
         filterPelajaran.addEventListener('change', applyFilters);
         resetFilterBtn.addEventListener('click', () => {
@@ -469,9 +501,7 @@
                 return;
             }
 
-            // PERUBAHAN: Menambahkan "Strategi" ke header Excel
             const headers = ["Kelas", "Pelajaran", "Tujuan Pembelajaran", "Materi", "RPP", "Video", "Media", "Strategi", "WhatsApp"];
-            // PERUBAHAN: Mengambil data hingga kolom ke-10 (rowData.slice(1, 10))
             const dataForSheet = dataToExport.map(rowData => rowData.slice(1, 10));
             const worksheetData = [headers, ...dataForSheet];
 
@@ -484,6 +514,7 @@
 
         modalClose.addEventListener('click', () => { chartModal.style.display = 'none'; });
         chartModal.addEventListener('click', (e) => { if (e.target === chartModal) { chartModal.style.display = 'none'; } });
+        viewModal.addEventListener('click', (e) => { if (e.target === viewModal) { viewModal.style.display = 'none'; } });
         
         chartFilterKelas.addEventListener('change', () => { setupChart(chartFilterKelas.value); });
         chartFilterPelajaran.addEventListener('change', () => { setupSubjectChart(chartFilterPelajaran.value); });
