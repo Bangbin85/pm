@@ -56,7 +56,8 @@
 		.btn-user { background-color: var(--user-color); color: white; }
         #resetFilterBtn { background-color: #7f8c8d; color: white; }
         .table-wrapper { flex-grow: 1; overflow: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--shadow); }
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        /* PERUBAHAN: Lebar minimum tabel ditambah untuk mengakomodasi kolom baru */
+        table { width: 100%; border-collapse: collapse; min-width: 1250px; }
         th, td { 
 			padding: 1rem 1.5rem; 
 			text-align: left; 
@@ -73,7 +74,6 @@
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
         .spinner { border: 5px solid #e0e6ed; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         
-        /* Modal Styles */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 1rem; }
         .modal-content { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 950px; max-height: 95vh; position: relative; display: flex; flex-direction: column; overflow-y: auto; }
         .modal-close { position: absolute; top: 1rem; right: 1rem; font-size: 2rem; line-height: 1; color: #888; cursor: pointer; transition: color 0.2s; }
@@ -86,26 +86,10 @@
         .modal-filter-bar select { padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-family: var(--font-family); flex-grow: 1; }
         .chart-container { position: relative; width: 100%; height: 320px; margin-bottom: 2rem; }
         .chart-container:last-child { margin-bottom: 0; }
-
-
-        /* Footer Styles */
-        .app-footer {
-            text-align: center;
-            padding-top: 1.5rem;
-            color: #888;
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: 1rem;
-            flex-shrink: 0;
-        }
-        .app-footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .app-footer a:hover {
-            text-decoration: underline;
-        }
+        
+        .app-footer { text-align: center; padding-top: 1.5rem; color: #888; font-size: 0.9rem; border-top: 1px solid var(--border-color); margin-top: 1rem; flex-shrink: 0; }
+        .app-footer a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+        .app-footer a:hover { text-decoration: underline; }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -141,7 +125,7 @@
             <button id="downloadExcelBtn" class="btn btn-excel" title="Download Excel">
                 <i class="fas fa-file-excel"></i>
             </button>
-            <a href="PJJ2025.html"><button class="btn btn-user" title="Download Excel">
+            <a href="PJJ2025.html"><button class="btn btn-user" title="Halaman Admin">
                 <i class="fas fa-user"></i>
             </button></a>			
         </div>
@@ -150,7 +134,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Kelas</th><th>Pelajaran</th><th>Tujuan Pembelajaran</th><th>Materi</th><th>RPP</th><th>Video</th><th>Media</th>
+                        <th>Kelas</th><th>Pelajaran</th><th>Tujuan Pembelajaran</th><th>Materi</th><th>RPP</th><th>Video</th><th>Media</th><th>Strategi</th>
                         <th title="WhatsApp"><i class="fab fa-whatsapp"></i></th>
                     </tr>
                 </thead>
@@ -218,12 +202,14 @@
         function renderTable(dataToRender) {
             dataTableBody.innerHTML = '';
             if (dataToRender.length === 0) {
-                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="8"><i class="fas fa-search" style="margin-right: 10px;"></i>Tidak ada data yang cocok dengan filter Anda.</td></tr>`;
+                // PERUBAHAN: Menyesuaikan colspan menjadi 9
+                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="9"><i class="fas fa-search" style="margin-right: 10px;"></i>Tidak ada data yang cocok dengan filter Anda.</td></tr>`;
                 return;
             }
             dataToRender.forEach(rowData => {
                 const row = document.createElement('tr');
-                const mainCells = rowData.slice(1, 8).map(cell => {
+                // PERUBAHAN: Mengambil data hingga kolom ke-9 (rowData.slice(1, 9))
+                const mainCells = rowData.slice(1, 9).map(cell => {
                     const content = String(cell);
                     let cellContent = content;
                     if (content.startsWith('http')) {
@@ -231,7 +217,8 @@
                     }
                     return `<td>${cellContent}</td>`;
                 }).join('');
-                const phone = rowData[8] || '';
+                // PERUBAHAN: Nomor telepon sekarang berada di indeks ke-9
+                const phone = rowData[9] || '';
                 let phoneCell = '<td>-</td>';
                 if (phone && String(phone).startsWith('62')) {
                     phoneCell = `<td><a href="https://wa.me/${phone}" target="_blank" class="btn-whatsapp" title="Hubungi via WhatsApp"><i class="fab fa-whatsapp"></i></a></td>`;
@@ -274,6 +261,7 @@
             });
         }
 
+        // --- Tidak ada perubahan pada fungsi-fungsi Chart ---
         function populateChartDropdowns() {
             chartFilterKelas.innerHTML = '<option value="">Semua Kelas</option>';
             const kelasOptions = [...new Set(allData.map(row => row[1]))].sort();
@@ -354,7 +342,6 @@
             const allUsedClasses = [...new Set(allData.map(row => row[1]))].sort();
 
             if (selectedPelajaran) {
-                // Tampilkan satu pelajaran di semua kelas
                 subjectChartTitle.textContent = `Distribusi Pelajaran "${selectedPelajaran}" per Kelas`;
                 const classCounts = {};
                 allUsedClasses.forEach(cls => { classCounts[cls] = 0; });
@@ -384,7 +371,6 @@
                 });
 
             } else {
-                // Tampilkan semua pelajaran di semua kelas (stacked)
                 subjectChartTitle.textContent = 'Grafik Distribusi Semua Pelajaran per Kelas';
                 const allSubjects = [...new Set(allData.map(row => row[2]))].sort();
                 const subjectClassCounts = {};
@@ -421,6 +407,7 @@
                 });
             }
         }
+        // --- Akhir dari fungsi Chart ---
 
         async function initialize() {
             showLoader(true);
@@ -433,7 +420,7 @@
                 populateDropdowns();
             } catch (error) {
                 console.error('Gagal mengambil data:', error);
-                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="8">Gagal memuat data. Silakan coba lagi nanti.</td></tr>`;
+                dataTableBody.innerHTML = `<tr class="empty-row"><td colspan="9">Gagal memuat data. Silakan coba lagi nanti.</td></tr>`;
             } finally {
                 showLoader(false);
             }
@@ -457,7 +444,6 @@
             setupSubjectChart(); 
         });
 
-        // downloadExcelBtn tidak diubah
         downloadExcelBtn.addEventListener('click', () => {
             const selectedKelas = filterKelas.value;
             const selectedPelajaran = filterPelajaran.value;
@@ -483,8 +469,10 @@
                 return;
             }
 
-            const headers = ["Kelas", "Pelajaran", "Tujuan Pembelajaran", "Materi", "RPP", "Video", "Media", "WhatsApp"];
-            const dataForSheet = dataToExport.map(rowData => rowData.slice(1, 9));
+            // PERUBAHAN: Menambahkan "Strategi" ke header Excel
+            const headers = ["Kelas", "Pelajaran", "Tujuan Pembelajaran", "Materi", "RPP", "Video", "Media", "Strategi", "WhatsApp"];
+            // PERUBAHAN: Mengambil data hingga kolom ke-10 (rowData.slice(1, 10))
+            const dataForSheet = dataToExport.map(rowData => rowData.slice(1, 10));
             const worksheetData = [headers, ...dataForSheet];
 
             const ws = XLSX.utils.aoa_to_sheet(worksheetData);
