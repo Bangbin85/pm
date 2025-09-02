@@ -9,7 +9,7 @@
     <link rel="icon" type="image/x-icon" href="https://disdik.jakarta.go.id/static/disdik/images/logo/logo.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -79,13 +79,29 @@
         }
         .btn-admin { background-color: var(--danger-color); }
         .btn-guru { background-color: var(--info-color); }
+        
+        /* PERUBAHAN PADA JUDUL SECTION */
         .section-title {
             font-size: 1.8rem;
             margin-bottom: 1.5rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--primary-color);
             color: var(--text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+        .section-toggle-icon {
+            font-size: 1.5rem;
+            color: var(--danger-color);
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .section-toggle-icon:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
         .card {
             background-color: var(--card-bg-color);
             border-radius: 12px;
@@ -93,6 +109,12 @@
             padding: 2rem;
             margin-bottom: 2.5rem;
         }
+        
+        /* KONTEN KARTU (UNTUK DISEMBUNYIKAN) */
+        .card-content {
+            display: none; /* Default tersembunyi */
+        }
+
         .chart-container {
             position: relative;
             width: 100%;
@@ -120,7 +142,7 @@
         }
         .table-wrapper {
             overflow-x: auto;
-            max-height: 500px; /* Menambahkan tinggi maksimal dan scroll vertikal */
+            max-height: 500px;
         }
         table {
             width: 100%;
@@ -236,12 +258,7 @@
             text-decoration: none;
             font-weight: 500;
         }
-        /* CSS BARU UNTUK VIEW COUNTER */
-        #view-counter {
-            margin-top: 1rem;
-            font-size: 0.85rem;
-        }
-
+        
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes modal-fade-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
     </style>
@@ -266,86 +283,107 @@
         </header>
 
         <div class="card">
-             <h2 class="section-title"><i class="fas fa-file-powerpoint"></i> Panduan PJJ 2025</h2>
-             <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%;
-                padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
-                border-radius: 8px; will-change: transform;">
-                <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-                   src="https://www.canva.com/design/DAGxoUFd3pc/o39REMoRObKWu-tG2ernMw/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
-                </iframe>
-             </div>
-             <p style="text-align: center; margin-top: 1rem;">
-                <a href="https://www.canva.com/design/DAGxoUFd3pc/o39REMoRObKWu-tG2ernMw/view?utm_content=DAGxoUFd3pc&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Panduan PJJ 2025</a> by Muhammad Yusuf Kurniawan
-             </p>
+             <h2 class="section-title">
+                <span><i class="fas fa-file-powerpoint"></i> Panduan PJJ 2025</span>
+                <i class="fas fa-eye section-toggle-icon" title="Tampilkan/Sembunyikan Konten"></i>
+             </h2>
+             <div class="card-content">
+                 <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%;
+                    padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
+                    border-radius: 8px; will-change: transform;">
+                    <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                       src="https://www.canva.com/design/DAGxoUFd3pc/o39REMoRObKWu-tG2ernMw/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                    </iframe>
+                 </div>
+                 <p style="text-align: center; margin-top: 1rem;">
+                    <a href="https://www.canva.com/design/DAGxoUFd3pc/o39REMoRObKWu-tG2ernMw/view?utm_content=DAGxoUFd3pc&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Panduan PJJ 2025</a> by Muhammad Yusuf Kurniawan
+                 </p>
+            </div>
         </div>
 
-
         <div class="card">
-            <h2 class="section-title"><i class="fas fa-school"></i> Sebaran Materi per Kelas</h2>
-            <div class="chart-container">
-                <canvas id="classDistributionChart"></canvas>
+            <h2 class="section-title">
+                <span><i class="fas fa-school"></i> Sebaran Materi per Kelas</span>
+                <i class="fas fa-eye section-toggle-icon" title="Tampilkan/Sembunyikan Konten"></i>
+            </h2>
+            <div class="card-content">
+                <div class="chart-container">
+                    <canvas id="classDistributionChart"></canvas>
+                </div>
             </div>
         </div>
         
         <div class="card">
-            <h2 class="section-title"><i class="fas fa-book"></i> Sebaran Materi per Pelajaran</h2>
-            <div class="chart-grid" id="subjectChartsGrid">
+            <h2 class="section-title">
+                <span><i class="fas fa-book"></i> Sebaran Materi per Pelajaran</span>
+                <i class="fas fa-eye section-toggle-icon" title="Tampilkan/Sembunyikan Konten"></i>
+            </h2>
+            <div class="card-content">
+                <div class="chart-grid" id="subjectChartsGrid"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">
+                <span><i class="fas fa-table"></i> Rangkuman Data</span>
+                <i class="fas fa-eye section-toggle-icon" title="Tampilkan/Sembunyikan Konten"></i>
+            </h2>
+            <div class="card-content">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kelas</th>
+                                <th>Pelajaran</th>
+                                <th>Strategi</th>
+                                <th>RPP</th>
+                                <th>Materi</th>
+                                <th>Media</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody">
+                        </tbody>
+                    </table>
                 </div>
-        </div>
-
-        <div class="card">
-            <h2 class="section-title"><i class="fas fa-table"></i> Rangkuman Data</h2>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Kelas</th>
-                            <th>Pelajaran</th>
-                            <th>Strategi</th>
-                            <th>RPP</th>
-                            <th>Materi</th>
-                            <th>Media</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summaryTableBody">
-                        </tbody>
-                </table>
             </div>
         </div>
 
         <div class="card">
-            <h2 class="section-title"><i class="fas fa-chart-pie"></i> Rekapitulasi Jumlah Materi</h2>
-            <div class="table-wrapper" style="max-height: none;"> <table>
-                    <thead>
-                        <tr>
-                            <th>Kelas</th>
-                            <th>Pendidikan Agama</th>
-                            <th>Pendidikan Pancasila</th>
-                            <th>Bahasa Indonesia</th>
-                            <th>Matematika</th>
-                            <th>IPAS</th>
-                            <th>Seni & Budaya</th>
-                            <th>PJOK</th> <th>PLBJ</th>
-                            <th>B. Inggris</th>
-                            <th>KKA</th>
-                            <th>Jumlah Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recapTableBody">
+            <h2 class="section-title">
+                <span><i class="fas fa-chart-pie"></i> Rekapitulasi Jumlah Materi</span>
+                <i class="fas fa-eye section-toggle-icon" title="Tampilkan/Sembunyikan Konten"></i>
+            </h2>
+            <div class="card-content">
+                <div class="table-wrapper" style="max-height: none;"> 
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kelas</th>
+                                <th>Pendidikan Agama</th>
+                                <th>Pendidikan Pancasila</th>
+                                <th>Bahasa Indonesia</th>
+                                <th>Matematika</th>
+                                <th>IPAS</th>
+                                <th>Seni & Budaya</th>
+                                <th>PJOK</th> <th>PLBJ</th>
+                                <th>B. Inggris</th>
+                                <th>KKA</th>
+                                <th>Jumlah Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recapTableBody">
                         </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
         </div>
-
-
         
         <footer class="app-footer">
             <a href="https://wa.me/6281285242527" target="_blank" rel="noopener noreferrer"><p>Copyright &copy; 2025 Bidang SD Provinsi DKI Jakarta</p></a>
- <a href='https://www.free-counters.org/'>free-Counters.org</a> <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=da405336c32546bd9b3761c796384f24213955cd'></script>
-<script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1384042/t/3"></script>			
+			
         </footer>
     </main>
-    
+
     <div id="strategiModal" class="modal-overlay">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
@@ -359,6 +397,7 @@
     </div>
 
     <script>
+        // SCRIPT UTAMA UNTUK MENGAMBIL DAN MERENDER DATA
         const scriptURL = 'https://script.google.com/macros/s/AKfycby9pCKDsubgrETJU2mciuib2mP8m7cpUFI0Vy_ky1TdKkLopCQfOmTc6rx7MTEqkJo8/exec';
         
         const loader = document.getElementById('loader-overlay');
@@ -382,7 +421,6 @@
             strategiModal.style.display = show ? 'flex' : 'none';
         }
 
-        // Fungsi untuk membuat grafik distribusi per kelas
         function renderClassChart(data) {
             const classCounts = {};
             data.forEach(row => {
@@ -403,21 +441,19 @@
                     datasets: [{
                         label: 'Jumlah Materi',
                         data: chartData,
-                        backgroundColor: COLORS.map(color => `${color}B3`), // 70% opacity
+                        backgroundColor: COLORS.map(color => `${color}B3`),
                         borderColor: COLORS,
                         borderWidth: 1
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
                     plugins: { legend: { display: false } }
                 }
             });
         }
 
-        // Fungsi untuk membuat grafik kecil per pelajaran
         function renderSubjectCharts(data) {
             const subjectData = {};
             data.forEach(row => {
@@ -432,70 +468,39 @@
             });
 
             const sortedSubjects = Object.keys(subjectData).sort();
-
             sortedSubjects.forEach((pelajaran, index) => {
                 const item = document.createElement('div');
                 item.className = 'chart-item';
-
                 const title = document.createElement('h3');
                 title.textContent = pelajaran;
-                
                 const container = document.createElement('div');
                 container.className = 'small-chart-container';
                 const canvas = document.createElement('canvas');
                 container.appendChild(canvas);
-
                 item.appendChild(title);
                 item.appendChild(container);
                 subjectChartsGrid.appendChild(item);
-
                 const labels = Object.keys(subjectData[pelajaran]).sort();
                 const chartData = labels.map(label => subjectData[pelajaran][label]);
-
                 new Chart(canvas, {
                     type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: chartData,
-                            backgroundColor: COLORS,
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    boxWidth: 12,
-                                    padding: 15
-                                }
-                            }
-                        }
-                    }
+                    data: { labels: labels, datasets: [{ data: chartData, backgroundColor: COLORS, hoverOffset: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } } } }
                 });
             });
         }
         
-        // Fungsi untuk mengisi tabel rangkuman
         function renderSummaryTable(data) {
             summaryTableBody.innerHTML = '';
             data.forEach(row => {
                 const tr = document.createElement('tr');
-                
-                // [Kelas, Pelajaran, Strategi, RPP, Materi, Media]
                 const kelas = row[1] || '-';
                 const pelajaran = row[2] || '-';
                 const strategiFull = row[8] || '-';
                 const rpp = row[5] || '-';
                 const materi = row[4] || '-';
                 const media = row[7] || '-';
-
-                // Ambil bagian pertama dari strategi
-                const strategiParts = strategiFull.split(':');
-                const strategiDisplay = strategiParts[0].trim();
+                const strategiDisplay = strategiFull.split(':')[0].trim();
                 
                 tr.innerHTML = `
                     <td>${kelas}</td>
@@ -509,90 +514,52 @@
             });
         }
         
-        // Fungsi untuk membuat tabel rekapitulasi
         function renderRecapTable(data) {
             const recapData = {};
-            // Menggunakan header tabel yang disingkat
-            const subjects = [
-                'Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 
-                'IPAS', 'Seni & Budaya',  'PJOK', 'PLBJ', 'B. Inggris', 'KKA'
-            ];
-
-            // Peta untuk mengubah nama panjang dari data ke nama pendek di header
+            const subjects = ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'IPAS', 'Seni & Budaya',  'PJOK', 'PLBJ', 'B. Inggris', 'KKA'];
             const subjectMap = {
-                'Ilmu Pengetahuan Alam dan Sosial': 'IPAS',
-                'Seni dan Budaya': 'Seni & Budaya',
-                'Pendidikan Jasmani Olahraga dan Kesehatan': 'PJOK', // PERUBAHAN 2: Memperbaiki typo
+                'Ilmu Pengetahuan Alam dan Sosial': 'IPAS', 'Seni dan Budaya': 'Seni & Budaya',
+                'Pendidikan Jasmani Olahraga dan Kesehatan': 'PJOK',
                 'Pendidikan Lingkungan dan Budaya Jakarta': 'PLBJ',
-                'Bahasa Inggris': 'B. Inggris',
-                'Koding dan Kecerdasan Artifisial': 'KKA', // PERUBAHAN 3: Menyesuaikan nama mapel KKA
-                'KKA': 'KKA'
+                'Bahasa Inggris': 'B. Inggris', 'Koding dan Kecerdasan Artifisial': 'KKA', 'KKA': 'KKA'
             };
-
-            // Inisialisasi struktur data
             const classes = [...new Set(data.map(row => row[1]))].filter(Boolean).sort();
             classes.forEach(kelas => {
                 recapData[kelas] = {};
-                subjects.forEach(subject => {
-                    recapData[kelas][subject] = 0;
-                });
+                subjects.forEach(subject => { recapData[kelas][subject] = 0; });
                 recapData[kelas]['Total'] = 0;
             });
-
-            // Hitung data
             data.forEach(row => {
                 const kelas = row[1];
                 let pelajaran = row[2];
-
-                if (!kelas) return; // Lewati baris tanpa kelas
-
-                // Normalisasi nama pelajaran
-                if (pelajaran.startsWith('Pendidikan Agama')) {
-                    pelajaran = 'Pendidikan Agama';
-                } else if (subjectMap[pelajaran]) {
-                    pelajaran = subjectMap[pelajaran];
-                }
-
+                if (!kelas) return;
+                if (pelajaran.startsWith('Pendidikan Agama')) pelajaran = 'Pendidikan Agama';
+                else if (subjectMap[pelajaran]) pelajaran = subjectMap[pelajaran];
                 if (recapData[kelas] && subjects.includes(pelajaran)) {
                     recapData[kelas][pelajaran]++;
                     recapData[kelas]['Total']++;
                 }
             });
-
-            // Render baris data ke tabel
             recapTableBody.innerHTML = '';
             classes.forEach(kelas => {
                 const tr = document.createElement('tr');
                 let rowHTML = `<td>${kelas}</td>`;
-                subjects.forEach(subject => {
-                    rowHTML += `<td>${recapData[kelas][subject] || 0}</td>`;
-                });
+                subjects.forEach(subject => { rowHTML += `<td>${recapData[kelas][subject] || 0}</td>`; });
                 rowHTML += `<td><strong>${recapData[kelas]['Total'] || 0}</strong></td>`;
                 tr.innerHTML = rowHTML;
                 recapTableBody.appendChild(tr);
             });
-
-            // Hitung dan render baris total
             const totals = {};
             subjects.forEach(subject => totals[subject] = 0);
             totals['Total'] = 0;
-
             classes.forEach(kelas => {
-                subjects.forEach(subject => {
-                    totals[subject] += recapData[kelas][subject] || 0;
-                });
+                subjects.forEach(subject => { totals[subject] += recapData[kelas][subject] || 0; });
                 totals['Total'] += recapData[kelas]['Total'] || 0;
             });
-
             const totalRow = document.createElement('tr');
-            totalRow.style.fontWeight = 'bold';
-            totalRow.style.backgroundColor = '#f9fafb';
-            totalRow.style.borderTop = '2px solid #ccc';
-            
+            totalRow.style.cssText = 'font-weight: bold; background-color: #f9fafb; border-top: 2px solid #ccc;';
             let totalRowHTML = `<td>Total</td>`;
-            subjects.forEach(subject => {
-                totalRowHTML += `<td>${totals[subject]}</td>`;
-            });
+            subjects.forEach(subject => { totalRowHTML += `<td>${totals[subject]}</td>`; });
             totalRowHTML += `<td>${totals['Total']}</td>`;
             totalRow.innerHTML = totalRowHTML;
             recapTableBody.appendChild(totalRow);
@@ -605,12 +572,10 @@
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 const cleanData = data.slice(1).filter(row => !row.every(cell => cell === "") && row[1] && row[2]);
-                
                 renderClassChart(cleanData);
                 renderSubjectCharts(cleanData);
                 renderSummaryTable(cleanData);
                 renderRecapTable(cleanData);
-
             } catch (error) {
                 console.error('Gagal mengambil data:', error);
                 subjectChartsGrid.innerHTML = '<p>Gagal memuat data. Silakan coba lagi nanti.</p>';
@@ -619,46 +584,46 @@
             }
         }
 
-        // Event listener untuk modal
         summaryTableBody.addEventListener('click', function(e) {
             if (e.target.classList.contains('strategi-clickable')) {
-                const fullText = e.target.getAttribute('data-fulltext');
-                strategiModalText.textContent = fullText;
+                strategiModalText.textContent = e.target.getAttribute('data-fulltext');
                 showModal(true);
             }
         });
-        
         strategiModal.querySelector('.modal-close').addEventListener('click', () => showModal(false));
         strategiModal.addEventListener('click', (e) => {
-            if (e.target === strategiModal) {
-                showModal(false);
-            }
+            if (e.target === strategiModal) showModal(false);
         });
-
-        // Panggil fungsi inisialisasi
         initialize();
     </script>
     
     <script>
+        // SCRIPT TAMBAHAN UNTUK INTERAKTIVITAS UI
         document.addEventListener('DOMContentLoaded', function() {
-            const counterElement = document.getElementById('view-counter');
-            const storageKey = 'dashboardPageViewCount';
-            
-            // Ambil data dari localStorage
-            let viewCount = localStorage.getItem(storageKey);
+            // --- LOGIKA UNTUK TOGGLE VISIBILITY PER SEKSI ---
+            const sectionToggles = document.querySelectorAll('.section-toggle-icon');
 
-            // Jika belum ada, mulai dari 1. Jika sudah ada, tambahkan 1.
-            viewCount = viewCount ? Number(viewCount) + 1 : 1;
-
-            // Simpan kembali jumlah yang baru
-            localStorage.setItem(storageKey, viewCount);
-
-            // Tampilkan di halaman
-            if(counterElement) {
-                counterElement.innerHTML = `<i class="fas fa-eye"></i> Halaman ini telah dilihat <strong>${viewCount}</strong> kali`;
-            }
+            sectionToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const card = toggle.closest('.card');
+                    const content = card.querySelector('.card-content');
+                    if (content) {
+                        const isHidden = content.style.display === 'none';
+                        // Gunakan animasi sederhana
+                        if(isHidden) {
+                            content.style.display = 'block';
+                            // Anda bisa menambahkan animasi fade-in di sini jika mau
+                        } else {
+                            content.style.display = 'none';
+                        }
+                        toggle.classList.toggle('fa-eye');
+                        toggle.classList.toggle('fa-eye-slash');
+                    }
+                });
+            });
         });
     </script>
 
 </body>
 </html>
+
