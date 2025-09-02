@@ -178,7 +178,7 @@
         }
 
         passwordModal.innerHTML = `<div class="modal-content"><h2><i class="fas fa-lock" style="margin-right: 10px;"></i> Autentikasi</h2><form id="passwordForm"><div class="form-group"><label for="password">Password</label><input type="password" id="password" required></div><button type="submit" class="btn btn-primary">Masuk</button></form><p id="passwordError" style="color: var(--danger-color); margin-top: 1rem; display: none;">Password salah!</p></div>`;
-        document.getElementById('passwordForm').addEventListener('submit', e => { e.preventDefault(); if (document.getElementById('password').value === 'PJJ2025') { showModal(passwordModal, false); pageContent.classList.remove('hidden'); fetchData(); } else { document.getElementById('passwordError').style.display = 'block'; } });
+        document.getElementById('passwordForm').addEventListener('submit', e => { e.preventDefault(); if (document.getElementById('password').value === 'DKI2025') { showModal(passwordModal, false); pageContent.classList.remove('hidden'); fetchData(); } else { document.getElementById('passwordError').style.display = 'block'; } });
 
 
         async function fetchData() {
@@ -336,5 +336,6 @@
     </script>
 </body>
 </html>
+
 
 
