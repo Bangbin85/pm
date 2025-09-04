@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Sertifikat</title>
+    <!-- Memuat font dari Google Fonts untuk tampilan yang lebih baik -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Tangerine:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/1_4llqCMNoBDmwDHsI7RYsCM6rSK5wEjw">	
+    <!-- Memuat pustaka untuk membuat QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        /* --- Gaya Dasar & Tata Letak --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 2rem;
+            color: #333;
+            display: flex;
+            gap: 2rem;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* --- Kontainer Formulir (Sisi Kiri) --- */
+        .form-container {
+            flex: 1;
+            max-width: 450px;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            height: fit-content;
+            max-height: 90vh;
+        }
+
+        .form-container h1 {
+            margin-top: 0;
+            font-family: 'Merriweather', serif;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="date"],
+        .form-container select,
+        .form-container input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-container input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .date-range {
+            display: flex;
+            gap: 10px;
+        }
+        .date-range > div {
+            flex: 1;
+        }
+
+        #print-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        #print-button:hover {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+        }
+
+        /* --- Kontainer Pratinjau Sertifikat (Sisi Kanan) --- */
+        .preview-container {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #certificate-preview {
+            width: 842px; /* A4 Landscape width */
+            height: 595px; /* A4 Landscape height */
+            border: 1px solid #ddd;
+            background: white;
+            padding: 2rem; /* Mengurangi padding agar konten tidak terlalu jauh dari bingkai */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            box-sizing: border-box;
+            position: relative;
+            transform: scale(0.9);
+            transform-origin: top center;
+        }
+        
+        .cert-bg-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 380px;
+            max-height: 380px;
+            opacity: 0.08;
+            z-index: 0;
+        }
+
+        /* Bingkai Ganda - POSISI DIPERBAIKI */
+        #certificate-preview::before, #certificate-preview::after {
+            content: '';
+            position: absolute;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+        /* Bingkai luar, tipis */
+        #certificate-preview::before {
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px solid #bdc3c7;
+        }
+        /* Bingkai dalam, tebal */
+        #certificate-preview::after {
+            top: 22px;
+            left: 22px;
+            right: 22px;
+            bottom: 22px;
+            border: 4px solid #3498db;
+        }
+
+        .cert-header, .cert-body, .cert-footer {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cert-header {
+            margin-bottom: 1rem;
+        }
+
+        .cert-header img#output-logo {
+             max-width: 85px; /* Sedikit lebih kecil agar pas */
+             max-height: 85px;
+             margin-bottom: 5px;
+        }
+        
+        .cert-header h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 2.6rem; /* Sedikit lebih kecil */
+            margin: 0;
+            color: #2c3e50;
+        }
+        .cert-header p {
+            font-size: 0.9rem;
+            margin: 5px 0 0;
+        }
+
+        .cert-body {
+            margin-bottom: 1.5rem;
+        }
+        
+        .cert-body p {
+            margin: 8px 0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        #output-nama {
+            font-family: 'Tangerine', cursive;
+            font-size: 3.8rem; /* Sedikit lebih kecil */
+            color: #3498db;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        .cert-footer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            width: 100%;
+        }
+
+        .barcode-area {
+            position: absolute;
+            left: 2rem; /* Disesuaikan dengan padding */
+            bottom: 2rem; /* Disesuaikan dengan padding */
+        }
+
+        .signature {
+            text-align: center;
+        }
+        
+        #output-lokasi_tanggal_ttd {
+            margin-bottom: 0;
+        }
+        
+        .signature-space {
+            height: 40px;
+            margin-bottom: 5px;
+        }
+        .signature-name {
+            font-weight: bold;
+            border-bottom: 1px solid #333;
+            padding-bottom: 4px;
+        }
+        
+        .barcode-area #output-qrcode {
+            display: inline-block;
+            padding: 5px;
+            background: white;
+        }
+         .barcode-area #output-qrcode img {
+            display: block;
+        }
+
+        /* --- Gaya untuk Mencetak --- */
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+                display: block;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .form-container, #print-button {
+                display: none;
+            }
+            .preview-container {
+                justify-content: flex-start;
+                align-items: flex-start;
+                width: 100%;
+                height: 100%;
+            }
+            #certificate-preview {
+                width: 100%;
+                height: 100%;
+                box-shadow: none;
+                border: none;
+                transform: scale(1);
+                margin: 0;
+                padding: 32px; /* Sama dengan 2rem */
+                box-sizing: border-box;
+            }
+             .barcode-area { left: 32px; bottom: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- KOLOM FORMULIR INPUT -->
+    <div class="form-container">
+        <h1>Data Sertifikat</h1>
+        <form id="certificate-form">
+            <label for="nama">Nama Lengkap (dengan gelar):</label>
+            <input type="text" id="nama" placeholder="Contoh: Bintang Adhi Permana, M.Pd" required value="Bintang Adhi Permana, M.Pd">
+
+            <label for="nip">NIP / ID (Opsional):</label>
+            <input type="text" id="nip" placeholder="Contoh: 198501012010121001" value="6281310051985">
+
+            <label for="instansi">Asal Instansi:</label>
+            <input type="text" id="instansi" placeholder="Contoh: SDN LUBANG BUAYA 01" required value="SDN LUBANG BUAYA 01">
+            
+            <label for="peran">Berperan sebagai:</label>
+            <select id="peran">
+                <option value="Peserta">Peserta</option>
+                <option value="Narasumber">Narasumber</option>
+                <option value="Panitia">Panitia</option>
+                <option value="Moderator">Moderator</option>
+            </select>
+
+            <label for="nama_pelatihan">Nama Pelatihan / Kegiatan:</label>
+            <input type="text" id="nama_pelatihan" placeholder="Contoh: Workshop Penulisan Artikel Ilmiah" required value="Workshop Perancangan Media Interaktif Implemntasi Pembelajaran Mendalam">
+
+            <label for="tempat_pelatihan">Tempat Pelatihan:</label>
+            <input type="text" id="tempat_pelatihan" placeholder="Contoh: Auditorium Gedung Rektorat" required value="Hotel Bangbin Jaya Jakarta">
+            
+            <label>Tanggal Pelatihan:</label>
+            <div class="date-range">
+                <div>
+                    <label for="tanggal_mulai" style="font-size: 0.8rem; font-weight:normal;">Dari tanggal</label>
+                    <input type="date" id="tanggal_mulai" required>
+                </div>
+                 <div>
+                    <label for="tanggal_selesai" style="font-size: 0.8rem; font-weight:normal;">Sampai tanggal</label>
+                    <input type="date" id="tanggal_selesai" required>
+                </div>
+            </div>
+
+            <label for="penyelenggara">Penyelenggara:</label>
+            <input type="text" id="penyelenggara" placeholder="Contoh: Lembaga Penelitian ABC" required value="BANGBIN EDUCATION">
+
+            <label for="ketua_penyelenggara">Nama Ketua Penyelenggara:</label>
+            <input type="text" id="ketua_penyelenggara" placeholder="Contoh: Prof. Dr. Siti Aminah" required value="Dr. Bangbin, E.dD">
+
+            <label for="logo">Logo Instansi (JPG/PNG):</label>
+            <input type="file" id="logo-input" accept="image/*">
+
+            <button type="button" id="print-button">Cetak Sertifikat</button>
+        </form>
+    </div>
+
+
+    <!-- KOLOM PRATINJAU SERTIFIKAT -->
+    <div class="preview-container">
+        <div id="certificate-preview">
+            <!-- Logo Latar -->
+            <img src="https://placehold.co/380x380/e0e0e0/333?text=Logo" id="output-bg-logo" class="cert-bg-logo" alt="Background Logo">
+
+            <header class="cert-header">
+                <img id="output-logo" src="https://placehold.co/90x90/e0e0e0/333?text=Logo" alt="Logo">
+                <h2>SERTIFIKAT</h2>
+                <p>diberikan kepada:</p>
+            </header>
+
+            <main class="cert-body">
+                <h1 id="output-nama">[Nama Lengkap]</h1>
+                <p>
+                    <span id="output-instansi">[Asal Instansi]</span><br>
+                    <span id="output-nip"></span>
+                </p>
+                <p id="output-deskripsi_kegiatan">
+                    Atas partisipasinya sebagai <strong>[Peran]</strong> dalam kegiatan <strong>"[Nama Pelatihan]"</strong>, yang diselenggarakan pada <strong>[Tanggal]</strong> di <strong>[Tempat Pelatihan]</strong>.
+                </p>
+            </main>
+
+            <footer class="cert-footer">
+                <div class="barcode-area">
+                    <div id="output-qrcode"></div>
+                </div>
+                <div class="signature">
+                    <p id="output-lokasi_tanggal_ttd">Jakarta, 4 September 2025</p>
+                    <p id="output-penyelenggara" style="margin-top: 1rem; margin-bottom: 0;">[Penyelenggara]</p>
+                    <div class="signature-space"></div>
+                    <div class="signature-name" id="output-ketua_penyelenggara">[Nama Ketua]</div>
+                    <p>Ketua Penyelenggara</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('certificate-form');
+            const printButton = document.getElementById('print-button');
+            const qrcodeContainer = document.getElementById('output-qrcode');
+            let qrcode = new QRCode(qrcodeContainer, {
+                width: 90,
+                height: 90,
+            });
+
+
+            // Menambahkan tanggal hari ini ke bagian tanda tangan
+            const today = new Date();
+            const signatureDate = today.toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            // Anda bisa mengganti "Jakarta" dengan kota yang relevan
+            document.getElementById('output-lokasi_tanggal_ttd').textContent = `Jakarta, ${signatureDate}`;
+
+            // Fungsi untuk memformat tanggal ke format Indonesia (contoh: 4 September 2025)
+            const formatTanggal = (tanggal) => {
+                if (!tanggal) return '';
+                const dateObj = new Date(tanggal + 'T00:00:00');
+                return dateObj.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            };
+
+            // HELPER: Fungsi promise-based untuk memuat gambar dari file ke elemen <img>
+            const loadImage = (file, targetElement) => {
+                return new Promise((resolve) => {
+                    if (!file) {
+                        if (targetElement.complete) resolve();
+                        else {
+                            targetElement.onload = resolve;
+                            targetElement.onerror = resolve;
+                        }
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        targetElement.src = e.target.result;
+                        if (targetElement.complete) resolve();
+                        else {
+                            targetElement.onload = resolve;
+                            targetElement.onerror = resolve;
+                        }
+                    };
+                    reader.onerror = () => {
+                        console.error("Gagal membaca file gambar.");
+                        resolve();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            // FUNGSI UTAMA: Memperbarui semua data di pratinjau
+            const updatePreview = () => {
+                const nama = document.getElementById('nama').value;
+                const nip = document.getElementById('nip').value;
+                const instansi = document.getElementById('instansi').value;
+                const peran = document.getElementById('peran').value;
+                const namaPelatihan = document.getElementById('nama_pelatihan').value;
+                const tempatPelatihan = document.getElementById('tempat_pelatihan').value;
+                const tanggalMulai = document.getElementById('tanggal_mulai').value;
+                const tanggalSelesai = document.getElementById('tanggal_selesai').value;
+                const penyelenggara = document.getElementById('penyelenggara').value;
+                const ketuaPenyelenggara = document.getElementById('ketua_penyelenggara').value;
+
+                document.getElementById('output-nama').textContent = nama || '[Nama Lengkap]';
+                document.getElementById('output-instansi').textContent = instansi || '[Asal Instansi]';
+                document.getElementById('output-nip').textContent = nip ? `NIP. ${nip}` : '';
+                document.getElementById('output-penyelenggara').textContent = penyelenggara || '[Penyelenggara]';
+                document.getElementById('output-ketua_penyelenggara').textContent = ketuaPenyelenggara || '[Nama Ketua]';
+                
+                const tglMulaiFormatted = formatTanggal(tanggalMulai);
+                const tglSelesaiFormatted = formatTanggal(tanggalSelesai);
+                let tanggalText = '[Tanggal]';
+                if (tglMulaiFormatted && tglSelesaiFormatted) {
+                    tanggalText = (tglMulaiFormatted === tglSelesaiFormatted) 
+                        ? tglMulaiFormatted 
+                        : `${tglMulaiFormatted} s.d. ${tglSelesaiFormatted}`;
+                }
+
+                const deskripsiKegiatan = `Atas partisipasinya sebagai <strong>${peran || '[Peran]'}</strong> dalam kegiatan <strong>"${namaPelatihan || '[Nama Pelatihan]'}"</strong>, yang diselenggarakan pada <strong>${tanggalText}</strong> di <strong>${tempatPelatihan || '[Tempat Pelatihan]'}</strong>.`;
+                document.getElementById('output-deskripsi_kegiatan').innerHTML = deskripsiKegiatan;
+
+                // Membuat data untuk QR Code dan men-generate-nya
+                const qrData = `Nama: ${nama}\nKegiatan: ${namaPelatihan}\nTanggal: ${tanggalText}`;
+                qrcode.makeCode(qrData);
+
+                // MENGGUNAKAN SATU FILE UNTUK DUA LOGO
+                const logoFile = document.getElementById('logo-input').files[0];
+                const logoPromise = loadImage(logoFile, document.getElementById('output-logo'));
+                const bgLogoPromise = loadImage(logoFile, document.getElementById('output-bg-logo'));
+
+
+                return Promise.all([logoPromise, bgLogoPromise]);
+            };
+
+            // EVENT LISTENER: Memperbarui pratinjau secara live saat pengguna mengetik
+            form.addEventListener('input', updatePreview);
+            
+            // EVENT LISTENER: Menjalankan fungsi cetak saat tombol ditekan
+            printButton.addEventListener('click', async () => {
+                try {
+                    await updatePreview();
+                    window.print();
+                } catch (error) {
+                    console.error("Gagal mempersiapkan data untuk dicetak:", error);
+                    window.print();
+                }
+            });
+
+            // Menjalankan update sekali saat halaman pertama kali dimuat
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
+
