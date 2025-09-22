@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Induk</title>
+    <link rel="icon" id="faviconLink" type="image/x-icon" href="">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppin:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Gaya dasar untuk tubuh dan kontainer */
+        body {
+            font-family: "Poppin", sans-serif;
+            background-color: #2e3537;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .book-container {
+            width: 400px;
+            height: 550px;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1500px;
+        }
+        .book {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        /* Gaya untuk setiap halaman */
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform-origin: left;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1), z-index 0.01s linear;
+            transform: rotateY(0deg);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 0 15px 15px 0;
+            cursor: pointer;
+            user-select: none;
+            will-change: transform, z-index;
+        }
+        .page.flipped {
+            transform: rotateY(-180deg);
+        }
+        .page.flipping {
+            z-index: 999 !important;
+        }
+
+        /* Gaya untuk konten halaman depan dan belakang */
+        .page-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            box-sizing: border-box;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 0 15px 15px 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #2e3537;
+        }
+        .page-content.back-side {
+            transform: rotateY(180deg);
+            border-radius: 15px 0 0 15px;
+        }
+
+        /* Gaya khusus untuk sampul */
+        .cover, .cover-back {
+            background-color: #1abc9c;
+            background-image: repeating-radial-gradient(circle at 0 0, transparent 0, #1abc9c 20px), repeating-linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
+            color: white;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .cover img {
+            max-width: 120px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Gaya untuk tombol 3D */
+        .button-3d {
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            color: white;
+            background-color: #3b82f6;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 0 #1d4ed8;
+            outline: none;
+        }
+
+        .button-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #1d4ed8;
+        }
+        
+        .button-3d:hover {
+            background-color: #2563eb;
+        }
+
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 1rem;
+        }
+
+        .image-container img {
+            max-width: 100px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+        
+        /* Gaya khusus untuk halaman tutorial */
+        .tutorial-page {
+            justify-content: flex-start; /* Rata atas */
+            align-items: flex-start; /* Rata kiri */
+            text-align: left; /* Teks rata kiri */
+            overflow-y: auto; /* Aktifkan scroll vertikal */
+            font-size: 13px; /* Ukuran font lebih kecil */
+            line-height: 1.6; /* Jarak baris lebih baik */
+            color: #4a5568; /* Warna teks abu-abu tua */
+        }
+        
+        .tutorial-page h2, .tutorial-page h3 {
+            color: #2d3748; /* Warna heading lebih gelap */
+            font-weight: 600; /* Sedikit tebal */
+        }
+
+        .tutorial-page h2 {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tutorial-page h3 {
+            font-size: 1rem;
+            margin-top: 0.8rem;
+            margin-bottom: 0.4rem;
+        }
+        
+        .tutorial-page p {
+             margin-bottom: 0.75rem;
+        }
+
+        .tutorial-page ul, .tutorial-page ol {
+            margin-left: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tutorial-page li {
+            margin-bottom: 0.4rem;
+        }
+        
+        .tutorial-page ul {
+            list-style-type: disc;
+        }
+        
+        .tutorial-page ol {
+            list-style-type: decimal;
+        }
+        
+        .tutorial-page strong {
+            color: #16a085; /* Warna hijau yang lebih gelap agar serasi */
+            font-weight: 600;
+        }
+        
+        .tutorial-page code {
+            background-color: #edf2f7;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: monospace;
+        }
+
+        .tutorial-page hr {
+            margin: 1.5rem 0;
+            border-color: #e2e8f0;
+        }
+        
+        /* Kustomisasi scrollbar untuk halaman tutorial */
+        .tutorial-page::-webkit-scrollbar {
+            width: 8px;
+        }
+        .tutorial-page::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .tutorial-page::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .tutorial-page::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Gaya untuk Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: none; /* Tersembunyi secara default */
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-backdrop.active {
+            display: flex;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        .modal-backdrop.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        .modal-close-btn:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 flex flex-col items-center justify-center p-4">
+
+    <div class="book-container">
+        <div class="book" id="book">
+            <!-- Sampul Depan -->
+            <div class="page z-50">
+                <div class="page-content cover">
+                    <h2 class="text-white text-2xl font-bold">BUKU INDUK SISWA</h2>
+                    <img id="coverSchoolLogo" src="" alt="Logo Sekolah" class="mb-2">
+                    <h1 id="bookTitle" class="text-white text-3xl font-bold">BUKU INDUK</h1>
+                </div>
+                <div class="page-content back-side cover">
+                    <img id="schoolLogo" src="https://placehold.co/200x200/4173a5/ffffff?text=LOGO SEKOLAH" alt="Logo Sekolah">
+                </div>
+            </div>
+            
+            <!-- Halaman 1 (Setelah membalik sampul) -->
+            <div class="page z-40">
+                <div class="page-content">
+                    <h2 class="text-xl font-semibold mb-2">Selamat Datang</h2>
+                    <p>Selamat datang di Buku Induk Siswa. Silakan geser atau klik halaman untuk melihat informasi lebih lanjut.</p>
+                    <h3 class="text-lg font-semibold mt-4">Tutorial Penggunaan</h3>
+                    <p>Geser ke kiri atau klik pada tepi halaman untuk melanjutkan ke halaman berikutnya. Geser ke kanan untuk kembali.</p>
+                </div>
+                <div class="page-content back-side">
+                    <div class="image-container">
+                        <h3 class="text-lg font-bold mt-4">TUTORIAL</h3>
+						<p>Aplikasi ini dirancang untuk mempermudah pengelolaan data siswa, kurikulum, dan penilaian secara digital. Terdapat dua jenis pengguna utama: Admin, yang mengelola data master dan pengaturan sistem, dan Guru, yang bertugas sebagai wali kelas untuk menginput nilai siswa yang berada di bawah peraliannya.</p>
+                    </div>
+                </div>
+            </div>
+
+			<!-- Halaman Tutorial -->
+            <div class="page z-30">
+                <div class="page-content tutorial-page">
+                    <h2 class="text-xl font-semibold mb-2">TUTORIAL</h2>
+                    <p>Sebagai Admin, Anda memiliki kontrol penuh atas seluruh sistem. Tugas utama Anda adalah mempersiapkan semua data dasar (user, siswa, kurikulum) agar para guru dapat melakukan input nilai dengan lancar</p>
+					<h2>&#x1F468;&#x200D;&#x1F4BC; Panduan untuk Admin</h2>
+					<p>Sebagai Admin, Anda memiliki kontrol penuh atas seluruh sistem. Tugas utama Anda adalah mempersiapkan semua data dasar (user, siswa, kurikulum) agar para guru dapat melakukan input nilai dengan lancar.</p>
+
+					<h3>1. Login dan Halaman Utama</h3>
+					<ul>
+						<li><strong>Login</strong>: Buka file <code>Admin.html</code>. Gunakan username <code>Bangbin</code> dan password <code>Bangbin123</code> untuk login pertama kali.</li>
+						<li><strong>Navigasi</strong>: Setelah login, Anda akan melihat halaman utama dengan menu navigasi di sebelah kiri (Sidebar) yang berisi: <strong>Users</strong>, <strong>Siswa</strong>, <strong>Kurikulum</strong>, dan <strong>Sekolah</strong>.</li>
+						<li><strong>Tahun Pelajaran</strong>: Di bagian atas, terdapat <em>dropdown</em> <strong>Tahap Pelajaran</strong>. Pastikan Anda selalu memilih tahun pelajaran yang benar sebelum menambah atau mengubah data, karena sebagian besar data (seperti user, kurikulum, dan pendaftaran siswa) terikat pada tahun pelajaran yang aktif.</li>
+					</ul>
+
+					<h3>2. Manajemen Users</h3>
+					<p>Di menu ini, Anda mengelola akun untuk semua pengguna, termasuk guru dan admin lainnya.</p>
+					<ul>
+						<li>
+							<p><strong>Menambah User Baru</strong>:</p>
+							<ol>
+								<li>Klik tombol <strong>Tambah User Baru</strong>.</li>
+								<li>Isi <strong>Nama Lengkap</strong>, <strong>Username</strong>, dan <strong>Password</strong>.</li>
+								<li>Pilih <strong>Role</strong> (Peran):
+									<ul>
+										<li><strong>Admin</strong>: Memiliki akses penuh seperti Anda.</li>
+										<li><strong>Guru</strong>: Hanya bisa mengakses halaman input nilai.</li>
+									</ul>
+								</li>
+								<li><strong>Penting</strong>: Jika Anda memilih role <strong>Guru</strong>, akan muncul kolom <strong>Wali Kelas Rombel</strong>. Isi dengan nama rombongan belajar (rombel) yang akan dipegang oleh guru tersebut, contoh: <code>1A</code>, <code>2B</code>, <code>3C</code>. Tanpa ini, guru tidak akan bisa melihat data siswa manapun.</li>
+								<li>Klik <strong>Simpan</strong>.</li>
+							</ol>
+						</li>
+						<li><strong>Mengedit dan Menghapus User</strong>: Gunakan tombol Edit atau Hapus pada baris user yang bersangkutan.</li>
+					</ul>
+
+					<h3>3. Manajemen Siswa</h3>
+					<p>Menu ini adalah pusat data induk semua siswa.</p>
+					<ul>
+						<li>
+							<p><strong>Menambah Siswa (Manual)</strong>:</p>
+							<ol>
+								<li>Klik <strong>Tambah Siswa (Manual)</strong>.</li>
+								<li>Akan muncul formulir dengan beberapa tab: <strong>Data Pribadi, Data Ayah, Data Ibu, Data Wali, Info Tambahan,</strong> dan <strong>Akademik</strong>.</li>
+								<li>Lengkapi data siswa selengkap mungkin.</li>
+								<li>Pada tab <strong>Akademik</strong>, pastikan Anda mengisi <strong>Kelas</strong>, <strong>Rombel</strong>, dan <strong>Status</strong> siswa untuk tahun pelajaran yang sedang aktif.</li>
+								<li>Klik <strong>Simpan</strong>.</li>
+							</ol>
+						</li>
+						<li>
+							<p><strong>Menambah Siswa (Upload Excel)</strong>:</p>
+							<ol>
+								<li>Klik <strong>Download Template</strong> untuk mengunduh format file Excel yang benar.</li>
+								<li>Isi data siswa pada file template tersebut. Kolom yang wajib diisi minimal adalah <strong>Nama</strong> dan <strong>NISN</strong>.</li>
+								<li>Kembali ke aplikasi, klik <strong>Upload Excel</strong> dan pilih file yang sudah Anda isi.</li>
+								<li>Sistem akan otomatis membaca data dan menambahkannya ke database. Jika ada siswa dengan NISN yang sama, sistem akan memperbarui datanya.</li>
+							</ol>
+						</li>
+						<li><strong>Melihat dan Mencari Siswa</strong>: Anda dapat menggunakan filter berdasarkan <strong>Kelas</strong> dan <strong>Rombel</strong>, atau mengetik nama siswa di kolom pencarian untuk menemukan data dengan cepat.</li>
+						<li><strong>Menghapus Siswa</strong>: Tombol Hapus di baris data siswa hanya akan menghapus status pendaftaran siswa di tahun ajaran tersebut, <strong>bukan menghapus data induknya</strong>. Siswa tersebut masih ada di database master.</li>
+					</ul>
+					
+					<h3>4. Manajemen Kurikulum</h3>
+					<p>Sebelum guru bisa input nilai, Anda harus mengatur struktur kurikulum untuk tahun ajaran yang aktif.</p>
+					 <ul>
+						<li><strong>Nama Kurikulum</strong>: Isi nama kurikulum yang digunakan, misalnya <code>Kurikulum Merdeka</code>.</li>
+						<li><strong>Mata Pelajaran</strong>: Klik <strong>Tambah Mapel</strong>. Masukkan nama lengkap dan nama singkatnya (misal: "Bahasa Indonesia" dan "B. Indo"). Nama singkat inilah yang akan muncul sebagai judul kolom di tabel nilai guru.</li>
+						<li><strong>Ekstrakurikuler</strong>: Klik <strong>Tambah Ekskul</strong> dan masukkan nama ekstrakurikuler yang tersedia di sekolah.</li>
+						<li>
+							<p><strong>Nilai Karakter</strong>:</p>
+							<ol>
+								<li>Klik <strong>Tambah Karakter Utama</strong>.</li>
+								<li>Masukkan nama karakter utama (contoh: <code>Profil Pelajar Pancasila</code>).</li>
+								<li>Di kolom di bawahnya, masukkan sub-karakter, <strong>satu per baris</strong> (contoh: <code>Beriman, bertakwa kepada Tuhan YME</code>, <code>Bergotong royong</code>, dll).</li>
+							</ol>
+						</li>
+						<li><strong>Opsi Penilaian Karakter</strong>: Masukkan pilihan nilai yang akan digunakan guru, pisahkan dengan koma. Contoh: <code>Sangat Baik, Baik, Cukup, Perlu Peningkatan</code>.</li>
+					</ul>
+
+					<h3>5. Manajemen Sekolah dan Tahun Ajaran</h3>
+					 <ul>
+						<li><strong>Data Sekolah</strong>: Perbarui informasi umum sekolah di sini.</li>
+						<li><strong>Kepala Sekolah</strong>: Masukkan nama dan NIP Kepala Sekolah untuk tahun ajaran yang aktif. Data ini akan digunakan pada dokumen rapor.</li>
+						<li><strong>Tahun Pelajaran</strong>:
+							<ul>
+								<li><strong>Tambah Tahun Pelajaran Baru</strong>: Masukkan tahun ajaran baru dengan format <code>YYYY/YYYY</code> (contoh: <code>2025/2026</code>).</li>
+								<li><strong>Set Tahun Pelajaran Aktif</strong>: Pilih tahun ajaran yang sedang berjalan dan klik simpan.</li>
+							</ul>
+						</li>
+						<li>
+							<p><strong>Kenaikan Kelas</strong>:</p>
+							<ol>
+								<li>Fitur ini digunakan saat akhir tahun ajaran untuk memindahkan siswa ke tingkat selanjutnya.</li>
+								<li>Pilih tahun ajaran <strong>Sumber</strong> (Dari) dan tahun ajaran <strong>Tujuan</strong> (Ke).</li>
+								<li>Klik <strong>Proses Pindah</strong>. Sistem akan menyalin semua siswa berstatus "Aktif" dari tahun sumber ke tahun tujuan, menaikkan tingkat kelasnya, dan mengubah status mereka di tahun sumber menjadi "Lulus".</li>
+							</ol>
+						</li>
+					</ul>
+
+					<h3>6. Pengaturan Lanjutan</h3>
+					<ul>
+						<li><strong>Backup Database</strong>: Sangat disarankan untuk melakukan backup secara berkala. Fitur ini akan mengunduh seluruh database dalam satu file JSON.</li>
+						<li><strong>Restore Database</strong>: Mengunggah file backup JSON untuk mengembalikan data. <strong>Hati-hati</strong>, tindakan ini akan menimpa semua data yang ada saat ini.</li>
+						<li><strong>Reset Database</strong>: Menghapus semua data dan mengembalikannya ke kondisi awal. <strong>Gunakan dengan sangat hati-hati!</strong></li>
+					</ul>
+
+					<hr>
+
+					<h2>&#x1F9D1;&#x200D;&#x1F3EB; Panduan untuk Guru (Wali Kelas)</h2>
+					<p>Sebagai Guru, tugas Anda adalah fokus pada pengisian nilai, absensi, dan catatan perkembangan siswa yang menjadi wali kelas Anda.</p>
+
+					<h3>1. Login dan Halaman Utama</h3>
+					<ul>
+						<li><strong>Login</strong>: Buka file <code>Guru.html</code>. Gunakan username dan password yang telah dibuatkan oleh Admin.</li>
+						<li><strong>Halaman Utama</strong>: Setelah login, Anda akan langsung diarahkan ke panel input nilai.
+							<ul>
+								<li><strong>Informasi Rombel</strong>: Di bagian atas, akan tertera informasi rombel yang Anda ajar (contoh: <code>Daftar Siswa Rombel: 1A</code>). Jika Anda melihat pesan "Anda tidak ditugaskan sebagai wali kelas", segera hubungi Admin.</li>
+								<li><strong>Pilih Tahun Pelajaran</strong>: Anda dapat memilih tahun pelajaran jika Anda mengajar di beberapa tahun ajaran yang berbeda.</li>
+								<li><strong>Pilih Semester</strong>: Terdapat dua tombol utama: <strong>Semester 1</strong> dan <strong>Semester 2</strong>. Pastikan Anda memilih semester yang benar sebelum mengisi nilai.</li>
+							</ul>
+						</li>
+					</ul>
+
+					<h3>2. Mengisi Nilai Akademik, Ekstrakurikuler, dan Absensi</h3>
+					<ul>
+						<li>Di dalam setiap tab semester, Anda akan melihat sebuah tabel besar.</li>
+						<li><strong>Struktur Tabel</strong>:
+							<ul>
+								<li>Baris berisi <strong>nama-nama siswa</strong> di rombel Anda.</li>
+								<li>Kolom berisi <strong>mata pelajaran</strong>, <strong>ekstrakurikuler</strong>, dan <strong>absensi (Sakit, Izin, Alpha)</strong> yang telah diatur oleh Admin.</li>
+							</ul>
+						</li>
+						<li>
+							<p><strong>Cara Mengisi</strong>:</p>
+							<ol>
+								<li>Cukup klik pada sel yang ingin diisi.</li>
+								<li>Untuk <strong>nilai mata pelajaran</strong> dan <strong>absensi</strong>, masukkan angka.</li>
+								<li>Untuk <strong>nilai ekstrakurikuler</strong>, masukkan deskripsi singkat (contoh: <code>Baik</code>, <code>Sangat Baik</code>, <code>Aktif mengikuti kegiatan</code>).</li>
+							</ol>
+						</li>
+						<li><strong>Simpan Otomatis</strong>: Anda tidak perlu mencari tombol simpan. Setelah Anda selesai mengetik di sebuah sel dan berpindah ke sel lain, sistem akan <strong>menyimpan data secara otomatis</strong>. Anda akan melihat notifikasi "Nilai tersimpan" di pojok kanan bawah.</li>
+					</ul>
+
+					<h3>3. Mengisi Nilai Karakter</h3>
+					<ul>
+						<li>Di bawah tabel nilai akademik, terdapat bagian <strong>Input Nilai Karakter</strong>.</li>
+						<li>Setiap aspek karakter utama (misal: "Profil Pelajar Pancasila") akan ditampilkan dalam kartu terpisah.</li>
+						<li>
+							<p><strong>Cara Mengisi</strong>:</p>
+							<ol>
+								<li>Di dalam setiap kartu, terdapat tabel yang berisi nama siswa dan kolom-kolom sub-karakter.</li>
+								<li>Klik pada menu <em>dropdown</em> di setiap sel.</li>
+								<li>Pilih penilaian yang sesuai (misalnya: <code>Sangat Baik</code>, <code>Baik</code>, <code>Cukup</code>). Pilihan ini juga diatur oleh Admin.</li>
+							</ol>
+						</li>
+						<li><strong>Simpan Otomatis</strong>: Sama seperti nilai akademik, nilai karakter juga tersimpan secara otomatis setelah Anda memilih.</li>
+					</ul>
+
+					<h3>4. Logout</h3>
+					<p>Jika sudah selesai, klik tombol <strong>Logout</strong> di pojok kanan atas untuk keluar dari sistem.</p>
+
+                </div>
+                <div class="page-content back-side">
+                    <h2 class="text-xl font-semibold mb-2">HALAMAN ADMIN</h2>
+                    <p>Halaman ini dikhususkan untuk administrator. Di sini, Anda dapat mengelola semua data siswa, guru, dan informasi sekolah.</p>
+                    <a href="Admin.html" class="button-3d mt-4">ADMIN</a>
+                </div>
+            </div>
+
+            <div class="page z-20">
+                <div class="page-content">
+                    <h2 class="text-xl font-semibold mb-2">HALAMAN GURU</h2>
+                    <p>Di sini, para guru dapat melihat dan memperbarui data kehadiran, nilai, serta catatan penting lainnya untuk siswa yang diajar.</p>
+                    <a href="Guru.html" class="button-3d mt-4">ADMIN</a>
+                </div>
+                <div class="page-content back-side">
+                    <h2 class="text-xl font-semibold mb-2">HALAMAN SISWA</h2>
+                    <p>Siswa dapat menggunakan halaman ini untuk melacak kemajuan akademis mereka, melihat nilai, dan mengecek informasi pribadi.</p>
+                    <button id="siswaButton" class="button-3d mt-4">SISWA</button>
+                </div>
+            </div>
+
+            <div class="page z-15">
+                <div class="page-content">
+                    <h2 class="text-xl font-semibold mb-2">PESAN</h2>
+                    <p class="mb-4">Silahkan hubungi Admin dengan mengklik icon berikut</p>
+                    <a href="https://wa.me/6281310051985" target="_blank" class="transition-transform transform hover:scale-110">
+                        <i class="fa-brands fa-whatsapp text-6xl text-green-500 hover:text-green-600"></i>
+                    </a>
+                </div>
+                <div class="page-content back-side p-0">
+                    <img src="https://lh3.googleusercontent.com/d/1ivUN8B8xdd4R8Kef_-wEqNx56_eeUv4w" alt="Background Image" class="w-full h-full object-cover opacity-50 select-none" draggable="false">
+                </div>
+            </div>
+
+            <!-- Sampul Belakang -->
+            <div class="page z-10">
+                <div class="page-content cover-back flex items-center justify-center">
+                    <h1 class="text-white text-3xl font-bold">TERIMA KASIH</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal untuk Halaman Siswa -->
+    <div id="siswaModal" class="modal-backdrop">
+        <div class="modal-content">
+            <button id="closeModalBtn" class="modal-close-btn">&times;</button>
+            <img src="https://lh3.googleusercontent.com/d/1JGu3OWlYZaGKzROgMjWPIakaOcBZNfn7" alt="Coming Soon" class="mx-auto mb-4 w-24 h-24">
+            <p class="text-gray-700">
+                Mohon maaf halaman ini sedang dalam proses akhir Saya sudah tidak sabar akan segera melaunching halaman ini
+            </p>
+        </div>
+    </div>
+
+    <script src="./Bangbin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookElement = document.getElementById('book');
+            const pages = document.querySelectorAll('.page');
+            
+            let currentPageIndex = 0;
+            let startX = 0;
+            let isSwiping = false;
+            let isAnimating = false;
+
+            // Ambil data dari Bangbin.js
+            let db = getDb();
+            if (!db) {
+                db = setDefaultData();
+            }
+
+            const schoolName = db.schoolInfo.nama;
+            const schoolLogoUrl = db.schoolInfo.logoUrl;
+
+            // Perbarui judul buku dan logo sekolah
+            document.getElementById('bookTitle').textContent = schoolName;
+            document.getElementById('schoolLogo').src = schoolLogoUrl;
+            document.getElementById('schoolLogo').onerror = function() {
+                this.src = 'https://placehold.co/200x200/4173a5/ffffff?text=' + schoolName;
+            };
+
+            // Perbarui logo di sampul depan
+            const coverSchoolLogo = document.getElementById('coverSchoolLogo');
+            coverSchoolLogo.src = schoolLogoUrl;
+            coverSchoolLogo.onerror = function() {
+                this.src = 'https://placehold.co/200x200/4173a5/ffffff?text=' + schoolName;
+            };
+
+            // Perbarui favicon
+            const faviconLink = document.getElementById('faviconLink');
+            if (faviconLink) {
+                faviconLink.href = schoolLogoUrl;
+            }
+
+            const updateZIndex = () => {
+                pages.forEach((page, index) => {
+                    if (index >= currentPageIndex) {
+                        page.style.zIndex = pages.length - index;
+                    } else {
+                        page.style.zIndex = 1;
+                    }
+                });
+            };
+
+            const flipPage = (direction) => {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                if (direction === 'next' && currentPageIndex < pages.length - 1) {
+                    pages[currentPageIndex].classList.add('flipped');
+                    pages[currentPageIndex].classList.add('flipping');
+                    currentPageIndex++;
+                } else if (direction === 'prev' && currentPageIndex > 0) {
+                    currentPageIndex--;
+                    pages[currentPageIndex].classList.remove('flipped');
+                    pages[currentPageIndex].classList.add('flipping');
+                }
+                
+                setTimeout(() => {
+                    isAnimating = false;
+                    pages.forEach(page => page.classList.remove('flipping'));
+                    updateZIndex();
+                }, 800);
+            };
+
+            const handleInteractionStart = (e) => {
+                // Mencegah interaksi jika targetnya adalah gambar yang bisa di-drag
+                if (e.target.tagName === 'IMG') {
+                     e.preventDefault();
+                }
+                isSwiping = true;
+                startX = e.type.startsWith('mouse') ? e.clientX : e.touches[0].clientX;
+            };
+
+            const handleInteractionEnd = (e) => {
+                if (!isSwiping) return;
+                isSwiping = false;
+
+                const endX = e.type.startsWith('mouse') ? e.clientX : e.changedTouches[0].clientX;
+                const deltaX = endX - startX;
+                const threshold = 50;
+
+                if (Math.abs(deltaX) > threshold) {
+                    if (deltaX < 0) { // Geser ke kiri (maju)
+                        flipPage('next');
+                    } else { // Geser ke kanan (mundur)
+                        flipPage('prev');
+                    }
+                }
+            };
+            
+            // Atur z-index awal saat halaman dimuat
+            updateZIndex();
+
+            // Event listeners
+            bookElement.addEventListener('mousedown', handleInteractionStart);
+            bookElement.addEventListener('mouseup', handleInteractionEnd);
+            bookElement.addEventListener('touchstart', handleInteractionStart, { passive: true });
+            bookElement.addEventListener('touchend', handleInteractionEnd);
+            bookElement.addEventListener('mouseleave', () => {
+                if (isSwiping) {
+                    isSwiping = false;
+                }
+            });
+
+            // Logika untuk Modal
+            const siswaButton = document.getElementById('siswaButton');
+            const siswaModal = document.getElementById('siswaModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+
+            const openModal = () => {
+                siswaModal.classList.add('active');
+            };
+
+            const closeModal = () => {
+                siswaModal.classList.remove('active');
+            };
+
+            if (siswaButton && siswaModal && closeModalBtn) {
+                siswaButton.addEventListener('click', openModal);
+                closeModalBtn.addEventListener('click', closeModal);
+                // Tutup modal jika latar belakang diklik
+                siswaModal.addEventListener('click', (e) => {
+                    if (e.target === siswaModal) {
+                        closeModal();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
