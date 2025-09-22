@@ -17,19 +17,25 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden; /* Mencegah scroll horizontal yang tidak perlu */
+            padding: 1rem; /* Memberi jarak aman dari tepi layar */
+            box-sizing: border-box;
         }
         .book-container {
-            width: 400px;
-            height: 550px;
+            width: 180vw; /* Lebar ganda untuk mengakomodasi buku terbuka */
+            max-width: 800px; /* Lebar maksimal ganda */
+            aspect-ratio: 800 / 550; /* Rasio aspek untuk buku terbuka */
+            height: auto; /* Tinggi menyesuaikan secara otomatis */
             position: relative;
             transform-style: preserve-3d;
             perspective: 1500px;
         }
         .book {
-            width: 100%;
+            width: 50%; /* Buku sekarang hanya separuh dari container */
             height: 100%;
-            position: relative;
+            position: absolute;
+            left: 50%; /* Posisi di separuh kanan container */
+            top: 0;
             transform-style: preserve-3d;
         }
 
@@ -163,8 +169,8 @@
 
         .tutorial-page h3 {
             font-size: 1rem;
-            margin-top: 0.8rem;
-            margin-bottom: 0.4rem;
+            margin-top: 1rem;
+            margin-bottom: 0.7rem;
         }
         
         .tutorial-page p {
@@ -269,9 +275,76 @@
         .modal-close-btn:hover {
             color: #333;
         }
+        
+        /* Penyesuaian konten untuk layar kecil */
+        @media (max-width: 480px) {
+            .page-content {
+                padding: 0.8rem;
+                line-height: 1.4;
+            }
+            .cover h2, .page-content h2 { /* Menargetkan semua h2 di dalam page-content */
+                font-size: 0.8rem !important; /* !important untuk override Tailwind */
+            }
+            .cover h1, .page-content h1 { /* Menargetkan semua h1 di dalam page-content */
+                font-size: 0.8rem !important; /* !important untuk override Tailwind */
+            }
+            .page-content p {
+                font-size: 0.6rem;
+            }
+            .page-content h3 { /* Menargetkan semua h3 di dalam page-content */
+                font-size: 0.9rem !important;
+            }
+            .cover img {
+                max-width: 90px;
+            }
+            .image-container img {
+                max-width: 80px;
+            }
+            .button-3d {
+                font-size: 0.5rem;
+                padding: 0.8rem 1.2rem;
+                box-shadow: 0 3px 0 #1d4ed8;
+            }
+            .button-3d:active {
+                transform: translateY(3px);
+                box-shadow: 0 0 0 #1d4ed8;
+            }
+            .fa-whatsapp {
+                font-size: 3rem; /* text-6xl adalah 3.75rem, dikecilkan */
+            }
+
+            /* Spesifik untuk halaman tutorial */
+            .tutorial-page {
+                font-size: 10px;
+                line-height: 1.5;
+            }
+            .tutorial-page h2 {
+                font-size: 1rem !important;
+            }
+            .tutorial-page h3 {
+                font-size: 0.6rem !important;
+            }
+        }
+        
+        /* Penyesuaian untuk layar lebih besar (tablet/desktop) */
+        @media (min-width: 481px) {
+            .book-container {
+                width: 800px; /* Kembali ke ukuran tetap ganda */
+                height: 550px;
+            }
+        }
+        
+        /* Penyesuaian untuk layar yang sangat pendek tingginya */
+        @media (max-height: 600px) {
+             body {
+                align-items: flex-start; /* Mulai dari atas agar tidak terpotong */
+                padding-top: 1.5rem;
+                padding-bottom: 1.5rem;
+             }
+        }
     </style>
 </head>
-<body class="bg-gray-800 flex flex-col items-center justify-center p-4">
+<body class="bg-gray-800 flex items-center justify-center">
 
     <div class="book-container">
         <div class="book" id="book">
@@ -476,7 +549,7 @@
                 <div class="page-content">
                     <h2 class="text-xl font-semibold mb-2">HALAMAN GURU</h2>
                     <p>Di sini, para guru dapat melihat dan memperbarui data kehadiran, nilai, serta catatan penting lainnya untuk siswa yang diajar.</p>
-                    <a href="Guru.html" class="button-3d mt-4">ADMIN</a>
+                    <a href="Guru.html" class="button-3d mt-4">Guru</a>
                 </div>
                 <div class="page-content back-side">
                     <h2 class="text-xl font-semibold mb-2">HALAMAN SISWA</h2>
