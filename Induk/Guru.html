@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Guru - Buku Induk Siswa</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        /* === DESAIN BARU: PANEL GURU MODERN === */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #f3f4f6;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --white-color: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Poppins', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        /* === HALAMAN LOGIN === */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .login-card {
+            background: var(--white-color);
+            padding: 2.5rem 3rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            animation: contentFadeIn 0.6s ease-out;
+        }
+        
+        .login-card h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        .login-card h1 .fa-chalkboard-user { color: var(--primary-color); }
+        .login-card p { color: var(--text-muted); margin-bottom: 2rem; }
+        .login-card .form-group { text-align: left; margin-bottom: 1rem; }
+        .login-card .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .login-card .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); }
+        .login-card .btn { width: 100%; margin-top: 1rem; }
+        #errorMessage { color: var(--danger-color); margin-top: 1rem; height: 20px; font-weight: 500; }
+
+        /* === TATA LETAK UTAMA === */
+        #mainContent {
+            padding: 2rem;
+        }
+
+        .header-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 1.5rem;
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        .header-container h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .header-container h1 .fa-solid { color: var(--primary-color); }
+
+        .header-controls { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+        .year-selector { display: flex; align-items: center; gap: 0.5rem; }
+        .year-selector label { font-weight: 600; }
+        #welcomeMessage { font-weight: 500; color: var(--text-muted); }
+        
+        .class-info-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        #kelasInfo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+            background-color: #eef2ff;
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-md);
+            display: inline-block;
+        }
+
+        /* === NAVIGASI TAB SEMESTER === */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .tab-button {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: var(--border-radius-md);
+            background: var(--white-color);
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            box-shadow: var(--shadow-sm);
+        }
+        .tab-button:hover { color: var(--primary-color); }
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* === KONTEN & KARTU === */
+        .card {
+            background: var(--white-color);
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: contentFadeIn 0.5s ease; }
+        @keyframes contentFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === TOMBOL === */
+        .btn {
+            padding: 0.7rem 1.25rem;
+            border: none;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition-speed) ease;
+        }
+        .btn:active { transform: translateY(2px); }
+        .btn-primary { background-color: var(--primary-color); color: var(--white-color); box-shadow: 0 4px 0 var(--primary-hover); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-primary:active { box-shadow: 0 2px 0 var(--primary-hover); }
+        .btn-secondary { background-color: #9ca3af; color: var(--white-color); box-shadow: 0 4px 0 #4b5563; }
+        .btn-secondary:hover { background-color: #6b7280; }
+        .btn-secondary:active { box-shadow: 0 2px 0 #4b5563; }
+        .btn-outline { background: var(--white-color); color: var(--text-color); border: 1px solid var(--border-color); }
+        .btn-outline:hover { background: var(--secondary-color); border-color: #d1d5db; }
+        .btn:disabled { background-color: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* === TABEL INPUT NILAI === */
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            max-height: 70vh; /* Batasi tinggi tabel agar bisa discroll */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap; /* Mencegah kolom jadi terlalu kecil */
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        thead th {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            background-color: var(--secondary-color);
+            position: sticky; /* Membuat header tabel tetap di atas */
+            top: 0;
+            z-index: 10;
+        }
+        tbody tr { transition: background-color var(--transition-speed) ease; }
+        tbody tr:nth-child(even) { background-color: #f9fafb; }
+        tbody tr:hover { background-color: #eef2ff; }
+        td:first-child, td:nth-child(2) { white-space: normal; } /* Izinkan nama siswa wrap */
+        th:first-child, td:first-child { position: sticky; left: 0; background-color: inherit; } /* Membuat kolom NISN sticky */
+        th:nth-child(2), td:nth-child(2) { position: sticky; left: 80px; background-color: inherit; } /* Membuat kolom Nama Siswa sticky */
+
+        table input[type="number"], table input[type="text"], table select {
+            width: 90px;
+            padding: 6px 8px;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius-md);
+            background-color: transparent;
+            text-align: center;
+            font-size: 0.95rem;
+            transition: all var(--transition-speed) ease;
+        }
+        table input:hover, table select:hover { border-color: var(--border-color); background-color: var(--white-color); }
+        table input:focus, table select:focus { border-color: var(--primary-color); background-color: var(--white-color); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
+        table select { width: 150px; text-align: left; }
+        
+        /* === NILAI KARAKTER === */
+        .character-value-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .character-table-card {
+            background-color: var(--white-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        .character-table-card h4 { font-size: 1.1rem; margin-bottom: 1rem; }
+
+        /* === MODAL & NOTIFIKASI === */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); }
+        .modal.show { animation: contentFadeIn 0.3s forwards; }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 0; border: none; width: 95%; max-width: 500px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: slideInUp 0.4s ease-out; }
+        @keyframes slideInUp { from { transform: translateY(50px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 1.25rem 2rem; background-color: var(--secondary-color); }
+        .modal-header h2 { font-size: 1.25rem; margin-bottom: 0; color: var(--text-color); }
+        .close-button { color: var(--text-muted); font-size: 28px; font-weight: bold; cursor: pointer; transition: color var(--transition-speed) ease; }
+        .close-button:hover { color: var(--text-color); }
+        .modal-body { padding: 2rem; text-align: center; }
+        .confirm-actions { display: flex; justify-content: center; padding: 1.25rem 2rem; background-color: var(--secondary-color); border-top: 1px solid var(--border-color); }
+        
+        #notification { position: fixed; bottom: 20px; right: 20px; background-color: var(--success-color); color: white; padding: 1rem 1.5rem; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); z-index: 2000; opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.4s ease-in-out; }
+        #notification.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+    <script src="./Bangbin.js"></script>
+
+    <div id="loginScreen" class="login-screen">
+        <div id="loginCard" class="login-card">
+            <h1><i class="fa-solid fa-chalkboard-user"></i> Selamat Datang</h1>
+            <p>Silakan login untuk mengakses Panel Guru.</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+				<a href="./" class="btn btn-primary"><i class="fa-solid fa-home"></i></a>
+                <p id="errorMessage"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <header class="header-container">
+            <h1><i class="fa-solid fa-pen-to-square"></i> Panel Input Nilai</h1>
+            <div class="header-controls">
+                <div class="year-selector">
+                    <label for="tahunPelajaranSelector">Tahun Pelajaran:</label>
+                    <select id="tahunPelajaranSelector" class="btn btn-outline"></select>
+                </div>
+                <div class="header-welcome">
+                    <span id="welcomeMessage"></span>
+                    <button id="logoutBtn" class="btn btn-secondary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="class-info-header">
+             <h2 id="kelasInfo"></h2>
+        </div>
+
+        <nav class="tab-nav">
+            <button class="tab-button active" data-target="semester1"><i class="fa-solid fa-1"></i>&nbsp; Semester 1</button>
+            <button class="tab-button" data-target="semester2"><i class="fa-solid fa-2"></i>&nbsp; Semester 2</button>
+        </nav>
+        
+        <section id="semester1" class="tab-content active">
+            <div class="card">
+                <h3>Input Nilai Akademik, Ekstrakurikuler & Absensi (Semester 1)</h3>
+                <div class="table-wrapper">
+                    <table id="siswaTable1">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                 <h3>Input Nilai Karakter (Semester 1)</h3>
+                <div class="character-value-container" id="characterTables1"></div>
+            </div>
+        </section>
+
+        <section id="semester2" class="tab-content">
+             <div class="card">
+                <h3>Input Nilai Akademik, Ekstrakurikuler & Absensi (Semester 2)</h3>
+                <div class="table-wrapper">
+                    <table id="siswaTable2">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                 <h3>Input Nilai Karakter (Semester 2)</h3>
+                <div class="character-value-container" id="characterTables2"></div>
+            </div>
+        </section>
+
+        <div id="notification"></div>
+        <div id="confirmPromptModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header"><h2>Perhatian</h2><span class="close-button">&times;</span></div>
+                <div class="modal-body">
+                    <p id="promptMessage"></p>
+                </div>
+                <div class="confirm-actions">
+                    <button class="btn btn-primary" id="confirmPromptBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let db = getDb() || setDefaultData();
+
+            const loginScreen = document.getElementById('loginScreen');
+            const mainContent = document.getElementById('mainContent');
+            const loginForm = document.getElementById('loginForm');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const tahunPelajaranSelector = document.getElementById('tahunPelajaranSelector');
+            const kelasInfo = document.getElementById('kelasInfo');
+            const siswaTable1 = document.getElementById('siswaTable1');
+            const siswaTable2 = document.getElementById('siswaTable2');
+            const characterTables1 = document.getElementById('characterTables1');
+            const characterTables2 = document.getElementById('characterTables2');
+            
+            const confirmPromptModal = document.getElementById('confirmPromptModal');
+            const confirmPromptBtn = document.getElementById('confirmPromptBtn');
+            const promptMessage = document.getElementById('promptMessage');
+            
+            let currentYear = '';
+            let debounceTimer;
+            let promptResolve;
+
+            const openModal = (modal) => { modal.style.display = 'block'; setTimeout(() => modal.classList.add('show'), 10); };
+            const closeModal = (modal) => { modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 300); };
+            document.querySelectorAll('.modal .close-button').forEach(btn => btn.onclick = () => closeModal(btn.closest('.modal')));
+            window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(e.target); };
+            
+            const showPrompt = (message) => {
+                promptMessage.textContent = message;
+                openModal(confirmPromptModal);
+                return new Promise(resolve => {
+                    promptResolve = resolve;
+                });
+            };
+            confirmPromptBtn.onclick = () => {
+                closeModal(confirmPromptModal);
+                if (promptResolve) promptResolve(true);
+            };
+
+            // === FUNGSI UTILITAS ===
+            const showNotification = (message, type = 'success') => {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = 'notification show';
+                setTimeout(() => notification.classList.remove('show'), 1500);
+            };
+
+            // === FUNGSI RENDER DATA ===
+            const renderTables = () => {
+                const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+                const teacherInYear = db.academicYears[currentYear]?.users.find(u => u.username === loggedInUser.username && u.role === 'Guru');
+
+                if (!teacherInYear || !teacherInYear.rombelAjar) {
+                    kelasInfo.textContent = `Anda tidak ditugaskan sebagai wali kelas di tahun ajaran ${currentYear}.`;
+                    const emptyContent = `<tbody><tr><td colspan="100" style="text-align:center;">Tidak ada data.</td></tr></tbody>`;
+                    siswaTable1.innerHTML = emptyContent;
+                    siswaTable2.innerHTML = emptyContent;
+                    characterTables1.innerHTML = '<p style="text-align:center;">Tidak ada data.</p>';
+                    characterTables2.innerHTML = '<p style="text-align:center;">Tidak ada data.</p>';
+                    return;
+                }
+
+                const teacherRombel = teacherInYear.rombelAjar;
+                const studentsInRombel = db.academicYears[currentYear]?.enrollment.filter(e => e.rombel === teacherRombel && e.status === 'Aktif');
+                
+                kelasInfo.textContent = `Daftar Siswa Rombel: ${teacherRombel}`;
+
+                if (!studentsInRombel || studentsInRombel.length === 0) {
+                    const emptyRow = `<tbody><tr><td colspan="100" style="text-align:center;">Belum ada data siswa untuk rombel ini.</td></tr></tbody>`;
+                    siswaTable1.innerHTML = emptyRow;
+                    siswaTable2.innerHTML = emptyRow;
+                    characterTables1.innerHTML = '<p style="text-align:center;">Belum ada data siswa.</p>';
+                    characterTables2.innerHTML = '<p style="text-align:center;">Belum ada data siswa.</p>';
+                    return;
+                }
+                
+                renderSubjectsAndExtracurriculars(siswaTable1, studentsInRombel, 'semester1');
+                renderSubjectsAndExtracurriculars(siswaTable2, studentsInRombel, 'semester2');
+
+                renderCharacterTables(characterTables1, studentsInRombel, 'semester1');
+                renderCharacterTables(characterTables2, studentsInRombel, 'semester2');
+            };
+
+            const renderSubjectsAndExtracurriculars = (table, studentsInRombel, semester) => {
+                const subjects = db.academicYears[currentYear]?.subjects || [];
+                const extracurriculars = db.academicYears[currentYear]?.extracurriculars || [];
+                
+                let headerHTML = `<thead><tr><th style="width: 80px;">NISN</th><th style="min-width: 200px;">Nama Siswa</th>`;
+                subjects.forEach(s => headerHTML += `<th>${s.shortName}</th>`);
+                extracurriculars.forEach(e => headerHTML += `<th>${e.name}</th>`);
+                headerHTML += `<th>Sakit</th><th>Izin</th><th>Alpha</th></tr></thead>`;
+                
+                let bodyHTML = '<tbody>';
+                studentsInRombel.forEach(enroll => {
+                    const siswaData = db.masterSiswa.find(s => s.id === enroll.studentId);
+                    if (!siswaData) return;
+                    
+                    if (!siswaData.grades) siswaData.grades = {};
+                    if (!siswaData.grades[currentYear]) siswaData.grades[currentYear] = { semester1: {}, semester2: {} };
+                    if (!siswaData.grades[currentYear][semester]) siswaData.grades[currentYear][semester] = { subjects: {}, extracurriculars: {}, absences: {} };
+
+                    const gradeData = siswaData.grades[currentYear][semester];
+                    const absenceData = gradeData.absences || {};
+                    
+                    let rowHTML = `<tr><td>${siswaData.s_nisn}</td><td>${siswaData.s_nama}</td>`;
+                    subjects.forEach(s => rowHTML += `<td><input type="number" min="0" max="100" value="${gradeData.subjects?.[s.shortName] || ''}" data-student-id="${siswaData.id}" data-type="subject" data-name="${s.shortName}" data-semester="${semester}"></td>`);
+                    extracurriculars.forEach(e => rowHTML += `<td><input type="text" value="${gradeData.extracurriculars?.[e.name] || ''}" data-student-id="${siswaData.id}" data-type="extracurricular" data-name="${e.name}" data-semester="${semester}"></td>`);
+                    rowHTML += `<td><input type="number" min="0" value="${absenceData.sakit || 0}" data-student-id="${siswaData.id}" data-type="absence" data-name="sakit" data-semester="${semester}"></td>`;
+                    rowHTML += `<td><input type="number" min="0" value="${absenceData.izin || 0}" data-student-id="${siswaData.id}" data-type="absence" data-name="izin" data-semester="${semester}"></td>`;
+                    rowHTML += `<td><input type="number" min="0" value="${absenceData.alpha || 0}" data-student-id="${siswaData.id}" data-type="absence" data-name="alpha" data-semester="${semester}"></td>`;
+                    rowHTML += `</tr>`;
+                    bodyHTML += rowHTML;
+                });
+                bodyHTML += '</tbody>';
+                table.innerHTML = headerHTML + bodyHTML;
+            };
+
+            const renderCharacterTables = (container, studentsInRombel, semester) => {
+                const characterValues = db.academicYears[currentYear]?.characterValues || [];
+                const gradeOptions = db.academicYears[currentYear]?.characterGradeOptions || [];
+                
+                container.innerHTML = '';
+                if (characterValues.length === 0) {
+                    container.innerHTML = `<p style="text-align:center;">Belum ada data nilai karakter yang perlu diinput.</p>`;
+                    return;
+                }
+
+                characterValues.forEach(charValue => {
+                    const tableWrapper = document.createElement('div');
+                    tableWrapper.className = 'character-table-card';
+                    tableWrapper.innerHTML = `
+                        <h4>${charValue.name}</h4>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">NISN</th>
+                                        <th style="min-width: 200px;">Nama Siswa</th>
+                                        ${charValue.subValues.map(sub => `<th>${sub.name}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    `;
+                    const tableBody = tableWrapper.querySelector('tbody');
+                    let bodyHTML = '';
+
+                    studentsInRombel.forEach(enroll => {
+                        const siswaData = db.masterSiswa.find(s => s.id === enroll.studentId);
+                        if (!siswaData) return;
+
+                        if (!siswaData.grades) siswaData.grades = {};
+                        if (!siswaData.grades[currentYear]) siswaData.grades[currentYear] = { semester1: {}, semester2: {} };
+                        if (!siswaData.grades[currentYear][semester]) siswaData.grades[currentYear][semester] = { character: {} };
+                        if (!siswaData.grades[currentYear][semester].character) siswaData.grades[currentYear][semester].character = {};
+                        if (!siswaData.grades[currentYear][semester].character[charValue.name]) siswaData.grades[currentYear][semester].character[charValue.name] = {};
+
+                        const characterGradeData = siswaData.grades[currentYear][semester].character[charValue.name];
+
+                        let rowHTML = `<tr><td>${siswaData.s_nisn}</td><td>${siswaData.s_nama}</td>`;
+                        charValue.subValues.forEach(sub => {
+                            const currentGrade = characterGradeData[sub.name] || '';
+                            const optionsHTML = gradeOptions.map(option => `<option value="${option}" ${option === currentGrade ? 'selected' : ''}>${option}</option>`).join('');
+                            rowHTML += `<td><select data-student-id="${siswaData.id}" data-type="character" data-character-name="${charValue.name}" data-sub-name="${sub.name}" data-semester="${semester}"><option value="">--Pilih Nilai--</option>${optionsHTML}</select></td>`;
+                        });
+                        rowHTML += `</tr>`;
+                        bodyHTML += rowHTML;
+                    });
+                    tableBody.innerHTML = bodyHTML;
+                    container.appendChild(tableWrapper);
+                });
+            };
+
+            const handleInputChange = (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const target = e.target;
+                    const studentId = Number(target.dataset.studentId);
+                    const type = target.dataset.type;
+                    const semester = target.dataset.semester;
+                    
+                    let student = db.masterSiswa.find(s => s.id === studentId);
+                    if (!student) return;
+
+                    if (!student.grades) student.grades = {};
+                    if (!student.grades[currentYear]) student.grades[currentYear] = {};
+                    if (!student.grades[currentYear][semester]) student.grades[currentYear][semester] = { subjects: {}, extracurriculars: {}, absences: {}, character: {} };
+                    
+                    const gradeSemester = student.grades[currentYear][semester];
+                    if (type === 'subject' || type === 'extracurricular' || type === 'absence') {
+                        const name = target.dataset.name;
+                        const value = (type === 'subject' || type === 'absence') ? Number(target.value) : target.value;
+                        if (type === 'subject') gradeSemester.subjects[name] = value;
+                        else if (type === 'extracurricular') gradeSemester.extracurriculars[name] = value;
+                        else if (type === 'absence') gradeSemester.absences[name] = value;
+                    } else if (type === 'character') {
+                        const characterName = target.dataset.characterName;
+                        const subName = target.dataset.subName;
+                        if (!gradeSemester.character[characterName]) {
+                            gradeSemester.character[characterName] = {};
+                        }
+                        gradeSemester.character[characterName][subName] = target.value;
+                    }
+
+                    saveDb(db);
+                    showNotification("Nilai tersimpan.");
+                }, 500);
+            };
+
+            mainContent.addEventListener('change', handleInputChange);
+            
+            // === LOGIKA LOGOUT & INISIALISASI HALAMAN ===
+            document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.reload(); });
+
+            tahunPelajaranSelector.addEventListener('change', (e) => { currentYear = e.target.value; renderTables(); });
+
+            const init = () => {
+                const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+                
+                if (loggedInUser && loggedInUser.role === 'Guru') {
+                    loginScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    welcomeMessage.textContent = `Selamat datang, ${loggedInUser.nama}!`;
+                    
+                    const years = Object.keys(db.academicYears).filter(year => 
+                        db.academicYears[year].users.some(u => u.username === loggedInUser.username)
+                    );
+                    
+                    currentYear = db.activeYear;
+                    const yearOptions = years.sort().reverse().map(year => {
+                         const teacherInYear = db.academicYears[year]?.users.find(u => u.username === loggedInUser.username);
+                         const teacherRombel = teacherInYear ? teacherInYear.rombelAjar : 'N/A';
+                         return `<option value="${year}" ${year === currentYear ? 'selected' : ''}>${year} (Rombel ${teacherRombel})</option>`;
+                    }).join('');
+                    
+                    tahunPelajaranSelector.innerHTML = yearOptions;
+
+                    document.querySelectorAll('.tab-button').forEach(tab => {
+                        tab.addEventListener('click', () => {
+                            document.querySelector('.tab-button.active').classList.remove('active');
+                            document.querySelector('.tab-content.active').classList.remove('active');
+                            tab.classList.add('active');
+                            document.getElementById(tab.dataset.target).classList.add('active');
+                        });
+                    });
+                    renderTables();
+                } else {
+                    loginScreen.style.display = 'flex';
+                    mainContent.style.display = 'none';
+                }
+            };
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                errorMessage.textContent = '';
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+    
+                const foundUser = Object.values(db.academicYears).flatMap(y => y.users).find(u => u.username === username && u.password === password);
+
+                if (foundUser && foundUser.role === 'Guru') {
+                    sessionStorage.setItem('loggedInUser', JSON.stringify(foundUser));
+                    init();
+                } else if (foundUser) {
+                    showPrompt('Anda tidak memiliki akses Guru.').then(() => {
+                        if (foundUser.role === 'Admin') window.location.href = 'Admin.html';
+                    });
+                } else {
+                    errorMessage.textContent = 'Username atau Password salah!';
+                }
+            });
+
+            init();
+        });
+    </script>
+</body>
+</html>
