@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buku Induk</title>
-    <link rel="icon" id="faviconLink" type="image/x-icon" href="">
+    <link rel="icon" id="faviconLink" type="image/x-icon" href="https://lh3.googleusercontent.com/d/16rll5zsRdwTbR3nF_NmPKwY51tg4tnOn">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppin:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -276,6 +276,42 @@
             color: #333;
         }
         
+        /* Gaya untuk tombol navigasi */
+        .navigation-buttons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1001; /* Di atas segalanya */
+        }
+
+        .nav-button {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .nav-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        .nav-button:active {
+            transform: scale(1);
+        }
+
         /* Penyesuaian konten untuk layar kecil */
         @media (max-width: 480px) {
             .page-content {
@@ -580,6 +616,16 @@
         </div>
     </div>
     
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+        <button id="prev-btn" class="nav-button">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="next-btn" class="nav-button">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
     <!-- Modal untuk Halaman Siswa -->
     <div id="siswaModal" class="modal-backdrop">
         <div class="modal-content">
@@ -702,6 +748,15 @@
                 }
             });
 
+            // Event listeners for navigation buttons
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', () => flipPage('prev'));
+                nextBtn.addEventListener('click', () => flipPage('next'));
+            }
+
             // Logika untuk Modal
             const siswaButton = document.getElementById('siswaButton');
             const siswaModal = document.getElementById('siswaModal');
@@ -729,4 +784,3 @@
     </script>
 </body>
 </html>
-
