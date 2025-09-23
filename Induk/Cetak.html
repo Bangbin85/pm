@@ -3,143 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Laporan Hasil Belajar</title>
+    <title>Cetak</title>
+    <link rel="icon" id="favicon" href="">
     
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
+        /* CSS Variables for theming */
         :root {
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
             --secondary-color: #f3f4f6;
             --text-color: #1f2937;
             --text-muted: #6b7280;
-            --border-color: #e5e7eb;
+            --border-color: #d1d5db;
             --white-color: #ffffff;
+            --danger-color: #ef4444;
+            --primary-glow: rgba(37, 99, 235, 0.2);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             --border-radius-lg: 12px;
             --border-radius-md: 8px;
         }
+
+        /* General Body Styles */
         body {
             font-family: 'Inter', 'Poppins', sans-serif;
-            background-color: var(--secondary-color);
-            background: linear-gradient(to bottom right, #f3f4f6, #e5e7eb);
+            background-color: #f9fafb; /* Lighter background */
             color: var(--text-color);
-            line-height: 1.6;
+            line-height: 1.5;
             margin: 0;
             padding: 2rem;
         }
+        
+        /* Main container */
         .container {
             max-width: 90%;
             margin: auto;
         }
+
+        /* Card base style */
         .card {
             background: var(--white-color);
             padding: 2rem;
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow-md);
+            border: 1px solid #e5e7eb;
             margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
+            transition: all 0.3s ease-in-out;
         }
+
+        /* * =================================================================
+         * NEW & IMPROVED SEARCH SECTION STYLES
+         * =================================================================
+        */
+
+        /* Search Card Header */
         .search-card .search-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
         }
         .search-card h1 {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             margin: 0;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            color: #111827;
         }
-        .search-card h1 .fa-solid { color: var(--primary-color); }
-        .action-buttons-top {
+        .search-card h1 .fa-solid {
+            background: linear-gradient(45deg, var(--primary-color), #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
+        }
+
+        /* Action Buttons (Home & Print) */
+        .action-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
         }
-        .action-buttons-top .btn {
-            width: auto;
+        .action-buttons .btn {
+            background-color: #f9fafb;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
         }
-        .form-grid {
+        .action-buttons .btn:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Main Search Controls */
+        .search-controls {
             display: grid;
-            grid-template-columns: 2fr 1fr auto;
+            grid-template-columns: 2fr 1.5fr auto;
             gap: 1rem;
-            align-items: end;
+            align-items: stretch;
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
+
+        /* General Form Group & Input Styling */
+        .form-group {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
-        .form-group input, .form-group select {
+        .form-group .icon {
+            position: absolute;
+            left: 1rem;
+            color: #9ca3af;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            pointer-events: none; /* Make icon unclickable */
+        }
+        .form-group input,
+        .form-group select {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.85rem 1rem;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius-md);
-            font-size: 0.95rem;
+            font-size: 1rem;
+            background-color: #f9fafb;
+            transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
         }
+        .form-group input {
+            padding-left: 2.75rem; /* Space for icon */
+        }
+
+        /* Focus states for inputs */
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--white-color);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .form-group input:focus ~ .icon {
+            color: var(--primary-color);
+        }
+        
+        /* Custom Select Dropdown Arrow */
+        .form-group select {
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25em;
+            padding-right: 2.5rem;
+        }
+        
+        /* General Button Styles (Modernized) */
         .btn {
-            padding: 0.75rem 1.25rem;
+            padding: 0.85rem 1.25rem;
             border: none;
             border-radius: var(--border-radius-md);
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            width: 100%;
             justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            box-shadow: var(--shadow-sm);
         }
-        .btn-primary { background-color: var(--primary-color); color: var(--white-color); }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-        .btn-secondary { background-color: var(--text-muted); color: var(--white-color); }
-        .btn-secondary:hover { background-color: var(--text-color); }
+        .btn:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow-lg);
+        }
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-primary { 
+            background-color: var(--primary-color); 
+            color: var(--white-color); 
+        }
+        .btn-primary:hover { 
+            background-color: var(--primary-hover); 
+        }
+        
+        /* * =================================================================
+         * END OF NEW STYLES
+         * =================================================================
+        */
+
+        /* Loading Spinner */
+        #loadingSpinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid currentColor;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error Message */
         #errorMessage {
-            color: #ef4444;
-            margin-top: 1rem;
+            color: var(--danger-color);
+            margin-top: 1.5rem;
             font-weight: 500;
             text-align: center;
         }
-        #resultContainer, #homeBtn, #printBtn { display: none; }
+
+        /* Initial state for dynamic elements */
+        #resultContainer, #actionButtonsContainer, #loadingSpinner { display: none; }
+
+        /* Rapor Styles */
         .rapor-header {
             text-align: center;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--text-color);
-            padding-bottom: 1rem;
+            margin-bottom: 2rem; 
+            border-bottom: 1px solid var(--text-color);
+            padding-bottom: 0.5rem; 
         }
-        .rapor-header h2 { margin: 0.25rem 0; }
+        .rapor-header h2 { margin: 0.25rem 0; font-size: 1.5rem; }
         .rapor-header p { margin: 0; color: var(--text-muted); }
 
-        .data-section {
-            margin-bottom: 2rem;
+        .data-section { margin-bottom: 2rem; } 
+        
+        .rapor-section-header {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            text-transform: uppercase;
         }
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 0.5rem 2rem;
-        }
-        .data-grid div {
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            padding: 4px 0;
-            border-bottom: 1px dashed var(--border-color);
-        }
-        .data-grid span:first-child { font-weight: 500; color: var(--text-muted); }
         
         .section-title {
             font-size: 1.2rem;
             font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
+            margin: 0 0 1rem 0;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--primary-color);
             color: var(--primary-color);
@@ -152,63 +273,83 @@
             font-weight: 900;
             font-size: 1rem;
         }
-        h3[id^="title-karakter"]::before { content: "\f518"; } /* fa-award */
-        h3[id^="title-akademik"]::before { content: "\f51c"; } /* fa-book-open */
-        h3[id^="title-ekstra"]::before { content: "\f433"; } /* fa-basketball-ball */
-        h3[id^="title-absen"]::before { content: "\f274"; } /* fa-calendar-check */
+        h3[id^="title-karakter"]::before { content: "\f518"; }
+        h3[id^="title-akademik"]::before { content: "\f51c"; }
+        h3[id^="title-ekstra"]::before { content: "\f433"; }
+        h3[id^="title-absen"]::before { content: "\f274"; }
+        h3[id^="title-prestasi"]::before { content: "\f091"; }
+        h3[id^="title-kenaikan"]::before { content: "\f501"; }
 
         .rapor-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 1.5rem;
         }
         .rapor-table th, .rapor-table td {
-            border: 1px solid var(--border-color);
+            border: 1px solid #e5e7eb;
             padding: 0.75rem;
             text-align: left;
             vertical-align: middle;
         }
         .rapor-table thead { background-color: var(--secondary-color); }
         .rapor-table th { font-weight: 600; }
-        .rapor-table td:nth-child(1) { width: 40px; text-align: center; }
-        .rapor-table .subject-col { width: 50%; } /* Lebar kolom mata pelajaran/kegiatan */
-        .rapor-table .grade-col { width: 20%; text-align: center; } /* Lebar kolom nilai */
-        #absenceTable .subject-col { width: 60%; }
-        #absenceTable .grade-col { width: 20%; }
-
+        .rapor-table td:first-child, .rapor-table .center-col { text-align: center; }
+        .rapor-table .no-col { width: 40px; }
+        #prestasiTable .subject-col { width: 40%; }
+        
+        .promotion-box {
+            border: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: var(--border-radius-md);
+            background-color: #f9fafb;
+        }
+        .promotion-box p { margin: 0.5rem 0; }
         .character-table-wrapper { margin-bottom: 1.5rem; }
         .character-table-wrapper h5 { font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem; }
-        
-        .signature-container {
-            margin-top: 3rem;
-            width: 100%;
-        }
-        .signature-grid {
-            display: flex;
-            justify-content: space-between;
-            text-align: center;
-        }
-        .signature-box { 
-            width: 45%;
-        }
+
+        /* Signature section */
+        .signature-container { margin-top: 3rem; }
+        .signature-grid { display: flex; justify-content: space-between; text-align: center; }
+        .signature-box { width: 30%; }
         .signature-box p { margin: 0; }
-        .signature-box .signature-space {
-            height: 5rem;
-        }
+        .signature-box .signature-space { height: 5rem; }
         .signature-box .name { font-weight: 600; text-decoration: underline; margin-top: 0.25rem; }
         .signature-box .nip { font-size: 0.9rem; }
         
-        @media (max-width: 1024px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .search-card .search-header { justify-content: center; text-align: center; }
-        }
-        @media (max-width: 768px) {
-            .data-grid { grid-template-columns: 1fr; }
-            .signature-grid { flex-direction: column; align-items: center; gap: 2rem;}
-            .signature-box { width: 80%; }
+        .identity-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 2rem;
+            align-items: start;
         }
 
-        /* Screen-specific Grid Layout */
+        .photo-box {
+            width: 150px;
+            height: 200px;
+            border: 1px solid var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .data-item {
+            display: grid;
+            grid-template-columns: 130px max-content 1fr;
+            padding: 2.5px 0;
+        }
+        .data-item span:first-child { font-weight: normal; }
+        .data-item span:nth-child(2) { padding: 0 0.5rem; }
+        
+        .parent-wali-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 2rem;
+            align-items: start;
+        }
+
+        /* --- Responsive Adjustments --- */
         @media screen and (min-width: 1200px) {
             #resultContainer {
                 display: grid;
@@ -216,37 +357,79 @@
                 gap: 2rem;
                 align-items: start;
             }
-            #resultContainer > .card {
-                margin-bottom: 0;
+        }
+        
+        @media (max-width: 900px) {
+            .search-controls {
+                grid-template-columns: 1fr;
+            }
+             .search-card .search-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .action-buttons {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+        @media (max-width: 500px) {
+            body { padding: 1rem; }
+            .action-buttons .btn .btn-text {
+                display: none; /* Hide text on very small screens */
+            }
+            .action-buttons .btn {
+                width: 44px; /* Make it a square icon button */
+                height: 44px;
+                font-size: 1rem;
             }
         }
 
-        /* Print Specific Styles */
+        /* --- Print Specific Styles --- */
         @media print {
-            body { padding: 0; background-color: var(--white-color); }
-            .search-card { display: none; }
+            body { padding: 0; background-color: var(--white-color); line-height: 1.4; }
+            .search-card, #homeBtn, #printBtn { display: none !important; }
             .container { max-width: 100%; margin: 0; padding: 0; }
             .card { box-shadow: none; border: 1px solid var(--border-color); padding: 1.5rem; margin: 0; border-radius: 0; }
-            .rapor-table th, .rapor-table td { font-size: 9pt; padding: 0.4rem; }
-            .data-grid, .section-title { font-size: 10pt; }
-            .page { page-break-after: always; }
-            .grades-page .section-title, .grades-page .character-table-wrapper, .grades-page .rapor-table, .grades-page .signature-container {
-                break-inside: avoid;
-            }
+            .rapor-table th, .rapor-table td, p, h3, h4, span, div { font-size: 9pt !important; }
+            
             #resultContainer { display: block !important; }
+            .page { page-break-after: always; }
+
+            .printable-section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                margin-top: 1.5rem;
+            }
+            .printable-section:first-child { margin-top: 0; }
+            .hide-on-print { display: none !important; }
+
             .print-header {
-                display: flex !important;
-                justify-content: space-between;
-                align-items: flex-start;
+                display: block !important;
+                text-align: center;
                 margin-bottom: 1.5rem;
                 padding-bottom: 1rem;
                 border-bottom: 2px solid var(--text-color);
-                font-size: 10pt;
             }
-            .print-header p { margin: 0; }
-            .signature-grid {
-                flex-direction: row !important;
+            .print-header h2 {
+                font-size: 14pt !important;
+                margin: 0 0 1rem 0;
+                font-weight: 600;
             }
+            .print-header .print-info-grid {
+                 display: grid !important;
+                 grid-template-columns: 1fr 1fr;
+                 gap: 0 2rem;
+                 text-align: left;
+                 font-size: 10pt !important;
+            }
+            .print-header .print-info-row {
+                display: grid;
+                grid-template-columns: 100px max-content auto;
+                gap: 0 4px;
+                margin: 0.2rem 0;
+                padding: 0;
+            }
+            .print-header .print-label { font-weight: 600; }
         }
         .print-header { display: none; }
     </style>
@@ -254,374 +437,192 @@
 <body>
 
     <div class="container">
+        <!-- SEARCH CARD: RESTRUCTURED AND REDESIGNED -->
         <div class="card search-card">
-            <div class="search-header">
-                <h1><i class="fa-solid fa-print"></i> Cetak Laporan Belajar Siswa</h1>
-                <div class="action-buttons-top">
-                    <a href="./" id="homeBtn" class="btn btn-secondary"><i class="fa-solid fa-home"></i> Home</a>
-                    <button id="printBtn" class="btn btn-primary"><i class="fa-solid fa-print"></i> Cetak</button>
+            <header class="search-header">
+                <h1><i class="fa-solid fa-magnifying-glass-chart"></i> BUKU INDUK SISWA</h1>
+                <div class="action-buttons" id="actionButtonsContainer">
+                     <a href="./" class="btn btn-secondary"><i class="fa-solid fa-home"></i> <span class="btn-text">Halaman Utama</span></a>
+                     <button type="button" id="printBtn" class="btn btn-secondary"><i class="fa-solid fa-print"></i> <span class="btn-text">Cetak Laporan</span></button>
                 </div>
-            </div>
+            </header>
             <form id="searchForm">
-                <div class="form-grid">
+                <div class="search-controls">
                     <div class="form-group">
-                        <label for="nisnSearch">Nomor Induk Siswa Nasional (NISN)</label>
                         <input type="number" id="nisnSearch" placeholder="Masukkan NISN siswa..." required>
+                        <i class="icon fa-solid fa-hashtag"></i>
                     </div>
-                <div class="action-buttons-top">
-                    <a href="./" id="homeBtn" class="btn btn-secondary"><i class="fa-solid fa-home"></i> Home</a>
-                    <button id="printBtn" class="btn btn-primary"><i class="fa-solid fa-print"></i> Cetak</button>
-                </div>
                     <div class="form-group">
-                        <label for="tahunPelajaran">Tahun Pelajaran</label>
                         <select id="tahunPelajaran" required></select>
                     </div>
-                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-search"></i> Cari</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-search"></i> Cari Siswa</button>
                 </div>
             </form>
+            <div id="loadingSpinner"><div class="spinner"></div><span>Mencari data siswa...</span></div>
             <p id="errorMessage"></p>
         </div>
 
-        <div id="resultContainer">
-            <!-- Page 1: Identitas Siswa -->
+        <main id="resultContainer">
+            <!-- The rest of the HTML content remains unchanged -->
             <div class="card page identity-page">
-                <div class="rapor-header">
+                <header class="rapor-header">
                     <h2 id="schoolName"></h2>
                     <p>NPSN: <span id="schoolNpsn"></span> | Alamat: <span id="schoolAddress"></span></p>
-                    <h3>KETERANGAN DIRI SISWA</h3>
-                </div>
+                </header>
+                
+                <section class="data-section">
+                    <h3 class="rapor-section-header">KETERANGAN DIRI SISWA</h3>
+                    <div class="identity-layout">
+                        <!-- Kolom Kiri: Foto dan data di bawahnya -->
+                        <div class="identity-left-column">
+                            <div class="photo-box">Pas Foto</div>
+                            <div class="data-item"><span>Status dalam Keluarga</span><span>:</span><span>-</span></div>
+                            <div class="data-item"><span>RT / RW</span><span>:</span><span id="s_rt_rw"></span></div>
+                            <div class="data-item"><span>Kelurahan/Desa</span><span>:</span><span id="s_kelurahan"></span></div>
+                            <div class="data-item"><span>Kode Pos</span><span>:</span><span id="s_kodePos"></span></div>
+                            <div class="data-item"><span>E-mail</span><span>:</span><span id="s_email"></span></div>
+                            <div class="data-item"><span>Alat Transportasi</span><span>:</span><span id="s_transportasi"></span></div>
+                            <div class="data-item"><span>Diterima di sekolah ini</span><span>:</span><span>-</span></div>
+                            <div class="data-item"><span>Pada Tanggal</span><span>:</span><span>-</span></div>
+                            <div class="data-item"><span>Jarak ke Sekolah</span><span>:</span><span id="s_jarak"></span></div>
+                            <div class="data-item"><span>No. Reg Akta Lahir</span><span>:</span><span id="s_noRegAkte"></span></div>
+                            <div class="data-item"><span>Kebutuhan Khusus</span><span>:</span><span id="s_kebutuhanKhusus"></span></div>
+                            <div class="data-item"><span>Penerima KPS</span><span>:</span><span id="s_penerimaKps"></span></div>
+                            <div class="data-item"><span>Nomor KPS</span><span>:</span><span id="s_noKps"></span></div>
+                        </div>
+                        
+                        <!-- Kolom Kanan: Sisa data -->
+                        <div class="identity-right-column">
+                            <div class="data-item"><span>Nama Lengkap</span><span>:</span><span id="s_nama"></span></div>
+                            <div class="data-item"><span>NIK</span><span>:</span><span id="s_nik"></span></div>
+                            <div class="data-item"><span>Jenis Kelamin</span><span>:</span><span id="s_jk"></span></div>
+                            <div class="data-item"><span>Agama</span><span>:</span><span id="s_agama"></span></div>
+                            <div class="data-item"><span>NISN / NIPD</span><span>:</span><span id="s_nisn_nipd"></span></div>
+                            <div class="data-item"><span>No. KK</span><span>:</span><span id="s_noKk"></span></div>
+                            <div class="data-item"><span>Tempat, Tgl Lahir</span><span>:</span><span id="s_ttl"></span></div>
+                            <div class="data-item"><span>Anak Ke-</span><span>:</span><span id="s_anakKe"></span></div>
+                            <div class="data-item"><span>Alamat Siswa</span><span>:</span><span id="s_alamat"></span></div>
+                            <div class="data-item"><span>Dusun</span><span>:</span><span id="s_dusun"></span></div>
+                            <div class="data-item"><span>Kecamatan</span><span>:</span><span id="s_kecamatan"></span></div>
+                            <div class="data-item"><span>No. Telepon/HP</span><span>:</span><span id="s_hp"></span></div>
+                            <div class="data-item"><span>Jenis Tinggal</span><span>:</span><span id="s_jenisTinggal"></span></div>
+                            <div class="data-item"><span>Sekolah Asal</span><span>:</span><span id="s_sekolahAsal"></span></div>
+                            <div class="data-item"><span>Di kelas</span><span>:</span><span id="s_kelas"></span></div>
+                            <div class="data-item"><span>Tinggi / Berat Badan</span><span>:</span><span id="s_tinggi_berat"></span></div>
+                            <div class="data-item"><span>No. Peserta Ujian</span><span>:</span><span id="s_noPesertaUjian"></span></div>
+                            <div class="data-item"><span>No. Seri Ijazah</span><span>:</span><span id="s_noSeriIjazah"></span></div>
+                            <div class="data-item"><span>SKHUN</span><span>:</span><span id="s_skhun"></span></div>
+                            <div class="data-item"><span>Penerima KIP</span><span>:</span><span id="s_penerimaKip"></span></div>
+                            <div class="data-item"><span>Nomor KIP</span><span>:</span><span id="s_noKip"></span></div>
+                        </div>
+                    </div>
+                </section>
 
-                <div class="data-section">
-                    <div class="data-grid">
-                        <div><span>Nama Lengkap</span><span id="s_nama"></span></div>
-                        <div><span>NISN / NIPD</span><span id="s_nisn_nipd"></span></div>
-                        <div><span>Jenis Kelamin</span><span id="s_jk"></span></div>
-                        <div><span>Tempat, Tgl Lahir</span><span id="s_ttl"></span></div>
-                        <div><span>Agama</span><span id="s_agama"></span></div>
-                        <div><span>Anak Ke-</span><span id="s_anakKe"></span></div>
-                        <div><span>Status dalam Keluarga</span><span >: -</span></div>
-                        <div><span>Alamat Siswa</span><span id="s_alamat"></span></div>
-                        <div><span>No. Telepon/HP</span><span id="s_hp"></span></div>
-                        <div><span>Sekolah Asal</span><span id="s_sekolahAsal"></span></div>
-                        <div><span>Diterima di sekolah ini</span><span >: -</span></div>
-                        <div><span>Di kelas</span><span id="s_kelas"></span></div>
-                        <div><span>Pada Tanggal</span><span >: -</span></div>
+                <section class="data-section">
+                    <h3 class="rapor-section-header">KETERANGAN ORANG TUA / WALI</h3>
+                    <div class="parent-wali-grid">
+                        <div>
+                            <h4 style="margin: 0.5rem 0; font-weight: 600;">A. Ayah</h4>
+                            <div class="data-item"><span>Nama Ayah</span><span>:</span><span id="d_ayah_nama"></span></div>
+                            <div class="data-item"><span>Pendidikan</span><span>:</span><span id="d_ayah_pendidikan"></span></div>
+                            <div class="data-item"><span>Pekerjaan</span><span>:</span><span id="d_ayah_pekerjaan"></span></div>
+                            
+                            <h4 style="margin: 1rem 0 0.5rem 0; font-weight: 600;">B. Ibu</h4>
+                            <div class="data-item"><span>Nama Ibu</span><span>:</span><span id="d_ibu_nama"></span></div>
+                            <div class="data-item"><span>Pendidikan</span><span>:</span><span id="d_ibu_pendidikan"></span></div>
+                            <div class="data-item"><span>Pekerjaan</span><span>:</span><span id="d_ibu_pekerjaan"></span></div>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0.5rem 0; font-weight: 600;">C. Wali</h4>
+                            <div class="data-item"><span>Nama Wali</span><span>:</span><span id="d_wali_nama"></span></div>
+                            <div class="data-item"><span>Pendidikan</span><span>:</span><span id="d_wali_pendidikan"></span></div>
+                            <div class="data-item"><span>Pekerjaan</span><span>:</span><span id="d_wali_pekerjaan"></span></div>
+                        </div>
                     </div>
-                </div>
-
-                <h3 class="section-title">Keterangan Orang Tua / Wali</h3>
-                <div class="data-section">
-                    <h4>A. Ayah</h4>
-                    <div class="data-grid">
-                        <div><span>Nama Ayah</span><span id="d_ayah_nama"></span></div>
-                        <div><span>Pendidikan</span><span id="d_ayah_pendidikan"></span></div>
-                        <div><span>Pekerjaan</span><span id="d_ayah_pekerjaan"></span></div>
-                        <div><span>Alamat</span><span >: -</span></div>
-                    </div>
-                    <h4 style="margin-top:1.5rem;">B. Ibu</h4>
-                    <div class="data-grid">
-                        <div><span>Nama Ibu</span><span id="d_ibu_nama"></span></div>
-                        <div><span>Pendidikan</span><span id="d_ibu_pendidikan"></span></div>
-                        <div><span>Pekerjaan</span><span id="d_ibu_pekerjaan"></span></div>
-                        <div><span>Alamat</span><span >: -</span></div>
-                    </div>
-                    <h4 style="margin-top:1.5rem;">C. Wali</h4>
-                    <div class="data-grid">
-                        <div><span>Nama Wali</span><span id="d_wali_nama"></span></div>
-                        <div><span>Pendidikan</span><span id="d_wali_pendidikan"></span></div>
-                        <div><span>Pekerjaan</span><span id="d_wali_pekerjaan"></span></div>
-                        <div><span>Alamat</span><span >: -</span></div>
-                    </div>
-                </div>
+                </section>
             </div>
 
-            <!-- Page 2: Laporan Nilai -->
             <div class="card page grades-page">
-                 <div class="print-header">
-                    <div>
-                        <p><strong>Nama Sekolah:</strong> <span id="print_schoolName"></span></p>
-                        <p><strong>Nama Siswa:</strong> <span id="print_studentName"></span></p>
+                 <header class="print-header">
+                    <h2>LAPORAN HASIL BELAJAR</h2>
+                    <div class="print-info-grid">
+                        <div>
+                            <p class="print-info-row">
+                                <span class="print-label">Nama Sekolah</span>
+                                <span>:</span>
+                                <span id="print_schoolName"></span>
+                            </p>
+                            <p class="print-info-row">
+                                <span class="print-label">Nama Siswa</span>
+                                <span>:</span>
+                                <span id="print_studentName"></span>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="print-info-row">
+                                <span class="print-label">Kelas/Rombel</span>
+                                <span>:</span>
+                                <span id="print_classRombel"></span>
+                            </p>
+                            <p class="print-info-row">
+                                <span class="print-label">Tahun Pelajaran</span>
+                                <span>:</span>
+                                <span id="print_academicYear"></span>
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p><strong>Kelas/Rombel:</strong> <span id="print_classRombel"></span></p>
-                        <p><strong>Tahun Pelajaran:</strong> <span id="print_academicYear"></span></p>
-                    </div>
+                 </header>
+
+                <div class="hide-on-print">
+                    <h3 class="section-title">Laporan Hasil Belajar</h3>
+                    <p style="margin-top:-0.5rem; margin-bottom:1.5rem;"><strong>Kelas: <span id="rhb_kelas"></span> | Rombel: <span id="rhb_rombel"></span> | Tahun Pelajaran: <span id="rhb_tahun"></span></strong></p>
                 </div>
-
-                <h3 class="section-title">Laporan Hasil Belajar</h3>
-                <p><strong>Kelas: <span id="rhb_kelas"></span> | Rombel: <span id="rhb_rombel"></span> | Tahun Pelajaran: <span id="rhb_tahun"></span></strong></p>
-
-                <h3 class="section-title" id="title-karakter">A. Penilaian Karakter (Kokurikuler)</h3>
-                <div id="characterSection"></div>
-
-                <h3 class="section-title" id="title-akademik">B. Nilai Akademik (Intrakurikuler)</h3>
-                <table class="rapor-table" id="subjectsTable">
-                    <thead><tr><th>No</th><th class="subject-col">Mata Pelajaran</th><th class="grade-col">Nilai Sem. I</th><th class="grade-col">Nilai Sem. II</th></tr></thead>
-                    <tbody></tbody>
-                </table>
                 
-                <h3 class="section-title" id="title-ekstra">C. Ekstrakurikuler</h3>
-                <table class="rapor-table" id="extraTable">
-                    <thead><tr><th>No</th><th class="subject-col">Kegiatan</th><th class="grade-col">Predikat Sem. I</th><th class="grade-col">Predikat Sem. II</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-
-                <h3 class="section-title" id="title-absen">D. Ketidakhadiran</h3>
-                <table class="rapor-table" id="absenceTable" style="max-width: 600px;">
-                     <thead>
-                        <tr>
-                            <th class="subject-col">Keterangan</th>
-                            <th class="grade-col">Semester I</th>
-                            <th class="grade-col">Semester II</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <section class="printable-section">
+                    <h3 class="section-title" id="title-karakter">A. Penilaian Karakter (Kokurikuler)</h3>
+                    <div id="characterSection"></div>
+                </section>
                 
-                <div class="signature-container">
+                <section class="printable-section">
+                    <h3 class="section-title" id="title-akademik">B. Nilai Akademik (Intrakurikuler)</h3>
+                    <table class="rapor-table" id="subjectsTable"><thead><tr><th class="no-col">No</th><th class="subject-col">Mata Pelajaran</th><th class="grade-col center-col">Nilai Sem. I</th><th class="grade-col center-col">Nilai Sem. II</th></tr></thead><tbody></tbody></table>
+                </section>
+
+                <section class="printable-section">
+                    <h3 class="section-title" id="title-ekstra">C. Ekstrakurikuler</h3>
+                    <table class="rapor-table" id="extraTable"><thead><tr><th class="no-col">No</th><th class="subject-col">Kegiatan</th><th class="grade-col center-col">Predikat Sem. I</th><th class="grade-col center-col">Predikat Sem. II</th></tr></thead><tbody></tbody></table>
+                </section>
+
+                <section class="printable-section">
+                    <h3 class="section-title" id="title-absen">D. Ketidakhadiran</h3>
+                    <table class="rapor-table" id="absenceTable"><thead><tr><th>Keterangan</th><th class="center-col">Semester I</th><th class="center-col">Semester II</th></tr></thead><tbody></tbody></table>
+                </section>
+                
+                <section class="printable-section">
+                    <h3 class="section-title" id="title-prestasi">E. Prestasi</h3>
+                    <table class="rapor-table" id="prestasiTable"><thead><tr><th class="no-col">No</th><th class="subject-col">Nama Kegiatan/Lomba</th><th class="center-col">Tingkat</th><th class="center-col">Juara</th><th class="center-col">Tahun</th><th class="center-col">Semester</th></tr></thead><tbody></tbody></table>
+                </section>
+                
+                <section class="printable-section">
+                    <h3 class="section-title" id="title-kenaikan">F. Catatan Kenaikan Kelas</h3>
+                    <div id="promotionStatusContainer" class="promotion-box"></div>
+                </section>
+                
+                <footer class="signature-container printable-section">
                     <div class="signature-grid">
-                        <div class="signature-box">
-                            <p>Mengetahui,</p>
-                            <p>Kepala Sekolah</p>
-                            <div class="signature-space"></div>
-                            <p class="name" id="headmasterName">(.................................)</p>
-                            <p class="nip" id="headmasterNip"></p>
-                        </div>
-                        <div class="signature-box">
-                            <p>Jakarta, <span id="currentDate"></span></p>
-                            <p>Wali Kelas</p>
-                            <div class="signature-space"></div>
-                            <p class="name" id="teacherName">(.................................)</p>
-                            <p class="nip" id="teacherNip"></p>
-                        </div>
+                        <div class="signature-box"><p>Mengetahui,</p><p>Orang Tua/Wali Murid</p><div class="signature-space"></div><p class="name">(.................................)</p></div>
+                        <div class="signature-box"><p>Mengetahui,</p><p>Kepala Sekolah</p><div class="signature-space"></div><p class="name" id="headmasterName">(.................................)</p><p class="nip" id="headmasterNip"></p></div>
+                        <div class="signature-box"><p><span id="signaturePlace"></span>, <span id="currentDate"></span></p><p>Wali Kelas</p><div class="signature-space"></div><p class="name" id="teacherName">(.................................)</p><p class="nip" id="teacherNip"></p></div>
                     </div>
-                </div>
+                </footer>
             </div>
-        </div>
+        </main>
     </div>
     
     <script src="./Bangbin.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let db = getDb();
-            if (!db) {
-                document.querySelector('.container').innerHTML = '<div class="card" style="text-align:center;"><h1>Database tidak ditemukan.</h1><p>Pastikan Anda telah login sebagai Admin setidaknya sekali untuk membuat data awal.</p></div>';
-                return;
-            }
-
-            const searchForm = document.getElementById('searchForm');
-            const nisnInput = document.getElementById('nisnSearch');
-            const tahunPelajaranSelect = document.getElementById('tahunPelajaran');
-            const errorMessage = document.getElementById('errorMessage');
-            const resultContainer = document.getElementById('resultContainer');
-            const printBtn = document.getElementById('printBtn');
-            const homeBtn = document.getElementById('homeBtn');
-
-            const yearOptions = Object.keys(db.academicYears).sort().reverse()
-                .map(year => `<option value="${year}" ${year === db.activeYear ? 'selected' : ''}>${year}</option>`).join('');
-            tahunPelajaranSelect.innerHTML = yearOptions;
-
-            searchForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                errorMessage.textContent = '';
-                resultContainer.style.display = 'none';
-                homeBtn.style.display = 'none';
-                printBtn.style.display = 'none';
-
-                const nisn = Number(nisnInput.value);
-                const selectedYear = tahunPelajaranSelect.value;
-
-                if (!nisn) {
-                    errorMessage.textContent = 'NISN tidak boleh kosong.';
-                    return;
-                }
-
-                const student = db.masterSiswa.find(s => s.s_nisn === nisn);
-                if (!student) {
-                    errorMessage.textContent = `Siswa dengan NISN ${nisn} tidak ditemukan.`;
-                    return;
-                }
-
-                const enrollment = db.academicYears[selectedYear]?.enrollment.find(e => e.studentId === student.id);
-                if (!enrollment) {
-                    errorMessage.textContent = `Siswa tidak terdaftar pada tahun pelajaran ${selectedYear}.`;
-                    return;
-                }
-                
-                populateRapor(student, enrollment, selectedYear);
-                resultContainer.style.display = ''; // Changed to empty to let CSS handle it
-                homeBtn.style.display = 'inline-flex';
-                printBtn.style.display = 'inline-flex';
-            });
-            
-            const formatValue = (value) => `: ${value || '-'}`;
-            
-            function getFormattedDate() {
-                const date = new Date();
-                const options = { day: 'numeric', month: 'long', year: 'numeric' };
-                return date.toLocaleDateString('id-ID', options);
-            }
-
-            function populateRapor(student, enrollment, selectedYear) {
-                const academicYearData = db.academicYears[selectedYear];
-                const headmasterData = academicYearData.kepalaSekolah || {};
-
-                // Headers
-                document.getElementById('schoolName').textContent = db.schoolInfo.nama;
-                document.getElementById('schoolNpsn').textContent = db.schoolInfo.npsn;
-                document.getElementById('schoolAddress').textContent = db.schoolInfo.alamat;
-                document.getElementById('print_schoolName').textContent = db.schoolInfo.nama;
-                document.getElementById('print_studentName').textContent = student.s_nama;
-                document.getElementById('print_classRombel').textContent = `${enrollment.kelas} / ${enrollment.rombel}`;
-                document.getElementById('print_academicYear').textContent = selectedYear;
-
-                // Student Info Lengkap
-                document.getElementById('s_nama').textContent = formatValue(student.s_nama);
-                document.getElementById('s_nisn_nipd').textContent = `: ${student.s_nisn || '-'} / ${student.s_nipd || '-'}`;
-                document.getElementById('s_jk').textContent = formatValue(student.s_jk === 'L' ? 'Laki-laki' : 'Perempuan');
-                document.getElementById('s_ttl').textContent = `: ${student.s_tempatLahir || '-'}, ${student.s_tanggalLahir || '-'}`;
-                document.getElementById('s_agama').textContent = formatValue(student.s_agama);
-                document.getElementById('s_anakKe').textContent = formatValue(student.s_anakKe);
-                document.getElementById('s_alamat').textContent = formatValue(`${student.s_alamat || ''}, ${student.s_kelurahan || ''}, ${student.s_kecamatan || ''}`);
-                document.getElementById('s_hp').textContent = formatValue(student.s_hp);
-                document.getElementById('s_sekolahAsal').textContent = formatValue(student.s_sekolahAsal);
-                document.getElementById('s_kelas').textContent = formatValue(enrollment.kelas);
-
-                // Orang Tua / Wali
-                document.getElementById('d_ayah_nama').textContent = formatValue(student.d_ayah_nama);
-                document.getElementById('d_ayah_pendidikan').textContent = formatValue(student.d_ayah_pendidikan);
-                document.getElementById('d_ayah_pekerjaan').textContent = formatValue(student.d_ayah_pekerjaan);
-                document.getElementById('d_ibu_nama').textContent = formatValue(student.d_ibu_nama);
-                document.getElementById('d_ibu_pendidikan').textContent = formatValue(student.d_ibu_pendidikan);
-                document.getElementById('d_ibu_pekerjaan').textContent = formatValue(student.d_ibu_pekerjaan);
-                document.getElementById('d_wali_nama').textContent = formatValue(student.d_wali_nama);
-                document.getElementById('d_wali_pendidikan').textContent = formatValue(student.d_wali_pendidikan);
-                document.getElementById('d_wali_pekerjaan').textContent = formatValue(student.d_wali_pekerjaan);
-
-                // Info Laporan Hasil Belajar
-                document.getElementById('rhb_kelas').textContent = enrollment.kelas;
-                document.getElementById('rhb_rombel').textContent = enrollment.rombel;
-                document.getElementById('rhb_tahun').textContent = selectedYear;
-
-                // Grades Data
-                const grades = student.grades?.[selectedYear] || {};
-                const semester1 = grades.semester1 || {};
-                const semester2 = grades.semester2 || {};
-                
-                // Penilaian Karakter (Kokurikuler)
-                const characterValueStructure = academicYearData.characterValues || [];
-                populateConsolidatedCharacterTable('characterSection', characterValueStructure, semester1.character || {}, semester2.character || {});
-
-                // Mata Pelajaran (Intrakurikuler)
-                const subjects = academicYearData.subjects || [];
-                populateConsolidatedSubjectTable('subjectsTable', subjects, semester1.subjects || {}, semester2.subjects || {});
-                
-                // Ekstrakurikuler
-                const extracurriculars = academicYearData.extracurriculars || [];
-                populateConsolidatedExtraTable('extraTable', extracurriculars, semester1.extracurriculars || {}, semester2.extracurriculars || {});
-
-                // Absensi
-                populateConsolidatedAbsenceTable('absenceTable', semester1.absences || {}, semester2.absences || {});
-                
-                // Signatures
-                document.getElementById('currentDate').textContent = getFormattedDate();
-                const waliKelas = academicYearData.users.find(u => u.role === 'Guru' && u.rombelAjar === enrollment.rombel);
-                document.getElementById('teacherName').textContent = waliKelas ? waliKelas.nama : '(.................................)';
-                document.getElementById('teacherNip').textContent = waliKelas && waliKelas.password ? `NIP: ${waliKelas.password}`: '';
-                
-                document.getElementById('headmasterName').textContent = headmasterData.nama || '(.................................)';
-                document.getElementById('headmasterNip').textContent = headmasterData.nip ? `NIP: ${headmasterData.nip}` : '';
-            }
-            
-            function populateConsolidatedCharacterTable(containerId, characterValueStructure, sem1CharData, sem2CharData) {
-                const container = document.getElementById(containerId);
-                container.innerHTML = '';
-
-                if (!characterValueStructure || characterValueStructure.length === 0) {
-                    container.innerHTML = '<p>Tidak ada struktur penilaian karakter.</p>';
-                    return;
-                }
-
-                characterValueStructure.forEach(charValue => {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'character-table-wrapper';
-                    
-                    let tableHTML = `<h5>${charValue.name}</h5>`;
-                    tableHTML += '<table class="rapor-table">';
-                    tableHTML += '<thead><tr><th>No</th><th class="subject-col">Sub-elemen</th><th class="grade-col">Predikat Sem. I</th><th class="grade-col">Predikat Sem. II</th></tr></thead><tbody>';
-
-                    const sem1Grades = sem1CharData[charValue.name] || {};
-                    const sem2Grades = sem2CharData[charValue.name] || {};
-
-                    if (!charValue.subValues || charValue.subValues.length === 0) {
-                        tableHTML += '<tr><td colspan="4" style="text-align:center;">-</td></tr>';
-                    } else {
-                        tableHTML += charValue.subValues.map((sub, index) => {
-                            const grade1 = sem1Grades[sub.name] || '-';
-                            const grade2 = sem2Grades[sub.name] || '-';
-                            return `<tr>
-                                <td>${index + 1}</td>
-                                <td>${sub.name}</td>
-                                <td>${grade1}</td>
-                                <td>${grade2}</td>
-                            </tr>`;
-                        }).join('');
-                    }
-
-                    tableHTML += '</tbody></table>';
-                    wrapper.innerHTML = tableHTML;
-                    container.appendChild(wrapper);
-                });
-            }
-
-            function populateConsolidatedSubjectTable(tableId, subjects, sem1GradeData, sem2GradeData) {
-                const tableBody = document.getElementById(tableId).querySelector('tbody');
-                if (subjects.length === 0) {
-                     tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">-</td></tr>';
-                     return;
-                }
-                tableBody.innerHTML = subjects.map((sub, index) => `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${sub.fullName}</td>
-                        <td>${sem1GradeData[sub.shortName] || '-'}</td>
-                        <td>${sem2GradeData[sub.shortName] || '-'}</td>
-                    </tr>
-                `).join('');
-            }
-            
-            function populateConsolidatedExtraTable(tableId, extraMasterList, sem1ExtraData, sem2ExtraData) {
-                const tableBody = document.getElementById(tableId).querySelector('tbody');
-                
-                if (extraMasterList.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">-</td></tr>';
-                    return;
-                }
-                tableBody.innerHTML = extraMasterList.map((activity, index) => `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${activity.name}</td>
-                        <td>${sem1ExtraData[activity.name] || '-'}</td>
-                        <td>${sem2ExtraData[activity.name] || '-'}</td>
-                    </tr>
-                `).join('');
-            }
-            
-            function populateConsolidatedAbsenceTable(tableId, sem1Absence, sem2Absence) {
-                 const tableBody = document.getElementById(tableId).querySelector('tbody');
-                 tableBody.innerHTML = `
-                    <tr><td>Sakit</td><td>${sem1Absence.sakit || 0} hari</td><td>${sem2Absence.sakit || 0} hari</td></tr>
-                    <tr><td>Izin</td><td>${sem1Absence.izin || 0} hari</td><td>${sem2Absence.izin || 0} hari</td></tr>
-                    <tr><td>Tanpa Keterangan</td><td>${sem1Absence.alpha || 0} hari</td><td>${sem2Absence.alpha || 0} hari</td></tr>
-                 `;
-            }
-
-            printBtn.addEventListener('click', () => {
-                window.print();
-            });
-        });
+    function _0x38ef(_0x5b864f,_0x137749){const _0x2fe834=_0x2fe8();return _0x38ef=function(_0x38ef4a,_0x2b69fb){_0x38ef4a=_0x38ef4a-0xa4;let _0x359cb1=_0x2fe834[_0x38ef4a];return _0x359cb1;},_0x38ef(_0x5b864f,_0x137749);}function _0x2fe8(){const _0x3908e3=['kelas','print_academicYear','currentDate','s_anakKe','print','</strong>.</p><p><strong>Catatan:</strong>\x20','s_noKip','activeYear','s_jenisTinggal','</p>','<option\x20value=\x22','s_noKps','s_nik','1015762eoBYYH','function','subValues','long','s_email','\x20cm\x20/\x20','d_ibu_pendidikan','s_kebutuhanKhusus','8xEbMGu','tingkat','schoolAddress','s_nisn','schoolNpsn','extraTable','teacherNip','note','preventDefault','1224034EBPCXT','message','\x20hari</td></tr>','numeric','DOMContentLoaded','s_rw','</tbody></table>','</td><td\x20class=\x22center-col\x22>','querySelector','print_studentName','print_schoolName','signaturePlace','\x20hari</td><td\x20class=\x22center-col\x22>','enrollment','(.................................)','d_wali_nama','</td></tr>','reverse','s_nama','s_sekolahAsal','s_tempatLahir','</option>','tahunPelajaran','NIP:\x20','rhb_kelas','s_tanggalLahir','<h5>','addEventListener','rhb_rombel','d_ibu_nama','s_ttl','subjects','<div\x20class=\x22card\x22\x20style=\x22text-align:center;\x22><h1>Database\x20tidak\x20ditemukan.</h1><p>Pastikan\x20file\x20<code>Bangbin.js</code>\x20dimuat\x20dengan\x20benar\x20dan\x20variabel\x20database\x20tersedia.</p></div>','2212934IPDygp','Belum\x20ditentukan','nama','masterSiswa','tbody','password','prestasiTable','5491989aYxmSG','schoolInfo','extracurriculars','click','d_ayah_pekerjaan','display','logoUrl','d_ayah_pendidikan','name','\x20km','map','academicYears','sakit','d_ayah_nama','tahun','errorMessage','character-table-wrapper','d_wali_pendidikan','sort','s_nipd','s_kelas','teacherName','s_tinggi','s_nisn_nipd','value','</td><td>','s_jarak','rombelAjar','flex','alpha','18DBLHcN','Perempuan','nip','Siswa\x20dengan\x20NISN\x20','promotionStatusContainer','toLocaleDateString','headmasterName','absences','s_penerimaKip','s_noRegAkte','characterSection','.container','appendChild','s_hp','nisnSearch','users','<tr><td>','print_classRombel','resultContainer','absenceTable','s_skhun','semester1','rombel','s_rt_rw','className','s_kodePos','s_kelurahan','20QlIUEA','createElement','keys','s_kecamatan','favicon','schoolName','subjectsTable','character','<tr><td\x20colspan=\x224\x22>-</td></tr>','characterValues','\x20tidak\x20ditemukan.','4252458OgEMmV','find','id-ID','Laki-laki','submit','style','tempat','\x20/\x20','kepalaSekolah','none','selected','s_agama','s_noPesertaUjian','prestasi','847508VTorms','s_alamat','izin','s_noSeriIjazah','s_transportasi','s_penerimaKps','s_dusun','shortName','getElementById','fullName','885270eoDsKy','length','join','Siswa\x20tidak\x20terdaftar\x20pada\x20tahun\x20pelajaran\x20','innerHTML','headmasterNip','<tr><td\x20colspan=\x224\x22\x20class=\x22center-col\x22>-</td></tr>','promotion','forEach','actionButtonsContainer','rhb_tahun','<p>-</p>','d_ibu_pekerjaan','3ZFmUGX','div','s_noKk','textContent','d_wali_pekerjaan','loadingSpinner'];_0x2fe8=function(){return _0x3908e3;};return _0x2fe8();}const _0x224dd6=_0x38ef;(function(_0x2e5b94,_0xea4c6a){const _0x17ae8f=_0x38ef,_0x547e55=_0x2e5b94();while(!![]){try{const _0x28b73b=parseInt(_0x17ae8f(0x113))/0x1+-parseInt(_0x17ae8f(0x134))/0x2*(parseInt(_0x17ae8f(0xef))/0x3)+-parseInt(_0x17ae8f(0xd8))/0x4+-parseInt(_0x17ae8f(0xe2))/0x5*(-parseInt(_0x17ae8f(0xa4))/0x6)+-parseInt(_0x17ae8f(0xca))/0x7+-parseInt(_0x17ae8f(0x10a))/0x8*(-parseInt(_0x17ae8f(0x13b))/0x9)+-parseInt(_0x17ae8f(0xbf))/0xa*(-parseInt(_0x17ae8f(0x102))/0xb);if(_0x28b73b===_0xea4c6a)break;else _0x547e55['push'](_0x547e55['shift']());}catch(_0x34a98d){_0x547e55['push'](_0x547e55['shift']());}}}(_0x2fe8,0x98687),document[_0x224dd6(0x12e)](_0x224dd6(0x117),function(){const _0x5b3584=_0x224dd6;if(typeof getDb!==_0x5b3584(0x103)||!getDb()){document[_0x5b3584(0x11b)](_0x5b3584(0xaf))['innerHTML']=_0x5b3584(0x133);return;}const _0x1c394f=getDb();_0x1c394f[_0x5b3584(0x13c)]&&_0x1c394f[_0x5b3584(0x13c)][_0x5b3584(0x141)]&&(document['getElementById'](_0x5b3584(0xc3))['href']=_0x1c394f[_0x5b3584(0x13c)]['logoUrl']);const _0x2558ab=document[_0x5b3584(0xe0)]('searchForm'),_0x2c89fa=document[_0x5b3584(0xe0)](_0x5b3584(0xb2)),_0x14adf6=document[_0x5b3584(0xe0)](_0x5b3584(0x129)),_0x594808=document['getElementById'](_0x5b3584(0x14a)),_0x22a549=document[_0x5b3584(0xe0)](_0x5b3584(0xb6)),_0x3bb875=document[_0x5b3584(0xe0)](_0x5b3584(0xeb)),_0x53abf7=document[_0x5b3584(0xe0)]('printBtn'),_0x16d10c=document[_0x5b3584(0xe0)](_0x5b3584(0xf4)),_0x9ef4bb=Object[_0x5b3584(0xc1)](_0x1c394f[_0x5b3584(0x146)])[_0x5b3584(0x14d)]()[_0x5b3584(0x124)]()[_0x5b3584(0x145)](_0x12ecbc=>_0x5b3584(0xff)+_0x12ecbc+'\x22\x20'+(_0x12ecbc===_0x1c394f[_0x5b3584(0xfc)]?_0x5b3584(0xd4):'')+'>T.P\x20'+_0x12ecbc+_0x5b3584(0x128))['join']('');_0x14adf6[_0x5b3584(0xe6)]=_0x9ef4bb,_0x2558ab[_0x5b3584(0x12e)](_0x5b3584(0xce),function(_0x475aee){const _0x56664c=_0x5b3584;_0x475aee[_0x56664c(0x112)](),_0x5bc2e8();const _0x4e386e=Number(_0x2c89fa[_0x56664c(0x153)]),_0x1b0a9c=_0x14adf6[_0x56664c(0x153)];if(!_0x4e386e){_0x125e35('NISN\x20tidak\x20boleh\x20kosong.');return;}_0x16d10c[_0x56664c(0xcf)]['display']='flex',setTimeout(()=>{const _0x57f1aa=_0x56664c;try{const _0x3b26b5=_0x1c394f[_0x57f1aa(0x137)][_0x57f1aa(0xcb)](_0x2111ea=>_0x2111ea[_0x57f1aa(0x10d)]===_0x4e386e);if(!_0x3b26b5)throw new Error(_0x57f1aa(0xa7)+_0x4e386e+_0x57f1aa(0xc9));const _0x21d0d3=_0x1c394f['academicYears'][_0x1b0a9c]?.[_0x57f1aa(0x120)]['find'](_0x2cedc8=>_0x2cedc8['studentId']===_0x3b26b5['id']);if(!_0x21d0d3)throw new Error(_0x57f1aa(0xe5)+_0x1b0a9c+'.');_0x13939b(_0x3b26b5,_0x21d0d3,_0x1b0a9c),_0x148e36();}catch(_0x536a59){_0x125e35(_0x536a59[_0x57f1aa(0x114)]);}finally{_0x16d10c[_0x57f1aa(0xcf)][_0x57f1aa(0x140)]=_0x57f1aa(0xd3);}},0x64);}),_0x53abf7['addEventListener'](_0x5b3584(0x13e),()=>{const _0x4c9f18=_0x5b3584;window[_0x4c9f18(0xf9)]();});function _0x5bc2e8(){const _0x47ee57=_0x5b3584;_0x594808[_0x47ee57(0xf2)]='',_0x22a549[_0x47ee57(0xcf)]['display']=_0x47ee57(0xd3),_0x3bb875['style']['display']=_0x47ee57(0xd3),_0x16d10c['style'][_0x47ee57(0x140)]='none';}function _0x125e35(_0x24689a){const _0x3c3525=_0x5b3584;_0x594808['textContent']=_0x24689a,_0x16d10c[_0x3c3525(0xcf)][_0x3c3525(0x140)]=_0x3c3525(0xd3);}function _0x148e36(){const _0x23285a=_0x5b3584;_0x22a549['style']['display']='',_0x3bb875['style'][_0x23285a(0x140)]=_0x23285a(0x157);}function _0x13939b(_0x33c9a3,_0x276ded,_0x5cdd79){const _0x15cb84=_0x5b3584,_0x168cef=_0x1c394f[_0x15cb84(0x146)][_0x5cdd79],_0x28e286=_0x33c9a3['grades']?.[_0x5cdd79]||{};_0x4f7361(_0x33c9a3,_0x276ded,_0x5cdd79),_0x30efc9(_0x33c9a3,_0x276ded),_0x224f1a(_0x33c9a3),_0x50ec12(_0x28e286,_0x168cef,_0x276ded),_0x10cdca(_0x168cef,_0x276ded);}function _0x4f7361(_0x5ec6c5,_0x4c14e2,_0x2a321f){const _0xa0e99b=_0x5b3584;document['getElementById'](_0xa0e99b(0xc4))[_0xa0e99b(0xf2)]=_0x1c394f[_0xa0e99b(0x13c)]['nama']||'-',document['getElementById'](_0xa0e99b(0x10e))[_0xa0e99b(0xf2)]=_0x1c394f[_0xa0e99b(0x13c)]['npsn']||'-',document['getElementById'](_0xa0e99b(0x10c))['textContent']=_0x1c394f[_0xa0e99b(0x13c)]['alamat']||'-',document['getElementById'](_0xa0e99b(0x11d))[_0xa0e99b(0xf2)]=_0x1c394f[_0xa0e99b(0x13c)][_0xa0e99b(0x136)]||'-',document[_0xa0e99b(0xe0)](_0xa0e99b(0x11c))[_0xa0e99b(0xf2)]=_0x5ec6c5[_0xa0e99b(0x125)]||'-',document['getElementById'](_0xa0e99b(0xb5))[_0xa0e99b(0xf2)]=_0x4c14e2[_0xa0e99b(0xf5)]+_0xa0e99b(0xd1)+_0x4c14e2[_0xa0e99b(0xba)],document[_0xa0e99b(0xe0)](_0xa0e99b(0xf6))[_0xa0e99b(0xf2)]=_0x2a321f;}function _0x30efc9(_0x32d705,_0x214576){const _0x48920a=_0x5b3584,_0x10807b=(_0x3b0a3c,_0x3cc7b0)=>{const _0x40fe65=_0x38ef;document[_0x40fe65(0xe0)](_0x3b0a3c)['textContent']=_0x3cc7b0||'-';};_0x10807b(_0x48920a(0x125),_0x32d705[_0x48920a(0x125)]),_0x10807b(_0x48920a(0x152),(_0x32d705[_0x48920a(0x10d)]||'-')+_0x48920a(0xd1)+(_0x32d705[_0x48920a(0x14e)]||'-')),_0x10807b(_0x48920a(0x101),_0x32d705[_0x48920a(0x101)]),_0x10807b(_0x48920a(0xf1),_0x32d705[_0x48920a(0xf1)]),_0x10807b('s_jk',_0x32d705['s_jk']==='L'?_0x48920a(0xcd):_0x48920a(0xa5)),_0x10807b(_0x48920a(0x131),(_0x32d705[_0x48920a(0x127)]||'-')+',\x20'+(_0x32d705[_0x48920a(0x12c)]||'-')),_0x10807b('s_agama',_0x32d705[_0x48920a(0xd5)]),_0x10807b(_0x48920a(0xf8),_0x32d705[_0x48920a(0xf8)]),_0x10807b(_0x48920a(0xd9),_0x32d705[_0x48920a(0xd9)]),_0x10807b(_0x48920a(0xbb),(_0x32d705['s_rt']||'-')+_0x48920a(0xd1)+(_0x32d705[_0x48920a(0x118)]||'-')),_0x10807b(_0x48920a(0xde),_0x32d705[_0x48920a(0xde)]),_0x10807b(_0x48920a(0xbe),_0x32d705[_0x48920a(0xbe)]),_0x10807b('s_kecamatan',_0x32d705[_0x48920a(0xc2)]),_0x10807b(_0x48920a(0xbd),_0x32d705['s_kodePos']),_0x10807b(_0x48920a(0xb1),_0x32d705['s_hp']),_0x10807b(_0x48920a(0x106),_0x32d705[_0x48920a(0x106)]),_0x10807b(_0x48920a(0xfd),_0x32d705[_0x48920a(0xfd)]),_0x10807b(_0x48920a(0xdc),_0x32d705[_0x48920a(0xdc)]),_0x10807b(_0x48920a(0x126),_0x32d705[_0x48920a(0x126)]),_0x10807b(_0x48920a(0x14f),_0x214576[_0x48920a(0xf5)]),_0x10807b('s_tinggi_berat',(_0x32d705[_0x48920a(0x151)]||'-')+_0x48920a(0x107)+(_0x32d705['s_berat']||'-')+'\x20kg'),_0x10807b(_0x48920a(0x155),(_0x32d705[_0x48920a(0x155)]||'-')+_0x48920a(0x144)),_0x10807b(_0x48920a(0xad),_0x32d705[_0x48920a(0xad)]),_0x10807b('s_noPesertaUjian',_0x32d705[_0x48920a(0xd6)]),_0x10807b(_0x48920a(0xdb),_0x32d705[_0x48920a(0xdb)]),_0x10807b(_0x48920a(0xb8),_0x32d705['s_skhun']),_0x10807b(_0x48920a(0x109),_0x32d705[_0x48920a(0x109)]),_0x10807b(_0x48920a(0xdd),_0x32d705[_0x48920a(0xdd)]),_0x10807b(_0x48920a(0x100),_0x32d705[_0x48920a(0x100)]),_0x10807b('s_penerimaKip',_0x32d705[_0x48920a(0xac)]),_0x10807b(_0x48920a(0xfb),_0x32d705[_0x48920a(0xfb)]);}function _0x224f1a(_0x562877){const _0x505685=_0x5b3584,_0x488ddd=(_0x470a87,_0x101bbb)=>{const _0x2580c3=_0x38ef;document[_0x2580c3(0xe0)](_0x470a87)[_0x2580c3(0xf2)]=_0x101bbb||'-';};_0x488ddd('d_ayah_nama',_0x562877[_0x505685(0x148)]),_0x488ddd(_0x505685(0x142),_0x562877[_0x505685(0x142)]),_0x488ddd(_0x505685(0x13f),_0x562877[_0x505685(0x13f)]),_0x488ddd(_0x505685(0x130),_0x562877[_0x505685(0x130)]),_0x488ddd(_0x505685(0x108),_0x562877[_0x505685(0x108)]),_0x488ddd('d_ibu_pekerjaan',_0x562877[_0x505685(0xee)]),_0x488ddd(_0x505685(0x122),_0x562877[_0x505685(0x122)]),_0x488ddd(_0x505685(0x14c),_0x562877[_0x505685(0x14c)]),_0x488ddd(_0x505685(0xf3),_0x562877[_0x505685(0xf3)]);}function _0x50ec12(_0x4538fc,_0x3f289a,_0x2b6266){const _0x3326c0=_0x5b3584,_0x41ff7a=_0x4538fc[_0x3326c0(0xb9)]||{},_0x118c72=_0x4538fc['semester2']||{};document[_0x3326c0(0xe0)](_0x3326c0(0x12b))['textContent']=_0x2b6266[_0x3326c0(0xf5)],document['getElementById'](_0x3326c0(0x12f))[_0x3326c0(0xf2)]=_0x2b6266[_0x3326c0(0xba)],document['getElementById'](_0x3326c0(0xec))[_0x3326c0(0xf2)]=_0x3f289a['year'],_0x14584a(_0x3326c0(0xae),_0x3f289a[_0x3326c0(0xc8)]||[],_0x41ff7a[_0x3326c0(0xc6)]||{},_0x118c72[_0x3326c0(0xc6)]||{}),_0x5b5c22(_0x3326c0(0xc5),_0x3f289a[_0x3326c0(0x132)]||[],_0x41ff7a[_0x3326c0(0x132)]||{},_0x118c72['subjects']||{}),_0x5367d2(_0x3326c0(0x10f),_0x3f289a[_0x3326c0(0x13d)]||[],_0x41ff7a[_0x3326c0(0x13d)]||{},_0x118c72[_0x3326c0(0x13d)]||{}),_0x32aaf8(_0x3326c0(0xb7),_0x41ff7a[_0x3326c0(0xab)]||{},_0x118c72[_0x3326c0(0xab)]||{}),_0x17fd03(_0x3326c0(0x13a),_0x41ff7a[_0x3326c0(0xd7)]||[],_0x118c72[_0x3326c0(0xd7)]||[]),_0x221a22(_0x3326c0(0xa8),_0x4538fc[_0x3326c0(0xe9)]||{});}function _0x10cdca(_0x1ca7e8,_0x58bfa9){const _0x145904=_0x5b3584,_0x1d9245=_0x1ca7e8[_0x145904(0xd2)]||{},_0x261ffa=_0x1ca7e8[_0x145904(0xb3)][_0x145904(0xcb)](_0x18bf45=>_0x18bf45['role']==='Guru'&&_0x18bf45[_0x145904(0x156)]===_0x58bfa9[_0x145904(0xba)]),_0x7309a0=()=>new Date()[_0x145904(0xa9)](_0x145904(0xcc),{'day':_0x145904(0x116),'month':_0x145904(0x105),'year':_0x145904(0x116)});document[_0x145904(0xe0)](_0x145904(0x11e))['textContent']=_0x1c394f[_0x145904(0x13c)][_0x145904(0xd0)]||'-',document[_0x145904(0xe0)](_0x145904(0xf7))[_0x145904(0xf2)]=_0x7309a0(),document[_0x145904(0xe0)](_0x145904(0x150))[_0x145904(0xf2)]=_0x261ffa?_0x261ffa[_0x145904(0x136)]:_0x145904(0x121),document[_0x145904(0xe0)](_0x145904(0x110))[_0x145904(0xf2)]=_0x261ffa&&_0x261ffa[_0x145904(0x139)]?_0x145904(0x12a)+_0x261ffa['password']:'',document[_0x145904(0xe0)](_0x145904(0xaa))[_0x145904(0xf2)]=_0x1d9245['nama']||_0x145904(0x121),document[_0x145904(0xe0)](_0x145904(0xe7))['textContent']=_0x1d9245[_0x145904(0xa6)]?_0x145904(0x12a)+_0x1d9245[_0x145904(0xa6)]:'';}function _0x14584a(_0x527a03,_0x31b032,_0x1927a5,_0x415610){const _0x1e171f=_0x5b3584,_0x584a79=document[_0x1e171f(0xe0)](_0x527a03);_0x584a79['innerHTML']='';if(!_0x31b032[_0x1e171f(0xe3)]){_0x584a79['innerHTML']=_0x1e171f(0xed);return;}_0x31b032[_0x1e171f(0xea)](_0x5a6cd9=>{const _0x2c5e16=_0x1e171f,_0x5d76a7=document[_0x2c5e16(0xc0)](_0x2c5e16(0xf0));_0x5d76a7[_0x2c5e16(0xbc)]=_0x2c5e16(0x14b);const _0x135ce8=_0x1927a5[_0x5a6cd9[_0x2c5e16(0x143)]]||{},_0x3f2d57=_0x415610[_0x5a6cd9[_0x2c5e16(0x143)]]||{};let _0x960bf6=_0x2c5e16(0x12d)+_0x5a6cd9[_0x2c5e16(0x143)]+'</h5><table\x20class=\x22rapor-table\x22><thead><tr><th\x20class=\x22no-col\x22>No</th><th\x20class=\x22subject-col\x22>Sub-elemen</th><th\x20class=\x22grade-col\x20center-col\x22>Sem.\x20I</th><th\x20class=\x22grade-col\x20center-col\x22>Sem.\x20II</th></tr></thead><tbody>';_0x960bf6+=!_0x5a6cd9[_0x2c5e16(0x104)][_0x2c5e16(0xe3)]?_0x2c5e16(0xc7):_0x5a6cd9['subValues'][_0x2c5e16(0x145)]((_0x323ab4,_0x3c341d)=>_0x2c5e16(0xb4)+(_0x3c341d+0x1)+_0x2c5e16(0x154)+_0x323ab4[_0x2c5e16(0x143)]+_0x2c5e16(0x11a)+(_0x135ce8[_0x323ab4[_0x2c5e16(0x143)]]||'-')+_0x2c5e16(0x11a)+(_0x3f2d57[_0x323ab4[_0x2c5e16(0x143)]]||'-')+_0x2c5e16(0x123))['join'](''),_0x960bf6+=_0x2c5e16(0x119),_0x5d76a7['innerHTML']=_0x960bf6,_0x584a79[_0x2c5e16(0xb0)](_0x5d76a7);});}function _0x5b5c22(_0x515be9,_0x1e38d3,_0x409325,_0x65c3e0){const _0x41e20d=_0x5b3584,_0xeb9aeb=document[_0x41e20d(0xe0)](_0x515be9)[_0x41e20d(0x11b)](_0x41e20d(0x138));_0xeb9aeb[_0x41e20d(0xe6)]=!_0x1e38d3[_0x41e20d(0xe3)]?_0x41e20d(0xe8):_0x1e38d3['map']((_0x37ea35,_0x16d76b)=>_0x41e20d(0xb4)+(_0x16d76b+0x1)+_0x41e20d(0x154)+_0x37ea35[_0x41e20d(0xe1)]+_0x41e20d(0x11a)+(_0x409325[_0x37ea35[_0x41e20d(0xdf)]]||'-')+_0x41e20d(0x11a)+(_0x65c3e0[_0x37ea35['shortName']]||'-')+_0x41e20d(0x123))[_0x41e20d(0xe4)]('');}function _0x5367d2(_0x12a7e6,_0x52a9e8,_0x4b9964,_0x4f8886){const _0x3eeabb=_0x5b3584,_0x710b97=document[_0x3eeabb(0xe0)](_0x12a7e6)[_0x3eeabb(0x11b)](_0x3eeabb(0x138));_0x710b97[_0x3eeabb(0xe6)]=!_0x52a9e8['length']?_0x3eeabb(0xe8):_0x52a9e8[_0x3eeabb(0x145)]((_0xc162c2,_0x44c430)=>'<tr><td>'+(_0x44c430+0x1)+'</td><td>'+_0xc162c2['name']+_0x3eeabb(0x11a)+(_0x4b9964[_0xc162c2[_0x3eeabb(0x143)]]||'-')+'</td><td\x20class=\x22center-col\x22>'+(_0x4f8886[_0xc162c2[_0x3eeabb(0x143)]]||'-')+_0x3eeabb(0x123))['join']('');}function _0x32aaf8(_0x57fdf5,_0x4833e7,_0x331ca0){const _0x4eeb93=_0x5b3584,_0x2f88c2=document[_0x4eeb93(0xe0)](_0x57fdf5)[_0x4eeb93(0x11b)]('tbody');_0x2f88c2[_0x4eeb93(0xe6)]='<tr><td>Sakit</td><td\x20class=\x22center-col\x22>'+(_0x4833e7[_0x4eeb93(0x147)]||0x0)+_0x4eeb93(0x11f)+(_0x331ca0[_0x4eeb93(0x147)]||0x0)+'\x20hari</td></tr><tr><td>Izin</td><td\x20class=\x22center-col\x22>'+(_0x4833e7['izin']||0x0)+_0x4eeb93(0x11f)+(_0x331ca0[_0x4eeb93(0xda)]||0x0)+'\x20hari</td></tr><tr><td>Tanpa\x20Keterangan</td><td\x20class=\x22center-col\x22>'+(_0x4833e7[_0x4eeb93(0x158)]||0x0)+'\x20hari</td><td\x20class=\x22center-col\x22>'+(_0x331ca0['alpha']||0x0)+_0x4eeb93(0x115);}function _0x17fd03(_0x5d86b2,_0x2ebb64,_0x42831e){const _0xec95e6=_0x5b3584,_0x33640c=document[_0xec95e6(0xe0)](_0x5d86b2)['querySelector']('tbody'),_0x498773=[..._0x2ebb64[_0xec95e6(0x145)](_0x43618d=>({..._0x43618d,'semester':'I'})),..._0x42831e[_0xec95e6(0x145)](_0x43f509=>({..._0x43f509,'semester':'II'}))];if(!_0x498773[_0xec95e6(0xe3)]){_0x33640c[_0xec95e6(0xe6)]='<tr><td\x20colspan=\x226\x22\x20class=\x22center-col\x22>-\x20Tidak\x20ada\x20prestasi\x20yang\x20diraih\x20-</td></tr>';return;}_0x33640c[_0xec95e6(0xe6)]=_0x498773['map']((_0x348524,_0x10ca97)=>'<tr><td>'+(_0x10ca97+0x1)+_0xec95e6(0x154)+(_0x348524['kegiatan']||'-')+_0xec95e6(0x11a)+(_0x348524[_0xec95e6(0x10b)]||'-')+_0xec95e6(0x11a)+(_0x348524['juara']||'-')+_0xec95e6(0x11a)+(_0x348524[_0xec95e6(0x149)]||'-')+'</td><td\x20class=\x22center-col\x22>'+_0x348524['semester']+_0xec95e6(0x123))[_0xec95e6(0xe4)]('');}function _0x221a22(_0x3d7642,_0x2690c8){const _0x330913=_0x5b3584,_0x4e2085=document[_0x330913(0xe0)](_0x3d7642),_0x2bdd9e=_0x2690c8['status']||_0x330913(0x135),_0x1f6656=_0x2690c8[_0x330913(0x111)]||'-';_0x4e2085[_0x330913(0xe6)]='<p><strong>Keputusan:</strong>\x20Siswa\x20dinyatakan\x20<strong>'+_0x2bdd9e+_0x330913(0xfa)+_0x1f6656+_0x330913(0xfe);}}));
     </script>
 
 </body>
 </html>
-
