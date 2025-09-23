@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
         /* === DESAIN BARU: PANEL GURU MODERN === */
@@ -22,21 +22,21 @@
             --border-color: #e5e7eb;
             --danger-color: #ef4444;
             --success-color: #10b981;
-            --warning-color: #f59e0b;
+            --sidebar-bg: #111827;
+            --sidebar-link-color: #9ca3af;
+            --sidebar-link-hover: #ffffff;
+            --sidebar-link-active: #ffffff;
+            --sidebar-active-bg: var(--primary-color);
             --white-color: #ffffff;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             --border-radius-md: 8px;
             --border-radius-lg: 12px;
             --transition-speed: 0.3s;
+            --sidebar-width: 260px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', 'Poppins', sans-serif;
@@ -45,218 +45,88 @@
             line-height: 1.6;
         }
         
-        /* === HALAMAN LOGIN === */
-        .login-screen {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
+        /* === HALAMAN LOGIN NEUMORPHIC === */
+        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(145deg, #e2e8f0, #f8fafc); }
+        #loginCard { background: #eef2f7; padding: 2.5rem 3rem; border-radius: 30px; box-shadow: 9px 9px 18px #c5cdd5, -9px -9px 18px #ffffff; width: 100%; max-width: 420px; text-align: center; animation: contentFadeIn 0.6s ease-out; border: 1px solid rgba(255, 255, 255, 0.8); }
+        #loginCard h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-color); margin-bottom: 0.5rem; }
+        #loginCard h1 .fa-chalkboard-user { color: var(--primary-color); }
+        #loginCard > p { color: var(--text-muted); margin-bottom: 2rem; }
+        #loginCard .form-group { text-align: left; margin-bottom: 1.5rem; }
+        #loginCard .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-muted); }
+        #loginCard .form-group input { width: 100%; padding: 1rem; border: none; border-radius: 15px; background: #eef2f7; box-shadow: inset 5px 5px 10px #c5cdd5, inset -5px -5px 10px #ffffff; font-size: 1rem; color: var(--text-color); transition: box-shadow 0.3s ease; }
+        #loginCard .form-group input:focus { outline: none; box-shadow: inset 7px 7px 14px #c5cdd5, inset -7px -7px 14px #ffffff; }
+        #loginCard .btn { width: 100%; margin-top: 1rem; padding: 1rem; border-radius: 15px; border: none; font-size: 1rem; font-weight: 700; letter-spacing: 0.5px; transition: all 0.3s ease; cursor: pointer; box-shadow: 5px 5px 10px #c5cdd5, -5px -5px 10px #ffffff; text-decoration: none; display: inline-block; }
+        #loginCard .btn:active { transform: translateY(2px); }
+        #loginCard button.btn-primary { background-color: var(--primary-color); color: var(--white-color); }
+        #loginCard button.btn-primary:hover { background-color: var(--primary-hover); box-shadow: 7px 7px 14px #c5cdd5, -7px -7px 14px #ffffff; }
+        #loginCard button.btn-primary:active { box-shadow: inset 5px 5px 10px #1a43a1, inset -5px -5px 10px #2b77ff; }
+        #loginCard a.btn-primary { margin-top: 0.75rem; background-color: #6b7280; color: var(--white-color); }
+        #loginCard a.btn-primary:hover { background-color: #4b5563; }
+        #loginCard a.btn-primary:active { box-shadow: inset 5px 5px 10px #3e4651, inset -5px -5px 10px #98a4b5; }
+        #loginCard #errorMessage { color: var(--danger-color); margin-top: 1rem; height: 20px; font-weight: 500; }
+
+        /* === TATA LETAK UTAMA DENGAN SIDEBAR === */
+        .app-container { display: flex; }
+        .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); color: var(--white-color); position: fixed; top: 0; left: 0; height: 100vh; display: flex; flex-direction: column; transition: width 0.3s ease; z-index: 100; }
+        .main-content-wrapper { flex-grow: 1; margin-left: var(--sidebar-width); transition: margin-left 0.3s ease; }
+        #pageContent { padding: 2rem; }
+
+        /* === SIDEBAR === */
+        .sidebar-header { padding: 1.5rem; text-align: center; border-bottom: 1px solid #374151; }
+        .sidebar-header img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 0.5rem; }
+        .sidebar-header h2 { font-size: 1.1rem; margin: 0; font-weight: 600; white-space: nowrap; }
+        .sidebar-nav { flex-grow: 1; overflow-y: auto; }
+        .sidebar-nav ul { list-style: none; padding: 1rem 0; }
+        .sidebar-nav a { display: flex; align-items: center; padding: 0.85rem 1.5rem; color: var(--sidebar-link-color); text-decoration: none; transition: all 0.2s ease; font-weight: 500; }
+        .sidebar-nav a:hover { background-color: #374151; color: var(--sidebar-link-hover); }
+        .sidebar-nav a.active { background-color: var(--sidebar-active-bg); color: var(--sidebar-link-active); font-weight: 600; }
+        .sidebar-nav .icon { width: 20px; text-align: center; margin-right: 1rem; font-size: 1.1rem; }
         
-        .login-card {
-            background: var(--white-color);
-            padding: 2.5rem 3rem;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-lg);
-            width: 100%;
-            max-width: 420px;
-            text-align: center;
-            animation: contentFadeIn 0.6s ease-out;
-        }
+        .submenu { list-style: none; padding-left: 2rem; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .submenu.open { max-height: 500px; /* Adjust as needed */ }
+        .submenu a { padding-left: 2.5rem; font-size: 0.9rem; }
+        .submenu a::before { content: '»'; margin-right: 0.75rem; }
+
+        .sidebar-footer { padding: 1.5rem; border-top: 1px solid #374151; }
+        #logoutBtn { width: 100%; }
+
+        /* === KONTEN UTAMA === */
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: contentFadeIn 0.5s ease; }
+        @keyframes contentFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
-        .login-card h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-        }
-        .login-card h1 .fa-chalkboard-user { color: var(--primary-color); }
-        .login-card p { color: var(--text-muted); margin-bottom: 2rem; }
-        .login-card .form-group { text-align: left; margin-bottom: 1rem; }
-        .login-card .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        .login-card .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); }
-        .login-card .btn { width: 100%; margin-top: 1rem; }
-        #errorMessage { color: var(--danger-color); margin-top: 1rem; height: 20px; font-weight: 500; }
-
-        /* === TATA LETAK UTAMA === */
-        #mainContent {
-            padding: 2rem;
-        }
-
-        .header-container { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 1.5rem;
-            background-color: var(--white-color);
-            padding: 1rem 2rem;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
-            margin-bottom: 2rem;
-        }
-        .header-container h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .header-container h1 .fa-solid { color: var(--primary-color); }
-
+        .header-container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; background-color: var(--white-color); padding: 1rem 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); margin-bottom: 2rem; }
+        .header-container h1 { font-size: 1.5rem; margin: 0; display: flex; align-items: center; gap: 0.75rem; }
+        .header-container .fa-solid { color: var(--primary-color); }
         .header-controls { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-        .year-selector { display: flex; align-items: center; gap: 0.5rem; }
         .year-selector label { font-weight: 600; }
         #welcomeMessage { font-weight: 500; color: var(--text-muted); }
-        
-        .class-info-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        #kelasInfo {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-color);
-            background-color: #eef2ff;
-            color: var(--primary-color);
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius-md);
-            display: inline-block;
-        }
 
-        /* === NAVIGASI TAB SEMESTER === */
-        .tab-nav {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-        .tab-button {
-            padding: 0.75rem 2rem;
-            border: none;
-            border-radius: var(--border-radius-md);
-            background: var(--white-color);
-            color: var(--text-muted);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--transition-speed) ease;
-            box-shadow: var(--shadow-sm);
-        }
-        .tab-button:hover { color: var(--primary-color); }
-        .tab-button.active {
-            background-color: var(--primary-color);
-            color: var(--white-color);
-            box-shadow: var(--shadow-md);
-        }
-        
-        /* === KONTEN & KARTU === */
-        .card {
-            background: var(--white-color);
-            padding: 2rem;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
-            margin-bottom: 2rem;
-        }
-        .card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-        }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: contentFadeIn 0.5s ease; }
-        @keyframes contentFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--white-color); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); margin-bottom: 2rem; }
+        .card h3 { font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
 
-        /* === TOMBOL === */
-        .btn {
-            padding: 0.7rem 1.25rem;
-            border: none;
-            border-radius: var(--border-radius-md);
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all var(--transition-speed) ease;
-        }
+        /* === TOMBOL & TABEL (Sama seperti sebelumnya) === */
+        .btn { padding: 0.7rem 1.25rem; border: none; border-radius: var(--border-radius-md); cursor: pointer; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all var(--transition-speed) ease; }
         .btn:active { transform: translateY(2px); }
-        .btn-primary { background-color: var(--primary-color); color: var(--white-color); box-shadow: 0 4px 0 var(--primary-hover); }
+        .btn-primary { background-color: var(--primary-color); color: var(--white-color); }
         .btn-primary:hover { background-color: var(--primary-hover); }
-        .btn-primary:active { box-shadow: 0 2px 0 var(--primary-hover); }
-        .btn-secondary { background-color: #9ca3af; color: var(--white-color); box-shadow: 0 4px 0 #4b5563; }
-        .btn-secondary:hover { background-color: #6b7280; }
-        .btn-secondary:active { box-shadow: 0 2px 0 #4b5563; }
+        .btn-secondary { background-color: #6b7280; color: var(--white-color); }
+        .btn-secondary:hover { background-color: #4b5563; }
         .btn-outline { background: var(--white-color); color: var(--text-color); border: 1px solid var(--border-color); }
         .btn-outline:hover { background: var(--secondary-color); border-color: #d1d5db; }
-        .btn:disabled { background-color: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* === TABEL INPUT NILAI === */
-        .table-wrapper {
-            overflow-x: auto;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-md);
-            max-height: 70vh; /* Batasi tinggi tabel agar bisa discroll */
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            white-space: nowrap; /* Mencegah kolom jadi terlalu kecil */
-        }
-        th, td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-        }
-        thead th {
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            background-color: var(--secondary-color);
-            position: sticky; /* Membuat header tabel tetap di atas */
-            top: 0;
-            z-index: 10;
-        }
-        tbody tr { transition: background-color var(--transition-speed) ease; }
-        tbody tr:nth-child(even) { background-color: #f9fafb; }
+        .table-wrapper { overflow-x: auto; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); max-height: 70vh; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        thead th { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background-color: var(--secondary-color); position: sticky; top: 0; z-index: 10; }
         tbody tr:hover { background-color: #eef2ff; }
-        td:first-child, td:nth-child(2) { white-space: normal; } /* Izinkan nama siswa wrap */
-        th:first-child, td:first-child { position: sticky; left: 0; background-color: inherit; } /* Membuat kolom NISN sticky */
-        th:nth-child(2), td:nth-child(2) { position: sticky; left: 80px; background-color: inherit; } /* Membuat kolom Nama Siswa sticky */
-
-        table input[type="number"], table input[type="text"], table select {
-            width: 90px;
-            padding: 6px 8px;
-            border: 1px solid transparent;
-            border-radius: var(--border-radius-md);
-            background-color: transparent;
-            text-align: center;
-            font-size: 0.95rem;
-            transition: all var(--transition-speed) ease;
-        }
-        table input:hover, table select:hover { border-color: var(--border-color); background-color: var(--white-color); }
+        th:first-child, td:first-child { position: sticky; left: 0; background-color: inherit; }
+        th:nth-child(2), td:nth-child(2) { position: sticky; left: 80px; background-color: inherit; }
+        table input, table select { width: 90px; padding: 6px 8px; border: 1px solid transparent; border-radius: var(--border-radius-md); background-color: transparent; text-align: center; font-size: 0.95rem; transition: all var(--transition-speed) ease; }
         table input:focus, table select:focus { border-color: var(--primary-color); background-color: var(--white-color); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
         table select { width: 150px; text-align: left; }
-        
-        /* === NILAI KARAKTER === */
-        .character-value-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        .character-table-card {
-            background-color: var(--white-color);
-            padding: 1.5rem;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
-        }
+        .character-value-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
+        .character-table-card { background-color: var(--white-color); padding: 1.5rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); }
         .character-table-card h4 { font-size: 1.1rem; margin-bottom: 1rem; }
 
         /* === MODAL & NOTIFIKASI === */
@@ -265,15 +135,11 @@
         .modal-content { background-color: #fefefe; margin: 10% auto; padding: 0; border: none; width: 95%; max-width: 500px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: slideInUp 0.4s ease-out; }
         @keyframes slideInUp { from { transform: translateY(50px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 1.25rem 2rem; background-color: var(--secondary-color); }
-        .modal-header h2 { font-size: 1.25rem; margin-bottom: 0; color: var(--text-color); }
-        .close-button { color: var(--text-muted); font-size: 28px; font-weight: bold; cursor: pointer; transition: color var(--transition-speed) ease; }
-        .close-button:hover { color: var(--text-color); }
-        .modal-body { padding: 2rem; text-align: center; }
-        .confirm-actions { display: flex; justify-content: center; padding: 1.25rem 2rem; background-color: var(--secondary-color); border-top: 1px solid var(--border-color); }
-        
+        .modal-header h2 { font-size: 1.25rem; margin-bottom: 0; }
+        .close-button { color: var(--text-muted); font-size: 28px; font-weight: bold; cursor: pointer; }
+        .modal-body { padding: 2rem; }
         #notification { position: fixed; bottom: 20px; right: 20px; background-color: var(--success-color); color: white; padding: 1rem 1.5rem; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); z-index: 2000; opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.4s ease-in-out; }
         #notification.show { opacity: 1; visibility: visible; transform: translateY(0); }
-
     </style>
 </head>
 <body>
@@ -284,96 +150,123 @@
             <h1><i class="fa-solid fa-chalkboard-user"></i> Selamat Datang</h1>
             <p>Silakan login untuk mengakses Panel Guru.</p>
             <form id="loginForm">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required>
-                </div>
+                <div class="form-group"><label for="username">Username</label><input type="text" id="username" required></div>
+                <div class="form-group"><label for="password">Password</label><input type="password" id="password" required></div>
                 <button type="submit" class="btn btn-primary">Login</button>
-				<a href="./" class="btn btn-primary"><i class="fa-solid fa-home"></i></a>
+				<a href="./" class="btn btn-primary"><i class="fa-solid fa-home"></i> Beranda</a>
                 <p id="errorMessage"></p>
             </form>
         </div>
     </div>
 
-    <div id="mainContent" style="display: none;">
-        <header class="header-container">
-            <h1><i class="fa-solid fa-pen-to-square"></i> Panel Input Nilai</h1>
-            <div class="header-controls">
-                <div class="year-selector">
-                    <label for="tahunPelajaranSelector">Tahun Pelajaran:</label>
-                    <select id="tahunPelajaranSelector" class="btn btn-outline"></select>
-                </div>
-                <div class="header-welcome">
-                    <span id="welcomeMessage"></span>
-                    <button id="logoutBtn" class="btn btn-secondary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-                </div>
+    <div id="appContainer" class="app-container" style="display: none;">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img id="schoolLogo" src="" alt="Logo Sekolah">
+                <h2 id="schoolName">Nama Sekolah</h2>
             </div>
-        </header>
-
-        <div class="class-info-header">
-             <h2 id="kelasInfo"></h2>
-        </div>
-
-        <nav class="tab-nav">
-            <button class="tab-button active" data-target="semester1"><i class="fa-solid fa-1"></i>&nbsp; Semester 1</button>
-            <button class="tab-button" data-target="semester2"><i class="fa-solid fa-2"></i>&nbsp; Semester 2</button>
+            <div class="sidebar-nav">
+                <ul>
+                    <li><a href="./" class="nav-link active" data-target="home"><i class="fas fa-home icon"></i> <span>Home</span></a></li>
+                    <li>
+                        <a href="#" class="nav-link has-submenu" data-target="intrakurikuler"><i class="fas fa-book-reader icon"></i> <span>Intrakurikuler</span></a>
+                        <ul class="submenu">
+                            <li><a href="#nilai-intra-s1" class="nav-link" data-target="nilai-intra-s1">Semester 1</a></li>
+                            <li><a href="#nilai-intra-s2" class="nav-link" data-target="nilai-intra-s2">Semester 2</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link has-submenu" data-target="ekstrakurikuler"><i class="fas fa-running icon"></i> <span>Ekstrakurikuler</span></a>
+                        <ul class="submenu">
+                            <li><a href="#ekstrakurikuler-s1" class="nav-link" data-target="ekstrakurikuler-s1">Semester 1</a></li>
+                            <li><a href="#ekstrakurikuler-s2" class="nav-link" data-target="ekstrakurikuler-s2">Semester 2</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link has-submenu" data-target="kokurikuler"><i class="fas fa-award icon"></i> <span>Kokurikuler</span></a>
+                         <ul class="submenu">
+                            <li><a href="#kokurikuler-s1" class="nav-link" data-target="kokurikuler-s1">Semester 1</a></li>
+                            <li><a href="#kokurikuler-s2" class="nav-link" data-target="kokurikuler-s2">Semester 2</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-footer">
+                 <button id="logoutBtn" class="btn btn-secondary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </div>
         </nav>
-        
-        <section id="semester1" class="tab-content active">
-            <div class="card">
-                <h3>Input Nilai Akademik, Ekstrakurikuler & Absensi (Semester 1)</h3>
-                <div class="table-wrapper">
-                    <table id="siswaTable1">
-                        <thead></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card">
-                 <h3>Input Nilai Karakter (Semester 1)</h3>
-                <div class="character-value-container" id="characterTables1"></div>
-            </div>
-        </section>
 
-        <section id="semester2" class="tab-content">
-             <div class="card">
-                <h3>Input Nilai Akademik, Ekstrakurikuler & Absensi (Semester 2)</h3>
-                <div class="table-wrapper">
-                    <table id="siswaTable2">
-                        <thead></thead>
-                        <tbody></tbody>
-                    </table>
+        <div class="main-content-wrapper">
+             <header class="header-container">
+                <h1 id="pageTitle"><i class="fa-solid fa-user"></i> Dashboard Guru</h1>
+                <div class="header-controls">
+                    <div class="year-selector">
+                        <label for="tahunPelajaranSelector">Tahun Pelajaran:</label>
+                        <select id="tahunPelajaranSelector" class="btn btn-outline"></select>
+                    </div>
+                    <span id="welcomeMessage"></span>
                 </div>
-            </div>
-            <div class="card">
-                 <h3>Input Nilai Karakter (Semester 2)</h3>
-                <div class="character-value-container" id="characterTables2"></div>
-            </div>
-        </section>
-
-        <div id="notification"></div>
-        <div id="confirmPromptModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header"><h2>Perhatian</h2><span class="close-button">&times;</span></div>
-                <div class="modal-body">
-                    <p id="promptMessage"></p>
-                </div>
-                <div class="confirm-actions">
-                    <button class="btn btn-primary" id="confirmPromptBtn">OK</button>
-                </div>
-            </div>
+            </header>
+            <main id="pageContent">
+                <section id="home" class="page-section active">
+                    <div class="card">
+                        <h3 id="welcomeCardTitle">Selamat Datang di Panel Guru</h3>
+                        <p id="welcomeCardInfo">Gunakan menu di samping untuk mengelola data nilai siswa. Anda saat ini mengajar di rombel <b id="infoRombel"></b>.</p>
+                    </div>
+                </section>
+                <section id="nilai-intra-s1" class="page-section">
+                    <div class="card">
+                        <h3>Input Nilai Akademik & Absensi (Semester 1)</h3>
+                        <div class="table-wrapper"><table id="siswaTable1"></table></div>
+                    </div>
+                </section>
+                <section id="nilai-intra-s2" class="page-section">
+                     <div class="card">
+                        <h3>Input Nilai Akademik & Absensi (Semester 2)</h3>
+                        <div class="table-wrapper"><table id="siswaTable2"></table></div>
+                    </div>
+                </section>
+                <section id="ekstrakurikuler-s1" class="page-section">
+                    <div class="card">
+                        <h3>Input Nilai Ekstrakurikuler (Semester 1)</h3>
+                        <div id="ekstraTables1"></div>
+                    </div>
+                </section>
+                 <section id="ekstrakurikuler-s2" class="page-section">
+                    <div class="card">
+                        <h3>Input Nilai Ekstrakurikuler (Semester 2)</h3>
+                        <div id="ekstraTables2"></div>
+                    </div>
+                </section>
+                <section id="kokurikuler-s1" class="page-section">
+                    <div class="card">
+                        <h3>Input Nilai Karakter (Semester 1)</h3>
+                        <div class="character-value-container" id="characterTables1"></div>
+                    </div>
+                </section>
+                 <section id="kokurikuler-s2" class="page-section">
+                    <div class="card">
+                        <h3>Input Nilai Karakter (Semester 2)</h3>
+                        <div class="character-value-container" id="characterTables2"></div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    
+    <div id="notification"></div>
+    <div id="confirmPromptModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Perhatian</h2><span class="close-button">&times;</span></div>
+            <div class="modal-body"><p id="promptMessage"></p></div>
         </div>
     </div>
     
     <script>
 
-function _0x2833(_0x14cdf9,_0x50fa2e){const _0x1aa290=_0x1aa2();return _0x2833=function(_0x283330,_0xe5d37b){_0x283330=_0x283330-0x16d;let _0x232afd=_0x1aa290[_0x283330];return _0x232afd;},_0x2833(_0x14cdf9,_0x50fa2e);}const _0x2e4a40=_0x2833;function _0x1aa2(){const _0x5c06ce=['\x22\x20data-type=\x22absence\x22\x20data-name=\x22sakit\x22\x20data-semester=\x22','join','getItem','extracurriculars','characterTables2','reverse','<option\x20value=\x22','<tbody><tr><td\x20colspan=\x22100\x22\x20style=\x22text-align:center;\x22>Belum\x20ada\x20data\x20siswa\x20untuk\x20rombel\x20ini.</td></tr></tbody>','className','errorMessage','s_nama','6887150gJtNDW','activeYear','sakit','flatMap','map','</tbody>','</th>','.tab-content.active','none','characterName','removeItem','</select></td>','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4>','\x22></td>','</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22table-wrapper\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<table>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th\x20style=\x22width:\x2080px;\x22>NISN</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th\x20style=\x22min-width:\x20200px;\x22>Nama\x20Siswa</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','tbody','.modal','<p\x20style=\x22text-align:center;\x22>Belum\x20ada\x20data\x20nilai\x20karakter\x20yang\x20perlu\x20diinput.</p>','rombel','.tab-button.active','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tbody></tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</table>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','notification\x20show','selected','\x22\x20data-type=\x22subject\x22\x20data-name=\x22','addEventListener','add','target','enrollment','grades','querySelectorAll','20GGEZZv','change','type','flex','value','masterSiswa','Aktif','active','username','izin','stringify','Guru','\x22\x20data-student-id=\x22','getElementById','siswaTable2','character','subValues','\x20(Rombel\x20','sort','characterGradeOptions','status','260018ElrAhQ','tahunPelajaranSelector','extracurricular','N/A','click','loginForm','391535vewtsM','preventDefault','character-table-card','semester1','subject','academicYears','find','absences','name','parse','Username\x20atau\x20Password\x20salah!','style','\x22\x20data-type=\x22character\x22\x20data-character-name=\x22','<p\x20style=\x22text-align:center;\x22>Belum\x20ada\x20data\x20siswa.</p>','\x22\x20data-sub-name=\x22','querySelector','classList','<p\x20style=\x22text-align:center;\x22>Tidak\x20ada\x20data.</p>','3147672aeyEAg','subjects','semester2','</tr>','3786372wYdGjk','textContent','Admin.html','keys','then','<td><input\x20type=\x22number\x22\x20min=\x220\x22\x20max=\x22100\x22\x20value=\x22','href','.tab-button','Anda\x20tidak\x20ditugaskan\x20sebagai\x20wali\x20kelas\x20di\x20tahun\x20ajaran\x20','welcomeMessage','<tr><td>','notification','show','onclick','<td><input\x20type=\x22number\x22\x20min=\x220\x22\x20value=\x22','forEach','remove','role','absence','loggedInUser','submit','\x22\x20data-semester=\x22','display','success','\x22><option\x20value=\x22\x22>--Pilih\x20Nilai--</option>','shortName','kelasInfo','users','<tbody>','rombelAjar','s_nisn','location','Selamat\x20datang,\x20',')</option>','filter','length','block','6punbyz','<td><select\x20data-student-id=\x22','\x22\x20data-type=\x22absence\x22\x20data-name=\x22izin\x22\x20data-semester=\x22','studentId','7kHdFyN','1663736JlVNAV','</td>','mainContent','alpha','dataset','</td><td>','subName','DOMContentLoaded','innerHTML','values','715909kMPIuy','reload','password','<th>','logoutBtn','Nilai\x20tersimpan.'];_0x1aa2=function(){return _0x5c06ce;};return _0x1aa2();}(function(_0x8ce772,_0x9d733e){const _0xe6f1a1=_0x2833,_0x47549f=_0x8ce772();while(!![]){try{const _0x362209=-parseInt(_0xe6f1a1(0x181))/0x1+parseInt(_0xe6f1a1(0x1c5))/0x2*(-parseInt(_0xe6f1a1(0x172))/0x3)+parseInt(_0xe6f1a1(0x1b0))/0x4*(parseInt(_0xe6f1a1(0x1cb))/0x5)+parseInt(_0xe6f1a1(0x1dd))/0x6*(parseInt(_0xe6f1a1(0x176))/0x7)+parseInt(_0xe6f1a1(0x177))/0x8+-parseInt(_0xe6f1a1(0x1e1))/0x9+parseInt(_0xe6f1a1(0x192))/0xa;if(_0x362209===_0x9d733e)break;else _0x47549f['push'](_0x47549f['shift']());}catch(_0x829217){_0x47549f['push'](_0x47549f['shift']());}}}(_0x1aa2,0x659c2),document[_0x2e4a40(0x1aa)](_0x2e4a40(0x17e),function(){const _0xcb7eb0=_0x2e4a40;let _0x3953a3=getDb()||setDefaultData();const _0x1b4e58=document[_0xcb7eb0(0x1bd)]('loginScreen'),_0x35f3d8=document[_0xcb7eb0(0x1bd)](_0xcb7eb0(0x179)),_0x4b7df4=document[_0xcb7eb0(0x1bd)](_0xcb7eb0(0x1ca)),_0x2c7407=document[_0xcb7eb0(0x1bd)](_0xcb7eb0(0x190)),_0xba09ea=document[_0xcb7eb0(0x1bd)](_0xcb7eb0(0x1ea)),_0x5cccd9=document[_0xcb7eb0(0x1bd)](_0xcb7eb0(0x1c6)),_0x47343b=document['getElementById'](_0xcb7eb0(0x1fb)),_0x17aa3d=document['getElementById']('siswaTable1'),_0xf08522=document[_0xcb7eb0(0x1bd)](_0xcb7eb0(0x1be)),_0x5da0e9=document[_0xcb7eb0(0x1bd)]('characterTables1'),_0x58c118=document[_0xcb7eb0(0x1bd)](_0xcb7eb0(0x18b)),_0xec9aa3=document['getElementById']('confirmPromptModal'),_0x3627ae=document[_0xcb7eb0(0x1bd)]('confirmPromptBtn'),_0x1d75b5=document[_0xcb7eb0(0x1bd)]('promptMessage');let _0x10f8e7='',_0x274989,_0x220d37;const _0x1c28b1=_0x3fccd3=>{const _0x582cdc=_0xcb7eb0;_0x3fccd3['style'][_0x582cdc(0x1f7)]=_0x582cdc(0x171),setTimeout(()=>_0x3fccd3[_0x582cdc(0x1db)][_0x582cdc(0x1ab)](_0x582cdc(0x1ed)),0xa);},_0x11a04d=_0x3fad4d=>{const _0x5b0ab7=_0xcb7eb0;_0x3fad4d[_0x5b0ab7(0x1db)][_0x5b0ab7(0x1f1)](_0x5b0ab7(0x1ed)),setTimeout(()=>_0x3fad4d[_0x5b0ab7(0x1d6)]['display']=_0x5b0ab7(0x19a),0x12c);};document[_0xcb7eb0(0x1af)]('.modal\x20.close-button')[_0xcb7eb0(0x1f0)](_0x23ef3e=>_0x23ef3e['onclick']=()=>_0x11a04d(_0x23ef3e['closest'](_0xcb7eb0(0x1a2)))),window[_0xcb7eb0(0x1ee)]=_0x132b31=>{const _0x2578dc=_0xcb7eb0;if(_0x132b31[_0x2578dc(0x1ac)][_0x2578dc(0x1db)]['contains']('modal'))_0x11a04d(_0x132b31[_0x2578dc(0x1ac)]);};const _0x1e65a5=_0x41abb6=>{return _0x1d75b5['textContent']=_0x41abb6,_0x1c28b1(_0xec9aa3),new Promise(_0x5bde0a=>{_0x220d37=_0x5bde0a;});};_0x3627ae[_0xcb7eb0(0x1ee)]=()=>{_0x11a04d(_0xec9aa3);if(_0x220d37)_0x220d37(!![]);};const _0x20ba9f=(_0x1de038,_0x5d0ecf=_0xcb7eb0(0x1f8))=>{const _0x6f672b=_0xcb7eb0,_0x29f526=document[_0x6f672b(0x1bd)](_0x6f672b(0x1ec));_0x29f526[_0x6f672b(0x1e2)]=_0x1de038,_0x29f526[_0x6f672b(0x18f)]=_0x6f672b(0x1a7),setTimeout(()=>_0x29f526['classList']['remove'](_0x6f672b(0x1ed)),0x5dc);},_0x12c572=()=>{const _0xf920e5=_0xcb7eb0,_0x42f31e=JSON['parse'](sessionStorage[_0xf920e5(0x189)]('loggedInUser')),_0x46e81b=_0x3953a3['academicYears'][_0x10f8e7]?.[_0xf920e5(0x1fc)]['find'](_0x4c5541=>_0x4c5541[_0xf920e5(0x1b8)]===_0x42f31e[_0xf920e5(0x1b8)]&&_0x4c5541[_0xf920e5(0x1f2)]===_0xf920e5(0x1bb));if(!_0x46e81b||!_0x46e81b[_0xf920e5(0x1fe)]){_0x47343b['textContent']=_0xf920e5(0x1e9)+_0x10f8e7+'.';const _0x5b49b4='<tbody><tr><td\x20colspan=\x22100\x22\x20style=\x22text-align:center;\x22>Tidak\x20ada\x20data.</td></tr></tbody>';_0x17aa3d[_0xf920e5(0x17f)]=_0x5b49b4,_0xf08522['innerHTML']=_0x5b49b4,_0x5da0e9[_0xf920e5(0x17f)]=_0xf920e5(0x1dc),_0x58c118[_0xf920e5(0x17f)]=_0xf920e5(0x1dc);return;}const _0x20d2b0=_0x46e81b[_0xf920e5(0x1fe)],_0x255c9f=_0x3953a3[_0xf920e5(0x1d0)][_0x10f8e7]?.[_0xf920e5(0x1ad)]['filter'](_0x1a714d=>_0x1a714d[_0xf920e5(0x1a4)]===_0x20d2b0&&_0x1a714d[_0xf920e5(0x1c4)]===_0xf920e5(0x1b6));_0x47343b['textContent']='Daftar\x20Siswa\x20Rombel:\x20'+_0x20d2b0;if(!_0x255c9f||_0x255c9f[_0xf920e5(0x170)]===0x0){const _0x29db70=_0xf920e5(0x18e);_0x17aa3d[_0xf920e5(0x17f)]=_0x29db70,_0xf08522[_0xf920e5(0x17f)]=_0x29db70,_0x5da0e9['innerHTML']=_0xf920e5(0x1d8),_0x58c118[_0xf920e5(0x17f)]=_0xf920e5(0x1d8);return;}_0xd019b2(_0x17aa3d,_0x255c9f,_0xf920e5(0x1ce)),_0xd019b2(_0xf08522,_0x255c9f,_0xf920e5(0x1df)),_0x508cfc(_0x5da0e9,_0x255c9f,_0xf920e5(0x1ce)),_0x508cfc(_0x58c118,_0x255c9f,_0xf920e5(0x1df));},_0xd019b2=(_0xa9157b,_0x3f3d06,_0x1124ce)=>{const _0x4ce467=_0xcb7eb0,_0x5f3791=_0x3953a3[_0x4ce467(0x1d0)][_0x10f8e7]?.[_0x4ce467(0x1de)]||[],_0x288e16=_0x3953a3['academicYears'][_0x10f8e7]?.[_0x4ce467(0x18a)]||[];let _0x167809='<thead><tr><th\x20style=\x22width:\x2080px;\x22>NISN</th><th\x20style=\x22min-width:\x20200px;\x22>Nama\x20Siswa</th>';_0x5f3791[_0x4ce467(0x1f0)](_0x1046b7=>_0x167809+=_0x4ce467(0x184)+_0x1046b7[_0x4ce467(0x1fa)]+_0x4ce467(0x198)),_0x288e16[_0x4ce467(0x1f0)](_0x4cc4cd=>_0x167809+='<th>'+_0x4cc4cd[_0x4ce467(0x1d3)]+_0x4ce467(0x198)),_0x167809+='<th>Sakit</th><th>Izin</th><th>Alpha</th></tr></thead>';let _0x22b75b=_0x4ce467(0x1fd);_0x3f3d06[_0x4ce467(0x1f0)](_0xdbd547=>{const _0x363648=_0x4ce467,_0x387cf2=_0x3953a3['masterSiswa'][_0x363648(0x1d1)](_0x59c346=>_0x59c346['id']===_0xdbd547[_0x363648(0x175)]);if(!_0x387cf2)return;if(!_0x387cf2[_0x363648(0x1ae)])_0x387cf2['grades']={};if(!_0x387cf2[_0x363648(0x1ae)][_0x10f8e7])_0x387cf2['grades'][_0x10f8e7]={'semester1':{},'semester2':{}};if(!_0x387cf2['grades'][_0x10f8e7][_0x1124ce])_0x387cf2[_0x363648(0x1ae)][_0x10f8e7][_0x1124ce]={'subjects':{},'extracurriculars':{},'absences':{}};const _0x5ccaf7=_0x387cf2[_0x363648(0x1ae)][_0x10f8e7][_0x1124ce],_0x597b82=_0x5ccaf7['absences']||{};let _0x49f32a=_0x363648(0x1eb)+_0x387cf2['s_nisn']+'</td><td>'+_0x387cf2[_0x363648(0x191)]+_0x363648(0x178);_0x5f3791[_0x363648(0x1f0)](_0x336a21=>_0x49f32a+=_0x363648(0x1e6)+(_0x5ccaf7[_0x363648(0x1de)]?.[_0x336a21[_0x363648(0x1fa)]]||'')+_0x363648(0x1bc)+_0x387cf2['id']+_0x363648(0x1a9)+_0x336a21[_0x363648(0x1fa)]+_0x363648(0x1f6)+_0x1124ce+_0x363648(0x19f)),_0x288e16[_0x363648(0x1f0)](_0x6bfcc8=>_0x49f32a+='<td><input\x20type=\x22text\x22\x20value=\x22'+(_0x5ccaf7[_0x363648(0x18a)]?.[_0x6bfcc8[_0x363648(0x1d3)]]||'')+_0x363648(0x1bc)+_0x387cf2['id']+'\x22\x20data-type=\x22extracurricular\x22\x20data-name=\x22'+_0x6bfcc8[_0x363648(0x1d3)]+_0x363648(0x1f6)+_0x1124ce+_0x363648(0x19f)),_0x49f32a+=_0x363648(0x1ef)+(_0x597b82[_0x363648(0x194)]||0x0)+'\x22\x20data-student-id=\x22'+_0x387cf2['id']+_0x363648(0x187)+_0x1124ce+_0x363648(0x19f),_0x49f32a+=_0x363648(0x1ef)+(_0x597b82[_0x363648(0x1b9)]||0x0)+'\x22\x20data-student-id=\x22'+_0x387cf2['id']+_0x363648(0x174)+_0x1124ce+_0x363648(0x19f),_0x49f32a+=_0x363648(0x1ef)+(_0x597b82[_0x363648(0x17a)]||0x0)+'\x22\x20data-student-id=\x22'+_0x387cf2['id']+'\x22\x20data-type=\x22absence\x22\x20data-name=\x22alpha\x22\x20data-semester=\x22'+_0x1124ce+_0x363648(0x19f),_0x49f32a+='</tr>',_0x22b75b+=_0x49f32a;}),_0x22b75b+=_0x4ce467(0x197),_0xa9157b[_0x4ce467(0x17f)]=_0x167809+_0x22b75b;},_0x508cfc=(_0x51d496,_0x1bccdc,_0x3a9410)=>{const _0x2d7811=_0xcb7eb0,_0x49f306=_0x3953a3[_0x2d7811(0x1d0)][_0x10f8e7]?.['characterValues']||[],_0x27b7c2=_0x3953a3[_0x2d7811(0x1d0)][_0x10f8e7]?.[_0x2d7811(0x1c3)]||[];_0x51d496[_0x2d7811(0x17f)]='';if(_0x49f306[_0x2d7811(0x170)]===0x0){_0x51d496[_0x2d7811(0x17f)]=_0x2d7811(0x1a3);return;}_0x49f306['forEach'](_0x47ae7b=>{const _0x515745=_0x2d7811,_0x4a1a06=document['createElement']('div');_0x4a1a06[_0x515745(0x18f)]=_0x515745(0x1cd),_0x4a1a06[_0x515745(0x17f)]=_0x515745(0x19e)+_0x47ae7b['name']+_0x515745(0x1a0)+_0x47ae7b['subValues'][_0x515745(0x196)](_0x4200a7=>_0x515745(0x184)+_0x4200a7[_0x515745(0x1d3)]+_0x515745(0x198))[_0x515745(0x188)]('')+_0x515745(0x1a6);const _0x4e2e7a=_0x4a1a06[_0x515745(0x1da)](_0x515745(0x1a1));let _0x2332dd='';_0x1bccdc['forEach'](_0x4ae901=>{const _0x2b5d20=_0x515745,_0x5f5025=_0x3953a3[_0x2b5d20(0x1b5)][_0x2b5d20(0x1d1)](_0x3bb132=>_0x3bb132['id']===_0x4ae901[_0x2b5d20(0x175)]);if(!_0x5f5025)return;if(!_0x5f5025['grades'])_0x5f5025[_0x2b5d20(0x1ae)]={};if(!_0x5f5025['grades'][_0x10f8e7])_0x5f5025[_0x2b5d20(0x1ae)][_0x10f8e7]={'semester1':{},'semester2':{}};if(!_0x5f5025[_0x2b5d20(0x1ae)][_0x10f8e7][_0x3a9410])_0x5f5025[_0x2b5d20(0x1ae)][_0x10f8e7][_0x3a9410]={'character':{}};if(!_0x5f5025[_0x2b5d20(0x1ae)][_0x10f8e7][_0x3a9410][_0x2b5d20(0x1bf)])_0x5f5025[_0x2b5d20(0x1ae)][_0x10f8e7][_0x3a9410][_0x2b5d20(0x1bf)]={};if(!_0x5f5025[_0x2b5d20(0x1ae)][_0x10f8e7][_0x3a9410][_0x2b5d20(0x1bf)][_0x47ae7b['name']])_0x5f5025[_0x2b5d20(0x1ae)][_0x10f8e7][_0x3a9410][_0x2b5d20(0x1bf)][_0x47ae7b[_0x2b5d20(0x1d3)]]={};const _0x4d6d62=_0x5f5025[_0x2b5d20(0x1ae)][_0x10f8e7][_0x3a9410][_0x2b5d20(0x1bf)][_0x47ae7b[_0x2b5d20(0x1d3)]];let _0x41b2a6=_0x2b5d20(0x1eb)+_0x5f5025[_0x2b5d20(0x1ff)]+_0x2b5d20(0x17c)+_0x5f5025[_0x2b5d20(0x191)]+_0x2b5d20(0x178);_0x47ae7b[_0x2b5d20(0x1c0)][_0x2b5d20(0x1f0)](_0x455701=>{const _0x61316a=_0x2b5d20,_0x4b9065=_0x4d6d62[_0x455701[_0x61316a(0x1d3)]]||'',_0x86f4af=_0x27b7c2[_0x61316a(0x196)](_0x5b5ffe=>_0x61316a(0x18d)+_0x5b5ffe+'\x22\x20'+(_0x5b5ffe===_0x4b9065?_0x61316a(0x1a8):'')+'>'+_0x5b5ffe+'</option>')['join']('');_0x41b2a6+=_0x61316a(0x173)+_0x5f5025['id']+_0x61316a(0x1d7)+_0x47ae7b[_0x61316a(0x1d3)]+_0x61316a(0x1d9)+_0x455701['name']+_0x61316a(0x1f6)+_0x3a9410+_0x61316a(0x1f9)+_0x86f4af+_0x61316a(0x19d);}),_0x41b2a6+=_0x2b5d20(0x1e0),_0x2332dd+=_0x41b2a6;}),_0x4e2e7a[_0x515745(0x17f)]=_0x2332dd,_0x51d496['appendChild'](_0x4a1a06);});},_0x2f64b4=_0x26218e=>{clearTimeout(_0x274989),_0x274989=setTimeout(()=>{const _0x409114=_0x2833,_0x13d076=_0x26218e[_0x409114(0x1ac)],_0x1be2d0=Number(_0x13d076[_0x409114(0x17b)]['studentId']),_0x2c156e=_0x13d076[_0x409114(0x17b)][_0x409114(0x1b2)],_0x2042ec=_0x13d076[_0x409114(0x17b)]['semester'];let _0x151051=_0x3953a3[_0x409114(0x1b5)][_0x409114(0x1d1)](_0x347f59=>_0x347f59['id']===_0x1be2d0);if(!_0x151051)return;if(!_0x151051[_0x409114(0x1ae)])_0x151051[_0x409114(0x1ae)]={};if(!_0x151051['grades'][_0x10f8e7])_0x151051[_0x409114(0x1ae)][_0x10f8e7]={};if(!_0x151051[_0x409114(0x1ae)][_0x10f8e7][_0x2042ec])_0x151051[_0x409114(0x1ae)][_0x10f8e7][_0x2042ec]={'subjects':{},'extracurriculars':{},'absences':{},'character':{}};const _0x24f62f=_0x151051['grades'][_0x10f8e7][_0x2042ec];if(_0x2c156e===_0x409114(0x1cf)||_0x2c156e===_0x409114(0x1c7)||_0x2c156e==='absence'){const _0x2731be=_0x13d076[_0x409114(0x17b)][_0x409114(0x1d3)],_0x3c3103=_0x2c156e===_0x409114(0x1cf)||_0x2c156e===_0x409114(0x1f3)?Number(_0x13d076['value']):_0x13d076['value'];if(_0x2c156e===_0x409114(0x1cf))_0x24f62f['subjects'][_0x2731be]=_0x3c3103;else{if(_0x2c156e==='extracurricular')_0x24f62f[_0x409114(0x18a)][_0x2731be]=_0x3c3103;else{if(_0x2c156e===_0x409114(0x1f3))_0x24f62f[_0x409114(0x1d2)][_0x2731be]=_0x3c3103;}}}else{if(_0x2c156e==='character'){const _0x3c391c=_0x13d076[_0x409114(0x17b)][_0x409114(0x19b)],_0x1f53fa=_0x13d076['dataset'][_0x409114(0x17d)];!_0x24f62f['character'][_0x3c391c]&&(_0x24f62f['character'][_0x3c391c]={}),_0x24f62f[_0x409114(0x1bf)][_0x3c391c][_0x1f53fa]=_0x13d076[_0x409114(0x1b4)];}}saveDb(_0x3953a3),_0x20ba9f(_0x409114(0x186));},0x1f4);};_0x35f3d8[_0xcb7eb0(0x1aa)](_0xcb7eb0(0x1b1),_0x2f64b4),document[_0xcb7eb0(0x1bd)](_0xcb7eb0(0x185))[_0xcb7eb0(0x1aa)](_0xcb7eb0(0x1c9),()=>{const _0x418d59=_0xcb7eb0;sessionStorage[_0x418d59(0x19c)](_0x418d59(0x1f4)),window[_0x418d59(0x200)][_0x418d59(0x182)]();}),_0x5cccd9['addEventListener'](_0xcb7eb0(0x1b1),_0x92fdba=>{const _0x5aadf0=_0xcb7eb0;_0x10f8e7=_0x92fdba['target'][_0x5aadf0(0x1b4)],_0x12c572();});const _0x33c5dd=()=>{const _0x3687b3=_0xcb7eb0,_0x43dc55=JSON[_0x3687b3(0x1d4)](sessionStorage['getItem'](_0x3687b3(0x1f4)));if(_0x43dc55&&_0x43dc55[_0x3687b3(0x1f2)]===_0x3687b3(0x1bb)){_0x1b4e58['style'][_0x3687b3(0x1f7)]='none',_0x35f3d8[_0x3687b3(0x1d6)][_0x3687b3(0x1f7)]=_0x3687b3(0x171),_0xba09ea[_0x3687b3(0x1e2)]=_0x3687b3(0x16d)+_0x43dc55['nama']+'!';const _0x14eb77=Object[_0x3687b3(0x1e4)](_0x3953a3[_0x3687b3(0x1d0)])[_0x3687b3(0x16f)](_0x377d6c=>_0x3953a3[_0x3687b3(0x1d0)][_0x377d6c][_0x3687b3(0x1fc)]['some'](_0x5b196e=>_0x5b196e[_0x3687b3(0x1b8)]===_0x43dc55[_0x3687b3(0x1b8)]));_0x10f8e7=_0x3953a3[_0x3687b3(0x193)];const _0x169730=_0x14eb77[_0x3687b3(0x1c2)]()[_0x3687b3(0x18c)]()[_0x3687b3(0x196)](_0x12942f=>{const _0x2bec46=_0x3687b3,_0x200864=_0x3953a3[_0x2bec46(0x1d0)][_0x12942f]?.['users'][_0x2bec46(0x1d1)](_0x19984a=>_0x19984a['username']===_0x43dc55['username']),_0x36a869=_0x200864?_0x200864['rombelAjar']:_0x2bec46(0x1c8);return _0x2bec46(0x18d)+_0x12942f+'\x22\x20'+(_0x12942f===_0x10f8e7?'selected':'')+'>'+_0x12942f+_0x2bec46(0x1c1)+_0x36a869+_0x2bec46(0x16e);})[_0x3687b3(0x188)]('');_0x5cccd9[_0x3687b3(0x17f)]=_0x169730,document[_0x3687b3(0x1af)](_0x3687b3(0x1e8))[_0x3687b3(0x1f0)](_0x15b142=>{const _0x19ee0d=_0x3687b3;_0x15b142['addEventListener'](_0x19ee0d(0x1c9),()=>{const _0x471590=_0x19ee0d;document[_0x471590(0x1da)](_0x471590(0x1a5))[_0x471590(0x1db)][_0x471590(0x1f1)]('active'),document[_0x471590(0x1da)](_0x471590(0x199))['classList'][_0x471590(0x1f1)](_0x471590(0x1b7)),_0x15b142[_0x471590(0x1db)]['add'](_0x471590(0x1b7)),document[_0x471590(0x1bd)](_0x15b142['dataset']['target'])[_0x471590(0x1db)][_0x471590(0x1ab)](_0x471590(0x1b7));});}),_0x12c572();}else _0x1b4e58[_0x3687b3(0x1d6)][_0x3687b3(0x1f7)]=_0x3687b3(0x1b3),_0x35f3d8['style'][_0x3687b3(0x1f7)]='none';};_0x4b7df4[_0xcb7eb0(0x1aa)](_0xcb7eb0(0x1f5),function(_0x3ed1e7){const _0xbc47b4=_0xcb7eb0;_0x3ed1e7[_0xbc47b4(0x1cc)](),_0x2c7407[_0xbc47b4(0x1e2)]='';const _0x39e97d=document[_0xbc47b4(0x1bd)](_0xbc47b4(0x1b8))[_0xbc47b4(0x1b4)],_0x3a76ef=document['getElementById'](_0xbc47b4(0x183))['value'],_0x5ea594=Object[_0xbc47b4(0x180)](_0x3953a3[_0xbc47b4(0x1d0)])[_0xbc47b4(0x195)](_0x18eb09=>_0x18eb09['users'])[_0xbc47b4(0x1d1)](_0x43eff3=>_0x43eff3[_0xbc47b4(0x1b8)]===_0x39e97d&&_0x43eff3['password']===_0x3a76ef);if(_0x5ea594&&_0x5ea594['role']===_0xbc47b4(0x1bb))sessionStorage['setItem']('loggedInUser',JSON[_0xbc47b4(0x1ba)](_0x5ea594)),_0x33c5dd();else _0x5ea594?_0x1e65a5('Anda\x20tidak\x20memiliki\x20akses\x20Guru.')[_0xbc47b4(0x1e5)](()=>{const _0xe4e079=_0xbc47b4;if(_0x5ea594['role']==='Admin')window[_0xe4e079(0x200)][_0xe4e079(0x1e7)]=_0xe4e079(0x1e3);}):_0x2c7407[_0xbc47b4(0x1e2)]=_0xbc47b4(0x1d5);}),_0x33c5dd();}));
-
+	function _0xd7d5(_0x20c1d5,_0x126cac){const _0x46f062=_0x46f0();return _0xd7d5=function(_0xd7d566,_0x36ac9f){_0xd7d566=_0xd7d566-0x8a;let _0x141ae2=_0x46f062[_0xd7d566];return _0x141ae2;},_0xd7d5(_0x20c1d5,_0x126cac);}function _0x46f0(){const _0x209578=[')</option>','input,\x20select','pageTitle','status','</th>','\x22\x20data-semester=\x22','siswaTable2','Aktif','classList','some','</tr>','textContent','characterGradeOptions','forEach','infoRombel','<td><input\x20type=\x22number\x22\x20min=\x220\x22\x20value=\x22','\x22><option\x20value=\x22\x22>--Pilih--</option>','Username,\x20Password,\x20atau\x20Role\x20salah!','1463840LIVXnO','querySelector','Guru','getItem','<td><input\x20type=\x22text\x22\x20value=\x22','subValues','<div\x20class=\x22character-table-card\x22><h4>','nama','<td><select\x20data-student-id=\x22','querySelectorAll','<tbody>','siswaTable1','link','role','</tr></thead><tbody>','Selamat\x20Datang,\x20','<td><input\x20type=\x22number\x22\x20min=\x220\x22\x20max=\x22100\x22\x20value=\x22','tahunPelajaranSelector','type','enrollment','\x22\x20data-type=\x22absence\x22\x20data-name=\x22sakit\x22\x20data-semester=\x22','setItem','find','display','join','1689952FJvZAD','appendChild','305498GoRarN','character','<th>','characterTables2','subject','stringify','<th>Sakit</th><th>Izin</th><th>Alpha</th></tr></thead>','schoolInfo','Nilai\x20tersimpan.','<tr><td>','\x22\x20data-type=\x22absence\x22\x20data-name=\x22alpha\x22\x20data-semester=\x22','addEventListener','welcomeCardTitle','characterTables1','click','toggle','remove','style','grades','selected','academicYears','izin','.sidebar-nav\x20a.nav-link','location','245959rBessg','absence','open','.submenu.open','characterName','span','N/A','semester1','\x22\x20data-type=\x22extracurricular\x22\x20data-name=\x22','contains','parse','rel','add','getElementById','semester2','value','target','absences','home','DOMContentLoaded','extracurriculars','</option>','</td><td>','block','loginScreen','map','closest','rombelAjar','\x22></td>','outerHTML','keys','users','subjects','</select></td>','dataset','.sidebar-nav\x20a.active','Selamat\x20datang,\x20','loggedInUser','rombel','src','removeItem','</td>','active','reload','\x22\x20data-sub-name=\x22','2373264aTCCbm','matches','studentId','<option\x20value=\x22','change','values','createElement','show','innerHTML','<p\x20style=\x22text-align:center;\x22>Belum\x20ada\x20data\x20siswa.</p>','logoutBtn','\x22\x20data-student-id=\x22','logoUrl','<p>Tidak\x20ada\x20data\x20ekstrakurikuler\x20untuk\x20diinput.</p>','s_nisn','name','\x22\x20data-type=\x22absence\x22\x20data-name=\x22izin\x22\x20data-semester=\x22','username','masterSiswa','sort','subName','519674cOqcNm','icon','flatMap','194898PbvxHf','</tbody></table></div></div>','className','<div\x20class=\x22table-wrapper\x22><table><thead><tr><th>NISN</th><th>Nama\x20Siswa</th>','length','extracurricular','ekstraTables2','\x22\x20data-type=\x22character\x22\x20data-character-name=\x22','preventDefault','submit','href','24UoZrIY','s_nama','none','alpha','password','ekstraTables1'];_0x46f0=function(){return _0x209578;};return _0x46f0();}const _0x43fc8e=_0xd7d5;(function(_0x4ffa1b,_0x5b78fd){const _0x446793=_0xd7d5,_0x475e56=_0x4ffa1b();while(!![]){try{const _0x4e70b3=-parseInt(_0x446793(0xaf))/0x1+parseInt(_0x446793(0x109))/0x2+parseInt(_0x446793(0x10c))/0x3+parseInt(_0x446793(0xad))/0x4+parseInt(_0x446793(0x94))/0x5+-parseInt(_0x446793(0xf4))/0x6+-parseInt(_0x446793(0xc7))/0x7*(parseInt(_0x446793(0x117))/0x8);if(_0x4e70b3===_0x5b78fd)break;else _0x475e56['push'](_0x475e56['shift']());}catch(_0x19832b){_0x475e56['push'](_0x475e56['shift']());}}}(_0x46f0,0x39086),document[_0x43fc8e(0xba)](_0x43fc8e(0xda),function(){const _0x251704=_0x43fc8e;let _0x5e4c2a=getDb()||setDefaultData();const _0x1d56f8=()=>{const _0x279834=_0xd7d5;if(_0x5e4c2a?.[_0x279834(0xb6)]?.[_0x279834(0x100)]){const _0x292469=document[_0x279834(0xfa)](_0x279834(0xa0));_0x292469[_0x279834(0xd2)]=_0x279834(0x10a),_0x292469['type']='image/x-icon',_0x292469[_0x279834(0x116)]=_0x5e4c2a[_0x279834(0xb6)][_0x279834(0x100)],document['head'][_0x279834(0xae)](_0x292469);}};_0x1d56f8();const _0x4e66d4=document[_0x251704(0xd4)](_0x251704(0xdf)),_0x2713a0=document[_0x251704(0xd4)]('appContainer'),_0x23fb92=document[_0x251704(0xd4)]('loginForm');let _0x5425f='';const _0x1cc1a4=_0x541216=>{const _0xaedbb6=_0x251704,_0x13101a=document['getElementById']('notification');_0x13101a[_0xaedbb6(0x8d)]=_0x541216,_0x13101a[_0xaedbb6(0x10e)]=_0xaedbb6(0xfb),setTimeout(()=>_0x13101a[_0xaedbb6(0x8a)][_0xaedbb6(0xbf)](_0xaedbb6(0xfb)),0x5dc);},_0x1c8a95=_0x378e7a=>{const _0x2bad89=_0x251704,_0xaba848=document[_0x2bad89(0x95)]('.nav-link[data-target=\x22'+_0x378e7a+'\x22]');if(_0xaba848){const _0x1f6392=_0xaba848[_0x2bad89(0x95)]('.icon')[_0x2bad89(0xe4)],_0x4f91ed=_0xaba848['querySelector']('span')?_0xaba848[_0x2bad89(0x95)](_0x2bad89(0xcc))[_0x2bad89(0x8d)]:_0xaba848['textContent'];document[_0x2bad89(0xd4)](_0x2bad89(0x11f))[_0x2bad89(0xfc)]=_0x1f6392+'\x20'+_0x4f91ed;}},_0x2aa13a=document['querySelectorAll'](_0x251704(0xc5));_0x2aa13a['forEach'](_0x1a64eb=>{const _0x3f0905=_0x251704;_0x1a64eb['addEventListener'](_0x3f0905(0xbd),function(_0x598f3d){const _0x3b616e=_0x3f0905;if(this[_0x3b616e(0x8a)][_0x3b616e(0xd0)]('has-submenu')){_0x598f3d[_0x3b616e(0x114)](),this['nextElementSibling'][_0x3b616e(0x8a)][_0x3b616e(0xbe)]('open');return;}_0x598f3d[_0x3b616e(0x114)]();const _0x1fc340=this[_0x3b616e(0xe9)][_0x3b616e(0xd7)];document[_0x3b616e(0x9d)]('.page-section.active')[_0x3b616e(0x8f)](_0xbb10ba=>_0xbb10ba[_0x3b616e(0x8a)][_0x3b616e(0xbf)](_0x3b616e(0xf1))),document[_0x3b616e(0xd4)](_0x1fc340)?.[_0x3b616e(0x8a)][_0x3b616e(0xd3)](_0x3b616e(0xf1)),document['querySelectorAll'](_0x3b616e(0xea))[_0x3b616e(0x8f)](_0x172c3b=>_0x172c3b[_0x3b616e(0x8a)][_0x3b616e(0xbf)]('active')),this[_0x3b616e(0x8a)][_0x3b616e(0xd3)]('active'),document[_0x3b616e(0x9d)](_0x3b616e(0xca))['forEach'](_0x38d4d0=>{const _0x507992=_0x3b616e;!this[_0x507992(0xe1)]('.submenu')&&_0x38d4d0[_0x507992(0x8a)][_0x507992(0xbf)](_0x507992(0xc9));}),_0x1c8a95(_0x1fc340);});});const _0x1ac55a=()=>{const _0x56a6de=_0x251704,_0x5dfd8d=JSON[_0x56a6de(0xd1)](sessionStorage[_0x56a6de(0x97)](_0x56a6de(0xec))),_0xf55577=_0x5e4c2a[_0x56a6de(0xc3)][_0x5425f]?.[_0x56a6de(0xe6)][_0x56a6de(0xaa)](_0x2692ff=>_0x2692ff['username']===_0x5dfd8d[_0x56a6de(0x105)]&&_0x2692ff[_0x56a6de(0xa1)]===_0x56a6de(0x96));if(!_0xf55577||!_0xf55577['rombelAjar']){document[_0x56a6de(0x9d)]('.page-section')[_0x56a6de(0x8f)](_0x1636cf=>_0x1636cf[_0x56a6de(0xc0)][_0x56a6de(0xab)]='none'),document[_0x56a6de(0xd4)](_0x56a6de(0xd9))[_0x56a6de(0xc0)][_0x56a6de(0xab)]=_0x56a6de(0xde),document[_0x56a6de(0xd4)]('welcomeCardInfo')[_0x56a6de(0x8d)]='Anda\x20tidak\x20ditugaskan\x20sebagai\x20wali\x20kelas\x20di\x20tahun\x20ajaran\x20'+_0x5425f+'.';return;}const _0x12f26f=_0xf55577[_0x56a6de(0xe2)];document['getElementById'](_0x56a6de(0x90))[_0x56a6de(0x8d)]=_0x12f26f;const _0x57ddd8=_0x5e4c2a['academicYears'][_0x5425f]?.[_0x56a6de(0xa7)]['filter'](_0x11718a=>_0x11718a[_0x56a6de(0xed)]===_0x12f26f&&_0x11718a[_0x56a6de(0x120)]===_0x56a6de(0x124));if(!_0x57ddd8||_0x57ddd8[_0x56a6de(0x110)]===0x0){const _0x1d8edc='<tbody><tr><td\x20colspan=\x22100\x22\x20style=\x22text-align:center;\x22>Belum\x20ada\x20data\x20siswa.</td></tr></tbody>';document['getElementById'](_0x56a6de(0x9f))['innerHTML']=_0x1d8edc,document[_0x56a6de(0xd4)](_0x56a6de(0x123))['innerHTML']=_0x1d8edc,document[_0x56a6de(0xd4)]('ekstraTables1')[_0x56a6de(0xfc)]=_0x56a6de(0xfd),document[_0x56a6de(0xd4)](_0x56a6de(0x112))['innerHTML']='<p\x20style=\x22text-align:center;\x22>Belum\x20ada\x20data\x20siswa.</p>',document[_0x56a6de(0xd4)]('characterTables1')[_0x56a6de(0xfc)]='<p\x20style=\x22text-align:center;\x22>Belum\x20ada\x20data\x20siswa.</p>',document[_0x56a6de(0xd4)](_0x56a6de(0xb2))['innerHTML']=_0x56a6de(0xfd);return;}_0x288589(document[_0x56a6de(0xd4)](_0x56a6de(0x9f)),_0x57ddd8,_0x56a6de(0xce)),_0x288589(document[_0x56a6de(0xd4)](_0x56a6de(0x123)),_0x57ddd8,'semester2'),_0x4a8bd0(document[_0x56a6de(0xd4)](_0x56a6de(0x11c)),_0x57ddd8,_0x56a6de(0xce)),_0x4a8bd0(document[_0x56a6de(0xd4)]('ekstraTables2'),_0x57ddd8,_0x56a6de(0xd5)),_0x3c89da(document[_0x56a6de(0xd4)](_0x56a6de(0xbc)),_0x57ddd8,_0x56a6de(0xce)),_0x3c89da(document['getElementById'](_0x56a6de(0xb2)),_0x57ddd8,_0x56a6de(0xd5));},_0x288589=(_0x976fb0,_0x2262cf,_0x483618)=>{const _0x5a5b8c=_0x251704,_0x419224=_0x5e4c2a[_0x5a5b8c(0xc3)][_0x5425f]?.[_0x5a5b8c(0xe7)]||[];let _0x17f245='<thead><tr><th>NISN</th><th>Nama\x20Siswa</th>';_0x419224[_0x5a5b8c(0x8f)](_0x4c3404=>_0x17f245+='<th>'+_0x4c3404['shortName']+_0x5a5b8c(0x121)),_0x17f245+=_0x5a5b8c(0xb5);let _0x1113f4=_0x5a5b8c(0x9e);_0x2262cf[_0x5a5b8c(0x8f)](_0x5070eb=>{const _0x44ec41=_0x5a5b8c,_0x4187cd=_0x5e4c2a[_0x44ec41(0x106)][_0x44ec41(0xaa)](_0x3706c7=>_0x3706c7['id']===_0x5070eb[_0x44ec41(0xf6)]);if(!_0x4187cd)return;const _0x1fa05b=_0x4187cd[_0x44ec41(0xc1)]?.[_0x5425f]?.[_0x483618]||{},_0x2d9a70=_0x1fa05b[_0x44ec41(0xd8)]||{};let _0x21c785=_0x44ec41(0xb8)+_0x4187cd[_0x44ec41(0x102)]+_0x44ec41(0xdd)+_0x4187cd[_0x44ec41(0x118)]+_0x44ec41(0xf0);_0x419224['forEach'](_0x53da73=>_0x21c785+=_0x44ec41(0xa4)+(_0x1fa05b[_0x44ec41(0xe7)]?.[_0x53da73['shortName']]||'')+'\x22\x20data-student-id=\x22'+_0x4187cd['id']+'\x22\x20data-type=\x22subject\x22\x20data-name=\x22'+_0x53da73['shortName']+_0x44ec41(0x122)+_0x483618+_0x44ec41(0xe3)),_0x21c785+=_0x44ec41(0x91)+(_0x2d9a70['sakit']||0x0)+_0x44ec41(0xff)+_0x4187cd['id']+_0x44ec41(0xa8)+_0x483618+_0x44ec41(0xe3),_0x21c785+=_0x44ec41(0x91)+(_0x2d9a70[_0x44ec41(0xc4)]||0x0)+_0x44ec41(0xff)+_0x4187cd['id']+_0x44ec41(0x104)+_0x483618+_0x44ec41(0xe3),_0x21c785+='<td><input\x20type=\x22number\x22\x20min=\x220\x22\x20value=\x22'+(_0x2d9a70[_0x44ec41(0x11a)]||0x0)+_0x44ec41(0xff)+_0x4187cd['id']+_0x44ec41(0xb9)+_0x483618+_0x44ec41(0xe3),_0x21c785+='</tr>',_0x1113f4+=_0x21c785;}),_0x976fb0[_0x5a5b8c(0xfc)]=_0x17f245+'</tbody>'+_0x1113f4;},_0x4a8bd0=(_0x254e72,_0x480004,_0x4ef707)=>{const _0xb9f6c4=_0x251704,_0x483765=_0x5e4c2a['academicYears'][_0x5425f]?.[_0xb9f6c4(0xdb)]||[];_0x254e72[_0xb9f6c4(0xfc)]='';if(_0x483765[_0xb9f6c4(0x110)]===0x0){_0x254e72[_0xb9f6c4(0xfc)]=_0xb9f6c4(0x101);return;}let _0x277a2c=_0xb9f6c4(0x10f);_0x483765[_0xb9f6c4(0x8f)](_0x314d3e=>_0x277a2c+=_0xb9f6c4(0xb1)+_0x314d3e[_0xb9f6c4(0x103)]+_0xb9f6c4(0x121)),_0x277a2c+='</tr></thead><tbody>',_0x480004[_0xb9f6c4(0x8f)](_0x1c41e9=>{const _0x4a44e3=_0xb9f6c4,_0x5a4401=_0x5e4c2a[_0x4a44e3(0x106)][_0x4a44e3(0xaa)](_0x214f91=>_0x214f91['id']===_0x1c41e9['studentId']);if(!_0x5a4401)return;const _0x12e90b=_0x5a4401[_0x4a44e3(0xc1)]?.[_0x5425f]?.[_0x4ef707]||{};_0x277a2c+='<tr><td>'+_0x5a4401[_0x4a44e3(0x102)]+'</td><td>'+_0x5a4401['s_nama']+_0x4a44e3(0xf0),_0x483765[_0x4a44e3(0x8f)](_0x3db594=>{const _0x456560=_0x4a44e3;_0x277a2c+=_0x456560(0x98)+(_0x12e90b['extracurriculars']?.[_0x3db594[_0x456560(0x103)]]||'')+_0x456560(0xff)+_0x5a4401['id']+_0x456560(0xcf)+_0x3db594[_0x456560(0x103)]+_0x456560(0x122)+_0x4ef707+_0x456560(0xe3);}),_0x277a2c+=_0x4a44e3(0x8c);}),_0x277a2c+='</tbody></table></div>',_0x254e72[_0xb9f6c4(0xfc)]=_0x277a2c;},_0x3c89da=(_0x264cc4,_0x85655d,_0x3e4ef6)=>{const _0x437cf4=_0x251704,_0x3c83e4=_0x5e4c2a[_0x437cf4(0xc3)][_0x5425f]?.['characterValues']||[],_0x4df106=_0x5e4c2a['academicYears'][_0x5425f]?.[_0x437cf4(0x8e)]||[];_0x264cc4[_0x437cf4(0xfc)]='';if(_0x3c83e4[_0x437cf4(0x110)]===0x0){_0x264cc4[_0x437cf4(0xfc)]='<p>Tidak\x20ada\x20data\x20nilai\x20karakter\x20untuk\x20diinput.</p>';return;}_0x3c83e4['forEach'](_0x13d30b=>{const _0x2d1a2c=_0x437cf4;let _0x418ab1=_0x2d1a2c(0x9a)+_0x13d30b['name']+'</h4><div\x20class=\x22table-wrapper\x22><table><thead><tr><th>NISN</th><th>Nama\x20Siswa</th>';_0x13d30b[_0x2d1a2c(0x99)][_0x2d1a2c(0x8f)](_0x1edaa0=>_0x418ab1+=_0x2d1a2c(0xb1)+_0x1edaa0[_0x2d1a2c(0x103)]+_0x2d1a2c(0x121)),_0x418ab1+=_0x2d1a2c(0xa2),_0x85655d[_0x2d1a2c(0x8f)](_0x2bb20a=>{const _0x2f1850=_0x2d1a2c,_0x221111=_0x5e4c2a['masterSiswa']['find'](_0x265587=>_0x265587['id']===_0x2bb20a[_0x2f1850(0xf6)]);if(!_0x221111)return;const _0x26120c=_0x221111[_0x2f1850(0xc1)]?.[_0x5425f]?.[_0x3e4ef6]?.['character']?.[_0x13d30b['name']]||{};_0x418ab1+=_0x2f1850(0xb8)+_0x221111[_0x2f1850(0x102)]+_0x2f1850(0xdd)+_0x221111[_0x2f1850(0x118)]+_0x2f1850(0xf0),_0x13d30b[_0x2f1850(0x99)]['forEach'](_0x244761=>{const _0x352669=_0x2f1850,_0x5ea142=_0x26120c[_0x244761[_0x352669(0x103)]]||'',_0x142cea=_0x4df106[_0x352669(0xe0)](_0x5d04fc=>_0x352669(0xf7)+_0x5d04fc+'\x22\x20'+(_0x5d04fc===_0x5ea142?_0x352669(0xc2):'')+'>'+_0x5d04fc+_0x352669(0xdc))[_0x352669(0xac)]('');_0x418ab1+=_0x352669(0x9c)+_0x221111['id']+_0x352669(0x113)+_0x13d30b[_0x352669(0x103)]+_0x352669(0xf3)+_0x244761[_0x352669(0x103)]+_0x352669(0x122)+_0x3e4ef6+_0x352669(0x92)+_0x142cea+_0x352669(0xe8);}),_0x418ab1+=_0x2f1850(0x8c);}),_0x418ab1+=_0x2d1a2c(0x10d),_0x264cc4[_0x2d1a2c(0xfc)]+=_0x418ab1;});};let _0x304b7c;_0x2713a0['addEventListener'](_0x251704(0xf8),_0x13ffe9=>{const _0x129071=_0x251704;_0x13ffe9[_0x129071(0xd7)][_0x129071(0xf5)](_0x129071(0x11e))&&(clearTimeout(_0x304b7c),_0x304b7c=setTimeout(()=>{const _0x46fd9a=_0x129071,_0x3311c6=_0x13ffe9[_0x46fd9a(0xd7)],_0x4f0c6f=Number(_0x3311c6['dataset'][_0x46fd9a(0xf6)]),_0xdbe611=_0x3311c6[_0x46fd9a(0xe9)]['semester'];let _0x5a8d3d=_0x5e4c2a[_0x46fd9a(0x106)]['find'](_0x5b2767=>_0x5b2767['id']===_0x4f0c6f);if(!_0x5a8d3d)return;if(!_0x5a8d3d[_0x46fd9a(0xc1)])_0x5a8d3d[_0x46fd9a(0xc1)]={};if(!_0x5a8d3d[_0x46fd9a(0xc1)][_0x5425f])_0x5a8d3d[_0x46fd9a(0xc1)][_0x5425f]={};if(!_0x5a8d3d[_0x46fd9a(0xc1)][_0x5425f][_0xdbe611])_0x5a8d3d['grades'][_0x5425f][_0xdbe611]={'subjects':{},'extracurriculars':{},'absences':{},'character':{}};const _0x337f1a=_0x5a8d3d[_0x46fd9a(0xc1)][_0x5425f][_0xdbe611],_0x34f3b9=_0x3311c6['dataset'][_0x46fd9a(0xa6)],_0x3f0db8=_0x3311c6[_0x46fd9a(0xe9)][_0x46fd9a(0x103)],_0x390936=_0x34f3b9===_0x46fd9a(0xb3)||_0x34f3b9==='absence'?Number(_0x3311c6[_0x46fd9a(0xd6)]):_0x3311c6[_0x46fd9a(0xd6)];if(_0x34f3b9==='subject')_0x337f1a[_0x46fd9a(0xe7)][_0x3f0db8]=_0x390936;else{if(_0x34f3b9===_0x46fd9a(0x111))_0x337f1a[_0x46fd9a(0xdb)][_0x3f0db8]=_0x390936;else{if(_0x34f3b9===_0x46fd9a(0xc8))_0x337f1a[_0x46fd9a(0xd8)][_0x3f0db8]=_0x390936;else{if(_0x34f3b9===_0x46fd9a(0xb0)){const _0x26b943=_0x3311c6[_0x46fd9a(0xe9)][_0x46fd9a(0xcb)],_0x1e8bed=_0x3311c6[_0x46fd9a(0xe9)][_0x46fd9a(0x108)];if(!_0x337f1a['character'][_0x26b943])_0x337f1a[_0x46fd9a(0xb0)][_0x26b943]={};_0x337f1a[_0x46fd9a(0xb0)][_0x26b943][_0x1e8bed]=_0x3311c6['value'];}}}}saveDb(_0x5e4c2a),_0x1cc1a4(_0x46fd9a(0xb7));},0x1f4));}),document['getElementById'](_0x251704(0xfe))[_0x251704(0xba)](_0x251704(0xbd),()=>{const _0x15dbea=_0x251704;sessionStorage[_0x15dbea(0xef)]('loggedInUser'),window[_0x15dbea(0xc6)][_0x15dbea(0xf2)]();}),document[_0x251704(0xd4)](_0x251704(0xa5))[_0x251704(0xba)](_0x251704(0xf8),_0x4c3a7d=>{const _0x161696=_0x251704;_0x5425f=_0x4c3a7d[_0x161696(0xd7)][_0x161696(0xd6)],_0x1ac55a();});const _0x5648a1=()=>{const _0x58ddf6=_0x251704,_0x1c541c=JSON[_0x58ddf6(0xd1)](sessionStorage[_0x58ddf6(0x97)]('loggedInUser'));if(_0x1c541c&&_0x1c541c[_0x58ddf6(0xa1)]===_0x58ddf6(0x96)){_0x4e66d4[_0x58ddf6(0xc0)][_0x58ddf6(0xab)]=_0x58ddf6(0x119),_0x2713a0[_0x58ddf6(0xc0)][_0x58ddf6(0xab)]='flex',document[_0x58ddf6(0xd4)]('welcomeMessage')[_0x58ddf6(0x8d)]=_0x58ddf6(0xeb)+_0x1c541c['nama']+'!',document['getElementById'](_0x58ddf6(0xbb))[_0x58ddf6(0x8d)]=_0x58ddf6(0xa3)+_0x1c541c['nama']+'!',document[_0x58ddf6(0xd4)]('schoolName')[_0x58ddf6(0x8d)]=_0x5e4c2a[_0x58ddf6(0xb6)][_0x58ddf6(0x9b)],document[_0x58ddf6(0xd4)]('schoolLogo')[_0x58ddf6(0xee)]=_0x5e4c2a[_0x58ddf6(0xb6)][_0x58ddf6(0x100)];const _0x4357db=Object[_0x58ddf6(0xe5)](_0x5e4c2a['academicYears'])['filter'](_0xb4cf9a=>_0x5e4c2a[_0x58ddf6(0xc3)][_0xb4cf9a][_0x58ddf6(0xe6)][_0x58ddf6(0x8b)](_0x3f39ad=>_0x3f39ad['username']===_0x1c541c[_0x58ddf6(0x105)]));_0x5425f=_0x5e4c2a['activeYear'];const _0x1ff770=_0x4357db[_0x58ddf6(0x107)]()['reverse']()[_0x58ddf6(0xe0)](_0x5e1dfc=>{const _0xa91b85=_0x58ddf6,_0x216e8d=_0x5e4c2a[_0xa91b85(0xc3)][_0x5e1dfc][_0xa91b85(0xe6)][_0xa91b85(0xaa)](_0x3f04cc=>_0x3f04cc['username']===_0x1c541c[_0xa91b85(0x105)]),_0x1e834f=_0x216e8d?_0x216e8d[_0xa91b85(0xe2)]:_0xa91b85(0xcd);return _0xa91b85(0xf7)+_0x5e1dfc+'\x22\x20'+(_0x5e1dfc===_0x5425f?_0xa91b85(0xc2):'')+'>'+_0x5e1dfc+'\x20(Rombel\x20'+_0x1e834f+_0xa91b85(0x11d);})[_0x58ddf6(0xac)]('');document[_0x58ddf6(0xd4)](_0x58ddf6(0xa5))['innerHTML']=_0x1ff770,_0x1ac55a();}else _0x4e66d4[_0x58ddf6(0xc0)][_0x58ddf6(0xab)]='flex',_0x2713a0[_0x58ddf6(0xc0)][_0x58ddf6(0xab)]='none';};_0x23fb92['addEventListener'](_0x251704(0x115),function(_0x1883a4){const _0x2e9e1b=_0x251704;_0x1883a4[_0x2e9e1b(0x114)]();const _0x4c7103=document[_0x2e9e1b(0xd4)](_0x2e9e1b(0x105))[_0x2e9e1b(0xd6)],_0x5e1e73=document[_0x2e9e1b(0xd4)](_0x2e9e1b(0x11b))[_0x2e9e1b(0xd6)],_0x1251cf=Object[_0x2e9e1b(0xf9)](_0x5e4c2a['academicYears'])[_0x2e9e1b(0x10b)](_0x2d2769=>_0x2d2769[_0x2e9e1b(0xe6)])[_0x2e9e1b(0xaa)](_0x5bfada=>_0x5bfada[_0x2e9e1b(0x105)]===_0x4c7103&&_0x5bfada[_0x2e9e1b(0x11b)]===_0x5e1e73);_0x1251cf?.['role']===_0x2e9e1b(0x96)?(sessionStorage[_0x2e9e1b(0xa9)](_0x2e9e1b(0xec),JSON[_0x2e9e1b(0xb4)](_0x1251cf)),_0x5648a1()):document[_0x2e9e1b(0xd4)]('errorMessage')[_0x2e9e1b(0x8d)]=_0x2e9e1b(0x93);}),_0x5648a1();}));
 		
     </script>
 </body>
 </html>
+
