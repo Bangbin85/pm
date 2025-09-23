@@ -1,20 +1,6 @@
-// === FUNGSI DATABASE & UTILITAS ===
-/**
- * Mengambil data database dari localStorage.
- * @returns {object|null} Objek database atau null jika tidak ada.
- */
+////Buku Induk Bangbin\\\
 const getDb = () => JSON.parse(localStorage.getItem('bukuIndukDb')) || null;
-
-/**
- * Menyimpan objek database ke localStorage.
- * @param {object} db - Objek database yang akan disimpan.
- */
 const saveDb = (db) => localStorage.setItem('bukuIndukDb', JSON.stringify(db));
-
-/**
- * Mengatur data default untuk aplikasi jika belum ada.
- * @returns {object} Objek database default yang telah dibuat.
- */
 const setDefaultData = () => {
     const defaultYear = '2024/2025';
     const nextYear = '2025/2026';
@@ -25,7 +11,9 @@ const setDefaultData = () => {
             npsn: '20123456', 
             alamat: 'Jl. Merdeka No. 1, Jakarta',
             telpon: '021-12345678',
-            logoUrl: 'https://lh3.googleusercontent.com/d/16rll5zsRdwTbR3nF_NmPKwY51tg4tnOn'
+            logoUrl: 'https://lh3.googleusercontent.com/d/16rll5zsRdwTbR3nF_NmPKwY51tg4tnOn',
+            noHpAdmin: '6281310051985', 
+            tempat: 'Jakarta'      
         },
         masterSiswa: [
             {
@@ -54,13 +42,16 @@ const setDefaultData = () => {
                         semester1: {
                             subjects: { Pancasila: 90, 'B. Indo': 85, MTK: 88 },
                             extracurriculars: { Pramuka: 'Baik' },
-                            absences: { sakit: 0, izin: 0, alpha: 0 }
+                            absences: { sakit: 0, izin: 0, alpha: 0 },
+                            prestasi: [] // BARU: Data Prestasi
                         },
                         semester2: {
                             subjects: { Pancasila: 92, 'B. Indo': 88, MTK: 90 },
                             extracurriculars: { Pramuka: 'Baik' },
-                            absences: { sakit: 1, izin: 0, alpha: 0 }
-                        }
+                            absences: { sakit: 1, izin: 0, alpha: 0 },
+                            prestasi: [] // BARU: Data Prestasi
+                        },
+                        promotion: { status: null, note: '' } // BARU: Data Kenaikan Kelas
                     }
                 }
             },
@@ -90,13 +81,16 @@ const setDefaultData = () => {
                         semester1: {
                             subjects: { Pancasila: 88, 'B. Indo': 90, MTK: 91 },
                             extracurriculars: { Pramuka: 'Baik', 'Seni Tari': 'Sangat Baik' },
-                            absences: { sakit: 0, izin: 1, alpha: 0 }
+                            absences: { sakit: 0, izin: 1, alpha: 0 },
+                            prestasi: []
                         },
                         semester2: {
                             subjects: { Pancasila: 89, 'B. Indo': 91, MTK: 92 },
                             extracurriculars: { Pramuka: 'Baik', 'Seni Tari': 'Sangat Baik' },
-                            absences: { sakit: 0, izin: 0, alpha: 1 }
-                        }
+                            absences: { sakit: 0, izin: 0, alpha: 1 },
+                            prestasi: []
+                        },
+                        promotion: { status: null, note: '' }
                     }
                 }
             },
