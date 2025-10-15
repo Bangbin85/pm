@@ -26,22 +26,22 @@
             background: #94a3b8; /* slate-400 */
         }
 
-        /* Modal Animations */
+        /* Modal Animations - Rombakan Total */
         @keyframes modal-backdrop-show { from { opacity: 0; } to { opacity: 1; } }
         @keyframes modal-backdrop-hide { from { opacity: 1; } to { opacity: 0; } }
         @keyframes modal-content-show {
-            from { opacity: 0; transform: scale(0.98) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes modal-content-hide {
-            from { opacity: 1; transform: scale(1) translateY(0); }
-            to { opacity: 0; transform: scale(0.98) translateY(10px); }
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(30px) scale(0.97); }
         }
 
-        .modal-backdrop.show { animation: modal-backdrop-show 0.2s ease-out forwards; }
-        .modal-backdrop.hide { animation: modal-backdrop-hide 0.2s ease-out forwards; }
-        .modal-content.show { animation: modal-content-show 0.3s ease-out forwards; }
-        .modal-content.hide { animation: modal-content-hide 0.2s ease-in forwards; }
+        .modal-backdrop.show { animation: modal-backdrop-show 0.3s ease-out forwards; }
+        .modal-backdrop.hide { animation: modal-backdrop-hide 0.3s ease-out forwards; }
+        .modal-content.show { animation: modal-content-show 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .modal-content.hide { animation: modal-content-hide 0.3s ease-in forwards; }
 
         /* Custom Styles for a refined look */
         body {
@@ -59,21 +59,21 @@
         .card-hover { @apply transition-all duration-300 ease-in-out; }
         .card-hover:hover { @apply shadow-lg transform -translate-y-1; }
 
-        /* New Curation Modal Specific Styles */
+        /* New Curation Modal Specific Styles - Rombakan Navigasi */
         #modal-sidebar .sidebar-link {
-            @apply flex items-center w-full text-left px-3 py-2 text-sm font-medium text-slate-600 rounded-md transition-colors duration-200 border-l-4 border-transparent;
+            @apply flex items-center w-full text-left px-4 py-2.5 text-sm font-medium text-slate-600 rounded-lg transition-all duration-200;
         }
         #modal-sidebar .sidebar-link .link-icon {
-            @apply w-8 h-8 flex-shrink-0 flex items-center justify-center text-base mr-2 text-slate-500 rounded-md transition-all duration-200;
+            @apply w-5 h-5 flex-shrink-0 flex items-center justify-center text-lg mr-3 text-slate-500 transition-all duration-200;
         }
         #modal-sidebar .sidebar-link:hover {
-            @apply bg-slate-200 text-slate-800;
+            @apply bg-slate-200 text-slate-900;
         }
         #modal-sidebar .sidebar-link.active {
-            @apply bg-indigo-50 text-indigo-700 font-semibold border-l-4 border-indigo-500;
+            @apply bg-indigo-600 text-white font-semibold shadow-md;
         }
         #modal-sidebar .sidebar-link.active .link-icon {
-            @apply text-indigo-600;
+            @apply text-white;
         }
         .indicator-section {
             @apply pt-8;
@@ -129,7 +129,7 @@
         </div>
     </main>
     
-    <!-- === CURATION MODAL (HIDDEN BY DEFAULT) === -->
+    <!-- === CURATION MODAL (HIDDEN BY DEFAULT) - Rombakan Total === -->
     <div id="curation-modal" class="fixed inset-0 bg-black bg-opacity-60 overflow-y-auto h-full w-full hidden z-50 p-4 flex items-center justify-center modal-backdrop">
         <div class="relative w-full max-w-7xl h-[95vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden modal-content">
             <!-- Header -->
@@ -145,8 +145,8 @@
             
             <!-- Main Content -->
             <div class="flex-grow flex overflow-hidden">
-                <!-- Sidebar -->
-                <nav id="modal-sidebar" class="w-80 flex-shrink-0 bg-slate-50 border-r border-slate-200 p-4 overflow-y-auto">
+                <!-- Sidebar - Rombakan Navigasi -->
+                <nav id="modal-sidebar" class="w-72 flex-shrink-0 bg-slate-50 border-r border-slate-200 p-4 overflow-y-auto">
                     <!-- Sidebar links will be injected here -->
                 </nav>
 
@@ -159,7 +159,7 @@
             </div>
 
              <!-- Footer -->
-            <div class="flex-shrink-0 p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+            <div class="flex-shrink-0 p-4 bg-white border-t border-slate-200 flex justify-end">
                 <button type="submit" form="curation-form" id="submit-curation-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-sm transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi
                 </button>
@@ -234,35 +234,26 @@
 
         function buildCurationForm() {
             let formHTML = `<input type="hidden" id="curation-video-id"><input type="hidden" id="curation-user-id">`;
-            let sidebarHTML = '';
+            let sidebarHTML = '<div class="space-y-1">';
             
             const allSections = [...curationQuestions, 
                 { id: 'D1', title: 'D.1 Simpulan Umum', icon: 'fa-clipboard-check' }, 
                 { id: 'D2', title: 'D.2 Keputusan Final', icon: 'fa-gavel' }
             ];
 
-            const groupedSections = allSections.reduce((acc, section) => {
-                const groupKey = section.id.charAt(0);
-                if (!acc[groupKey]) acc[groupKey] = [];
-                acc[groupKey].push(section);
-                return acc;
-            }, {});
+            const groupSeparators = ['B1', 'C1', 'D1'];
 
-            const groupTitles = { 'A': 'Aspek Umum', 'B': 'Aspek Tampilan & Teknis', 'C': 'Aspek Metadata', 'D': 'Simpulan & Keputusan' };
-
-            for (const key in groupedSections) {
-                sidebarHTML += `<div class="mb-4">`;
-                sidebarHTML += `<h5 class="px-3 mb-2 text-xs font-bold uppercase text-slate-400 tracking-wider">${groupTitles[key] || 'Lainnya'}</h5>`;
-                sidebarHTML += `<div class="space-y-1">`;
-                groupedSections[key].forEach(group => {
-                    sidebarHTML += `
-                        <a href="#group-${group.id}" class="sidebar-link" data-target="group-${group.id}">
-                            <span class="link-icon"><i class="fas ${group.icon || 'fa-file'}"></i></span>
-                            <span class="truncate">${group.title}</span>
-                        </a>`;
-                });
-                sidebarHTML += `</div></div>`;
-            }
+            allSections.forEach(group => {
+                if (groupSeparators.includes(group.id)) {
+                    sidebarHTML += `<div class="pt-2 pb-1"><hr class="border-slate-200"></div>`;
+                }
+                sidebarHTML += `
+                    <a href="#group-${group.id}" class="sidebar-link" data-target="group-${group.id}">
+                        <span class="link-icon"><i class="fas ${group.icon || 'fa-file'}"></i></span>
+                        <span class="truncate">${group.title}</span>
+                    </a>`;
+            });
+            sidebarHTML += '</div>';
             
             formHTML += curationQuestions.map(group => `
                 <section id="group-${group.id}" class="indicator-section scroll-mt-8">
@@ -283,10 +274,10 @@
                             </select>
                          </div>
                     </header>
-                    <div class="mt-8 space-y-4">
+                    <div class="mt-4 space-y-6">
                     ${(group.items || []).map(item => `
-                        <div class="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-x-8 gap-y-2 items-start py-5 border-t border-slate-200">
-                            <label for="textarea-${group.id}-${item.id}" class="text-sm text-slate-700 font-medium">${item.text}</label>
+                        <div class="py-5 border-t border-slate-200 first:border-t-0 first:pt-0">
+                            <label for="textarea-${group.id}-${item.id}" class="text-sm text-slate-700 font-medium mb-2 block">${item.text}</label>
                             <textarea id="textarea-${group.id}-${item.id}" rows="3" class="form-textarea w-full text-sm" placeholder="Catatan perbaikan atau justifikasi..."></textarea>
                         </div>
                     `).join('')}
@@ -300,18 +291,21 @@
                         <h3 class="text-xl font-bold text-slate-800">D.1 Simpulan Umum</h3>
                         <p class="text-sm text-slate-500 mt-1">Berikan ringkasan dari hasil kurasi Anda.</p>
                     </header>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 border-t border-slate-200">
+                    <div class="space-y-6 pt-6 border-t border-slate-200">
                         <div>
                             <label for="final-kelebihan" class="form-label font-semibold mb-1.5">Kelebihan Konten</label>
-                            <textarea id="final-kelebihan" rows="5" class="form-textarea text-sm" placeholder="Contoh: Penjelasan materi sangat mudah dipahami..." required></textarea>
+							<br>
+                            <textarea id="final-kelebihan" rows="5" class="form-textarea w-full text-sm" placeholder="Contoh: Penjelasan materi sangat mudah dipahami..." required></textarea>
                         </div>
                         <div>
                             <label for="final-kekurangan" class="form-label font-semibold mb-1.5">Kekurangan Konten</label>
-                            <textarea id="final-kekurangan" rows="5" class="form-textarea text-sm" placeholder="Contoh: Kualitas audio kurang jernih pada menit ke-2..." required></textarea>
+							<br>
+                            <textarea id="final-kekurangan" rows="5" class="form-textarea w-full text-sm" placeholder="Contoh: Kualitas audio kurang jernih pada menit ke-2..." required></textarea>
                         </div>
                         <div>
                             <label for="final-saran" class="form-label font-semibold mb-1.5">Saran Perbaikan</label>
-                            <textarea id="final-saran" rows="5" class="form-textarea text-sm" placeholder="Contoh: Sebaiknya audio diperbaiki dan ditambahkan takarir..." required></textarea>
+							<br>
+                            <textarea id="final-saran" rows="5" class="form-textarea w-full text-sm" placeholder="Contoh: Sebaiknya audio diperbaiki dan ditambahkan takarir..." required></textarea>
                         </div>
                     </div>
                 </section>
@@ -320,7 +314,7 @@
                         <h3 class="text-xl font-bold text-slate-800">D.2 Keputusan Final</h3>
                         <p class="text-sm text-slate-500 mt-1">Tentukan kelayakan konten berdasarkan analisis keseluruhan.</p>
                     </header>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start pt-6 border-t border-slate-200">
+                    <div class="space-y-6 pt-6 border-t border-slate-200">
                         <div>
                             <label for="final-keputusan" class="form-label font-semibold mb-1.5">Keputusan Final</label>
                             <select id="final-keputusan" class="form-select" required>
@@ -332,7 +326,8 @@
                         </div>
                         <div>
                              <label for="final-nilai-deskripsi" class="form-label font-semibold mb-1.5">Deskripsi Nilai Akhir</label>
-                             <textarea id="final-nilai-deskripsi" class="form-textarea text-sm" rows="5" placeholder="Tuliskan justifikasi untuk keputusan final Anda di sini..." required></textarea>
+							 <br>
+                             <textarea id="final-nilai-deskripsi" class="form-textarea w-full text-sm" rows="5" placeholder="Tuliskan justifikasi untuk keputusan final Anda di sini..." required></textarea>
                         </div>
                     </div>
                 </section>`;
@@ -453,7 +448,7 @@
             setTimeout(() => {
                 curationModal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
-            }, 200); 
+            }, 300); 
         }
 
         function setupSidebarNavigation() {
@@ -604,3 +599,4 @@
     </script>
 </body>
 </html>
+
