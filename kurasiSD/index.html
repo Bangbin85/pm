@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Kurasi Konten Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  	<link rel="icon" type="image/x-icon" href="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4">  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/x-icon" href="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,79 +14,147 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9; /* slate-100 */
+            background-color: #f0f4f8;
+            background-image: linear-gradient(175deg, #f8fafc 0%, #eef2f7 100%);
         }
         .table-container {
-            max-height: 60vh;
+            max-height: 65vh;
             overflow-y: auto;
         }
-        /* Styling for sticky header and first column */
         thead th {
             position: sticky;
             top: 0;
-            z-index: 20;
-        }
-        tbody td:first-child {
-            position: sticky;
-            left: 0;
             z-index: 10;
         }
-        /* To prevent transparent background on sticky elements */
-        thead th.sticky-header, tbody td.sticky-col {
-             background-color: #f8fafc; /* slate-50 for header */
+        /* Custom animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-         tbody tr:hover td.sticky-col {
-             background-color: #f1f5f9; /* slate-100 for hover */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0; /* Start hidden */
         }
-         tbody td.sticky-col {
-            background-color: white;
+        .fade-in-delay-1 { animation-delay: 0.1s; }
+        .fade-in-delay-2 { animation-delay: 0.2s; }
+        .fade-in-delay-3 { animation-delay: 0.3s; }
+        .fade-in-delay-4 { animation-delay: 0.4s; }
+        .fade-in-delay-5 { animation-delay: 0.5s; }
+
+        .stat-card {
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
+<body class="p-4 sm:p-6 lg:p-8 min-h-screen">
 
-    <div class="text-center w-full max-w-6xl mx-auto">
-        <header class="mb-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8 fade-in">
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight">
-                KURASI KONTEN DIGITAL DIREKTORAT SD 2025
+                Dashboard Kurasi Konten Digital
             </h1>
-            <p class="mt-2 text-lg text-slate-600">Dashboard Pemantauan Hasil Kurasi</p>
+            <p class="mt-2 text-lg text-slate-600">Direktorat SD 2025 - Pemantauan Hasil Kurasi</p>
         </header>
 
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-            <a href="Kurator.html" class="w-full sm:w-auto flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                <i class="fas fa-user-check mr-3"></i>
-                Kurator
+        <!-- Navigation Buttons -->
+        <div class="flex flex-wrap items-center justify-start gap-3 mb-8 fade-in fade-in-delay-1">
+            <a href="Kurator.html" class="flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 hover:shadow-lg">
+                <i class="fas fa-user-check mr-2"></i>
+                <span>Kurator</span>
             </a>
-            <a href="Admin.html" class="w-full sm:w-auto flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                <i class="fas fa-user-shield mr-3"></i>
-                Admin
+            <a href="Admin.html" class="flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 hover:shadow-lg">
+                <i class="fas fa-user-shield mr-2"></i>
+                <span>Admin</span>
             </a>
-            <a href="Supervisor.html" class="w-full sm:w-auto flex items-center justify-center bg-slate-700 hover:bg-green-800 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                <i class="fas fa-chalkboard-teacher"></i>
-                Supervisor
+            <a href="Supervisor.html" class="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 hover:shadow-lg">
+                <i class="fas fa-chalkboard-teacher mr-2"></i>
+                <span>Supervisor</span>
+            </a>
+            <a href="Pass.html" class="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 hover:shadow-lg">
+                <i class="fas fa-key mr-2"></i>
+                <span>Pass</span>
             </a>
         </div>
 
-        <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg w-full">
-            <h2 class="text-2xl font-bold text-slate-700 mb-6 text-left">Grafik Penilaian Hasil Kurasi</h2>
-            <div class="overflow-x-auto table-container border rounded-lg">
-                <table class="w-full text-left whitespace-nowrap">
-                    <thead id="hasil-table-head">
-                        <!-- Header akan digenerate oleh JavaScript -->
-                    </thead>
-                    <tbody id="hasil-table-body">
-                        <!-- Baris data akan diisi oleh JavaScript -->
-                        <tr>
-                            <td colspan="13" class="text-center py-10">
-                                <i class="fas fa-spinner fa-spin text-2xl text-slate-500"></i>
-                                <p class="mt-2 text-slate-500">Memuat data...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Stats & Chart -->
+            <div class="lg:col-span-1 flex flex-col gap-8">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+                    <div class="stat-card bg-white p-6 rounded-xl shadow-lg border border-slate-200 fade-in fade-in-delay-2">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 text-blue-600 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-file-alt text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-slate-500 text-sm font-medium">Total Konten</p>
+                                <p id="total-content" class="text-2xl font-bold text-slate-800">...</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="stat-card bg-white p-6 rounded-xl shadow-lg border border-slate-200 fade-in fade-in-delay-3">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 text-green-600 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-check-double text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-slate-500 text-sm font-medium">Konten Terkurasi</p>
+                                <p id="curated-content" class="text-2xl font-bold text-slate-800">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white p-6 rounded-xl shadow-lg border border-slate-200 fade-in fade-in-delay-4">
+                        <div class="flex items-center">
+                            <div class="bg-purple-100 text-purple-600 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-slate-500 text-sm font-medium">Total Kurator</p>
+                                <p id="total-kurator" class="text-2xl font-bold text-slate-800">...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Card -->
+                <div class="stat-card bg-white p-6 rounded-xl shadow-lg border border-slate-200 fade-in fade-in-delay-5">
+                    <h3 class="text-lg font-bold text-slate-700 mb-4">Progres Keseluruhan</h3>
+                    <div class="relative h-60 w-full flex items-center justify-center">
+                         <canvas id="curationChart"></canvas>
+                         <div id="chart-percentage" class="absolute text-3xl font-extrabold text-slate-700">...</div>
+                    </div>
+                </div>
             </div>
-        </main>
+
+            <!-- Right Column: Progress Table -->
+            <main class="lg:col-span-2 bg-white p-6 md:p-8 rounded-xl shadow-lg w-full border border-slate-200 fade-in fade-in-delay-5">
+                <h2 class="text-2xl font-bold text-slate-700 mb-6">Progres Kurasi per Individu</h2>
+                <div class="overflow-x-auto table-container border rounded-lg">
+                    <table class="w-full text-left whitespace-nowrap">
+                        <thead id="hasil-table-head" class="bg-slate-50">
+                            <!-- Header akan digenerate oleh JavaScript -->
+                        </thead>
+                        <tbody id="hasil-table-body">
+                            <tr>
+                                <td colspan="13" class="text-center py-10">
+                                    <div class="flex flex-col items-center text-slate-500">
+                                        <i class="fas fa-spinner fa-spin text-2xl"></i>
+                                        <p class="mt-2">Memuat data...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
     </div>
 
     <!-- Firebase SDK -->
@@ -93,7 +162,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase Anda (sama seperti di file Admin.html)
         const firebaseConfig = {
             apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
             authDomain: "kurasisd.firebaseapp.com",
@@ -110,22 +178,74 @@
         let allUsers = [];
         let allAssignments = {};
         let allCurations = [];
+        let allContent = [];
+        let curationChart;
+
+        // --- Chart Initialization ---
+        function initChart() {
+            const ctx = document.getElementById('curationChart').getContext('2d');
+            curationChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Konten Selesai', 'Konten Sisa'],
+                    datasets: [{
+                        data: [0, 1],
+                        backgroundColor: ['#22c55e', '#e2e8f0'],
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } }
+                }
+            });
+        }
+
+        // --- UI Update Functions ---
+        function updateDashboardStats() {
+            const totalContentEl = document.getElementById('total-content');
+            const curatedContentEl = document.getElementById('curated-content');
+            const totalKuratorEl = document.getElementById('total-kurator');
+            const chartPercentageEl = document.getElementById('chart-percentage');
+
+            const totalContentCount = allContent.length;
+            const uniqueCuratedIds = new Set(allCurations.map(c => c.contentId));
+            const curatedContentCount = uniqueCuratedIds.size;
+            const curatorCount = allUsers.filter(u => u.role === 'Kurator').length;
+            
+            totalContentEl.textContent = totalContentCount;
+            curatedContentEl.textContent = curatedContentCount;
+            totalKuratorEl.textContent = curatorCount;
+
+            const percentage = totalContentCount > 0 ? ((curatedContentCount / totalContentCount) * 100) : 0;
+            chartPercentageEl.textContent = `${percentage.toFixed(0)}%`;
+
+            if (curationChart) {
+                curationChart.data.datasets[0].data = [curatedContentCount, totalContentCount - curatedContentCount];
+                curationChart.update();
+            }
+        }
 
         function renderHasilTable() {
             const thead = document.getElementById('hasil-table-head');
             const tbody = document.getElementById('hasil-table-body');
             if (!thead || !tbody) return;
 
-            // --- Buat Header Tabel ---
-            let headerHTML = '<tr class="bg-slate-50"><th class="py-3 px-4 font-semibold text-slate-600 sticky-header sticky left-0 z-10">Nama Kurator</th>';
+            // Build the header with 12 content columns
+            let headerHTML = `
+                <tr>
+                    <th class="py-3 px-4 font-semibold text-slate-600 text-left sticky left-0 z-20 bg-slate-50">Nama Kurator</th>`;
             for (let i = 1; i <= 12; i++) {
                 headerHTML += `<th class="py-3 px-4 font-semibold text-slate-600 text-center">Konten ${i}</th>`;
             }
-            headerHTML += '</tr>';
+            headerHTML += `</tr>`;
             thead.innerHTML = headerHTML;
 
-            // --- Buat Body Tabel ---
-            const curators = allUsers.filter(u => u.role === 'Kurator');
+            const curators = allUsers.filter(u => u.role === 'Kurator').sort((a, b) => a.nama.localeCompare(b.nama));
             const curatedSet = new Set(allCurations.map(c => `${c.userId}_${c.contentId}`));
 
             if (curators.length === 0) {
@@ -134,11 +254,12 @@
             }
 
             tbody.innerHTML = curators.map(curator => {
-                let rowHTML = `<tr class="border-b hover:bg-slate-100"><td class="py-3 px-4 font-medium text-slate-800 sticky-col">${curator.nama}</td>`;
+                // Add group class for hover effect on sticky column
+                let rowHTML = `<tr class="group border-b transition-colors duration-200 hover:bg-slate-50">
+                                <td class="py-3 px-4 font-medium text-slate-800 sticky left-0 z-10 bg-white group-hover:bg-slate-50">${curator.nama}</td>`;
                 
-                // Cari penugasan untuk kurator ini berdasarkan username
                 const assignedContentIds = allAssignments[curator.username] || [];
-
+                
                 for (let i = 0; i < 12; i++) {
                     const contentId = assignedContentIds[i];
                     if (contentId) {
@@ -149,9 +270,7 @@
                                         <i class="fas ${isCurated ? 'fa-check-circle text-green-500' : 'fa-times-circle text-slate-300'}" 
                                            title="${isCurated ? 'Selesai' : 'Belum Selesai'}"></i>
                                     </td>`;
-
                     } else {
-                        // Jika tidak ada konten yang ditugaskan di slot ini
                         rowHTML += `<td class="py-2 px-4 text-center text-slate-400">-</td>`;
                     }
                 }
@@ -161,10 +280,16 @@
             }).join('');
         }
         
-        // --- Listener Realtime ---
+        // Combined update function
+        function updateAllUI() {
+            updateDashboardStats();
+            renderHasilTable();
+        }
+
+        // --- Realtime Listeners ---
         onSnapshot(collection(db, "users"), (snapshot) => {
             allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderHasilTable();
+            updateAllUI();
         });
 
         onSnapshot(collection(db, "assignments"), (snapshot) => {
@@ -172,14 +297,23 @@
             snapshot.docs.forEach(doc => {
                 allAssignments[doc.id] = doc.data().contentIds || [];
             });
-            renderHasilTable();
+            updateAllUI();
+        });
+        
+        onSnapshot(collection(db, "contents"), (snapshot) => {
+            allContent = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            updateAllUI();
         });
 
         onSnapshot(collection(db, "curations"), (snapshot) => {
             allCurations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderHasilTable();
+            updateAllUI();
         });
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', initChart);
 
     </script>
 </body>
 </html>
+
