@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kurasi Konten Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  	<link rel="icon" type="image/x-icon" href="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        .table-container {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        /* Styling for sticky header and first column */
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        tbody td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+        /* To prevent transparent background on sticky elements */
+        thead th.sticky-header, tbody td.sticky-col {
+             background-color: #f8fafc; /* slate-50 for header */
+        }
+         tbody tr:hover td.sticky-col {
+             background-color: #f1f5f9; /* slate-100 for hover */
+        }
+         tbody td.sticky-col {
+            background-color: white;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
+
+    <div class="text-center w-full max-w-6xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight">
+                KURASI KONTEN DIGITAL DIREKTORAT SD 2025
+            </h1>
+            <p class="mt-2 text-lg text-slate-600">Dashboard Pemantauan Hasil Kurasi</p>
+        </header>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+            <a href="Kurator.html" class="w-full sm:w-auto flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <i class="fas fa-user-check mr-3"></i>
+                Masuk sebagai Kurator
+            </a>
+            <a href="Admin.html" class="w-full sm:w-auto flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <i class="fas fa-user-shield mr-3"></i>
+                Masuk sebagai Admin
+            </a>
+        </div>
+
+        <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg w-full">
+            <h2 class="text-2xl font-bold text-slate-700 mb-6 text-left">Grafik Penilaian Hasil Kurasi</h2>
+            <div class="overflow-x-auto table-container border rounded-lg">
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead id="hasil-table-head">
+                        <!-- Header akan digenerate oleh JavaScript -->
+                    </thead>
+                    <tbody id="hasil-table-body">
+                        <!-- Baris data akan diisi oleh JavaScript -->
+                        <tr>
+                            <td colspan="13" class="text-center py-10">
+                                <i class="fas fa-spinner fa-spin text-2xl text-slate-500"></i>
+                                <p class="mt-2 text-slate-500">Memuat data...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase Anda (sama seperti di file Admin.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
+            authDomain: "kurasisd.firebaseapp.com",
+            projectId: "kurasisd",
+            storageBucket: "kurasisd.firebasestorage.app",
+            messagingSenderId: "520054778765",
+            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- State ---
+        let allUsers = [];
+        let allAssignments = {};
+        let allCurations = [];
+
+        function renderHasilTable() {
+            const thead = document.getElementById('hasil-table-head');
+            const tbody = document.getElementById('hasil-table-body');
+            if (!thead || !tbody) return;
+
+            // --- Buat Header Tabel ---
+            let headerHTML = '<tr class="bg-slate-50"><th class="py-3 px-4 font-semibold text-slate-600 sticky-header sticky left-0 z-10">Nama Kurator</th>';
+            for (let i = 1; i <= 12; i++) {
+                headerHTML += `<th class="py-3 px-4 font-semibold text-slate-600 text-center">Konten ${i}</th>`;
+            }
+            headerHTML += '</tr>';
+            thead.innerHTML = headerHTML;
+
+            // --- Buat Body Tabel ---
+            const curators = allUsers.filter(u => u.role === 'Kurator');
+            const curatedSet = new Set(allCurations.map(c => `${c.userId}_${c.contentId}`));
+
+            if (curators.length === 0) {
+                 tbody.innerHTML = `<tr><td colspan="13" class="text-center py-10 text-slate-500">Belum ada data kurator.</td></tr>`;
+                 return;
+            }
+
+            tbody.innerHTML = curators.map(curator => {
+                let rowHTML = `<tr class="border-b hover:bg-slate-100"><td class="py-3 px-4 font-medium text-slate-800 sticky-col">${curator.nama}</td>`;
+                
+                // Cari penugasan untuk kurator ini berdasarkan username
+                const assignedContentIds = allAssignments[curator.username] || [];
+
+                for (let i = 0; i < 12; i++) {
+                    const contentId = assignedContentIds[i];
+                    if (contentId) {
+                        const compositeKey = `${curator.id}_${contentId}`;
+                        const isCurated = curatedSet.has(compositeKey);
+                        
+                        rowHTML += `<td class="py-2 px-4 text-center">
+                                        <i class="fas ${isCurated ? 'fa-check-circle text-green-500' : 'fa-times-circle text-slate-300'}" 
+                                           title="${isCurated ? 'Selesai' : 'Belum Selesai'}"></i>
+                                    </td>`;
+
+                    } else {
+                        // Jika tidak ada konten yang ditugaskan di slot ini
+                        rowHTML += `<td class="py-2 px-4 text-center text-slate-400">-</td>`;
+                    }
+                }
+                
+                rowHTML += '</tr>';
+                return rowHTML;
+            }).join('');
+        }
+        
+        // --- Listener Realtime ---
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderHasilTable();
+        });
+
+        onSnapshot(collection(db, "assignments"), (snapshot) => {
+            allAssignments = {};
+            snapshot.docs.forEach(doc => {
+                allAssignments[doc.id] = doc.data().contentIds || [];
+            });
+            renderHasilTable();
+        });
+
+        onSnapshot(collection(db, "curations"), (snapshot) => {
+            allCurations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderHasilTable();
+        });
+
+    </script>
+</body>
+</html>
