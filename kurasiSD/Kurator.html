@@ -6,6 +6,7 @@
     <title>Panel Kurator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	<link rel="icon" type="image/x-icon" href="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -266,12 +267,12 @@
                         <div class="w-full md:w-auto md:min-w-[280px] mt-4 md:mt-0 flex-shrink-0">
                             <label for="select-${group.id}" class="form-label mb-1.5">Status Indikator</label>
                             <select id="select-${group.id}" class="form-select w-full" required>
-                                <option value="">Pilih Nilai Indikator...</option>
-                                <option value="Sesuai Sepenuhnya">Sesuai Sepenuhnya</option>
-                                <option value="Sesuai dengan Catatan">Sesuai dengan Catatan</option>
-                                <option value="Perlu Perbaikan">Perlu Perbaikan</option>
-                                <option value="Tidak Sesuai">Tidak Sesuai</option>
-                                <option value="N/A">Tidak Berlaku (N/A)</option>
+                                <option value="">Nilai</option>
+                                <option value="Lulus Kurasi">Lulus Kurasi</option>
+                                <option value="Kurang Sesuai">Kurang Sesuai</option>
+                                <option value="Perbaikan Minor">Perbaikan Minor</option>
+                                <option value="Perbaikan Mayor">Perbaikan Mayor</option>
+                                <option value="Tidak Lulus Kurasi">Tidak Lulus Kurasi</option>
                             </select>
                          </div>
                     </header>
@@ -316,10 +317,12 @@
                         <div>
                             <label for="final-keputusan" class="form-label font-semibold mb-1.5">Keputusan Final</label>
                             <select id="final-keputusan" class="form-select" required>
-                                <option value="">Pilih Keputusan...</option>
-                                <option value="Layak Tayang">Layak Tayang</option>
-                                <option value="Layak dengan Revisi">Layak dengan Revisi</option>
-                                <option value="Tidak Layak Tayang">Tidak Layak Tayang</option>
+                                <option value="">Nilai</option>
+                                <option value="Lulus Kurasi">Lulus Kurasi</option>
+                                <option value="Kurang Sesuai">Kurang Sesuai</option>
+                                <option value="Perbaikan Minor">Perbaikan Minor</option>
+                                <option value="Perbaikan Mayor">Perbaikan Mayor</option>
+                                <option value="Tidak Lulus Kurasi">Tidak Lulus Kurasi</option>
                             </select>
                         </div>
                         <div>
