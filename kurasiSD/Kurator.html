@@ -11,119 +11,242 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Custom scrollbar for a cleaner look */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f8fafc; /* slate-50 */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; /* slate-300 */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; /* slate-400 */
+        /* === TEMA MODERN & ANIMASI === */
+        :root {
+            --c-primary: #7c3aed; /* violet-600 */
+            --c-secondary: #3b82f6; /* blue-500 */
+            --c-primary-light: #a78bfa; /* violet-400 */
+            --c-glow: rgba(124, 58, 237, 0.4);
         }
 
-        /* Modal Animations */
-        @keyframes modal-backdrop-show { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes modal-backdrop-hide { from { opacity: 1; } to { opacity: 0; } }
-        @keyframes modal-content-show {
-            from { opacity: 0; transform: translateY(30px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes modal-content-hide {
-            from { opacity: 1; transform: translateY(0) scale(1); }
-            to { opacity: 0; transform: translateY(30px) scale(0.97); }
-        }
-
-        .modal-backdrop.show { animation: modal-backdrop-show 0.3s ease-out forwards; }
-        .modal-backdrop.hide { animation: modal-backdrop-hide 0.3s ease-out forwards; }
-        .modal-content.show { animation: modal-content-show 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-        .modal-content.hide { animation: modal-content-hide 0.3s ease-in forwards; }
-
-        /* Custom Styles for a refined look */
         body {
             font-family: 'Inter', sans-serif;
         }
 
-        .form-label { @apply block text-sm font-medium text-slate-700; }
-        
-        .form-input, .form-select, .form-textarea { 
-            @apply block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 
-                   focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 focus:border-indigo-500 
-                   transition-all duration-150 sm:text-sm;
+        .animated-gradient-bg {
+            background: linear-gradient(-45deg, #f5f3ff, #eef2ff, #eff6ff, #f0f9ff);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
         }
 
-        .card-hover { @apply transition-all duration-300 ease-in-out; }
-        .card-hover:hover { @apply shadow-lg transform -translate-y-1; }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        /* Curation Modal Specific Styles */
+        /* === Animasi Umum === */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes modal-backdrop-show { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modal-backdrop-hide { to { opacity: 0; } }
+        @keyframes modal-content-show {
+            from { opacity: 0; transform: translateY(50px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes modal-content-hide {
+            to { opacity: 0; transform: translateY(50px) scale(0.95); }
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px var(--c-primary-light); }
+            50% { box-shadow: 0 0 20px var(--c-primary-light); }
+            100% { box-shadow: 0 0 5px var(--c-primary-light); }
+        }
+
+        .modal-backdrop.show { animation: modal-backdrop-show 0.3s ease-out forwards; }
+        .modal-backdrop.hide { animation: modal-backdrop-hide 0.3s ease-out forwards; }
+        .modal-content.show { animation: modal-content-show 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .modal-content.hide { animation: modal-content-hide 0.3s ease-in forwards; }
+
+        /* === Gaya Komponen === */
+
+        /* Kartu Login */
+        .login-card-container {
+            opacity: 0;
+            animation: fadeInDown 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Kartu Konten */
+        .content-card {
+            opacity: 0; /* Mulai tersembunyi, diaktifkan oleh JS */
+            animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            @apply transition-all duration-300 ease-in-out;
+        }
+         .content-card:hover {
+            @apply shadow-2xl shadow-violet-200 transform -translate-y-2;
+        }
+
+
+        /* Formulir dengan gaya Neumorphism / Claymorphism */
+        .form-label { @apply block text-sm font-medium text-slate-700 mb-1; }
+        .form-input, .form-select, .form-textarea {
+            @apply block w-full px-4 py-3 rounded-xl placeholder-slate-400 text-slate-600 transition-all duration-300;
+            background-color: #eef2ff; /* Warna terang dari background gradien halaman */
+            border: none;
+            /* Bayangan gaya Neumorphism untuk efek 'cekung ke dalam' */
+            box-shadow: inset 5px 5px 10px #dbe1f2,
+                        inset -5px -5px 10px #ffffff;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            /* Saat fokus, kembali ke gaya yang lebih jelas untuk usabilitas */
+            @apply outline-none ring-2 ring-violet-400 ring-offset-2 ring-offset-white;
+            box-shadow: none;
+            background-color: white;
+        }
+
+        /* Tombol dengan gaya Claymorphism / Menonjol */
+        .btn {
+            @apply font-bold py-2.5 px-5 rounded-xl transition-all duration-100 transform focus:outline-none text-center relative;
+        }
+        .btn:active {
+            @apply top-1; /* Efek ditekan */
+        }
+
+        .btn-primary {
+            @apply text-white bg-gradient-to-r from-violet-500 to-blue-500 border-none;
+            box-shadow: 0px 5px 0px 0px #6d28d9; /* bayangan 3D */
+            @apply focus:ring-2 focus:ring-offset-2 focus:ring-violet-500;
+        }
+        .btn-primary:active {
+            box-shadow: 0px 2px 0px 0px #6d28d9;
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            @apply bg-white text-slate-700 border border-slate-300;
+            box-shadow: 0px 5px 0px 0px #cbd5e1; /* bayangan 3D */
+            @apply focus:ring-2 focus:ring-offset-2 focus:ring-slate-400;
+        }
+        .btn-secondary:active {
+            box-shadow: 0px 2px 0px 0px #cbd5e1;
+        }
+        .btn-secondary:hover {
+            @apply bg-slate-50;
+        }
+
+         .btn-home {
+            @apply bg-green-600 text-white font-semibold py-2 px-4 text-sm flex items-center border-none;
+             box-shadow: 0px 5px 0px 0px #166534; /* bayangan 3D */
+             @apply focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
+        }
+        .btn-home:hover {
+            @apply bg-green-700;
+        }
+        .btn-home:active {
+            box-shadow: 0px 2px 0px 0px #166534;
+        }
+    
+        /* Modal Kurasi */
+        #curation-progress-bar {
+            animation: glow 2s linear infinite;
+        }
+
+        #modal-sidebar {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem; /* 12px */
+            align-content: start;
+            perspective: 1500px;
+            padding: 1.5rem 1rem;
+        }
         #modal-sidebar .sidebar-link {
-            @apply flex items-center w-full text-left px-4 py-2.5 text-sm font-medium text-slate-600 rounded-lg transition-all duration-200;
+            @apply flex items-center justify-center w-full text-center p-3 text-slate-800 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] font-bold text-lg;
+            @apply bg-white border border-slate-200 shadow-lg;
+            transform: rotateY(-20deg) scale(0.9);
+            opacity: 0.8;
         }
-        #modal-sidebar .sidebar-link .link-icon {
-            @apply w-5 h-5 flex-shrink-0 flex items-center justify-center text-lg mr-3 text-slate-500 transition-all duration-200;
+         #modal-sidebar .sidebar-link-content {
+            transform: rotateY(15deg);
+            transition: transform 0.5s ease;
         }
         #modal-sidebar .sidebar-link:hover {
-            @apply bg-slate-200 text-slate-900;
+            @apply bg-gradient-to-r from-violet-500 to-blue-500 text-white border-transparent;
+            transform: scale(1.1) rotateY(0deg) translateX(10px);
+            box-shadow: 0 15px 30px var(--c-glow);
+            z-index: 10;
+            position: relative;
+            opacity: 1;
+        }
+         #modal-sidebar .sidebar-link:hover .sidebar-link-content,
+         #modal-sidebar .sidebar-link.active .sidebar-link-content {
+            transform: rotateY(0deg);
         }
         #modal-sidebar .sidebar-link.active {
-            @apply bg-indigo-600 text-white font-semibold shadow-md;
+            @apply bg-slate-800 text-white shadow-2xl border-slate-900;
+            transform: scale(1.05) rotateY(0deg) translateX(5px);
+            z-index: 5;
+            position: relative;
+            opacity: 1;
         }
-        #modal-sidebar .sidebar-link.active .link-icon {
-            @apply text-white;
-        }
-        .indicator-section {
-            @apply pt-8;
-        }
-        .indicator-section + .indicator-section {
-            @apply border-t border-slate-200;
-        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; } /* slate-100 */
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; } /* gray-300 */
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; } /* gray-400 */
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="animated-gradient-bg text-slate-800">
 
-    <!-- === LOGIN SECTION === -->
-    <div id="login-section" class="flex items-center justify-center min-h-screen p-4 bg-slate-100">
-        <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-sm text-center border border-slate-200">
-            <i class="fas fa-user-shield text-5xl text-indigo-500 mb-4"></i>
-            <h1 class="text-2xl font-bold text-slate-800">Login Kurator</h1>
-            <p class="text-slate-500 mb-6">Gunakan ID dan Password Anda.</p>
-            <form id="login-form">
-                <div class="w-full mb-4 text-left">
-                    <label for="username-input" class="form-label">ID / Username</label>
-                    <input type="text" id="username-input" class="form-input" placeholder="e.g., DirSD001" required>
+    <!-- === BAGIAN LOGIN === -->
+    <div id="login-section" class="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 bg-slate-100">
+        <div class="login-card-container w-full max-w-5xl mx-auto flex flex-col md:flex-row bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <!-- Kolom Kiri - Ilustrasi -->
+            <div class="hidden md:flex flex-col justify-center items-center w-full md:w-1/2 p-10 lg:p-12 bg-gradient-to-br from-violet-500 to-blue-500 text-white">
+                 <div class="text-center">
+                    <i class="fas fa-book-reader text-7xl mb-6 opacity-80"></i>
+                    <h2 class="text-3xl lg:text-4xl font-bold leading-tight">Panel Kurasi Konten</h2>
+                    <p class="mt-4 text-violet-200 text-lg">Mewujudkan materi pembelajaran berkualitas untuk masa depan pendidikan Indonesia.</p>
                 </div>
-                <div class="w-full mb-6 text-left">
-                    <label for="password-input" class="form-label">Password</label>
-                    <input type="password" id="password-input" class="form-input" placeholder="••••••••" required>
+            </div>
+
+            <!-- Kolom Kanan - Formulir -->
+            <div class="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
+                <div class="w-full max-w-md mx-auto">
+                    <div class="text-center md:text-left mb-8">
+                         <h1 class="text-3xl font-bold text-slate-800">Login Kurator</h1>
+                         <p class="text-slate-500 mt-2">Selamat datang kembali! Silakan masuk.</p>
+                    </div>
+                    <form id="login-form">
+                        <div class="w-full mb-5">
+                            <input type="text" id="username-input" class="form-input w-full" placeholder="Username, DirSD001" required>
+                        </div>
+                        <div class="w-full mb-6">
+                            <input type="password" id="password-input" class="form-input w-full" placeholder="123**6" required>
+                        </div>
+                         <p id="login-error" class="text-red-500 text-sm mb-4 hidden"></p>
+                        <div class="flex flex-col sm:flex-row gap-3 items-center">
+                            <button id="login-btn" type="submit" class="btn btn-primary w-full sm:w-auto flex-grow text-xl">
+                                Masuk
+                            </button>
+                            <a href="./" class="btn btn-home w-full sm:w-auto">
+                                <i class="fas fa-home mr-2"></i>Home
+                            </a>
+                        </div>
+                    </form>
                 </div>
-                 <p id="login-error" class="text-red-500 text-sm mb-4 hidden"></p>
-                <button id="login-btn" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Masuk
-                </button>
-                <div class="flex justify-center w-full mt-4">
-                    <a href="./" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
-                        <i class="fas fa-home mr-2"></i>Home
-                    </a>
-                </div>              
-            </form>
+            </div>
         </div>
     </div>
 
-    <!-- === MAIN DASHBOARD (HIDDEN BY DEFAULT) === -->
+    <!-- === DASBOR UTAMA (TERSEMBUNYI) === -->
     <main id="main-dashboard" class="hidden">
         <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-20 border-b border-slate-200">
             <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <h1 id="welcome-message" class="text-xl font-bold text-slate-800">Dashboard Kurator</h1>
                 <div class="flex items-center gap-4">
-                    <a href="./" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
+                    <a href="./" class="btn btn-home">
                         <i class="fas fa-home mr-2"></i>Home
                     </a>
-                    <button id="logout-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200">
+                    <button id="logout-btn" class="btn btn-secondary">
                         <i class="fas fa-sign-out-alt mr-2"></i>Logout
                     </button>
                 </div>
@@ -132,62 +255,65 @@
 
         <div class="py-10">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <h2 class="text-xl font-semibold text-slate-700 mb-5 px-4 sm:px-0">Konten yang Ditugaskan:</h2>
-                <div id="content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Cards will be loaded here -->
+                <h2 class="text-2xl font-semibold text-slate-700 mb-6 px-4 sm:px-0">Konten yang Ditugaskan:</h2>
+                <div id="content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Kartu konten akan dimuat di sini oleh JavaScript -->
                 </div>
             </div>
         </div>
     </main>
     
-    <!-- === CURATION MODAL (HIDDEN BY DEFAULT) === -->
-    <div id="curation-modal" class="fixed inset-0 bg-black bg-opacity-60 overflow-y-auto h-full w-full hidden z-50 p-4 flex items-center justify-center modal-backdrop">
-        <div class="relative w-full max-w-7xl h-[95vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden modal-content">
+    <!-- === MODAL KURASI (TERSEMBUNYI) === -->
+    <div id="curation-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 p-4 items-center justify-center modal-backdrop">
+        <div class="relative w-full max-w-7xl h-[95vh] bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col overflow-hidden modal-content">
             <!-- Header -->
             <div class="flex-shrink-0 px-6 py-4 flex justify-between items-center border-b border-slate-200">
                 <h3 class="text-lg font-semibold text-slate-900" id="curation-modal-title">Formulir Kurasi Konten</h3>
-                <button id="close-modal-btn" class="text-slate-400 hover:text-red-500 hover:rotate-90 transition-all duration-300 text-3xl leading-none focus:outline-none">&times;</button>
+                <button id="close-modal-btn" class="text-slate-500 hover:bg-red-100 hover:text-red-500 rounded-full h-10 w-10 flex items-center justify-center transition-all duration-300 text-3xl leading-none focus:outline-none hover:rotate-90">&times;</button>
             </div>
             
             <!-- Progress Bar -->
-            <div class="flex-shrink-0 w-full bg-slate-100 h-1.5">
-                <div id="curation-progress-bar" class="bg-indigo-500 h-1.5 rounded-r-full transition-all duration-300" style="width: 0%"></div>
+            <div class="flex-shrink-0 w-full bg-slate-200 h-1.5">
+                <div id="curation-progress-bar" class="bg-gradient-to-r from-violet-500 to-blue-500 h-1.5 rounded-r-full transition-all duration-300" style="width: 0%"></div>
             </div>
             
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <div class="flex-grow flex overflow-hidden">
                 <!-- Sidebar -->
-                <nav id="modal-sidebar" class="w-72 flex-shrink-0 bg-slate-50 border-r border-slate-200 p-4 overflow-y-auto">
-                    <!-- Sidebar links will be injected here -->
+                <nav id="modal-sidebar" class="w-72 flex-shrink-0 bg-slate-50 border-r border-slate-200 overflow-y-auto">
+                    <!-- Link sidebar akan disuntikkan di sini -->
                 </nav>
 
-                <!-- Form Area -->
+                <!-- Area Formulir -->
                 <div id="modal-form-content" class="flex-grow p-8 overflow-y-auto">
                     <form id="curation-form" class="max-w-4xl mx-auto">
-                        <!-- Dynamic form content will be injected here -->
+                        <!-- Konten formulir dinamis akan disuntikkan di sini -->
                     </form>
                 </div>
             </div>
 
              <!-- Footer -->
-            <div class="flex-shrink-0 p-4 bg-white border-t border-slate-200 flex justify-end gap-4">
-                <button type="button" id="save-draft-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400">
-                    <i class="fas fa-save mr-2"></i>Simpan Draft
-                </button>
-                <button type="submit" form="curation-form" id="submit-curation-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-sm transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi
-                </button>
+            <div class="flex-shrink-0 p-4 bg-white/80 backdrop-blur-sm border-t border-slate-200 flex justify-between items-center">
+                <span id="draft-status" class="text-sm text-slate-500 italic"></span>
+                <div class="flex gap-4">
+                    <button type="button" id="save-draft-btn" class="btn btn-secondary text-base py-3 px-6">
+                        <i class="fas fa-save mr-2"></i>Simpan Draft
+                    </button>
+                    <button type="submit" form="curation-form" id="submit-curation-btn" class="btn btn-primary text-base py-3 px-6">
+                        <i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi
+                    </button>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- === Custom Alert / Confirmation Modal === -->
-    <div id="alert-modal" class="fixed inset-0 bg-black bg-opacity-60 h-full w-full hidden z-[100] p-4 items-center justify-center modal-backdrop">
-         <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl flex flex-col modal-content p-8 text-center">
-            <h4 id="alert-modal-title" class="text-xl font-bold text-slate-800 mb-2">Title</h4>
-            <p id="alert-modal-message" class="text-slate-600 mb-6">Message goes here.</p>
+    <!-- === Modal Alert / Konfirmasi Kustom === -->
+    <div id="alert-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm h-full w-full hidden z-[100] p-4 items-center justify-center modal-backdrop">
+         <div class="relative w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col modal-content p-8 text-center">
+            <h4 id="alert-modal-title" class="text-xl font-bold text-slate-800 mb-2">Judul</h4>
+            <p id="alert-modal-message" class="text-slate-600 mb-6">Pesan akan muncul di sini.</p>
             <div id="alert-modal-buttons" class="flex gap-4 justify-center">
-                <!-- Buttons are added dynamically -->
+                <!-- Tombol ditambahkan secara dinamis -->
             </div>
         </div>
     </div>
@@ -195,7 +321,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, serverTimestamp, query, where, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, serverTimestamp, query, where, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // Konfigurasi Firebase Anda
         const firebaseConfig = {
@@ -210,7 +336,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- UI Elements ---
+        // --- Elemen UI ---
         const loginSection = document.getElementById('login-section');
         const mainDashboard = document.getElementById('main-dashboard');
         const loginForm = document.getElementById('login-form');
@@ -223,10 +349,12 @@
         const modalFormContent = document.getElementById('modal-form-content');
         const progressBar = document.getElementById('curation-progress-bar');
         const alertModal = document.getElementById('alert-modal');
+        const saveDraftBtn = document.getElementById('save-draft-btn');
+        const draftStatus = document.getElementById('draft-status');
 
         let currentUser = null;
 
-        // --- Curation Form Structure ---
+        // --- Struktur Formulir Kurasi ---
         const curationQuestions = [
              { id: 'A1', title: 'A.1 Keamanan Materi', icon: 'fa-shield-halved', items: [ { id: 'radikalisme', text: 'Materi bebas dari unsur radikalisme, ekstremisme, dan terorisme' }, { id: 'pornografi', text: 'Materi bebas dari pornografi atau ketelanjangan yang tidak sesuai konteks' }, { id: 'diskriminasi', text: 'Materi bebas dari unsur perundungan atau diskriminasi' }, { id: 'promosi', text: 'Materi bebas dari promosi produk komersial' }, { id: 'sara', text: 'Materi bebas dari unsur SARA' }, { id: 'kekerasan', text: 'Materi bebas dari unsur kekerasan atau isu politik kontroversial' }, { id: 'komersial', text: 'Materi bebas dari unsur komersial (logo/identitas bisa diburamkan)' } ]},
              { id: 'A2', title: 'A.2 Copyright', icon: 'fa-copyright', items: [ { id: 'sumber', text: 'Mencantumkan sumber/referensi/credit' }, { id: 'ai', text: 'Jika dibuat oleh AI perlu dituliskan keterangan' } ]},
@@ -248,7 +376,7 @@
 
         function buildCurationForm() {
             let formHTML = `<input type="hidden" id="curation-content-id"><input type="hidden" id="curation-user-id">`;
-            let sidebarHTML = '<div class="space-y-1">';
+            let sidebarHTML = ''; 
             
             const allSections = [...curationQuestions, 
                 { id: 'D1', title: 'D.1 Simpulan Umum', icon: 'fa-clipboard-check' }, 
@@ -259,16 +387,16 @@
 
             allSections.forEach(group => {
                 if (groupSeparators.includes(group.id)) {
-                    sidebarHTML += `<div class="pt-2 pb-1"><hr class="border-slate-200"></div>`;
+                    sidebarHTML += `<div class="col-span-3 pt-2 pb-1"><hr class="border-slate-300"></div>`;
                 }
+                
+                const code = group.title.split(' ')[0];
 
                 sidebarHTML += `
                     <a href="#group-${group.id}" class="sidebar-link" data-target="group-${group.id}">
-                        <span class="link-icon"><i class="fas ${group.icon || 'fa-file'}"></i></span>
-                        <span class="truncate">${group.title}</span>
+                        <span class="sidebar-link-content">${code}</span>
                     </a>`;
             });
-            sidebarHTML += '</div>';
             
             formHTML += curationQuestions.map(group => `
                 <section id="group-${group.id}" class="indicator-section scroll-mt-8">
@@ -351,7 +479,7 @@
             setupScrollObserver();
         }
         
-        // --- Functions ---
+        // --- Fungsi-fungsi ---
         async function handleLogin(e) { e.preventDefault();
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value;
@@ -388,7 +516,7 @@
         async function displayUserDashboard(userId) {
             loginSection.classList.add('hidden');
             mainDashboard.classList.remove('hidden');
-            contentGrid.innerHTML = '<p class="text-slate-500 px-4 sm:px-0">Memuat konten...</p>';
+            contentGrid.innerHTML = '<p class="text-slate-500 px-4 sm:px-0 col-span-full">Memuat konten...</p>';
             try {
                 const userDoc = await getDoc(doc(db, 'users', userId));
                 if (!userDoc.exists()) throw new Error("User not found");
@@ -397,17 +525,25 @@
                 const assignmentDoc = await getDoc(doc(db, 'assignments', currentUser.username));
                 
                 if (!assignmentDoc.exists() || !assignmentDoc.data().contentIds) {
-                    contentGrid.innerHTML = '<p class="px-4 sm:px-0 text-slate-500">Tidak ada konten yang ditugaskan untuk Anda saat ini.</p>';
+                    contentGrid.innerHTML = '<p class="px-4 sm:px-0 text-slate-500 col-span-full">Tidak ada konten yang ditugaskan untuk Anda saat ini.</p>';
                     return;
                 }
                 const contentIds = assignmentDoc.data().contentIds;
                 
+                // Ambil data kurasi yang sudah selesai dan draf sekaligus
                 const curationsQuery = query(collection(db, "curations"), where("userId", "==", userId));
-                const curationsSnapshot = await getDocs(curationsQuery);
+                const draftsQuery = query(collection(db, "curation_drafts"), where("userId", "==", userId));
+                
+                const [curationsSnapshot, draftsSnapshot] = await Promise.all([
+                    getDocs(curationsQuery),
+                    getDocs(draftsQuery)
+                ]);
+
                 const curatedContentIds = curationsSnapshot.docs.map(doc => doc.data().contentId);
+                const draftedContentIds = draftsSnapshot.docs.map(doc => doc.data().contentId);
 
                 if (contentIds.length === 0) {
-                     contentGrid.innerHTML = '<p class="px-4 sm:px-0 text-slate-500">Tidak ada konten yang ditugaskan untuk Anda saat ini.</p>';
+                     contentGrid.innerHTML = '<p class="px-4 sm:px-0 text-slate-500 col-span-full">Tidak ada konten yang ditugaskan untuk Anda saat ini.</p>';
                      return;
                 }
 
@@ -418,41 +554,104 @@
                     if (!doc.exists()) return '';
                     const content = { id: doc.id, ...doc.data() };
                     const isCurated = curatedContentIds.includes(content.id);
-                    const hasDraft = localStorage.getItem(`draft_${content.id}`) !== null;
+                    const hasDraft = draftedContentIds.includes(content.id);
+                    
+                    let buttonText = '<i class="fas fa-edit mr-2"></i>Kurasi';
+                    if (isCurated) {
+                        buttonText = '<i class="fas fa-check-circle mr-2"></i>Selesai';
+                    } else if (hasDraft) {
+                        buttonText = '<i class="fas fa-file-alt mr-2"></i>Lanjutkan Draft';
+                    }
+
                     return `
-                        <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col card-hover border border-slate-200">
-                            <div class="p-5 flex-grow">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="text-sm text-indigo-600 font-medium">${content.subject || 'Umum'}</p>
-                                        <h3 class="font-semibold text-lg text-slate-800 mt-1">${content.title}</h3>
-                                    </div>
-                                    ${hasDraft && !isCurated ? '<span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Draft</span>' : ''}
-                                </div>
+                        <div class="content-card bg-white rounded-xl shadow-lg overflow-hidden flex flex-col border border-slate-200">
+                            <div class="p-6 flex-grow">
+                                <p class="text-sm text-violet-600 font-medium">${content.subject || 'Umum'}</p>
+                                <h3 class="font-semibold text-lg text-slate-800 mt-1">${content.title}</h3>
                             </div>
                             <div class="p-4 bg-slate-50 grid grid-cols-2 gap-3 border-t border-slate-200">
-                                <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="text-center w-full font-bold py-2 px-4 rounded-md bg-white hover:bg-slate-100 text-slate-700 transition-all shadow-sm border border-slate-300">
+                                <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary text-sm">
                                     <i class="fas fa-external-link-alt mr-2 text-xs"></i>Buka
                                 </a>
-                                <button class="start-curation-btn w-full font-bold py-2 px-4 rounded-md transition-all shadow-sm
-                                    ${isCurated ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}"
+                                <button class="start-curation-btn btn btn-primary text-sm
+                                    ${isCurated ? 'bg-slate-200 text-slate-500 cursor-not-allowed !bg-none !shadow-none' : ''}"
                                     data-content-id="${content.id}" 
                                     data-content-title="${content.title}"
                                     ${isCurated ? 'disabled' : ''}>
-                                    ${isCurated ? '<i class="fas fa-check-circle mr-2"></i>Selesai' : '<i class="fas fa-edit mr-2"></i>Kurasi'}
+                                    ${buttonText}
                                 </button>
                             </div>
                         </div>`;
                 }).join('');
+
+                // Terapkan animasi staggered setelah konten di-render
+                const contentCards = contentGrid.querySelectorAll('.content-card');
+                contentCards.forEach((card, index) => {
+                    card.style.animationDelay = `${index * 100}ms`;
+                });
+
             } catch (error) {
                 console.error("Error displaying dashboard: ", error);
-                contentGrid.innerHTML = `<p class="text-red-500 px-4 sm:px-0">Terjadi kesalahan: ${error.message}</p>`;
+                contentGrid.innerHTML = `<p class="text-red-500 px-4 sm:px-0 col-span-full">Terjadi kesalahan: ${error.message}</p>`;
             }
         }
         
-        // --- Modal & Navigation Logic ---
-        function openCurationModal(contentId) {
+        // --- Logika Modal & Navigasi ---
+        function getAnswersFromForm() {
+            const answers = {};
+            curationQuestions.forEach(group => {
+                answers[group.id] = { 
+                    value: document.getElementById(`select-${group.id}`).value, 
+                    items: Object.fromEntries(group.items.map(item => [item.id, { notes: document.getElementById(`textarea-${group.id}-${item.id}`).value }]))
+                };
+            });
+            answers.D1_Simpulan_Umum = { kelebihan: document.getElementById('final-kelebihan').value, kekurangan: document.getElementById('final-kekurangan').value, saran: document.getElementById('final-saran').value };
+            answers.D2_Keputusan_Final = { keputusan: document.getElementById('final-keputusan').value, nilai_deskripsi: document.getElementById('final-nilai-deskripsi').value };
+            return answers;
+        }
+
+        function populateFormWithDraft(draftData) {
+            const { answers } = draftData;
+            if (!answers) return;
+
+            curationQuestions.forEach(group => {
+                if (answers[group.id]) {
+                    document.getElementById(`select-${group.id}`).value = answers[group.id].value || '';
+                    group.items.forEach(item => {
+                        if (answers[group.id].items && answers[group.id].items[item.id]) {
+                            document.getElementById(`textarea-${group.id}-${item.id}`).value = answers[group.id].items[item.id].notes || '';
+                        }
+                    });
+                }
+            });
+
+            if (answers.D1_Simpulan_Umum) {
+                document.getElementById('final-kelebihan').value = answers.D1_Simpulan_Umum.kelebihan || '';
+                document.getElementById('final-kekurangan').value = answers.D1_Simpulan_Umum.kekurangan || '';
+                document.getElementById('final-saran').value = answers.D1_Simpulan_Umum.saran || '';
+            }
+             if (answers.D2_Keputusan_Final) {
+                document.getElementById('final-keputusan').value = answers.D2_Keputusan_Final.keputusan || '';
+                document.getElementById('final-nilai-deskripsi').value = answers.D2_Keputusan_Final.nilai_deskripsi || '';
+            }
+        }
+
+        async function openCurationModal(contentId, contentTitle) {
             curationForm.reset();
+            draftStatus.textContent = '';
+            document.getElementById('curation-modal-title').textContent = `Kurasi Konten: ${contentTitle}`;
+            document.getElementById('curation-content-id').value = contentId;
+            document.getElementById('curation-user-id').value = currentUser.id;
+            
+            // Cek dan muat draf jika ada
+            const curationDocId = `${currentUser.id}_${contentId}`;
+            const draftDocRef = doc(db, "curation_drafts", curationDocId);
+            const draftDocSnap = await getDoc(draftDocRef);
+            if (draftDocSnap.exists()) {
+                populateFormWithDraft(draftDocSnap.data());
+                draftStatus.textContent = 'Draf sebelumnya telah dimuat.';
+            }
+
             modalFormContent.scrollTop = 0; 
             const modalContent = curationModal.querySelector('.modal-content');
             curationModal.classList.remove('hidden');
@@ -461,13 +660,6 @@
             curationModal.classList.add('show');
             modalContent.classList.add('show');
             document.body.style.overflow = 'hidden';
-
-            // Load draft if it exists
-            const draftData = localStorage.getItem(`draft_${contentId}`);
-            if (draftData) {
-                loadDraft(JSON.parse(draftData));
-                setTimeout(() => showAlert('Info', 'Draft sebelumnya telah dimuat.'), 400);
-            }
         }
 
         function closeCurationModal() {
@@ -480,30 +672,6 @@
                 curationModal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
             }, 300); 
-        }
-
-        function loadDraft(draftData) {
-            for (const groupId in draftData) {
-                if (groupId.startsWith('A') || groupId.startsWith('B') || groupId.startsWith('C')) {
-                    const groupData = draftData[groupId];
-                    const selectEl = document.getElementById(`select-${groupId}`);
-                    if (selectEl) selectEl.value = groupData.value;
-
-                    if (groupData.items) {
-                        for (const itemId in groupData.items) {
-                            const textareaEl = document.getElementById(`textarea-${groupId}-${itemId}`);
-                            if (textareaEl) textareaEl.value = groupData.items[itemId].notes;
-                        }
-                    }
-                } else if (groupId === 'D1_Simpulan_Umum') {
-                    document.getElementById('final-kelebihan').value = draftData[groupId].kelebihan;
-                    document.getElementById('final-kekurangan').value = draftData[groupId].kekurangan;
-                    document.getElementById('final-saran').value = draftData[groupId].saran;
-                } else if (groupId === 'D2_Keputusan_Final') {
-                    document.getElementById('final-keputusan').value = draftData[groupId].keputusan;
-                    document.getElementById('final-nilai-deskripsi').value = draftData[groupId].nilai_deskripsi;
-                }
-            }
         }
 
         function setupSidebarNavigation() {
@@ -535,9 +703,8 @@
                     if (activeLink) activeLink.classList.add('active');
                 }
                 
-                // Update progress bar
                 const scrollableHeight = modalFormContent.scrollHeight - modalFormContent.clientHeight;
-                const progress = scrollableHeight > 0 ? (modalFormContent.scrollTop / scrollableHeight) * 100 : 0;
+                const progress = scrollableHeight > 0 ? (modalFormContent.scrollTop / scrollableHeight) * 100 : 100;
                 progressBar.style.width = `${progress}%`;
 
             }, { root: modalFormContent, threshold: 0.1, rootMargin: "-40% 0px -60% 0px" });
@@ -547,15 +714,14 @@
             });
         }
         
-        // --- Custom Alert/Confirm Modal Functionality ---
         function showConfirmation(title, message, onConfirm) {
             showAlert(title, message, [
-                { text: 'Batal', class: 'bg-slate-200 hover:bg-slate-300 text-slate-800', callback: hideAlert },
-                { text: 'Ya, Kirim', class: 'bg-indigo-600 hover:bg-indigo-700 text-white', callback: () => { hideAlert(); onConfirm(); } }
+                { text: 'Batal', class: 'btn-secondary', callback: hideAlert },
+                { text: 'Ya, Lanjutkan', class: 'btn-primary', callback: () => { hideAlert(); onConfirm(); } }
             ]);
         }
 
-        function showAlert(title, message, buttons = [{ text: 'OK', class: 'bg-indigo-600 hover:bg-indigo-700 text-white', callback: hideAlert }]) {
+        function showAlert(title, message, buttons = [{ text: 'OK', class: 'btn-primary', callback: hideAlert }]) {
             document.getElementById('alert-modal-title').textContent = title;
             document.getElementById('alert-modal-message').textContent = message;
             const buttonsContainer = document.getElementById('alert-modal-buttons');
@@ -564,7 +730,7 @@
             buttons.forEach(btnInfo => {
                 const button = document.createElement('button');
                 button.textContent = btnInfo.text;
-                button.className = `w-full font-bold py-2.5 px-4 rounded-lg transition-all duration-200 ${btnInfo.class}`;
+                button.className = `btn w-full ${btnInfo.class}`;
                 button.onclick = btnInfo.callback;
                 buttonsContainer.appendChild(button);
             });
@@ -593,33 +759,34 @@
         document.body.addEventListener('click', (e) => {
             const startBtn = e.target.closest('.start-curation-btn');
             if (startBtn) {
-                const contentId = startBtn.dataset.contentId;
-                document.getElementById('curation-modal-title').textContent = `Kurasi Konten: ${startBtn.dataset.contentTitle}`;
-                document.getElementById('curation-content-id').value = contentId;
-                document.getElementById('curation-user-id').value = currentUser.id;
-                openCurationModal(contentId);
+                openCurationModal(startBtn.dataset.contentId, startBtn.dataset.contentTitle);
             }
         });
 
         document.getElementById('close-modal-btn').addEventListener('click', closeCurationModal);
         
-        document.getElementById('save-draft-btn').addEventListener('click', () => {
-            const contentId = document.getElementById('curation-content-id').value;
-            if (!contentId) return;
-
-            const draftData = {};
-            curationQuestions.forEach(group => {
-                draftData[group.id] = { 
-                    value: document.getElementById(`select-${group.id}`).value, 
-                    items: Object.fromEntries(group.items.map(item => [item.id, { notes: document.getElementById(`textarea-${group.id}-${item.id}`).value }]))
-                };
-            });
-            draftData.D1_Simpulan_Umum = { kelebihan: document.getElementById('final-kelebihan').value, kekurangan: document.getElementById('final-kekurangan').value, saran: document.getElementById('final-saran').value };
-            draftData.D2_Keputusan_Final = { keputusan: document.getElementById('final-keputusan').value, nilai_deskripsi: document.getElementById('final-nilai-deskripsi').value };
+        saveDraftBtn.addEventListener('click', async () => {
+            saveDraftBtn.disabled = true;
+            saveDraftBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+            draftStatus.textContent = '';
             
-            localStorage.setItem(`draft_${contentId}`, JSON.stringify(draftData));
-            showAlert('Berhasil', 'Draft Anda telah berhasil disimpan.');
-            displayUserDashboard(currentUser.id);
+            try {
+                const answers = getAnswersFromForm();
+                const contentId = document.getElementById('curation-content-id').value;
+                const userId = document.getElementById('curation-user-id').value;
+                const curationDocId = `${userId}_${contentId}`;
+
+                await setDoc(doc(db, "curation_drafts", curationDocId), { userId, contentId, timestamp: serverTimestamp(), answers });
+                
+                draftStatus.textContent = `Draf disimpan pada ${new Date().toLocaleTimeString()}.`;
+                await displayUserDashboard(currentUser.id); // Refresh dashboard to update button text
+            } catch (error) {
+                console.error("Error saving draft: ", error);
+                draftStatus.textContent = 'Gagal menyimpan draf.';
+            } finally {
+                saveDraftBtn.disabled = false;
+                saveDraftBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Simpan Draft';
+            }
         });
 
         curationForm.addEventListener('submit', async (e) => {
@@ -631,29 +798,23 @@
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
 
                 try {
-                    const answers = {};
-                    curationQuestions.forEach(group => {
-                        answers[group.id] = { 
-                            value: document.getElementById(`select-${group.id}`).value, 
-                            items: Object.fromEntries(group.items.map(item => [item.id, { notes: document.getElementById(`textarea-${group.id}-${item.id}`).value }]))
-                        };
-                    });
-                    answers.D1_Simpulan_Umum = { kelebihan: document.getElementById('final-kelebihan').value, kekurangan: document.getElementById('final-kekurangan').value, saran: document.getElementById('final-saran').value };
-                    answers.D2_Keputusan_Final = { keputusan: document.getElementById('final-keputusan').value, nilai_deskripsi: document.getElementById('final-nilai-deskripsi').value };
-                    
+                    const answers = getAnswersFromForm();
                     const contentId = document.getElementById('curation-content-id').value;
                     const userId = document.getElementById('curation-user-id').value;
                     const curationDocId = `${userId}_${contentId}`;
 
+                    // Simpan ke koleksi kurasi final
                     await setDoc(doc(db, "curations", curationDocId), { userId, contentId, timestamp: serverTimestamp(), answers });
                     
-                    localStorage.removeItem(`draft_${contentId}`);
+                    // Hapus draf jika ada
+                    const draftDocRef = doc(db, "curation_drafts", curationDocId);
+                    await deleteDoc(draftDocRef).catch(err => console.log("No draft to delete or error:", err));
                     
                     closeCurationModal();
                     setTimeout(() => {
                         showAlert('Berhasil', 'Hasil kurasi telah berhasil disimpan.');
                         displayUserDashboard(currentUser.id);
-                    }, 250);
+                    }, 250)
 
                 } catch (error) {
                     console.error("Error submitting curation: ", error);
@@ -665,7 +826,7 @@
             });
         });
 
-        // Initialize App
+        // Inisialisasi Aplikasi
         window.addEventListener('load', () => {
             buildCurationForm();
             const savedUserId = localStorage.getItem('userId');
