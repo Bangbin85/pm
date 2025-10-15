@@ -11,67 +11,163 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --neu-bg: #e0e5ec;
+            --neu-light: #ffffff;
+            --neu-dark: #a3b1c6;
+            --neu-primary: #4f46e5;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
+            background-color: var(--neu-bg);
         }
+
+        /* Gaya Neumorphism Login */
+        .neumorphism-card {
+            background: var(--neu-bg);
+            border-radius: 20px;
+            box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5);
+            animation: fadeInScale 0.5s ease-out forwards;
+        }
+
+        .neumorphism-input {
+            width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
+            background: var(--neu-bg); color: #555; font-size: 1rem;
+            box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #ffffff;
+            transition: box-shadow 0.3s ease;
+        }
+        .neumorphism-input::placeholder { color: #999; }
+        .neumorphism-input:focus { box-shadow: inset 7px 7px 12px #cbced1, inset -7px -7px 12px #ffffff; }
+
+        .neumorphism-button {
+            width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
+            background-color: var(--neu-bg); color: var(--neu-primary);
+            font-weight: bold; font-size: 1rem; cursor: pointer;
+            box-shadow: 6px 6px 12px #b8bcc2, -6px -6px 12px #ffffff;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .neumorphism-button:hover { box-shadow: 4px 4px 10px #b8bcc2, -4px -4px 10px #ffffff; color: #3c34d0; }
+        .neumorphism-button:active, .neumorphism-button:disabled {
+            box-shadow: inset 4px 4px 8px #b8bcc2, inset -4px -4px 8px #ffffff;
+            color: #6a63f1;
+        }
+        
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
         .form-label { @apply block text-sm font-medium text-slate-700; }
-        .form-input { 
-            @apply block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 
-                   focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 focus:border-indigo-500 
-                   transition-all duration-150 sm:text-sm;
+
+        /* Gaya Neumorphism Tabel */
+        .neumorphism-table-container {
+            background: var(--neu-bg);
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5);
+            overflow-x: auto; /* Memungkinkan scroll horizontal */
+            max-height: 70vh; /* Batasi tinggi agar bisa di-scroll */
+        }
+        .neumorphism-table {
+            border-collapse: separate;
+            border-spacing: 0 10px; /* Jarak antar baris */
+        }
+        .neumorphism-table thead th {
+            position: sticky; /* Membuat header tabel tetap */
+            top: 0; /* Menempel di bagian atas container scroll */
+            z-index: 10;
+            background-color: var(--neu-bg);
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            white-space: nowrap;
+            box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
+            border-radius: 8px;
+            margin: 5px;
+        }
+        .neumorphism-table tbody tr {
+             box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
+             border-radius: 10px;
+        }
+        .neumorphism-table tbody td {
+            background: var(--neu-bg);
+            padding: 1rem 1.5rem;
+            vertical-align: top;
+        }
+        .neumorphism-table tbody td:first-child { border-radius: 10px 0 0 10px; }
+        .neumorphism-table tbody td:last-child { border-radius: 0 10px 10px 0; }
+        
+        /* Kelas untuk wrapping text */
+        .content-cell {
+            min-width: 300px;
+            max-width: 450px;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .curator-cell {
+            min-width: 200px;
+            white-space: normal;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="text-slate-800">
 
-    <!-- === LOGIN SECTION === -->
-    <div id="login-section" class="flex items-center justify-center min-h-screen p-4 bg-slate-100">
-        <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-sm text-center border border-slate-200">
-            <i class="fas fa-user-tie text-5xl text-indigo-500 mb-4"></i>
-            <h1 class="text-2xl font-bold text-slate-800">Login Supervisor</h1>
-            <p class="text-slate-500 mb-6">Gunakan ID dan Password Anda.</p>
-            <form id="login-form">
-                <div class="w-full mb-4 text-left">
-                    <label for="username-input" class="form-label">ID / Username</label>
-                    <input type="text" id="username-input" class="form-input" placeholder="e.g., DirSD041" required>
+    <!-- === LOGIN SECTION (GAYA NEUMORPHISM) === -->
+    <div id="login-section" class="flex items-center justify-center min-h-screen p-4">
+        <div class="neumorphism-card p-8 sm:p-12 w-full max-w-md text-center">
+            <i class="fas fa-user-shield text-5xl text-indigo-500 mb-4"></i>
+            <h1 class="text-3xl font-bold text-slate-800">Login Supervisor</h1>
+            <p class="text-slate-500 mb-8 mt-2">Gunakan ID dan Password Anda.</p>
+            <form id="login-form" class="space-y-6">
+                <div class="w-full text-left">
+                    <label for="username-input" class="form-label mb-2 ml-1">ID / Username</label>
+                    <input type="text" id="username-input" class="neumorphism-input" placeholder="e.g., DirSD041" required>
                 </div>
-                <div class="w-full mb-6 text-left">
-                    <label for="password-input" class="form-label">Password</label>
-                    <input type="password" id="password-input" class="form-input" placeholder="••••••••" required>
+                <div class="w-full text-left">
+                    <label for="password-input" class="form-label mb-2 ml-1">Password</label>
+                    <input type="password" id="password-input" class="neumorphism-input" placeholder="••••••••" required>
                 </div>
-                 <p id="login-error" class="text-red-500 text-sm mb-4 h-4"></p>
-                <button id="login-btn" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                 <p id="login-error" class="text-red-500 text-sm h-5 text-center"></p>
+                <button id="login-btn" type="submit" class="neumorphism-button">
                     Masuk
                 </button>
             </form>
+             <a href="./" class="neumorphism-button mt-4" style="color: #555;">
+                <i class="fas fa-home mr-2"></i>
+                Kembali ke Home
+            </a>
         </div>
     </div>
 
-    <!-- === MAIN DASHBOARD (HIDDEN BY DEFAULT) === -->
-    <main id="main-dashboard" class="hidden">
-        <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-20 border-b border-slate-200">
-            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                <h1 id="welcome-message" class="text-xl font-bold text-slate-800">Dashboard Supervisor</h1>
-                <button id="logout-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200">
+    <!-- === HEADER (HIDDEN BY DEFAULT, STICKY REMOVED) === -->
+    <header id="main-header" class="hidden bg-white/80 backdrop-blur-lg shadow-sm z-30 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 id="welcome-message" class="text-xl font-bold text-slate-800">Dashboard Supervisor</h1>
+            <div class="flex items-center space-x-2">
+                <a href="./" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
                     <i class="fas fa-sign-out-alt mr-2"></i>Logout
                 </button>
             </div>
-        </header>
+        </div>
+    </header>
 
+    <!-- === MAIN DASHBOARD (HIDDEN BY DEFAULT) === -->
+    <main id="main-dashboard" class="hidden bg-slate-50">
         <div class="py-10">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <h2 class="text-2xl font-semibold text-slate-800 mb-6 px-4 sm:px-0">Tinjauan Hasil Kurasi Konten</h2>
-                <div class="bg-white rounded-lg shadow-md overflow-x-auto border border-slate-200">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b border-slate-200">
-                            <tr>
-                                <th class="py-3 px-4 font-semibold text-slate-600">ID & Judul Konten</th>
-                                <th class="py-3 px-4 font-semibold text-slate-600">Detail Kurasi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="results-table-body">
-                            <!-- Data akan dimuat di sini oleh JavaScript -->
-                        </tbody>
+                <div id="table-wrapper" class="neumorphism-table-container">
+                    <table id="results-table" class="w-full neumorphism-table">
+                        <!-- Konten tabel akan dirender oleh JavaScript -->
                     </table>
                 </div>
             </div>
@@ -98,12 +194,13 @@
 
         // --- UI Elements ---
         const loginSection = document.getElementById('login-section');
+        const mainHeader = document.getElementById('main-header');
         const mainDashboard = document.getElementById('main-dashboard');
         const loginForm = document.getElementById('login-form');
         const loginError = document.getElementById('login-error');
         const logoutBtn = document.getElementById('logout-btn');
         const welcomeMessage = document.getElementById('welcome-message');
-        const resultsTableBody = document.getElementById('results-table-body');
+        const resultsTable = document.getElementById('results-table');
 
         // --- Login & Authentication ---
         async function handleLogin(e) {
@@ -122,6 +219,7 @@
                 loginBtn.textContent = 'Masuk';
                 return;
             }
+            await new Promise(resolve => setTimeout(resolve, 500));
 
             try {
                 const q = query(collection(db, "users"), 
@@ -152,105 +250,112 @@
 
         function handleLogout() {
             sessionStorage.removeItem('supervisorUser');
+            mainHeader.classList.add('hidden');
             mainDashboard.classList.add('hidden');
+            document.body.style.backgroundColor = 'var(--neu-bg)';
             loginSection.classList.remove('hidden');
         }
 
         // --- Data Fetching and Rendering ---
         async function displayDashboard(supervisor) {
             loginSection.classList.add('hidden');
+            mainHeader.classList.remove('hidden');
             mainDashboard.classList.remove('hidden');
+            document.body.style.backgroundColor = '';
             welcomeMessage.textContent = `Selamat Datang, ${supervisor.nama}!`;
-            resultsTableBody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-slate-500">Memuat data kurasi... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+            resultsTable.innerHTML = `<tbody><tr><td colspan="4" class="text-center p-4 text-slate-500">Memuat data kurasi... <i class="fas fa-spinner fa-spin"></i></td></tr></tbody>`;
 
             try {
-                // 1. Fetch semua data yang dibutuhkan secara paralel
                 const [usersSnap, contentsSnap, assignmentsSnap, curationsSnap] = await Promise.all([
                     getDocs(collection(db, "users")),
                     getDocs(collection(db, "contents")),
                     getDocs(collection(db, "assignments")),
                     getDocs(collection(db, "curations"))
                 ]);
-
-                // 2. Proses data menjadi struktur yang mudah digunakan
-                const usersMap = new Map(usersSnap.docs.map(doc => [doc.id, doc.data()]));
                 
-                // Buat map dari username ke userId untuk assignment
-                const usernameToIdMap = new Map();
-                usersSnap.docs.forEach(doc => {
-                    usernameToIdMap.set(doc.data().username, doc.id);
-                });
-
+                const usersMap = new Map(usersSnap.docs.map(doc => [doc.id, doc.data()]));
+                const usernameToIdMap = new Map(usersSnap.docs.map(doc => [doc.data().username, doc.id]));
                 const curationsMap = new Map(curationsSnap.docs.map(doc => [doc.id, doc.data()]));
 
-                // 3. Gabungkan data untuk setiap konten
-                let tableHTML = '';
-                for (const contentDoc of contentsSnap.docs) {
-                    const content = { id: contentDoc.id, ...contentDoc.data() };
-                    
-                    const assignedCuratorUsernames = [];
-                    assignmentsSnap.docs.forEach(assignDoc => {
-                        const assignment = assignDoc.data();
-                        if (assignment.contentIds && assignment.contentIds.includes(content.id)) {
-                            assignedCuratorUsernames.push(assignDoc.id); // doc.id adalah username
-                        }
-                    });
+                // Petakan penugasan per konten untuk pencarian cepat
+                const assignmentsByContent = new Map();
+                assignmentsSnap.docs.forEach(assignDoc => {
+                    const assignment = assignDoc.data();
+                    const username = assignDoc.id;
+                    const userId = usernameToIdMap.get(username);
+                    if (userId && assignment.contentIds) {
+                        assignment.contentIds.forEach(contentId => {
+                            if (!assignmentsByContent.has(contentId)) {
+                                assignmentsByContent.set(contentId, []);
+                            }
+                            assignmentsByContent.get(contentId).push(userId);
+                        });
+                    }
+                });
 
-                    let curatorDetailsHTML = '<div class="space-y-2">';
-                    if (assignedCuratorUsernames.length === 0) {
-                        curatorDetailsHTML += '<span class="text-xs text-slate-400 italic">Belum ada kurator ditugaskan.</span>';
-                    } else {
-                        for (const username of assignedCuratorUsernames) {
-                            const userId = usernameToIdMap.get(username);
-                            const user = usersMap.get(userId);
-                            const curatorName = user ? user.nama : 'Kurator Tidak Dikenal';
-                            
-                            // Cek apakah kurasi sudah selesai
-                            const curationId = `${userId}_${content.id}`;
+                // Bangun HTML Tabel
+                const MAX_CURATORS_COLUMNS = 3; // Definisikan jumlah kolom kurator
+                let tableHTML = '<thead><tr><th>Konten</th>';
+                for (let i = 1; i <= MAX_CURATORS_COLUMNS; i++) {
+                    tableHTML += `<th>Kurator ${i}</th>`;
+                }
+                tableHTML += '</tr></thead><tbody>';
+
+                contentsSnap.docs.forEach(contentDoc => {
+                    const content = { id: contentDoc.id, ...contentDoc.data() };
+                    const assignedCuratorIds = assignmentsByContent.get(content.id) || [];
+
+                    tableHTML += `<tr>`;
+                    // Kolom Konten
+                    tableHTML += `
+                        <td class="content-cell">
+                            <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline">
+                                ${content.id}
+                            </a>
+                            <p class="text-sm text-slate-700 mt-1">${content.title}</p>
+                        </td>
+                    `;
+                    
+                    // Kolom Kurator
+                    for (let i = 0; i < MAX_CURATORS_COLUMNS; i++) {
+                        if (i < assignedCuratorIds.length) {
+                            // Ada kurator yang ditugaskan di slot kolom ini
+                            const curatorId = assignedCuratorIds[i];
+                            const curator = usersMap.get(curatorId);
+                            const curatorName = curator ? curator.nama : 'Kurator Tidak Dikenal';
+                            const curationId = `${curatorId}_${content.id}`;
                             const curationData = curationsMap.get(curationId);
                             
+                            tableHTML += `<td class="curator-cell">`;
+                            tableHTML += `<div class="font-semibold text-slate-800">${curatorName}</div>`;
+
                             if (curationData) {
                                 const finalScore = curationData.answers?.D2_Keputusan_Final?.keputusan || 'N/A';
-                                curatorDetailsHTML += `
-                                    <div class="flex items-center">
+                                tableHTML += `
+                                    <div class="flex items-center mt-1">
                                         <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                        <span class="font-semibold text-green-700">${curatorName}:</span>
-                                        <span class="ml-2 text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full">${finalScore}</span>
+                                        <span class="text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full">${finalScore}</span>
                                     </div>
                                 `;
                             } else {
-                                curatorDetailsHTML += `
-                                    <div class="flex items-center text-slate-500">
-                                        <i class="far fa-circle text-slate-400 mr-2"></i>
-                                        <span class="font-medium">${curatorName}:</span>
-                                        <span class="ml-2 text-sm italic">Belum dikurasi</span>
-                                    </div>
-                                `;
+                                tableHTML += `<div class="mt-1"><span class="text-sm italic text-slate-500">Belum dikurasi</span></div>`;
                             }
+                            tableHTML += `</td>`;
+                        } else {
+                            // Slot kolom ini kosong karena kurator yang ditugaskan lebih sedikit
+                            tableHTML += `<td class="text-center align-middle"><span class="text-slate-400">—</span></td>`;
                         }
                     }
-                    curatorDetailsHTML += '</div>';
 
-                    tableHTML += `
-                        <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
-                            <td class="p-4 align-top">
-                                <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline break-all">
-                                    ${content.id}
-                                </a>
-                                <p class="text-sm text-slate-700 mt-1">${content.title}</p>
-                            </td>
-                            <td class="p-4 align-top">
-                                ${curatorDetailsHTML}
-                            </td>
-                        </tr>
-                    `;
-                }
+                    tableHTML += `</tr>`;
+                });
 
-                resultsTableBody.innerHTML = tableHTML || `<tr><td colspan="2" class="text-center p-4 text-slate-500">Tidak ada konten yang ditemukan.</td></tr>`;
+                tableHTML += '</tbody>';
+                resultsTable.innerHTML = tableHTML || '<tbody><tr><td colspan="4" class="text-center">Tidak ada data konten ditemukan.</td></tr></tbody>';
 
             } catch (error) {
                 console.error("Error displaying dashboard:", error);
-                resultsTableBody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr>`;
+                resultsTable.innerHTML = `<tbody><tr><td colspan="4" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr></tbody>`;
             }
         }
 
@@ -259,6 +364,8 @@
             const savedUser = sessionStorage.getItem('supervisorUser');
             if (savedUser) {
                 displayDashboard(JSON.parse(savedUser));
+            } else {
+                 document.body.style.backgroundColor = 'var(--neu-bg)';
             }
 
             loginForm.addEventListener('submit', handleLogin);
@@ -267,3 +374,4 @@
     </script>
 </body>
 </html>
+
