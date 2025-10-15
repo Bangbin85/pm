@@ -105,10 +105,10 @@
                 <button id="login-btn" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Masuk
                 </button>
-                <div class="flex justify-center w-full">
-                <a href="./" class="bg-red-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
-                    <i class="fas fa-home mr-2"></i>Home
-                </a>
+                <div class="flex justify-center w-full mt-4">
+                    <a href="./" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
                 </div>              
             </form>
         </div>
@@ -170,7 +170,10 @@
             </div>
 
              <!-- Footer -->
-            <div class="flex-shrink-0 p-4 bg-white border-t border-slate-200 flex justify-end">
+            <div class="flex-shrink-0 p-4 bg-white border-t border-slate-200 flex justify-end gap-4">
+                <button type="button" id="save-draft-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400">
+                    <i class="fas fa-save mr-2"></i>Simpan Draft
+                </button>
                 <button type="submit" form="curation-form" id="submit-curation-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-sm transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi
                 </button>
@@ -415,11 +418,17 @@
                     if (!doc.exists()) return '';
                     const content = { id: doc.id, ...doc.data() };
                     const isCurated = curatedContentIds.includes(content.id);
+                    const hasDraft = localStorage.getItem(`draft_${content.id}`) !== null;
                     return `
                         <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col card-hover border border-slate-200">
                             <div class="p-5 flex-grow">
-                                <p class="text-sm text-indigo-600 font-medium">${content.subject || 'Umum'}</p>
-                                <h3 class="font-semibold text-lg text-slate-800 mt-1">${content.title}</h3>
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm text-indigo-600 font-medium">${content.subject || 'Umum'}</p>
+                                        <h3 class="font-semibold text-lg text-slate-800 mt-1">${content.title}</h3>
+                                    </div>
+                                    ${hasDraft && !isCurated ? '<span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Draft</span>' : ''}
+                                </div>
                             </div>
                             <div class="p-4 bg-slate-50 grid grid-cols-2 gap-3 border-t border-slate-200">
                                 <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="text-center w-full font-bold py-2 px-4 rounded-md bg-white hover:bg-slate-100 text-slate-700 transition-all shadow-sm border border-slate-300">
@@ -442,7 +451,7 @@
         }
         
         // --- Modal & Navigation Logic ---
-        function openCurationModal() {
+        function openCurationModal(contentId) {
             curationForm.reset();
             modalFormContent.scrollTop = 0; 
             const modalContent = curationModal.querySelector('.modal-content');
@@ -452,6 +461,13 @@
             curationModal.classList.add('show');
             modalContent.classList.add('show');
             document.body.style.overflow = 'hidden';
+
+            // Load draft if it exists
+            const draftData = localStorage.getItem(`draft_${contentId}`);
+            if (draftData) {
+                loadDraft(JSON.parse(draftData));
+                setTimeout(() => showAlert('Info', 'Draft sebelumnya telah dimuat.'), 400);
+            }
         }
 
         function closeCurationModal() {
@@ -464,6 +480,30 @@
                 curationModal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
             }, 300); 
+        }
+
+        function loadDraft(draftData) {
+            for (const groupId in draftData) {
+                if (groupId.startsWith('A') || groupId.startsWith('B') || groupId.startsWith('C')) {
+                    const groupData = draftData[groupId];
+                    const selectEl = document.getElementById(`select-${groupId}`);
+                    if (selectEl) selectEl.value = groupData.value;
+
+                    if (groupData.items) {
+                        for (const itemId in groupData.items) {
+                            const textareaEl = document.getElementById(`textarea-${groupId}-${itemId}`);
+                            if (textareaEl) textareaEl.value = groupData.items[itemId].notes;
+                        }
+                    }
+                } else if (groupId === 'D1_Simpulan_Umum') {
+                    document.getElementById('final-kelebihan').value = draftData[groupId].kelebihan;
+                    document.getElementById('final-kekurangan').value = draftData[groupId].kekurangan;
+                    document.getElementById('final-saran').value = draftData[groupId].saran;
+                } else if (groupId === 'D2_Keputusan_Final') {
+                    document.getElementById('final-keputusan').value = draftData[groupId].keputusan;
+                    document.getElementById('final-nilai-deskripsi').value = draftData[groupId].nilai_deskripsi;
+                }
+            }
         }
 
         function setupSidebarNavigation() {
@@ -553,15 +593,35 @@
         document.body.addEventListener('click', (e) => {
             const startBtn = e.target.closest('.start-curation-btn');
             if (startBtn) {
+                const contentId = startBtn.dataset.contentId;
                 document.getElementById('curation-modal-title').textContent = `Kurasi Konten: ${startBtn.dataset.contentTitle}`;
-                document.getElementById('curation-content-id').value = startBtn.dataset.contentId;
+                document.getElementById('curation-content-id').value = contentId;
                 document.getElementById('curation-user-id').value = currentUser.id;
-                openCurationModal();
+                openCurationModal(contentId);
             }
         });
 
         document.getElementById('close-modal-btn').addEventListener('click', closeCurationModal);
         
+        document.getElementById('save-draft-btn').addEventListener('click', () => {
+            const contentId = document.getElementById('curation-content-id').value;
+            if (!contentId) return;
+
+            const draftData = {};
+            curationQuestions.forEach(group => {
+                draftData[group.id] = { 
+                    value: document.getElementById(`select-${group.id}`).value, 
+                    items: Object.fromEntries(group.items.map(item => [item.id, { notes: document.getElementById(`textarea-${group.id}-${item.id}`).value }]))
+                };
+            });
+            draftData.D1_Simpulan_Umum = { kelebihan: document.getElementById('final-kelebihan').value, kekurangan: document.getElementById('final-kekurangan').value, saran: document.getElementById('final-saran').value };
+            draftData.D2_Keputusan_Final = { keputusan: document.getElementById('final-keputusan').value, nilai_deskripsi: document.getElementById('final-nilai-deskripsi').value };
+            
+            localStorage.setItem(`draft_${contentId}`, JSON.stringify(draftData));
+            showAlert('Berhasil', 'Draft Anda telah berhasil disimpan.');
+            displayUserDashboard(currentUser.id);
+        });
+
         curationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submit-curation-btn');
@@ -587,11 +647,13 @@
 
                     await setDoc(doc(db, "curations", curationDocId), { userId, contentId, timestamp: serverTimestamp(), answers });
                     
+                    localStorage.removeItem(`draft_${contentId}`);
+                    
                     closeCurationModal();
                     setTimeout(() => {
                         showAlert('Berhasil', 'Hasil kurasi telah berhasil disimpan.');
                         displayUserDashboard(currentUser.id);
-                    }, 250)
+                    }, 250);
 
                 } catch (error) {
                     console.error("Error submitting curation: ", error);
@@ -614,3 +676,4 @@
     </script>
 </body>
 </html>
+
