@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Kurator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .form-input, .form-select, .form-textarea {
+            @apply mt-1 block w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md;
+        }
+        .indicator-group {
+            @apply bg-white p-5 rounded-lg shadow;
+        }
+        .indicator-item {
+            @apply border-t pt-4 mt-4;
+        }
+        .indicator-item:first-child {
+            @apply border-t-0 pt-0 mt-0;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- === LOGIN SECTION === -->
+    <div id="login-section" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
+            <i class="fas fa-user-lock text-5xl text-blue-500 mb-4"></i>
+            <h1 class="text-2xl font-bold text-slate-800">Login Kurator</h1>
+            <p class="text-slate-500 mb-6">Gunakan ID dan Password Anda.</p>
+            <form id="login-form">
+                <div class="w-full mb-4 text-left">
+                    <label for="username-input" class="form-label">ID / Username</label>
+                    <input type="text" id="username-input" class="form-input" placeholder="e.g., DirSD001" required>
+                </div>
+                <div class="w-full mb-6 text-left">
+                    <label for="password-input" class="form-label">Password</label>
+                    <input type="password" id="password-input" class="form-input" placeholder="••••••••" required>
+                </div>
+                 <p id="login-error" class="text-red-500 text-sm mb-4 hidden"></p>
+                <button id="login-btn" type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                    Masuk
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- === MAIN DASHBOARD (HIDDEN BY DEFAULT) === -->
+    <main id="main-dashboard" class="hidden">
+        <header class="bg-white shadow-md">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 id="welcome-message" class="text-2xl font-bold text-slate-800">Dashboard Kurator</h1>
+                <button id="logout-btn" class="text-sm text-red-500 hover:underline">Logout</button>
+            </div>
+        </header>
+
+        <div class="py-10">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <h2 class="text-xl font-semibold text-slate-700 mb-4">Konten yang Ditugaskan:</h2>
+                <div id="content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Kartu konten akan dimuat di sini oleh JavaScript -->
+                    <p id="loading-content" class="text-slate-500">Memuat konten...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- === CURATION MODAL (HIDDEN BY DEFAULT) === -->
+    <div id="curation-modal" class="fixed inset-0 modal-backdrop overflow-y-auto h-full w-full hidden z-50 p-4">
+        <div class="relative top-5 mx-auto border w-full max-w-5xl shadow-lg rounded-md bg-slate-50">
+            <div class="sticky top-0 bg-white p-4 flex justify-between items-center border-b z-10">
+                <h3 class="text-xl leading-6 font-medium text-gray-900" id="curation-modal-title">Formulir Kurasi Konten</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="p-5 max-h-[85vh] overflow-y-auto">
+                <form id="curation-form" class="space-y-6">
+                    <!-- DYNAMIC FORM CONTENT HERE -->
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, where, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
+            authDomain: "kurasisd.firebaseapp.com",
+            projectId: "kurasisd",
+            storageBucket: "kurasisd.firebasestorage.app",
+            messagingSenderId: "520054778765",
+            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- UI Elements ---
+        const loginSection = document.getElementById('login-section');
+        const mainDashboard = document.getElementById('main-dashboard');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+        const contentGrid = document.getElementById('content-grid');
+        const curationModal = document.getElementById('curation-modal');
+        const curationForm = document.getElementById('curation-form');
+
+        let currentUser = null;
+
+        // --- Curation Form Structure ---
+        const curationQuestions = [
+            { id: 'A1', title: 'A.1 Keamanan Materi', items: [
+                { id: 'radikalisme', text: 'Materi bebas dari unsur radikalisme, ekstremisme, dan terorisme dalam bentuk nama, simbol, logo, bendera, slogan, seragam, foto, maupun objek lain' },
+                { id: 'pornografi', text: 'Materi bebas dari pornografi atau ketelanjangan yang tidak sesuai konteks atau kebutuhan materi' },
+                { id: 'diskriminasi', text: 'Materi bebas dari unsur penyerangan, perundungan, ejekan atau diskriminasi individu atau kelompok, serta bebas dari ajakan untuk melukai diri sendiri (self harm)' },
+                { id: 'promosi', text: 'Materi bebas dari promosi, iklan, atau ajakan membeli produk komersial' },
+                { id: 'sara', text: 'Materi bebas dari unsur SARA (Suku, Agama, Ras, dan Antargolongan)' },
+                { id: 'kekerasan', text: 'Materi bebas dari unsur kekerasan atau isu politik yang kontroversial' },
+                { id: 'komersial', text: 'Materi bebas dari unsur-unsur komersial. *Catatan: logo atau identitas bisa diburamkan' }
+            ]},
+            { id: 'A2', title: 'A.2 Copyright', items: [
+                { id: 'sumber', text: 'Mencantumkan sumber/referensi/credit pada elemen sajian' },
+                { id: 'ai', text: 'Jika dibuat oleh AI perlu dituliskan keterangan (contoh: "Gambar ini dibuat oleh AI")' }
+            ]},
+            { id: 'A3', title: 'A.3 Substansi Materi', items: [
+                 { id: 'konsumsi', text: 'Materi dapat dikonsumsi langsung oleh murid' },
+                 { id: 'mapel', text: 'Materi dirancang untuk mendukung mata pelajaran secara spesifik' },
+                 { id: 'kurikulum', text: 'Materi relevan dengan kurikulum yang berlaku' },
+                 { id: 'akurat', text: 'Isi materi baik berupa visual, ilustrasi, dan atau audio berisi informasi yang akurat' },
+                 { id: 'sistematis', text: 'Materi disusun sistematis sesuai perkembangan kompetensi murid' },
+                 { id: 'kesulitan', text: 'Materi disajikan dengan tingkat kesulitan sesuai jenjang pendidikan' },
+                 { id: 'asesmen', text: 'Materi memuat asesmen yang sesuai untuk mengukur pemahaman murid (asesmen dapat berupa pertanyaan reflektif, kuis singkat, latihan, dsb). *Catatan = pertanyaan reflektif dapat dimuat di deskripsi materi' },
+            ]},
+            { id: 'A4', title: 'A.4 Kebahasaan', items: [
+                 { id: 'sopan', text: 'Menggunakan bahasa yang sopan, baik, dan benar' },
+                 { id: 'struktur', text: 'Struktur kalimat disesuaikan dengan tingkat pemahaman pengguna' },
+            ]},
+             { id: 'A5', title: 'A.5 Inklusivitas', items: [
+                 { id: 'bias', text: 'Materi bebas dari bias gender, sosial, ekonomi, dan budaya' },
+                 { id: 'prinsip', text: 'Materi yang disajikan tidak bertentangan dengan prinsip inklusivitas' },
+                 { id: 'akses', text: 'Materi dapat diakses oleh murid dengan berbagai kebutuhan dan kemampuan' },
+                 { id: 'ilustrasi', text: 'Ilustrasi mencerminkan keberagaman murid, termasuk perbedaan fisik, budaya, dan disabilitas' },
+            ]},
+            // More sections can be added here following the same structure
+        ];
+
+        function buildCurationForm() {
+            let formHTML = `
+                <input type="hidden" id="curation-video-id">
+                <input type="hidden" id="curation-user-id">
+            `;
+            
+            formHTML += curationQuestions.map(group => `
+                <div class="indicator-group">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                         <h3 class="text-xl font-bold text-slate-800 mb-2 md:mb-0">${group.title}</h3>
+                         <div class="w-full md:w-1/3">
+                            <label for="select-${group.id}" class="sr-only">Penilaian Indikator</label>
+                            <select id="select-${group.id}" class="form-select" required>
+                                <option value="">Pilih Nilai Indikator...</option>
+                                <option value="Sesuai">Sesuai</option>
+                                <option value="Tidak Sesuai">Tidak Sesuai</option>
+                                <option value="Perlu Diperbaiki">Perlu Diperbaiki</option>
+                                <option value="N/A">Tidak Berlaku</option>
+                            </select>
+                         </div>
+                    </div>
+                   
+                    ${group.items.map(item => `
+                        <div class="indicator-item">
+                            <label for="textarea-${group.id}-${item.id}" class="block text-base text-gray-800 mb-2">${item.text}</label>
+                            <textarea id="textarea-${group.id}-${item.id}" rows="2" class="form-textarea" placeholder="Tulis deskripsi/catatan Anda di sini..."></textarea>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+
+            // Add final sections
+            formHTML += `
+                <div class="indicator-group">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">D.1 Simpulan Umum</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="final-kelebihan" class="form-label">Kelebihan dari Konten Pembelajaran Digital</label>
+                            <textarea id="final-kelebihan" rows="3" class="form-textarea" required></textarea>
+                        </div>
+                        <div>
+                            <label for="final-kekurangan" class="form-label">Kekurangan dari Konten Pembelajaran Digital</label>
+                            <textarea id="final-kekurangan" rows="3" class="form-textarea" required></textarea>
+                        </div>
+                        <div>
+                            <label for="final-saran" class="form-label">Saran untuk Konten Pembelajaran Digital</label>
+                            <textarea id="final-saran" rows="3" class="form-textarea" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                 <div class="indicator-group">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">D.2 Keputusan Final</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                        <div>
+                            <label for="final-keputusan" class="form-label">Keputusan Final</label>
+                            <select id="final-keputusan" class="form-select" required>
+                                <option value="">Pilih Keputusan...</option>
+                                <option value="Layak Tayang">Layak Tayang</option>
+                                <option value="Layak dengan Revisi">Layak dengan Revisi</option>
+                                <option value="Tidak Layak Tayang">Tidak Layak Tayang</option>
+                            </select>
+                        </div>
+                        <div>
+                             <label for="final-nilai" class="form-label">Nilai Akhir (0-100)</label>
+                             <input type="number" id="final-nilai" class="form-input" min="0" max="100" required>
+                        </div>
+                    </div>
+                </div>`;
+            
+            formHTML += `
+                <div class="pt-4">
+                    <button type="submit" id="submit-curation-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg">
+                        <i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi
+                    </button>
+                </div>`;
+
+            curationForm.innerHTML = formHTML;
+        }
+
+        // --- Functions ---
+        
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            const loginBtn = document.getElementById('login-btn');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Mengecek...';
+            loginError.classList.add('hidden');
+
+            if (!username || !password) {
+                loginError.textContent = 'Username dan Password harus diisi.';
+                loginError.classList.remove('hidden');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Masuk';
+                return;
+            }
+
+            try {
+                const q = query(collection(db, "users"), where("username", "==", username));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) throw new Error("Username atau password salah.");
+                
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+
+                if (userData.password !== password) throw new Error("Username atau password salah.");
+
+                localStorage.setItem('userId', userDoc.id);
+                await displayUserDashboard(userDoc.id);
+
+            } catch (error) {
+                console.error("Login Gagal! Jika ini pertama kali, pastikan indeks Firestore sudah dibuat. Lihat pesan error di console untuk link pembuatan indeks.", error);
+                loginError.textContent = error.message;
+                loginError.classList.remove('hidden');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Masuk';
+            }
+        }
+
+        async function displayUserDashboard(userId) {
+            loginSection.classList.add('hidden');
+            mainDashboard.classList.remove('hidden');
+            contentGrid.innerHTML = '<p id="loading-content" class="text-slate-500">Memuat konten...</p>';
+            
+            try {
+                const userDoc = await getDoc(doc(db, 'users', userId));
+                if (!userDoc.exists()) throw new Error("User not found");
+                currentUser = { id: userDoc.id, ...userDoc.data() };
+                document.getElementById('welcome-message').textContent = `Selamat Bekerja, ${currentUser.nama}!`;
+
+                const assignmentDoc = await getDoc(doc(db, 'assignments', currentUser.username));
+                if (!assignmentDoc.exists() || !assignmentDoc.data().videoIds) {
+                    contentGrid.innerHTML = '<p>Tidak ada konten yang ditugaskan untuk Anda saat ini.</p>';
+                    return;
+                }
+                const videoIds = assignmentDoc.data().videoIds;
+
+                const curationsQuery = query(collection(db, "curations"), where("userId", "==", userId));
+                const curationsSnapshot = await getDocs(curationsQuery);
+                const curatedVideoIds = curationsSnapshot.docs.map(doc => doc.data().videoId);
+
+                if (videoIds.length === 0) {
+                     contentGrid.innerHTML = '<p>Tidak ada konten yang ditugaskan untuk Anda saat ini.</p>';
+                     return;
+                }
+                const videoPromises = videoIds.map(id => getDoc(doc(db, 'videos', id)));
+                const videoDocs = await Promise.all(videoPromises);
+
+                contentGrid.innerHTML = videoDocs.map(doc => {
+                    if (!doc.exists()) return '';
+                    const video = { id: doc.id, ...doc.data() };
+                    const isCurated = curatedVideoIds.includes(video.id);
+                    return `
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+                            <div class="p-5 flex-grow">
+                                <p class="text-sm text-gray-500">${video.subject || 'Umum'}</p>
+                                <h3 class="font-bold text-lg text-slate-800">${video.title}</h3>
+                            </div>
+                            <div class="p-4 bg-gray-50 grid grid-cols-2 gap-3">
+                                <a href="${video.url}" target="_blank" rel="noopener noreferrer" class="text-center w-full font-bold py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white">
+                                    <i class="fas fa-external-link-alt mr-2"></i>Buka Konten
+                                </a>
+                                <button class="start-curation-btn w-full font-bold py-2 px-4 rounded-lg
+                                    ${isCurated ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-600 text-white'}"
+                                    data-video-id="${video.id}" 
+                                    data-video-title="${video.title}"
+                                    ${isCurated ? 'disabled' : ''}>
+                                    ${isCurated ? '<i class="fas fa-check-circle mr-2"></i>Selesai' : '<i class="fas fa-edit mr-2"></i>Mulai Kurasi'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error("Error displaying dashboard: ", error);
+                contentGrid.innerHTML = `<p class="text-red-500">Terjadi kesalahan saat memuat data: ${error.message}</p>`;
+            }
+        }
+        
+        // --- Event Listeners ---
+        loginForm.addEventListener('submit', handleLogin);
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('userId');
+            currentUser = null;
+            mainDashboard.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+        });
+
+        document.body.addEventListener('click', (e) => {
+            const startBtn = e.target.closest('.start-curation-btn');
+            if (startBtn) {
+                document.getElementById('curation-modal-title').textContent = `Kurasi: ${startBtn.dataset.videoTitle}`;
+                document.getElementById('curation-video-id').value = startBtn.dataset.videoId;
+                document.getElementById('curation-user-id').value = currentUser.id;
+                
+                curationForm.reset();
+                curationModal.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('close-modal-btn').addEventListener('click', () => {
+            curationModal.classList.add('hidden');
+        });
+
+        curationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submit-curation-btn');
+            if (!confirm("Apakah Anda yakin ingin mengirim hasil kurasi ini?")) return;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Menyimpan...';
+
+            try {
+                const answers = {};
+                // Collect structured answers
+                curationQuestions.forEach(group => {
+                    const groupValue = document.getElementById(`select-${group.id}`).value;
+                    const items = {};
+                    group.items.forEach(item => {
+                        const notes = document.getElementById(`textarea-${group.id}-${item.id}`).value;
+                        items[item.id] = { notes };
+                    });
+                    answers[group.id] = { value: groupValue, items: items };
+                });
+                
+                // Collect final summary
+                answers.D1_Simpulan_Umum = {
+                    kelebihan: document.getElementById('final-kelebihan').value,
+                    kekurangan: document.getElementById('final-kekurangan').value,
+                    saran: document.getElementById('final-saran').value,
+                };
+                answers.D2_Keputusan_Final = {
+                    keputusan: document.getElementById('final-keputusan').value,
+                    nilai: document.getElementById('final-nilai').value,
+                };
+                
+                const videoId = document.getElementById('curation-video-id').value;
+                const userId = document.getElementById('curation-user-id').value;
+                
+                // Use a composite key for the document ID to prevent duplicates
+                const curationDocId = `${userId}_${videoId}`;
+
+                await setDoc(doc(db, "curations", curationDocId), {
+                    userId: userId,
+                    videoId: videoId,
+                    timestamp: serverTimestamp(),
+                    answers: answers
+                });
+
+                alert('Hasil kurasi berhasil disimpan!');
+                curationModal.classList.add('hidden');
+                await displayUserDashboard(currentUser.id);
+
+            } catch (error) {
+                console.error("Error submitting curation: ", error);
+                alert('Gagal menyimpan. Coba lagi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi';
+            }
+        });
+
+        // Initialize App
+        window.addEventListener('load', () => {
+            buildCurationForm(); // Build the form once on load
+            const savedUserId = localStorage.getItem('userId');
+            if (savedUserId) {
+                displayUserDashboard(savedUserId);
+            }
+        });
+    </script>
+</body>
+</html>
+
