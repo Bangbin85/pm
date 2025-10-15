@@ -242,17 +242,39 @@
             ];
 
             const groupSeparators = ['B1', 'C1', 'D1'];
+const fontSizes = ['text-xs', 'text-sm', 'text-base', 'text-lg'];
+const fontWeights = ['font-light', 'font-medium', 'font-bold', 'font-extrabold'];
+const textColors = ['text-slate-700', 'text-indigo-600', 'text-red-500', 'text-green-600', 'text-sky-500'];
+const alignments = ['justify-start', 'justify-center', 'justify-end'];
+const rotations = ['rotate-0', 'rotate-1', '-rotate-2', 'rotate-3', '-rotate-1'];
+const paddings = ['py-1', 'py-2', 'py-3', 'py-4'];
 
-            allSections.forEach(group => {
-                if (groupSeparators.includes(group.id)) {
-                    sidebarHTML += `<div class="pt-2 pb-1"><hr class="border-slate-200"></div>`;
-                }
-                sidebarHTML += `
-                    <a href="#group-${group.id}" class="sidebar-link" data-target="group-${group.id}">
-                        <span class="link-icon"><i class="fas ${group.icon || 'fa-file'}"></i></span>
-                        <span class="truncate">${group.title}</span>
-                    </a>`;
-            });
+allSections.forEach(group => {
+    if (groupSeparators.includes(group.id)) {
+        sidebarHTML += `<div class="pt-2 pb-1"><hr class="border-slate-200"></div>`;
+    }
+
+    // --- Pilih kelas secara acak untuk setiap item ---
+    const randomSize = fontSizes[Math.floor(Math.random() * fontSizes.length)];
+    const randomWeight = fontWeights[Math.floor(Math.random() * fontWeights.length)];
+    const randomColor = textColors[Math.floor(Math.random() * textColors.length)];
+    const randomAlign = alignments[Math.floor(Math.random() * alignments.length)];
+    const randomRotate = rotations[Math.floor(Math.random() * rotations.length)];
+    const randomPadding = paddings[Math.floor(Math.random() * paddings.length)];
+
+    // Terapkan kelas acak ke elemen a dan span
+    sidebarHTML += `
+        <a href="#group-${group.id}" 
+           class="sidebar-link flex items-center ${randomPadding} ${randomAlign} ${randomRotate} transition-transform" 
+           data-target="group-${group.id}">
+            
+            <span class="link-icon ${randomColor}"><i class="fas ${group.icon || 'fa-file'}"></i></span>
+            
+            <span class="truncate ${randomSize} ${randomWeight} ${randomColor}">
+                ${group.title}
+            </span>
+        </a>`;
+});
             sidebarHTML += '</div>';
             
             formHTML += curationQuestions.map(group => `
