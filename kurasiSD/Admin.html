@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin Kurasi</title>
+    <title>Login - Panel Admin Kurasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+	<link rel="icon" type="image/x-icon" href="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- Library untuk membaca file Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         .sidebar-link.active {
-            background-color: #3182CE; /* blue-500 */
+            background-color: #4f46e5; /* indigo-600 */
             color: white;
+            font-weight: 600;
         }
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.5);
@@ -29,159 +31,244 @@
         .form-input {
              @apply mt-1 block w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md;
         }
+        .login-input {
+            @apply w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300;
+        }
     </style>
 </head>
-<body class="bg-slate-100">
+<body class="bg-slate-900">
 
-    <div class="flex min-h-screen">
-        <!-- === SIDEBAR === -->
-        <aside class="w-64 bg-slate-800 text-slate-200 flex flex-col">
-            <div class="p-6 text-center border-b border-slate-700">
-                <h1 class="text-2xl font-bold text-white">Admin Kurasi</h1>
-            </div>
-            <nav class="flex-1 p-4 space-y-2">
-                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700 active" data-target="dashboard">
-                    <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard</span>
-                </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="users">
-                    <i class="fas fa-users-cog w-6"></i><span>Manajemen Pengguna</span>
-                </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="content">
-                    <i class="fas fa-file-alt w-6"></i><span>Manajemen Konten</span>
-                </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="assignments">
-                    <i class="fas fa-tasks w-6"></i><span>Penugasan</span>
-                </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="settings">
-                    <i class="fas fa-cogs w-6"></i><span>Pengaturan</span>
-                </a>
-            </nav>
-        </aside>
-
-        <!-- === MAIN CONTENT === -->
-        <main class="flex-1 p-8 overflow-y-auto">
-            
-            <!-- Dashboard Page -->
-            <div id="dashboard-page" class="page-content">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Dashboard</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
-                        <i class="fas fa-users text-4xl text-blue-500"></i>
-                        <div>
-                            <p class="text-slate-500">Total Pengguna</p>
-                            <p id="total-users" class="text-3xl font-bold">0</p>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
-                        <i class="fas fa-file-alt text-4xl text-green-500"></i>
-                        <div>
-                            <p class="text-slate-500">Total Konten</p>
-                            <p id="total-content" class="text-3xl font-bold">0</p>
-                        </div>
+    <!-- === LOGIN SCREEN === -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-gray-800 p-4">
+        <div class="w-full max-w-md">
+            <form id="login-form" class="bg-slate-800/50 backdrop-blur-xl shadow-2xl rounded-2xl px-8 pt-10 pb-8 mb-4 border border-slate-700">
+                 <div class="mb-8 text-center">
+                    <h1 class="text-3xl font-bold text-white">Admin Panel Login</h1>
+                    <p class="text-slate-400 mt-2">Silakan masuk untuk melanjutkan</p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-slate-300 text-sm font-bold mb-2" for="username">
+                        Username
+                    </label>
+                    <div class="relative">
+                         <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                             <i class="fas fa-user text-gray-400"></i>
+                         </span>
+                         <input class="login-input pl-10" id="username" type="text" placeholder="Masukkan username admin" required>
                     </div>
                 </div>
-            </div>
-
-            <!-- Users Page -->
-            <div id="users-page" class="page-content hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-slate-800">Manajemen Pengguna</h2>
-                    <button id="add-user-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-plus mr-2"></i>Tambah Pengguna</button>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="border-b">
-                                <th class="py-2 px-4">Nama</th>
-                                <th class="py-2 px-4">Instansi</th>
-                                <th class="py-2 px-4">ID/Username</th>
-                                <th class="py-2 px-4">Role</th>
-                                <th class="py-2 px-4">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body">
-                            <!-- Data pengguna akan diisi oleh JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Content Page -->
-            <div id="content-page" class="page-content hidden">
-                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-slate-800">Manajemen Konten</h2>
-                    <div class="flex space-x-2">
-                         <button id="download-template-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-download mr-2"></i>Unduh Template</button>
-                         <button id="upload-excel-btn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-file-excel mr-2"></i>Upload Excel</button>
-                         <button id="add-content-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-plus mr-2"></i>Tambah Konten</button>
-                         <!-- Tombol Baru Untuk Hapus Semua Konten -->
-                         <button id="delete-all-content-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-trash mr-2"></i>Hapus Semua Konten</button>
-                         <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls">
+                <div class="mb-6">
+                    <label class="block text-slate-300 text-sm font-bold mb-2" for="password">
+                        Password
+                    </label>
+                    <div class="relative">
+                         <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                             <i class="fas fa-lock text-gray-400"></i>
+                         </span>
+                        <input class="login-input pl-10" id="password" type="password" placeholder="******************" required>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="border-b">
-                                <th class="py-2">Judul</th>
-                                <th class="py-2">URL</th>
-                                <th class="py-2">Subjek</th>
-                                <th class="py-2">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="content-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- Assignments Page -->
-            <div id="assignments-page" class="page-content hidden">
-                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-slate-800">Penugasan Konten</h2>
-                    <button id="random-assign-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
-                        <i class="fas fa-random mr-2"></i>Bagikan Penugasan Acak
+                 <p id="login-error" class="text-red-500 text-xs italic mb-4 h-4"></p>
+                <div class="flex items-center justify-between">
+                    <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-all duration-300 disabled:opacity-50" type="submit">
+                        Masuk
                     </button>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="mb-4">
-                        <label for="user-select" class="block text-sm font-medium text-slate-700">Pilih Pengguna (Role Kurator):</label>
-                        <select id="user-select" class="form-input mt-1">
-                            <option value="">-- Pilih Kurator --</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                        <div>
-                            <h3 class="font-bold text-lg mb-2">Konten yang Ditugaskan</h3>
-                            <ul id="assigned-content-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg mb-2">Konten yang Tersedia</h3>
-                             <ul id="available-content-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Page (Reset) -->
-            <div id="settings-page" class="page-content hidden">
-                 <h2 class="text-3xl font-bold text-slate-800 mb-6">Pengaturan & Reset</h2>
-                 <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-auto">
-                    <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md mb-6" role="alert">
-                        <p class="font-bold">Zona Berbahaya!</p>
-                        <p>Tindakan reset akan menghapus koleksi `users`, `contents`, `assignments`, dan `curations` lalu mengisinya dengan data default.</p>
-                    </div>
-                    <button id="resetButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default</button>
-                    <div class="mt-6">
-                        <h3 class="text-lg font-semibold text-slate-700 mb-2">Log Proses:</h3>
-                        <div id="logBox">Menunggu perintah...</div>
-                    </div>
-                </div>
-            </div>
-        </main>
+            </form>
+            <p class="text-center text-gray-500 text-xs">
+                &copy;2024 Kurasi Konten.
+            </p>
+        </div>
     </div>
 
-    <!-- Modals -->
 
+    <!-- === ADMIN PANEL (HIDDEN BY DEFAULT) === -->
+    <div id="admin-panel" class="hidden">
+        <div class="flex min-h-screen bg-slate-100">
+            <!-- === SIDEBAR === -->
+            <aside class="w-64 bg-slate-800 text-slate-200 flex flex-col">
+                <div class="p-6 text-center border-b border-slate-700">
+                    <h1 class="text-2xl font-bold text-white">Admin Kurasi</h1>
+                </div>
+                <nav class="flex-1 p-4 space-y-2">
+                    <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700 active" data-target="dashboard">
+                        <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard</span>
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="users">
+                        <i class="fas fa-users-cog w-6"></i><span>Manajemen Pengguna</span>
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="content">
+                        <i class="fas fa-file-alt w-6"></i><span>Manajemen Konten</span>
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="assignments">
+                        <i class="fas fa-tasks w-6"></i><span>Penugasan</span>
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="hasil">
+                        <i class="fas fa-check-square w-6"></i><span>Hasil Kurasi</span>
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="settings">
+                        <i class="fas fa-cogs w-6"></i><span>Pengaturan</span>
+                    </a>
+                </nav>
+                 <div class="p-4 border-t border-slate-700">
+                    <a href="#" id="logout-btn" class="flex items-center py-2 px-4 rounded-lg text-red-400 transition-colors hover:bg-red-500 hover:text-white">
+                        <i class="fas fa-sign-out-alt w-6"></i><span>Logout</span>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- === MAIN CONTENT === -->
+            <main class="flex-1 p-8 overflow-y-auto">
+                
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page-content">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-6">Dashboard</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                            <i class="fas fa-users text-4xl text-blue-500"></i>
+                            <div>
+                                <p class="text-slate-500">Total Pengguna</p>
+                                <p id="total-users" class="text-3xl font-bold">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                            <i class="fas fa-file-alt text-4xl text-green-500"></i>
+                            <div>
+                                <p class="text-slate-500">Total Konten</p>
+                                <p id="total-content" class="text-3xl font-bold">0</p>
+                            </div>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                            <i class="fas fa-check-double text-4xl text-indigo-500"></i>
+                            <div>
+                                <p class="text-slate-500">Total Kurasi</p>
+                                <p id="total-curations" class="text-3xl font-bold">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Page -->
+                <div id="users-page" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-slate-800">Manajemen Pengguna</h2>
+                        <button id="add-user-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-plus mr-2"></i>Tambah Pengguna</button>
+                    </div>
+                    <div class="mb-4">
+                        <input type="search" id="search-user-input" placeholder="Cari nama pengguna..." class="form-input w-full max-w-sm">
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="py-2 px-4">Nama</th>
+                                    <th class="py-2 px-4">Instansi</th>
+                                    <th class="py-2 px-4">ID/Username</th>
+                                    <th class="py-2 px-4">Role</th>
+                                    <th class="py-2 px-4">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- Data pengguna akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Content Page -->
+                <div id="content-page" class="page-content hidden">
+                     <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-slate-800">Manajemen Konten</h2>
+                        <div class="flex space-x-2">
+                             <button id="download-template-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-download mr-2"></i>Unduh Template</button>
+                             <button id="upload-excel-btn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-file-excel mr-2"></i>Upload Excel</button>
+                             <button id="add-content-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-plus mr-2"></i>Tambah Konten</button>
+                             <!-- Tombol Baru Untuk Hapus Semua Konten -->
+                             <button id="delete-all-content-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-trash mr-2"></i>Hapus Semua Konten</button>
+                             <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls">
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="py-2">Judul</th>
+                                    <th class="py-2">URL</th>
+                                    <th class="py-2">Subjek</th>
+                                    <th class="py-2">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="content-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Assignments Page -->
+                <div id="assignments-page" class="page-content hidden">
+                     <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-slate-800">Penugasan Konten</h2>
+                        <button id="random-assign-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                            <i class="fas fa-random mr-2"></i>Bagikan Penugasan Acak
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="mb-4">
+                            <label for="user-select" class="block text-sm font-medium text-slate-700">Pilih Pengguna (Role Kurator):</label>
+                            <select id="user-select" class="form-input mt-1">
+                                <option value="">-- Pilih Kurator --</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                            <div>
+                                <h3 class="font-bold text-lg mb-2">Konten yang Ditugaskan</h3>
+                                <ul id="assigned-content-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-2">Konten yang Tersedia</h3>
+                                 <ul id="available-content-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hasil Kurasi Page -->
+                <div id="hasil-page" class="page-content hidden">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-6">Hasil dan Kemajuan Kurasi</h2>
+                    <div class="bg-white p-6 rounded-lg shadow-md overflow-auto max-h-[75vh]">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead id="hasil-table-head">
+                                <!-- Header will be generated by JavaScript -->
+                            </thead>
+                            <tbody id="hasil-table-body">
+                                <!-- Data hasil kurasi akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <!-- Settings Page (Reset) -->
+                <div id="settings-page" class="page-content hidden">
+                     <h2 class="text-3xl font-bold text-slate-800 mb-6">Pengaturan & Reset</h2>
+                     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-auto">
+                        <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md mb-6" role="alert">
+                            <p class="font-bold">Zona Berbahaya!</p>
+                            <p>Tindakan reset akan menghapus koleksi `users`, `contents`, `assignments`, dan `curations` lalu mengisinya dengan data default.</p>
+                        </div>
+                        <button id="resetButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default</button>
+                        <div class="mt-6">
+                            <h3 class="text-lg font-semibold text-slate-700 mb-2">Log Proses:</h3>
+                            <div id="logBox">Menunggu perintah...</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+    <!-- Modals -->
+    <!-- (Modal content remains the same as your original file) -->
     <!-- User Modal -->
     <div id="user-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
       <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
@@ -283,7 +370,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, writeBatch, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, writeBatch, onSnapshot, updateDoc, arrayUnion, arrayRemove, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
@@ -297,10 +384,86 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // --- NEW LOGIN & AUTH LOGIC ---
+        const loginScreen = document.getElementById('login-screen');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Check session on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                showAdminPanel();
+            } else {
+                showLoginScreen();
+            }
+        });
+
+        function showAdminPanel() {
+            loginScreen.classList.add('hidden');
+            adminPanel.classList.remove('hidden');
+            document.querySelector('body').classList.remove('bg-slate-900');
+            document.querySelector('body').classList.add('bg-slate-100');
+        }
+        
+        function showLoginScreen() {
+            adminPanel.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+            document.querySelector('body').classList.add('bg-slate-900');
+            document.querySelector('body').classList.remove('bg-slate-100');
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.textContent = '';
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginButton = loginForm.querySelector('button[type="submit"]');
+            const originalButtonText = loginButton.innerHTML;
+            
+            loginButton.disabled = true;
+            loginButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Mencoba Masuk...`;
+
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, 
+                where("username", "==", username), 
+                where("password", "==", password),
+                where("role", "==", "Admin")
+            );
+
+            try {
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    // Admin found
+                    sessionStorage.setItem('isAdminLoggedIn', 'true');
+                    showAdminPanel();
+                } else {
+                    // Not found or not an admin
+                    loginError.textContent = 'Username, password, atau role tidak valid.';
+                    loginButton.disabled = false;
+                    loginButton.innerHTML = originalButtonText;
+                }
+            } catch (error) {
+                console.error("Error logging in: ", error);
+                loginError.textContent = 'Terjadi kesalahan saat login.';
+                loginButton.disabled = false;
+                loginButton.innerHTML = originalButtonText;
+            }
+        });
+
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            sessionStorage.removeItem('isAdminLoggedIn');
+            showLoginScreen();
+        });
+
+
         // --- State Management ---
         let allUsers = [];
         let allContent = [];
         let allAssignments = {};
+        let allCurations = [];
 
         // --- UI Elements ---
         const pageContents = document.querySelectorAll('.page-content');
@@ -367,12 +530,14 @@
             document.getElementById('total-users').textContent = allUsers.length;
             renderUsersTable();
             renderUserSelect();
+            renderHasilTable();
         });
 
         onSnapshot(collection(db, "contents"), (snapshot) => {
             allContent = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             document.getElementById('total-content').textContent = allContent.length;
             renderContentTable();
+            renderHasilTable();
         });
 
         onSnapshot(collection(db, "assignments"), (snapshot) => {
@@ -384,11 +549,30 @@
             if (selectedUserId) {
                 renderAssignmentLists(selectedUserId);
             }
+            renderHasilTable();
         });
+
+        onSnapshot(collection(db, "curations"), (snapshot) => {
+            allCurations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            document.getElementById('total-curations').textContent = allCurations.length;
+            renderHasilTable();
+        });
+
 
         function renderUsersTable() {
             const tbody = document.getElementById('users-table-body');
-            tbody.innerHTML = allUsers.map(u => `
+            const searchTerm = document.getElementById('search-user-input').value.toLowerCase();
+
+            const filteredUsers = allUsers.filter(user =>
+                user.nama.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">Pengguna tidak ditemukan.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filteredUsers.map(u => `
                 <tr class="border-b hover:bg-slate-50">
                     <td class="py-2 px-4">${u.nama}</td>
                     <td class="py-2 px-4">${u.instansi}</td>
@@ -431,7 +615,13 @@
         function renderAssignmentLists(username) {
             const assignedIds = allAssignments[username] || [];
             const assignedContent = allContent.filter(c => assignedIds.includes(c.id));
-            const availableContent = allContent.filter(c => !assignedIds.includes(c.id));
+            
+            const allAssignedContentIds = new Set();
+            Object.values(allAssignments).forEach(contentIdArray => {
+                contentIdArray.forEach(id => allAssignedContentIds.add(id));
+            });
+
+            const availableContent = allContent.filter(c => !allAssignedContentIds.has(c.id));
 
             document.getElementById('assigned-content-list').innerHTML = assignedContent.map(c => `
                 <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded"><span>${c.title}</span><button class="unassign-btn text-red-500 text-xs" data-content-id="${c.id}">Lepas</button></li>`).join('');
@@ -439,9 +629,75 @@
                  <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded"><span>${c.title}</span><button class="assign-btn text-green-500 text-xs" data-content-id="${c.id}">Tugas</button></li>`).join('');
         }
 
+        function renderHasilTable() {
+            const thead = document.getElementById('hasil-table-head');
+            const tbody = document.getElementById('hasil-table-body');
+            if (!thead || !tbody || allContent.length === 0) return;
+
+            const contentStats = {};
+            allContent.forEach(content => {
+                contentStats[content.id] = {
+                    title: content.title,
+                    assignedTo: new Set(),
+                    completedBy: new Set()
+                };
+            });
+
+            const curatorUsernameToId = new Map();
+            allUsers.forEach(user => {
+                if (user.role === 'Kurator') {
+                    curatorUsernameToId.set(user.username, user.id);
+                }
+            });
+
+            for (const username in allAssignments) {
+                const curatorId = curatorUsernameToId.get(username);
+                if (curatorId) {
+                    const contentIds = allAssignments[username] || [];
+                    contentIds.forEach(contentId => {
+                        if (contentStats[contentId]) {
+                            contentStats[contentId].assignedTo.add(curatorId);
+                        }
+                    });
+                }
+            }
+
+            allCurations.forEach(curation => {
+                if (contentStats[curation.contentId]) {
+                    contentStats[curation.contentId].completedBy.add(curation.userId);
+                }
+            });
+
+            thead.innerHTML = `
+                <tr class="border-b bg-slate-100 sticky top-0 z-10">
+                    <th class="py-3 px-4 font-semibold text-slate-600 text-left">Judul Konten</th>
+                    <th class="py-3 px-4 font-semibold text-slate-600 text-center">Jumlah Pengurasi</th>
+                    <th class="py-3 px-4 font-semibold text-slate-600 text-center">Progres Selesai</th>
+                </tr>`;
+
+            const contentArray = Object.values(contentStats);
+            if (contentArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-slate-500">Tidak ada konten untuk ditampilkan.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = contentArray.map(stats => {
+                const assignedCount = stats.assignedTo.size;
+                const completedCount = stats.completedBy.size;
+                return `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="py-2 px-4 font-medium text-slate-800">${stats.title}</td>
+                        <td class="py-2 px-4 text-center font-medium">${assignedCount}</td>
+                        <td class="py-2 px-4 text-center">${completedCount} dari ${assignedCount}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         // --- Event Listeners ---
         
-        // User Modal
+        document.getElementById('search-user-input').addEventListener('input', renderUsersTable);
+
         document.getElementById('add-user-btn').addEventListener('click', () => {
             userForm.reset();
             document.getElementById('user-id').value = '';
@@ -471,7 +727,6 @@
             userModal.classList.add('hidden');
         });
 
-        // Content Modal
         document.getElementById('add-content-btn').addEventListener('click', () => {
             contentForm.reset(); document.getElementById('content-id').value = '';
             document.getElementById('content-modal-title').textContent = 'Tambah Konten Baru';
@@ -487,12 +742,10 @@
             contentModal.classList.add('hidden');
         });
         
-        // Main Click Handler for Edit/Delete/Assign
         document.body.addEventListener('click', async (e) => {
             const target = e.target.closest('button');
             if (!target) return;
 
-            // User Actions
             if (target.matches('.edit-user-btn')) {
                 const id = target.dataset.id;
                 const user = allUsers.find(u => u.id === id);
@@ -500,8 +753,8 @@
                 document.getElementById('user-nama').value = user.nama;
                 document.getElementById('user-instansi').value = user.instansi;
                 document.getElementById('user-username').value = user.username;
-                document.getElementById('user-password').value = ''; // Clear password for security
-                document.getElementById('user-password').required = false; // Not required on edit
+                document.getElementById('user-password').value = '';
+                document.getElementById('user-password').required = false;
                 document.getElementById('user-role').value = user.role;
                 document.getElementById('user-modal-title').textContent = 'Edit Pengguna';
                 userModal.classList.remove('hidden');
@@ -511,7 +764,6 @@
                     deleteDoc(doc(db, 'users', target.dataset.id));
                 });
             }
-            // Content Actions
             if (target.matches('.edit-content-btn')) {
                 const id = target.dataset.id;
                 const content = allContent.find(c => c.id === id);
@@ -527,15 +779,15 @@
                     deleteDoc(doc(db, 'contents', target.dataset.id));
                 });
             }
-            // Assignment Actions
             const username = document.getElementById('user-select').value;
-            if (!username) return;
-            const assignmentRef = doc(db, 'assignments', username);
-            if (target.matches('.assign-btn')) {
-                await setDoc(assignmentRef, { contentIds: arrayUnion(target.dataset.contentId) }, { merge: true });
-            }
-            if (target.matches('.unassign-btn')) {
-                await updateDoc(assignmentRef, { contentIds: arrayRemove(target.dataset.contentId) });
+            if (username) {
+                const assignmentRef = doc(db, 'assignments', username);
+                if (target.matches('.assign-btn')) {
+                    await setDoc(assignmentRef, { contentIds: arrayUnion(target.dataset.contentId) }, { merge: true });
+                }
+                if (target.matches('.unassign-btn')) {
+                    await updateDoc(assignmentRef, { contentIds: arrayRemove(target.dataset.contentId) });
+                }
             }
         });
 
@@ -548,7 +800,6 @@
             }
         });
 
-        // Event listener untuk tombol Hapus Semua Konten
         document.getElementById('delete-all-content-btn').addEventListener('click', () => {
             showConfirm(
                 'Hapus Semua Konten',
@@ -559,11 +810,10 @@
             );
         });
 
-        // --- Random Assignment ---
         document.getElementById('random-assign-btn').addEventListener('click', () => {
             showConfirm(
                 'Bagikan Penugasan Acak?',
-                'PERINGATAN! Ini akan MENGHAPUS semua penugasan yang ada dan membuat yang baru secara acak. Setiap kurator akan mendapatkan 12 konten. Lanjutkan?',
+                'PERINGATAN! Ini akan MENGHAPUS semua penugasan yang ada dan membuat yang baru. Setiap kurator akan mendapatkan 12 konten secara acak. Lanjutkan?',
                 async () => {
                     const curators = allUsers.filter(u => u.role === 'Kurator');
                     const contentIds = allContent.map(c => c.id);
@@ -579,7 +829,7 @@
 
                     const assignmentPool = [];
                     contentIds.forEach(id => {
-                        assignmentPool.push(id, id, id); // Setiap konten dikurasi 3 kali
+                        assignmentPool.push(id, id, id);
                     });
 
                     function shuffleArray(array) {
@@ -591,7 +841,7 @@
                     shuffleArray(assignmentPool);
                     
                     if (curators.length * 12 > assignmentPool.length) {
-                        console.warn("Tidak cukup konten untuk memberikan 12 ke setiap kurator. Beberapa kurator mungkin mendapatkan kurang dari 12.");
+                        console.warn("Tidak cukup konten untuk memberikan 12 ke setiap kurator.");
                     }
 
                     const batch = writeBatch(db);
@@ -618,8 +868,6 @@
             );
         });
 
-
-        // --- Excel Upload/Download ---
         document.getElementById('download-template-btn').addEventListener('click', () => {
             const sampleData = [{ title: "Contoh Judul Konten", url: "https://www.youtube.com/watch?v=example", subject: "Matematika" }];
             const ws = XLSX.utils.json_to_sheet(sampleData);
@@ -660,7 +908,7 @@
                     log(`Ditemukan ${json.length} baris data. Memulai proses unggah...`);
                     const batch = writeBatch(db);
                     json.forEach(item => {
-                        if (item.title && item.url) { // Basic validation
+                        if (item.title && item.url) {
                             const contentRef = doc(collection(db, "contents"));
                             batch.set(contentRef, {
                                 title: String(item.title),
@@ -673,7 +921,7 @@
 
                     await batch.commit();
                     log(`✅ Berhasil: ${json.length} konten baru berhasil diunggah.`);
-                    event.target.value = ''; // Reset file input
+                    event.target.value = '';
 
                 } catch (error) {
                     log(`❌ Terjadi kesalahan: ${error.message}`);
@@ -683,8 +931,6 @@
             reader.readAsArrayBuffer(file);
         });
 
-
-        // --- RESET LOGIC ---
         function log(message) { logBox.innerHTML += `\n> ${message}`; logBox.scrollTop = logBox.scrollHeight; }
         
         async function clearCollection(name) {
