@@ -23,7 +23,7 @@
             background-color: var(--neu-bg);
         }
 
-        /* Gaya Neumorphism Login */
+        /* Gaya Neumorphism Umum */
         .neumorphism-card {
             background: var(--neu-bg);
             border-radius: 20px;
@@ -31,14 +31,14 @@
             animation: fadeInScale 0.5s ease-out forwards;
         }
 
-        .neumorphism-input {
+        .neumorphism-input, .neumorphism-textarea {
             width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
             background: var(--neu-bg); color: #555; font-size: 1rem;
             box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #ffffff;
             transition: box-shadow 0.3s ease;
         }
-        .neumorphism-input::placeholder { color: #999; }
-        .neumorphism-input:focus { box-shadow: inset 7px 7px 12px #cbced1, inset -7px -7px 12px #ffffff; }
+        .neumorphism-input::placeholder, .neumorphism-textarea::placeholder { color: #999; }
+        .neumorphism-input:focus, .neumorphism-textarea:focus { box-shadow: inset 7px 7px 12px #cbced1, inset -7px -7px 12px #ffffff; }
 
         .neumorphism-button {
             width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
@@ -69,83 +69,76 @@
             border-radius: 15px;
             padding: 1rem;
             box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5);
-            overflow-x: auto; /* Memungkinkan scroll horizontal */
-            max-height: 70vh; /* Batasi tinggi agar bisa di-scroll */
+            overflow-x: auto;
+            max-height: 70vh;
         }
         .neumorphism-table {
             border-collapse: separate;
-            border-spacing: 0 10px; /* Jarak antar baris */
+            border-spacing: 0 10px;
         }
         .neumorphism-table thead th {
-            position: sticky; /* Membuat header tabel tetap */
-            top: 0; /* Menempel di bagian atas container scroll */
-            z-index: 10;
+            position: sticky; top: 0; z-index: 10;
             background-color: var(--neu-bg);
-            padding: 1rem 1.5rem;
-            text-align: left;
-            font-weight: 600;
-            color: #555;
-            white-space: nowrap;
-            box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
-            border-radius: 8px;
-            margin: 5px;
+            padding: 1rem 1.5rem; text-align: left; font-weight: 600; color: #555;
+            white-space: nowrap; box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
+            border-radius: 8px; margin: 5px;
         }
         .neumorphism-table tbody tr {
              box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
              border-radius: 10px;
         }
         .neumorphism-table tbody td {
-            background: var(--neu-bg);
-            padding: 1rem 1.5rem;
-            vertical-align: top;
+            background: var(--neu-bg); padding: 1rem 1.5rem; vertical-align: top;
         }
         .neumorphism-table tbody td:first-child { border-radius: 10px 0 0 10px; }
         .neumorphism-table tbody td:last-child { border-radius: 0 10px 10px 0; }
         
-        /* Kelas untuk wrapping text */
-        .content-cell {
-            min-width: 300px;
-            max-width: 450px;
-            white-space: normal;
-            word-break: break-word;
-        }
+        .content-cell { min-width: 300px; max-width: 450px; white-space: normal; word-break: break-word; }
+        .curator-cell { min-width: 200px; white-space: normal; }
 
-        .curator-cell {
-            min-width: 200px;
-            white-space: normal;
+        /* Gaya Modal */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
         }
     </style>
 </head>
 <body class="text-slate-800">
 
-    <!-- === LOGIN SECTION (GAYA NEUMORPHISM) === -->
+    <!-- === LOGIN SECTION === -->
     <div id="login-section" class="flex items-center justify-center min-h-screen p-4">
-        <div class="neumorphism-card p-8 sm:p-12 w-full max-w-md text-center">
-            <i class="fas fa-user-shield text-5xl text-indigo-500 mb-4"></i>
-            <h1 class="text-3xl font-bold text-slate-800">Login Supervisor</h1>
-            <p class="text-slate-500 mb-8 mt-2">Gunakan ID dan Password Anda.</p>
-            <form id="login-form" class="space-y-6">
-                <div class="w-full text-left">
-                    <label for="username-input" class="form-label mb-2 ml-1">ID / Username</label>
-                    <input type="text" id="username-input" class="neumorphism-input" placeholder="e.g., DirSD041" required>
-                </div>
-                <div class="w-full text-left">
-                    <label for="password-input" class="form-label mb-2 ml-1">Password</label>
-                    <input type="password" id="password-input" class="neumorphism-input" placeholder="••••••••" required>
-                </div>
-                 <p id="login-error" class="text-red-500 text-sm h-5 text-center"></p>
-                <button id="login-btn" type="submit" class="neumorphism-button">
-                    Masuk
-                </button>
-            </form>
-             <a href="./" class="neumorphism-button mt-4" style="color: #555;">
-                <i class="fas fa-home mr-2"></i>
-                Kembali ke Home
-            </a>
+        <div class="neumorphism-card w-full max-w-4xl flex flex-col md:flex-row items-center rounded-2xl overflow-hidden">
+            <div class="md:w-1/2 text-center p-8 md:p-12">
+                <img src="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4" alt="Logo Kemendikbud" class="w-24 h-24 mx-auto mb-6">
+                <h2 class="text-2xl font-bold text-slate-800">Panel Supervisor</h2>
+                <p class="text-slate-500 mt-2">Selamat datang kembali. Silakan masuk untuk meninjau hasil kurasi konten.</p>
+            </div>
+            <div class="md:w-1/2 w-full p-8 md:p-12">
+                <h1 class="text-2xl font-bold text-slate-800 mb-2">Login Akun</h1>
+                <p class="text-slate-500 mb-6">Gunakan ID dan Password Anda.</p>
+                <form id="login-form" class="space-y-6">
+                    <div class="w-full text-left">
+                        <label for="username-input" class="form-label mb-2 ml-1">ID / Username</label>
+                        <input type="text" id="username-input" class="neumorphism-input" placeholder="e.g., DirSD041" required>
+                    </div>
+                    <div class="w-full text-left">
+                        <label for="password-input" class="form-label mb-2 ml-1">Password</label>
+                        <input type="password" id="password-input" class="neumorphism-input" placeholder="••••••••" required>
+                    </div>
+                    <p id="login-error" class="text-red-500 text-sm h-5 text-center"></p>
+                    <button id="login-btn" type="submit" class="neumorphism-button">
+                        Masuk
+                    </button>
+                </form>
+                <a href="./" class="neumorphism-button mt-4" style="color: #555;">
+                    <i class="fas fa-home mr-2"></i>
+                    Kembali ke Home
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- === HEADER (HIDDEN BY DEFAULT, STICKY REMOVED) === -->
+    <!-- === HEADER === -->
     <header id="main-header" class="hidden bg-white/80 backdrop-blur-lg shadow-sm z-30 border-b border-slate-200">
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <h1 id="welcome-message" class="text-xl font-bold text-slate-800">Dashboard Supervisor</h1>
@@ -160,20 +153,76 @@
         </div>
     </header>
 
-    <!-- === MAIN DASHBOARD (HIDDEN BY DEFAULT) === -->
+    <!-- === MAIN DASHBOARD === -->
     <main id="main-dashboard" class="hidden bg-slate-50">
         <div class="py-10">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <h2 class="text-2xl font-semibold text-slate-800 mb-6 px-4 sm:px-0">Tinjauan Hasil Kurasi Konten</h2>
                 <div id="table-wrapper" class="neumorphism-table-container">
                     <table id="results-table" class="w-full neumorphism-table">
-                        <!-- Konten tabel akan dirender oleh JavaScript -->
                     </table>
                 </div>
             </div>
         </div>
     </main>
     
+    <!-- === MODAL DETAIL KURASI === -->
+    <div id="details-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="neumorphism-card w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl overflow-hidden">
+            <!-- Header Modal -->
+            <div class="flex-shrink-0 p-5 flex justify-between items-center border-b border-slate-300/50">
+                <h3 id="modal-title" class="text-xl font-bold text-slate-800">Detail Hasil Kurasi</h3>
+                <button id="close-modal-btn" class="neumorphism-button !w-10 !h-10 !p-0 !rounded-full !text-xl hover:!text-red-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Konten Modal -->
+            <div class="flex-grow p-6 overflow-y-auto space-y-6">
+                <div>
+                    <h4 class="font-bold text-lg text-slate-800 mb-1">Judul Konten</h4>
+                    <p id="modal-content-title" class="text-slate-600">Memuat...</p>
+                </div>
+                <!-- Nilai Indikator -->
+                <div>
+                    <h4 class="font-bold text-lg text-slate-800 mb-3">Nilai Indikator</h4>
+                    <div id="modal-indicator-values" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <!-- Nilai A1, A2...C5 akan dirender di sini -->
+                    </div>
+                </div>
+                <hr class="border-slate-300/60 my-6">
+                <!-- D1 Simpulan Umum -->
+                <div class="space-y-4">
+                     <h4 class="font-bold text-lg text-slate-800">D1. Simpulan Umum</h4>
+                    <div>
+                        <label class="form-label font-semibold">Kelebihan</label>
+                        <textarea id="modal-d1-kelebihan" class="neumorphism-textarea text-sm" rows="4" readonly></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label font-semibold">Kekurangan</label>
+                        <textarea id="modal-d1-kekurangan" class="neumorphism-textarea text-sm" rows="4" readonly></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label font-semibold">Saran Perbaikan</label>
+                        <textarea id="modal-d1-saran" class="neumorphism-textarea text-sm" rows="4" readonly></textarea>
+                    </div>
+                </div>
+                 <hr class="border-slate-300/60 my-6">
+                <!-- D2 Keputusan Final -->
+                <div class="space-y-4">
+                     <h4 class="font-bold text-lg text-slate-800">D2. Keputusan Final</h4>
+                    <div>
+                        <label class="form-label font-semibold">Nilai Akhir</label>
+                        <p id="modal-d2-keputusan" class="neumorphism-input !shadow-none !bg-slate-200/80 font-bold"></p>
+                    </div>
+                     <div>
+                        <label class="form-label font-semibold">Deskripsi Nilai Akhir</label>
+                        <textarea id="modal-d2-deskripsi" class="neumorphism-textarea text-sm" rows="4" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -201,6 +250,22 @@
         const logoutBtn = document.getElementById('logout-btn');
         const welcomeMessage = document.getElementById('welcome-message');
         const resultsTable = document.getElementById('results-table');
+        const detailsModal = document.getElementById('details-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        let curationsMap = new Map();
+
+        // --- Struktur Pertanyaan Kurasi (diambil dari Kurator.html untuk konsistensi) ---
+        const curationQuestions = [
+             { id: 'A1', title: 'A.1 Keamanan Materi'}, { id: 'A2', title: 'A.2 Copyright'},
+             { id: 'A3', title: 'A.3 Substansi Materi'}, { id: 'A4', title: 'A.4 Kebahasaan'},
+             { id: 'A5', title: 'A.5 Inklusivitas'}, { id: 'B1', title: 'B.1 Teks'},
+             { id: 'B2', title: 'B.2 Gambar'}, { id: 'B3', title: 'B.3 Video'},
+             { id: 'B4', title: 'B.4 Interaktif'}, { id: 'B5', title: 'B.5 Lab Maya'},
+             { id: 'B6', title: 'B.6 Gim Edukasi'}, { id: 'C1', title: 'C.1 Judul'},
+             { id: 'C2', title: 'C.2 Isi Materi'}, { id: 'C3', title: 'C.3 Deskripsi'},
+             { id: 'C4', title: 'C.4 Penulis'}, { id: 'C5', title: 'C.5 Prinsip Keselarasan'}
+        ];
 
         // --- Login & Authentication ---
         async function handleLogin(e) {
@@ -275,9 +340,8 @@
                 
                 const usersMap = new Map(usersSnap.docs.map(doc => [doc.id, doc.data()]));
                 const usernameToIdMap = new Map(usersSnap.docs.map(doc => [doc.data().username, doc.id]));
-                const curationsMap = new Map(curationsSnap.docs.map(doc => [doc.id, doc.data()]));
+                curationsMap = new Map(curationsSnap.docs.map(doc => [doc.id, doc.data()]));
 
-                // Petakan penugasan per konten untuk pencarian cepat
                 const assignmentsByContent = new Map();
                 assignmentsSnap.docs.forEach(assignDoc => {
                     const assignment = assignDoc.data();
@@ -293,8 +357,7 @@
                     }
                 });
 
-                // Bangun HTML Tabel
-                const MAX_CURATORS_COLUMNS = 3; // Definisikan jumlah kolom kurator
+                const MAX_CURATORS_COLUMNS = 3;
                 let tableHTML = '<thead><tr><th>Konten</th>';
                 for (let i = 1; i <= MAX_CURATORS_COLUMNS; i++) {
                     tableHTML += `<th>Kurator ${i}</th>`;
@@ -306,7 +369,6 @@
                     const assignedCuratorIds = assignmentsByContent.get(content.id) || [];
 
                     tableHTML += `<tr>`;
-                    // Kolom Konten
                     tableHTML += `
                         <td class="content-cell">
                             <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline">
@@ -316,13 +378,11 @@
                         </td>
                     `;
                     
-                    // Kolom Kurator
                     for (let i = 0; i < MAX_CURATORS_COLUMNS; i++) {
                         if (i < assignedCuratorIds.length) {
-                            // Ada kurator yang ditugaskan di slot kolom ini
                             const curatorId = assignedCuratorIds[i];
                             const curator = usersMap.get(curatorId);
-                            const curatorName = curator ? curator.nama : 'Kurator Tidak Dikenal';
+                            const curatorName = curator ? curator.nama : 'Kurator Tdk Dikenal';
                             const curationId = `${curatorId}_${content.id}`;
                             const curationData = curationsMap.get(curationId);
                             
@@ -334,7 +394,11 @@
                                 tableHTML += `
                                     <div class="flex items-center mt-1">
                                         <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                        <span class="text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full">${finalScore}</span>
+                                        <button class="view-details-btn text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full hover:bg-green-200 transition-all"
+                                                data-curation-id="${curationId}" 
+                                                data-content-title="${content.title}">
+                                            ${finalScore}
+                                        </button>
                                     </div>
                                 `;
                             } else {
@@ -342,7 +406,6 @@
                             }
                             tableHTML += `</td>`;
                         } else {
-                            // Slot kolom ini kosong karena kurator yang ditugaskan lebih sedikit
                             tableHTML += `<td class="text-center align-middle"><span class="text-slate-400">—</span></td>`;
                         }
                     }
@@ -359,6 +422,50 @@
             }
         }
 
+        // --- Modal Logic ---
+        function openDetailsModal(curationId, contentTitle) {
+            const curationData = curationsMap.get(curationId);
+            if (!curationData || !curationData.answers) {
+                alert("Data kurasi tidak ditemukan!");
+                return;
+            }
+            const answers = curationData.answers;
+
+            // Set Judul Konten
+            document.getElementById('modal-content-title').textContent = contentTitle;
+
+            // Set Nilai Indikator (A1-C5)
+            const indicatorContainer = document.getElementById('modal-indicator-values');
+            indicatorContainer.innerHTML = ''; // Kosongkan dulu
+            curationQuestions.forEach(q => {
+                const value = answers[q.id]?.value || 'N/A';
+                const shortTitle = q.title.split(' ')[0]; // Ambil kode seperti "A.1"
+                indicatorContainer.innerHTML += `
+                    <div class="neumorphism-input !shadow-none !bg-slate-100 p-3 rounded-lg">
+                        <p class="text-xs font-bold text-slate-500">${shortTitle}</p>
+                        <p class="text-sm font-semibold text-slate-800">${value}</p>
+                    </div>
+                `;
+            });
+            
+            // Set D1 Simpulan Umum
+            document.getElementById('modal-d1-kelebihan').value = answers.D1_Simpulan_Umum?.kelebihan || '';
+            document.getElementById('modal-d1-kekurangan').value = answers.D1_Simpulan_Umum?.kekurangan || '';
+            document.getElementById('modal-d1-saran').value = answers.D1_Simpulan_Umum?.saran || '';
+
+            // Set D2 Keputusan Final
+            document.getElementById('modal-d2-keputusan').textContent = answers.D2_Keputusan_Final?.keputusan || 'N/A';
+            document.getElementById('modal-d2-deskripsi').value = answers.D2_Keputusan_Final?.nilai_deskripsi || '';
+
+            detailsModal.classList.remove('hidden');
+            detailsModal.classList.add('flex');
+        }
+
+        function closeDetailsModal() {
+            detailsModal.classList.add('hidden');
+            detailsModal.classList.remove('flex');
+        }
+
         // --- Initialize App ---
         window.addEventListener('load', () => {
             const savedUser = sessionStorage.getItem('supervisorUser');
@@ -370,8 +477,18 @@
 
             loginForm.addEventListener('submit', handleLogin);
             logoutBtn.addEventListener('click', handleLogout);
+            closeModalBtn.addEventListener('click', closeDetailsModal);
+
+            // Event listener untuk tombol detail
+            document.body.addEventListener('click', function(event) {
+                const target = event.target.closest('.view-details-btn');
+                if (target) {
+                    const curationId = target.dataset.curationId;
+                    const contentTitle = target.dataset.contentTitle;
+                    openDetailsModal(curationId, contentTitle);
+                }
+            });
         });
     </script>
 </body>
 </html>
-
