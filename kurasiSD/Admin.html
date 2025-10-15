@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin Kurasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        .sidebar-link.active {
+            background-color: #3182CE; /* blue-500 */
+            color: white;
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        #logBox {
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            height: 300px;
+            overflow-y: auto;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #1E293B; /* slate-800 */
+            color: #E2E8F0; /* slate-200 */
+        }
+        .form-input {
+             @apply mt-1 block w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md;
+        }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <div class="flex min-h-screen">
+        <!-- === SIDEBAR === -->
+        <aside class="w-64 bg-slate-800 text-slate-200 flex flex-col">
+            <div class="p-6 text-center border-b border-slate-700">
+                <h1 class="text-2xl font-bold text-white">Admin Kurasi</h1>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700 active" data-target="dashboard">
+                    <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard</span>
+                </a>
+                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="users">
+                    <i class="fas fa-users-cog w-6"></i><span>Manajemen Pengguna</span>
+                </a>
+                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="videos">
+                    <i class="fas fa-video w-6"></i><span>Manajemen Video</span>
+                </a>
+                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="assignments">
+                    <i class="fas fa-tasks w-6"></i><span>Penugasan</span>
+                </a>
+                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="settings">
+                    <i class="fas fa-cogs w-6"></i><span>Pengaturan</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- === MAIN CONTENT === -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Dashboard</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                        <i class="fas fa-users text-4xl text-blue-500"></i>
+                        <div>
+                            <p class="text-slate-500">Total Pengguna</p>
+                            <p id="total-users" class="text-3xl font-bold">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                        <i class="fas fa-video text-4xl text-green-500"></i>
+                        <div>
+                            <p class="text-slate-500">Total Video</p>
+                            <p id="total-videos" class="text-3xl font-bold">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div id="users-page" class="page-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-slate-800">Manajemen Pengguna</h2>
+                    <button id="add-user-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-plus mr-2"></i>Tambah Pengguna</button>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="py-2 px-4">Nama</th>
+                                <th class="py-2 px-4">Instansi</th>
+                                <th class="py-2 px-4">ID/Username</th>
+                                <th class="py-2 px-4">Role</th>
+                                <th class="py-2 px-4">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Data pengguna akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Videos Page -->
+            <div id="videos-page" class="page-content hidden">
+                 <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-slate-800">Manajemen Video</h2>
+                    <button id="add-video-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-plus mr-2"></i>Tambah Video</button>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="py-2">Judul</th>
+                                <th class="py-2">URL</th>
+                                <th class="py-2">Subjek</th>
+                                <th class="py-2">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="videos-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Assignments Page -->
+            <div id="assignments-page" class="page-content hidden">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Penugasan Video</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="mb-4">
+                        <label for="user-select" class="block text-sm font-medium text-slate-700">Pilih Pengguna (Role Kurator):</label>
+                        <select id="user-select" class="form-input mt-1">
+                            <option value="">-- Pilih Kurator --</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <h3 class="font-bold text-lg mb-2">Video yang Ditugaskan</h3>
+                            <ul id="assigned-videos-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2">Video yang Tersedia</h3>
+                             <ul id="available-videos-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page (Reset) -->
+            <div id="settings-page" class="page-content hidden">
+                 <h2 class="text-3xl font-bold text-slate-800 mb-6">Pengaturan & Reset</h2>
+                 <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-auto">
+                    <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md mb-6" role="alert">
+                        <p class="font-bold">Zona Berbahaya!</p>
+                        <p>Tindakan reset akan menghapus koleksi `users`, `videos`, `assignments`, dan `curations` lalu mengisinya dengan data default sesuai daftar yang ditentukan.</p>
+                    </div>
+                    <button id="resetButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default</button>
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-slate-700 mb-2">Log Proses:</h3>
+                        <div id="logBox">Menunggu perintah...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Modal -->
+    <div id="user-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+      <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 text-center" id="user-modal-title">Tambah Pengguna Baru</h3>
+          <div class="mt-2 px-7 py-3">
+            <form id="user-form" class="space-y-4">
+              <input type="hidden" id="user-id">
+              <div><label class="block text-sm font-medium">Nama</label><input type="text" id="user-nama" class="form-input" required></div>
+              <div><label class="block text-sm font-medium">Instansi</label><input type="text" id="user-instansi" class="form-input" required></div>
+              <div><label class="block text-sm font-medium">ID/Username</label><input type="text" id="user-username" class="form-input" required></div>
+              <div><label class="block text-sm font-medium">Password</label><input type="password" id="user-password" class="form-input" required></div>
+              <div><label class="block text-sm font-medium">Role</label>
+                <select id="user-role" class="form-input" required>
+                    <option value="Kurator">Kurator</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Admin">Admin</option>
+                </select>
+              </div>
+              <div class="items-center px-4 py-3 space-y-2">
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600">Simpan</button>
+                <button type="button" id="cancel-user-modal" class="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">Batal</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Video Modal -->
+    <div id="video-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+          <h3 class="text-lg leading-6 font-medium text-gray-900" id="video-modal-title">Tambah Video Baru</h3>
+          <div class="mt-2 px-7 py-3">
+            <form id="video-form">
+              <input type="hidden" id="video-id">
+              <input type="text" id="video-title" placeholder="Judul Video" class="form-input" required>
+              <input type="url" id="video-url" placeholder="URL Video (e.g., https://...)" class="form-input" required>
+              <input type="text" id="video-subject" placeholder="Subjek" class="form-input" required>
+              <div class="items-center px-4 py-3">
+                <button type="submit" class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-600">Simpan</button>
+                <button type="button" id="cancel-video-modal" class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">Batal</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, writeBatch, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
+            authDomain: "kurasisd.firebaseapp.com",
+            projectId: "kurasisd",
+            storageBucket: "kurasisd.firebasestorage.app",
+            messagingSenderId: "520054778765",
+            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- State Management ---
+        let allUsers = [];
+        let allVideos = [];
+        let allAssignments = {};
+
+        // --- UI Elements ---
+        const pageContents = document.querySelectorAll('.page-content');
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        const userModal = document.getElementById('user-modal');
+        const videoModal = document.getElementById('video-modal');
+        const userForm = document.getElementById('user-form');
+        const videoForm = document.getElementById('video-form');
+
+        // --- Navigation Logic ---
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = link.dataset.target;
+                sidebarLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                pageContents.forEach(page => {
+                    page.id === `${target}-page` ? page.classList.remove('hidden') : page.classList.add('hidden');
+                });
+                // Rename target for correct page id
+                const newTarget = (target === 'curators') ? 'users' : target;
+                document.getElementById(`${newTarget}-page`)?.classList.remove('hidden');
+
+            });
+        });
+        
+        // --- Data Fetching & Rendering ---
+        
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            document.getElementById('total-users').textContent = allUsers.length;
+            renderUsersTable();
+            renderUserSelect();
+        });
+
+        onSnapshot(collection(db, "videos"), (snapshot) => {
+            allVideos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            document.getElementById('total-videos').textContent = allVideos.length;
+            renderVideosTable();
+        });
+
+        onSnapshot(collection(db, "assignments"), (snapshot) => {
+            allAssignments = {};
+            snapshot.docs.forEach(doc => {
+                allAssignments[doc.id] = doc.data().videoIds || [];
+            });
+            const selectedUserId = document.getElementById('user-select').value;
+            if (selectedUserId) {
+                renderAssignmentLists(selectedUserId);
+            }
+        });
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = allUsers.map(u => `
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="py-2 px-4">${u.nama}</td>
+                    <td class="py-2 px-4">${u.instansi}</td>
+                    <td class="py-2 px-4">${u.username}</td>
+                    <td class="py-2 px-4">${u.role}</td>
+                    <td class="py-2 px-4 whitespace-nowrap">
+                        <button class="edit-user-btn text-blue-500 hover:text-blue-700" data-id="${u.id}"><i class="fas fa-edit"></i></button>
+                        <button class="delete-user-btn text-red-500 hover:text-red-700 ml-2" data-id="${u.id}"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderVideosTable() {
+            const tbody = document.getElementById('videos-table-body');
+            tbody.innerHTML = allVideos.map(v => `
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="py-2">${v.title}</td>
+                    <td class="py-2 truncate max-w-xs">${v.url}</td>
+                    <td class="py-2">${v.subject}</td>
+                    <td class="py-2">
+                        <button class="edit-video-btn text-blue-500 hover:text-blue-700" data-id="${v.id}"><i class="fas fa-edit"></i></button>
+                        <button class="delete-video-btn text-red-500 hover:text-red-700 ml-2" data-id="${v.id}"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderUserSelect() {
+            const select = document.getElementById('user-select');
+            select.innerHTML = '<option value="">-- Pilih Kurator --</option>';
+            allUsers.filter(u => u.role === 'Kurator').forEach(u => {
+                const option = document.createElement('option');
+                option.value = u.username;
+                option.textContent = `${u.nama} (${u.username})`;
+                select.appendChild(option);
+            });
+        }
+
+        function renderAssignmentLists(username) {
+            const assignedIds = allAssignments[username] || [];
+            const assignedVideos = allVideos.filter(v => assignedIds.includes(v.id));
+            const availableVideos = allVideos.filter(v => !assignedIds.includes(v.id));
+
+            document.getElementById('assigned-videos-list').innerHTML = assignedVideos.map(v => `
+                <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded"><span>${v.title}</span><button class="unassign-btn text-red-500 text-xs" data-video-id="${v.id}">Lepas</button></li>`).join('');
+            document.getElementById('available-videos-list').innerHTML = availableVideos.map(v => `
+                 <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded"><span>${v.title}</span><button class="assign-btn text-green-500 text-xs" data-video-id="${v.id}">Tugas</button></li>`).join('');
+        }
+
+        // --- Event Listeners for CRUD and Assignments ---
+        
+        // User Modal
+        document.getElementById('add-user-btn').addEventListener('click', () => {
+            userForm.reset();
+            document.getElementById('user-id').value = '';
+            document.getElementById('user-modal-title').textContent = 'Tambah Pengguna Baru';
+            userModal.classList.remove('hidden');
+        });
+        document.getElementById('cancel-user-modal').addEventListener('click', () => userModal.classList.add('hidden'));
+
+        userForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('user-id').value;
+            const userData = {
+                nama: document.getElementById('user-nama').value,
+                instansi: document.getElementById('user-instansi').value,
+                username: document.getElementById('user-username').value,
+                password: document.getElementById('user-password').value,
+                role: document.getElementById('user-role').value,
+            };
+
+            if (id) { // Update
+                await setDoc(doc(db, 'users', id), userData, { merge: true });
+            } else { // Create
+                await addDoc(collection(db, 'users'), userData);
+            }
+            userModal.classList.add('hidden');
+        });
+
+        // Video Modal
+        document.getElementById('add-video-btn').addEventListener('click', () => {
+            videoForm.reset(); document.getElementById('video-id').value = '';
+            document.getElementById('video-modal-title').textContent = 'Tambah Video Baru';
+            videoModal.classList.remove('hidden');
+        });
+        document.getElementById('cancel-video-modal').addEventListener('click', () => videoModal.classList.add('hidden'));
+        videoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('video-id').value;
+            const videoData = { title: document.getElementById('video-title').value, url: document.getElementById('video-url').value, subject: document.getElementById('video-subject').value };
+            if (id) { await setDoc(doc(db, 'videos', id), videoData, { merge: true }); } 
+            else { await addDoc(collection(db, 'videos'), {...videoData, status: 'pending'}); }
+            videoModal.classList.add('hidden');
+        });
+        
+        document.body.addEventListener('click', async (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            // User Actions
+            if (target.matches('.edit-user-btn')) {
+                const id = target.dataset.id;
+                const user = allUsers.find(u => u.id === id);
+                document.getElementById('user-id').value = id;
+                document.getElementById('user-nama').value = user.nama;
+                document.getElementById('user-instansi').value = user.instansi;
+                document.getElementById('user-username').value = user.username;
+                document.getElementById('user-password').value = user.password;
+                document.getElementById('user-role').value = user.role;
+                document.getElementById('user-modal-title').textContent = 'Edit Pengguna';
+                userModal.classList.remove('hidden');
+            }
+            if (target.matches('.delete-user-btn')) {
+                if(confirm('Yakin ingin menghapus pengguna ini?')) await deleteDoc(doc(db, 'users', target.dataset.id));
+            }
+            // Video Actions
+            if (target.matches('.edit-video-btn')) {
+                const id = target.dataset.id;
+                const video = allVideos.find(v => v.id === id);
+                document.getElementById('video-id').value = id;
+                document.getElementById('video-title').value = video.title;
+                document.getElementById('video-url').value = video.url;
+                document.getElementById('video-subject').value = video.subject;
+                document.getElementById('video-modal-title').textContent = 'Edit Video';
+                videoModal.classList.remove('hidden');
+            }
+            if (target.matches('.delete-video-btn')) {
+                if(confirm('Yakin ingin menghapus video ini?')) await deleteDoc(doc(db, 'videos', target.dataset.id));
+            }
+            // Assignment Actions
+            const username = document.getElementById('user-select').value;
+            if (!username) return;
+            const assignmentRef = doc(db, 'assignments', username);
+            if (target.matches('.assign-btn')) {
+                await setDoc(assignmentRef, { videoIds: arrayUnion(target.dataset.videoId) }, { merge: true });
+            }
+            if (target.matches('.unassign-btn')) {
+                await updateDoc(assignmentRef, { videoIds: arrayRemove(target.dataset.videoId) });
+            }
+        });
+
+        document.getElementById('user-select').addEventListener('change', (e) => {
+            const username = e.target.value;
+            if (username) { renderAssignmentLists(username); } 
+            else {
+                document.getElementById('assigned-videos-list').innerHTML = '';
+                document.getElementById('available-videos-list').innerHTML = '';
+            }
+        });
+
+        // --- RESET LOGIC ---
+        const logBox = document.getElementById('logBox');
+        function log(message) { logBox.innerHTML += `\n> ${message}`; logBox.scrollTop = logBox.scrollHeight; }
+        async function clearCollection(name) {
+            log(`Membersihkan koleksi '${name}'...`);
+            const snapshot = await getDocs(collection(db, name));
+            if (snapshot.empty) { log(`Koleksi '${name}' sudah kosong.`); return; }
+            const batch = writeBatch(db);
+            snapshot.docs.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+            log(`✅ Koleksi '${name}' berhasil dibersihkan.`);
+        }
+        
+        const defaultUsers = [
+            { nama: "Nurul Afifah", instansi: "Sekolah Cikal Serpong", password: "123456", username: "DirSD001", role: "Kurator" },
+            { nama: "Eka Annisa", instansi: "TK Al Hariki Depok", password: "123456", username: "DirSD002", role: "Kurator" },
+            { nama: "Yudi Kustiana", instansi: "SMPN 4 Lembang", password: "123456", username: "DirSD003", role: "Kurator" },
+            { nama: "1 orang Perwakilan Guru SMP", instansi: "", password: "123456", username: "DirSD004", role: "Kurator" },
+            { nama: "Novita Handayani", instansi: "SMA Cikal Amri Jakarta Timur", password: "123456", username: "DirSD005", role: "Kurator" },
+            { nama: "1 orang Perwakilan Guru SMA", instansi: "", password: "123456", username: "DirSD006", role: "Kurator" },
+            { nama: "Ari Setyani", instansi: "SDN Cipinang Besar Selatan 01 Pagi", password: "123456", username: "DirSD007", role: "Kurator" },
+            { nama: "Maulana Yusuf", instansi: "SDN Menteng Atas 21", password: "123456", username: "DirSD008", role: "Kurator" },
+            { nama: "Shodiq Fathoni", instansi: "SDN Batu Ampar 05", password: "123456", username: "DirSD009", role: "Kurator" },
+            { nama: "Yusuf Kurniawan", instansi: "SDN Petemburan 01", password: "123456", username: "DirSD010", role: "Kurator" },
+            { nama: "Deliana Sagitalia", instansi: "SDIT Rahmaniyah 1 Kota Depok", password: "123456", username: "DirSD011", role: "Kurator" },
+            { nama: "Rizal Listyo Mahardhika", instansi: "SDN Mampang Prapatan 02 Pagi", password: "123456", username: "DirSD012", role: "Kurator" },
+            { nama: "Muhammad Muslim Machbub Sulhtony", instansi: "SDN Cibubur 10, Jakarta Timur", password: "123456", username: "DirSD013", role: "Kurator" },
+            { nama: "Ronald Stevanus SS", instansi: "SDN Kayuringin XIX,Kota Bekasi", password: "123456", username: "DirSD014", role: "Kurator" },
+            { nama: "Fajar Sidiq Setiawan", instansi: "SDN Sukamakmur 02, Kabupaten Bogor", password: "123456", username: "DirSD015", role: "Kurator" },
+            { nama: "Bintang Adhi Permana", instansi: "SDN Lubang Buaya 01, Jakarta Timur", password: "123456", username: "DirSD016", role: "Kurator" },
+            { nama: "Didik Rahmadi", instansi: "SDN Pejaten Timur 11, Jakarta Selatan", password: "123456", username: "DirSD017", role: "Kurator" },
+            { nama: "Jul Rasdi", instansi: "SDN Menteng Atas 21", password: "123456", username: "DirSD018", role: "Kurator" },
+            { nama: "Citra Dewi Nurlela Afni", instansi: "SDN Parapat 1, Kota Tangerang", password: "123456", username: "DirSD019", role: "Kurator" },
+            { nama: "Rahardian Adi Nugroho", instansi: "SDN Sungai Bambu 01, Jakarta Utara", password: "123456", username: "DirSD020", role: "Kurator" },
+            { nama: "Resti Ningsih", instansi: "SD Mutiara Hati, Kota Tangerang", password: "123456", username: "DirSD021", role: "Kurator" },
+            { nama: "Ujang Edi Brata", instansi: "SDN 2 Perdana, Kab. Pandeglang", password: "123456", username: "DirSD022", role: "Kurator" },
+            { nama: "Errisca Tri Oktavianasari", instansi: "SDN Batu Ampar 11 Pagi, Jakarta Timur", password: "123456", username: "DirSD023", role: "Kurator" },
+            { nama: "Yogi Permana", instansi: "SDN 4 Depok, Kota Depok", password: "123456", username: "DirSD024", role: "Kurator" },
+            { nama: "Asmaul Husnah", instansi: "SDN Cijantung 01, Jakarta Timur", password: "123456", username: "DirSD025", role: "Kurator" },
+            { nama: "Irfanda Fathan", instansi: "SDN Pekayon 16 Pagi, Jakarta Timur", password: "123456", username: "DirSD026", role: "Kurator" },
+            { nama: "Yoga Adi Pratama", instansi: "SDN Harapan 1, Kota Cimahi", password: "123456", username: "DirSD027", role: "Kurator" },
+            { nama: "Oryza Sativa N", instansi: "SDN Ulujami 06 Pagi, Jakarta Selatan", password: "123456", username: "DirSD028", role: "Kurator" },
+            { nama: "Hidayat", instansi: "SDN Peulau Kelapa 02 Pagi, Kab. Kep. Seribu", password: "123456", username: "DirSD029", role: "Kurator" },
+            { nama: "Desi Erfan", instansi: "SDN Cipinang Besar Utara 08", password: "123456", username: "DirSD030", role: "Kurator" },
+            { nama: "Hizbul Pahman", instansi: "SDN Kalibaru 1 Kota Depok", password: "123456", username: "DirSD031", role: "Kurator" },
+            { nama: "Firman Rizkiana", instansi: "SDN Utan Kayu Utara 11 Pagi, Jakarta Timur", password: "123456", username: "DirSD032", role: "Kurator" },
+            { nama: "Emat Sulaemat", instansi: "Sekolah Bosowa Binda Insani, Kota Bogor", password: "123456", username: "DirSD033", role: "Kurator" },
+            { nama: "Dimas Wijaya", instansi: "SD Labschool Cibubur", password: "123456", username: "DirSD034", role: "Kurator" },
+            { nama: "Kurator 35", instansi: "instansi Kurator 35", password: "123456", username: "DirSD035", role: "Kurator" },
+            { nama: "Kurator 36", instansi: "instansi Kurator 36", password: "123456", username: "DirSD036", role: "Kurator" },
+            { nama: "Kurator 37", instansi: "instansi Kurator 37", password: "123456", username: "DirSD037", role: "Kurator" },
+            { nama: "Kurator 38", instansi: "instansi Kurator 38", password: "123456", username: "DirSD038", role: "Kurator" },
+            { nama: "Kurator 39", instansi: "instansi Kurator 39", password: "123456", username: "DirSD039", role: "Kurator" },
+            { nama: "Kurator 40", instansi: "instansi Kurator 40", password: "123456", username: "DirSD040", role: "Kurator" },
+            { nama: "Supervisor1", instansi: "Instansi Supervisor 1", password: "123456", username: "DirSD041", role: "Supervisor" },
+            { nama: "Supervisor2", instansi: "Instansi Supervisor 2", password: "123456", username: "DirSD042", role: "Supervisor" },
+            { nama: "Supervisor3", instansi: "Instansi Supervisor 3", password: "123456", username: "DirSD043", role: "Supervisor" },
+            { nama: "Supervisor4", instansi: "Instansi Supervisor 4", password: "123456", username: "DirSD044", role: "Supervisor" },
+            { nama: "Supervisor5", instansi: "Instansi Supervisor 5", password: "123456", username: "DirSD045", role: "Supervisor" },
+            { nama: "Admin", instansi: "Instansi Admin", password: "Admin123", username: "Admin", role: "Admin" },
+        ];
+
+        document.getElementById('resetButton').addEventListener('click', async () => {
+            if (!confirm("Peringatan Keras!\nAnda akan MENGHAPUS SEMUA data dan membuat ulang database default. Lanjutkan?")) return;
+            
+            const btn = document.getElementById('resetButton');
+            btn.disabled = true;
+            btn.innerText = 'Sedang Memproses...';
+            logBox.innerHTML = 'Memulai proses reset...';
+
+            try {
+                await clearCollection('users');
+                await clearCollection('videos');
+                await clearCollection('assignments');
+                await clearCollection('curations');
+
+                log(`Membuat ${defaultUsers.length} data pengguna default...`);
+                const usersBatch = writeBatch(db);
+                defaultUsers.forEach(user => {
+                    const userRef = doc(collection(db, "users"));
+                    usersBatch.set(userRef, user);
+                });
+                await usersBatch.commit();
+                log(`✅ ${defaultUsers.length} pengguna berhasil dibuat.`);
+
+                log('Membuat 200 data video default...');
+                const videosBatch = writeBatch(db);
+                const videoIds = [];
+                for (let i = 1; i <= 200; i++) {
+                    const videoRef = doc(collection(db, "videos"));
+                    videoIds.push(videoRef.id);
+                    videosBatch.set(videoRef, { title: `Video Pembelajaran #${i}`, url: `https://youtube.com/watch?v=example${i}`, subject: "Umum", status: "pending" });
+                }
+                await videosBatch.commit();
+                log('✅ 200 video berhasil dibuat.');
+
+                log('Membuat penugasan untuk kurator...');
+                const assignmentsBatch = writeBatch(db);
+                let videoIndex = 0;
+                const curators = defaultUsers.filter(u => u.role === 'Kurator');
+                curators.forEach(curator => {
+                    const assignmentRef = doc(db, "assignments", curator.username);
+                    const assignedVideoIds = videoIds.slice(videoIndex, videoIndex + 5);
+                    if(assignedVideoIds.length > 0) {
+                        videoIndex += 5;
+                        assignmentsBatch.set(assignmentRef, { videoIds: assignedVideoIds });
+                    }
+                });
+                await assignmentsBatch.commit();
+                log('✅ Penugasan berhasil dibuat.');
+                log('\n🎉 SEMUA PROSES SELESAI!');
+
+            } catch (error) {
+                log(`\n❌ TERJADI ERROR: ${error.message}`);
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default';
+            }
+        });
+
+        // Initial setup for sidebar click to handle renamed page
+        document.querySelector('.sidebar-link[data-target="curators"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.getElementById('users-page').classList.remove('hidden');
+        });
+
+
+    </script>
+</body>
+</html>
+
