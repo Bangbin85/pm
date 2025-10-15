@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Password Pengguna</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Styling tetap sama */
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 font-sans">
+
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-white">Daftar Akun Pengguna</h1>
+            <p class="text-slate-400 mt-2">Salin username dan password dengan satu kali klik.</p>
+        </header>
+
+        <main class="max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border border-slate-700">
+            <!-- Search Input -->
+            <div class="mb-6 relative">
+                <input type="search" id="search-input" placeholder="Ketik nama pengguna untuk mencari..." class="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300" disabled>
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <i class="fas fa-search text-slate-400"></i>
+                </span>
+            </div>
+
+            <!-- User Account List -->
+            <div id="user-list-container" class="space-y-4">
+                 <p id="initial-message" class="text-center text-slate-400">Silakan ketik nama di kotak pencarian untuk menampilkan data pengguna.</p>
+                 <div id="user-list" class="space-y-4"></div>
+            </div>
+        </main>
+        
+        <footer class="text-center text-gray-500 text-xs mt-8">
+            &copy;2024 Kurasi Konten.
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase dari Admin.html
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
+            authDomain: "kurasisd.firebaseapp.com",
+            projectId: "kurasisd",
+            storageBucket: "kurasisd.firebasestorage.app",
+            messagingSenderId: "520054778765",
+            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const userListContainer = document.getElementById('user-list');
+        const searchInput = document.getElementById('search-input');
+        const initialMessage = document.getElementById('initial-message');
+        
+        let allUsers = [];
+
+        // Fungsi untuk merender daftar pengguna
+        function renderUsers(users) {
+            if (searchInput.value.trim() === '') {
+                userListContainer.innerHTML = '';
+                initialMessage.classList.remove('hidden');
+                initialMessage.textContent = 'Silakan ketik nama di kotak pencarian untuk menampilkan data pengguna.';
+                return;
+            }
+
+            if (users.length === 0) {
+                userListContainer.innerHTML = '<p class="text-center text-slate-500">Pengguna tidak ditemukan.</p>';
+                initialMessage.classList.add('hidden');
+                return;
+            }
+            
+            initialMessage.classList.add('hidden');
+
+            userListContainer.innerHTML = users.map((user, index) => `
+                <div class="user-card bg-slate-700/50 p-4 rounded-lg border border-slate-600 transition-all duration-300 hover:border-indigo-500">
+                    <h3 class="text-lg font-bold text-white mb-3">${user.nama || 'Tanpa Nama'}</h3>
+                    <div class="space-y-3">
+                        <!-- Username Field -->
+                        <div class="flex items-center gap-3">
+                            <label for="username-${index}" class="w-24 text-sm font-medium text-slate-400">Username</label>
+                            <div class="relative flex-grow">
+                                <input id="username-${index}" type="text" value="${user.username}" class="w-full pl-3 pr-10 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-300 focus:outline-none" readonly>
+                                <button onclick="copyToClipboard('username-${index}', this)" class="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-indigo-400 transition-colors">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Password Field -->
+                        <div class="flex items-center gap-3">
+                            <label for="password-${index}" class="w-24 text-sm font-medium text-slate-400">Password</label>
+                            <div class="relative flex-grow">
+                                <input id="password-${index}" type="password" value="${user.password}" class="w-full pl-3 pr-20 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-300 focus:outline-none" readonly>
+                                <div class="absolute inset-y-0 right-0 flex items-center">
+                                     <button onclick="togglePasswordVisibility('password-${index}', this)" class="px-3 text-slate-400 hover:text-indigo-400 transition-colors">
+                                        <i class="far fa-eye"></i>
+                                    </button>
+                                    <button onclick="copyToClipboard('password-${index}', this)" class="px-3 text-slate-400 hover:text-indigo-400 transition-colors">
+                                        <i class="far fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function fetchUsers() {
+            try {
+                const usersCollection = collection(db, 'users');
+                const q = query(usersCollection, where("password", "!=", null));
+                const userSnapshot = await getDocs(q);
+                allUsers = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                searchInput.disabled = false;
+                searchInput.placeholder = 'Ketik nama pengguna untuk mencari...';
+                initialMessage.textContent = 'Data siap. Silakan mulai mencari.';
+
+            } catch (error) {
+                console.error("Gagal mengambil data pengguna: ", error);
+                initialMessage.textContent = 'Gagal memuat data pengguna. Coba muat ulang halaman.';
+                initialMessage.classList.add('text-red-500');
+            }
+        }
+
+        function handleSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            if (searchTerm === '') {
+                renderUsers([]); 
+                return;
+            }
+            const filteredUsers = allUsers.filter(user => 
+                user.nama && user.nama.toLowerCase().includes(searchTerm)
+            );
+            renderUsers(filteredUsers);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            searchInput.placeholder = 'Sedang memuat data...';
+            await fetchUsers();
+            searchInput.addEventListener('input', handleSearch);
+        });
+    </script>
+    
+    <script>
+        // Fungsi helper ini tidak memerlukan module, jadi dipisah agar tetap berfungsi
+        function copyToClipboard(elementId, buttonElement) {
+            const input = document.getElementById(elementId);
+            if (navigator.clipboard && window.isSecureContext) {
+                 navigator.clipboard.writeText(input.value);
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = input.value;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                } catch (err) {
+                    console.error('Fallback: Gagal menyalin teks', err);
+                }
+                document.body.removeChild(textArea);
+            }
+
+            const originalIcon = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i class="fas fa-check text-green-400"></i>';
+            setTimeout(() => {
+                buttonElement.innerHTML = originalIcon;
+            }, 1500);
+        }
+        
+        function togglePasswordVisibility(elementId, buttonElement) {
+            const input = document.getElementById(elementId);
+            const icon = buttonElement.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+
+</body>
+</html>
+
