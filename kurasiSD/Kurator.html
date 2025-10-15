@@ -105,6 +105,11 @@
                 <button id="login-btn" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Masuk
                 </button>
+                <div class="flex justify-center w-full">
+                <a href="./" class="bg-red-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                </div>              
             </form>
         </div>
     </div>
@@ -114,9 +119,14 @@
         <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-20 border-b border-slate-200">
             <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <h1 id="welcome-message" class="text-xl font-bold text-slate-800">Dashboard Kurator</h1>
-                <button id="logout-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                </button>
+                <div class="flex items-center gap-4">
+                    <a href="./" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                    <button id="logout-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -317,7 +327,7 @@
                         <div>
                             <label for="final-keputusan" class="form-label font-semibold mb-1.5">Keputusan Final</label>
                             <select id="final-keputusan" class="form-select" required>
-                                <option value="">Nilai</option>
+                                <option value="">Nilai Akhir</option>
                                 <option value="Lulus Kurasi">Lulus Kurasi</option>
                                 <option value="Kurang Sesuai">Kurang Sesuai</option>
                                 <option value="Perbaikan Minor">Perbaikan Minor</option>
