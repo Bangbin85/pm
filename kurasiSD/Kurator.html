@@ -14,28 +14,28 @@
         /* === TEMA MODERN & ANIMASI === */
         :root {
             --c-primary: #7c3aed; /* violet-600 */
-            --c-primary-dark: #6d28d9; /* violet-700 */
-            --c-primary-light: #a78bfa; /* violet-400 */
             --c-secondary: #3b82f6; /* blue-500 */
+            --c-primary-light: #a78bfa; /* violet-400 */
             --c-glow: rgba(124, 58, 237, 0.4);
-
-            /* Variabel Gaya Neumorphism Baru */
-            --neu-bg: #eef2ff;
-            --neu-light-shadow: #ffffff;
-            --neu-dark-shadow: #d4d9e9;
-            --neu-text: #5b647c;
-            --neu-radius-lg: 24px;
-            --neu-radius-md: 16px;
-            --neu-radius-sm: 12px;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--neu-bg);
-            color: var(--neu-text);
         }
 
-        /* === Animasi Umum (Tetap Sama) === */
+        .animated-gradient-bg {
+            background: linear-gradient(-45deg, #f5f3ff, #eef2ff, #eff6ff, #f0f9ff);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* === Animasi Umum === */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -64,108 +64,87 @@
         .modal-content.show { animation: modal-content-show 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .modal-content.hide { animation: modal-content-hide 0.3s ease-in forwards; }
 
-        /* === GAYA KOMPONEN (Diperbarui ke Neumorphism) === */
+        /* === Gaya Komponen === */
 
         /* Kartu Login */
         .login-card-container {
             opacity: 0;
             animation: fadeInDown 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            background: var(--neu-bg);
-            border-radius: var(--neu-radius-lg);
-            box-shadow: 12px 12px 24px var(--neu-dark-shadow), -12px -12px 24px var(--neu-light-shadow);
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-        
-        .login-card-container .bg-gradient-to-br { /* Tetap menjaga gradien pada sisi ilustrasi */
-            border-radius: var(--neu-radius-lg) 0 0 var(--neu-radius-lg);
         }
 
         /* Kartu Konten */
         .content-card {
             opacity: 0; /* Mulai tersembunyi, diaktifkan oleh JS */
             animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            background: var(--neu-bg);
-            border-radius: var(--neu-radius-md);
-            box-shadow: 6px 6px 12px var(--neu-dark-shadow), -6px -6px 12px var(--neu-light-shadow);
-            transition: all 0.3s ease-in-out;
+            @apply transition-all duration-300 ease-in-out;
         }
-        .content-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 8px 8px 16px var(--neu-dark-shadow), -8px -8px 16px var(--neu-light-shadow);
-        }
-        .content-card .p-4 {
-            background-color: transparent;
+         .content-card:hover {
+            @apply shadow-2xl shadow-violet-200 transform -translate-y-2;
         }
 
-        /* Formulir dengan gaya Neumorphism Inset */
-        .form-label { @apply block text-sm font-medium mb-1; color: var(--neu-text); }
+
+        /* Formulir dengan gaya Neumorphism / Claymorphism */
+        .form-label { @apply block text-sm font-medium text-slate-700 mb-1; }
         .form-input, .form-select, .form-textarea {
-            @apply block w-full px-4 py-3 placeholder-slate-400 transition-all duration-300;
-            background-color: var(--neu-bg);
-            color: var(--neu-text);
+            @apply block w-full px-4 py-3 rounded-xl placeholder-slate-400 text-slate-600 transition-all duration-300;
+            background-color: #eef2ff; /* Warna terang dari background gradien halaman */
             border: none;
-            border-radius: var(--neu-radius-sm);
-            box-shadow: inset 5px 5px 10px var(--neu-dark-shadow),
-                        inset -5px -5px 10px var(--neu-light-shadow);
+            /* Bayangan gaya Neumorphism untuk efek 'cekung ke dalam' */
+            box-shadow: inset 5px 5px 10px #dbe1f2,
+                        inset -5px -5px 10px #ffffff;
         }
         .form-input:focus, .form-select:focus, .form-textarea:focus {
-            @apply outline-none ring-2 ring-offset-2;
-            --tw-ring-color: var(--c-primary);
-            --tw-ring-offset-color: var(--neu-bg);
-            box-shadow: none; /* Hilangkan shadow saat fokus untuk kejelasan */
+            /* Saat fokus, kembali ke gaya yang lebih jelas untuk usabilitas */
+            @apply outline-none ring-2 ring-violet-400 ring-offset-2 ring-offset-white;
+            box-shadow: none;
+            background-color: white;
         }
 
-        /* Tombol dengan gaya Neumorphism Raised */
+        /* Tombol dengan gaya Claymorphism / Menonjol */
         .btn {
-            @apply font-bold py-2.5 px-5 rounded-xl transition-all duration-150 transform focus:outline-none text-center relative;
-            background: var(--neu-bg);
-            color: var(--neu-text);
-            box-shadow: 5px 5px 10px var(--neu-dark-shadow), -5px -5px 10px var(--neu-light-shadow);
-            border: none;
-        }
-        .btn:hover {
-            filter: brightness(1.05);
+            @apply font-bold py-2.5 px-5 rounded-xl transition-all duration-100 transform focus:outline-none text-center relative;
         }
         .btn:active {
-            box-shadow: inset 4px 4px 8px var(--neu-dark-shadow), inset -4px -4px 8px var(--neu-light-shadow);
-            transform: translateY(1px);
-            font-size: 0.98em;
-            filter: brightness(1);
-        }
-        .btn.disabled, .btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            box-shadow: inset 4px 4px 8px var(--neu-dark-shadow), inset -4px -4px 8px var(--neu-light-shadow);
+            @apply top-1; /* Efek ditekan */
         }
 
         .btn-primary {
-            color: var(--c-primary);
-            font-weight: 700;
+            @apply text-white bg-gradient-to-r from-violet-500 to-blue-500 border-none;
+            box-shadow: 0px 5px 0px 0px #6d28d9; /* bayangan 3D */
+            @apply focus:ring-2 focus:ring-offset-2 focus:ring-violet-500;
         }
-        
-        #login-btn, #submit-curation-btn {
-            background: var(--c-primary);
-            color: white;
-            box-shadow: 5px 5px 10px var(--c-primary-dark), -5px -5px 10px var(--c-primary-light);
+        .btn-primary:active {
+            box-shadow: 0px 2px 0px 0px #6d28d9;
         }
-        #login-btn:active, #submit-curation-btn:active {
-            box-shadow: inset 5px 5px 10px var(--c-primary-dark), inset -5px -5px 10px var(--c-primary-light);
+        .btn-primary:hover {
+            filter: brightness(1.1);
         }
 
         .btn-secondary {
-            color: var(--neu-text);
+            @apply bg-white text-slate-700 border border-slate-300;
+            box-shadow: 0px 5px 0px 0px #cbd5e1; /* bayangan 3D */
+            @apply focus:ring-2 focus:ring-offset-2 focus:ring-slate-400;
+        }
+        .btn-secondary:active {
+            box-shadow: 0px 2px 0px 0px #cbd5e1;
+        }
+        .btn-secondary:hover {
+            @apply bg-slate-50;
         }
 
-        .btn-home {
-            color: #16a34a; /* green-600 */
+         .btn-home {
+            @apply bg-green-600 text-white font-semibold py-2 px-4 text-sm flex items-center border-none;
+             box-shadow: 0px 5px 0px 0px #166534; /* bayangan 3D */
+             @apply focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
+        }
+        .btn-home:hover {
+            @apply bg-green-700;
+        }
+        .btn-home:active {
+            box-shadow: 0px 2px 0px 0px #166534;
         }
     
         /* Modal Kurasi */
-        .modal-content {
-            background: var(--neu-bg);
-            border-radius: var(--neu-radius-lg);
-            box-shadow: 10px 10px 20px var(--neu-dark-shadow), -10px -10px 20px var(--neu-light-shadow);
-        }
         #curation-progress-bar {
             animation: glow 2s linear infinite;
         }
@@ -173,41 +152,53 @@
         #modal-sidebar {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 0.75rem;
+            gap: 0.75rem; /* 12px */
             align-content: start;
+            perspective: 1500px;
             padding: 1.5rem 1rem;
-            border-right: 1px solid var(--neu-dark-shadow);
         }
         #modal-sidebar .sidebar-link {
-            @apply flex items-center justify-center w-full text-center p-3 rounded-xl transition-all duration-300 ease-in-out font-bold text-lg;
-            color: var(--neu-text);
-            box-shadow: 4px 4px 8px var(--neu-dark-shadow), -4px -4px 8px var(--neu-light-shadow);
+            @apply flex items-center justify-center w-full text-center p-3 text-slate-800 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] font-bold text-lg;
+            @apply bg-white border border-slate-200 shadow-lg;
+            transform: rotateY(-20deg) scale(0.9);
+            opacity: 0.8;
+        }
+         #modal-sidebar .sidebar-link-content {
+            transform: rotateY(15deg);
+            transition: transform 0.5s ease;
         }
         #modal-sidebar .sidebar-link:hover {
-            color: var(--c-primary);
+            @apply bg-gradient-to-r from-violet-500 to-blue-500 text-white border-transparent;
+            transform: scale(1.1) rotateY(0deg) translateX(10px);
+            box-shadow: 0 15px 30px var(--c-glow);
+            z-index: 10;
+            position: relative;
+            opacity: 1;
+        }
+         #modal-sidebar .sidebar-link:hover .sidebar-link-content,
+         #modal-sidebar .sidebar-link.active .sidebar-link-content {
+            transform: rotateY(0deg);
         }
         #modal-sidebar .sidebar-link.active {
-            color: var(--c-primary);
-            font-weight: 800;
-            box-shadow: inset 4px 4px 8px var(--neu-dark-shadow), inset -4px -4px 8px var(--neu-light-shadow);
+            @apply bg-slate-800 text-white shadow-2xl border-slate-900;
+            transform: scale(1.05) rotateY(0deg) translateX(5px);
+            z-index: 5;
+            position: relative;
+            opacity: 1;
         }
-        #modal-sidebar .sidebar-link-content { /* Kelas ini tidak lagi diperlukan untuk efek 3D */
-            transform: none;
-        }
-
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--neu-bg); }
-        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; } /* slate-100 */
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; } /* gray-300 */
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; } /* gray-400 */
     </style>
 </head>
-<body class="text-slate-800">
+<body class="animated-gradient-bg text-slate-800">
 
     <!-- === BAGIAN LOGIN === -->
-    <div id="login-section" class="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8">
-        <div class="login-card-container w-full max-w-5xl mx-auto flex flex-col md:flex-row overflow-hidden">
+    <div id="login-section" class="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 bg-slate-100">
+        <div class="login-card-container w-full max-w-5xl mx-auto flex flex-col md:flex-row bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
             <!-- Kolom Kiri - Ilustrasi -->
             <div class="hidden md:flex flex-col justify-center items-center w-full md:w-1/2 p-10 lg:p-12 bg-gradient-to-br from-violet-500 to-blue-500 text-white">
                  <div class="text-center">
@@ -221,8 +212,8 @@
             <div class="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
                 <div class="w-full max-w-md mx-auto">
                     <div class="text-center md:text-left mb-8">
-                         <h1 class="text-3xl font-bold">Login Kurator</h1>
-                         <p class="mt-2">Selamat datang kembali! Silakan masuk.</p>
+                         <h1 class="text-3xl font-bold text-slate-800">Login Kurator</h1>
+                         <p class="text-slate-500 mt-2">Selamat datang kembali! Silakan masuk.</p>
                     </div>
                     <form id="login-form">
                         <div class="w-full mb-5">
@@ -233,7 +224,7 @@
                         </div>
                          <p id="login-error" class="text-red-500 text-sm mb-4 hidden"></p>
                         <div class="flex flex-col sm:flex-row gap-3 items-center">
-                            <button id="login-btn" type="submit" class="btn w-full sm:w-auto flex-grow text-xl">
+                            <button id="login-btn" type="submit" class="btn btn-primary w-full sm:w-auto flex-grow text-xl">
                                 Masuk
                             </button>
                             <a href="./" class="btn btn-home w-full sm:w-auto">
@@ -273,12 +264,12 @@
     </main>
     
     <!-- === MODAL KURASI (TERSEMBUNYI) === -->
-    <div id="curation-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 p-4 items-center justify-center modal-backdrop">
-        <div class="relative w-full max-w-7xl h-[95vh] flex flex-col overflow-hidden modal-content">
+    <div id="curation-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 p-4 flex items-center justify-center modal-backdrop">
+        <div class="relative w-full h-[95vh] bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col overflow-hidden modal-content">
             <!-- Header -->
-            <div class="flex-shrink-0 px-6 py-4 flex justify-between items-center border-b border-[var(--neu-dark-shadow)]">
-                <h3 class="text-lg font-semibold" id="curation-modal-title">Formulir Kurasi Konten</h3>
-                <button id="close-modal-btn" class="text-slate-500 hover:text-red-500 h-10 w-10 flex items-center justify-center transition-all duration-300 text-3xl leading-none focus:outline-none hover:rotate-90">&times;</button>
+            <div class="flex-shrink-0 px-6 py-4 flex justify-between items-center border-b border-slate-200">
+                <h3 class="text-lg font-semibold text-slate-900" id="curation-modal-title">Formulir Kurasi Konten</h3>
+                <button id="close-modal-btn" class="text-slate-500 hover:bg-red-100 hover:text-red-500 rounded-full h-10 w-10 flex items-center justify-center transition-all duration-300 text-3xl leading-none focus:outline-none hover:rotate-90">&times;</button>
             </div>
             
             <!-- Progress Bar -->
@@ -289,7 +280,7 @@
             <!-- Konten Utama -->
             <div class="flex-grow flex overflow-hidden">
                 <!-- Sidebar -->
-                <nav id="modal-sidebar" class="w-72 flex-shrink-0 overflow-y-auto">
+                <nav id="modal-sidebar" class="w-72 flex-shrink-0 bg-slate-50 border-r border-slate-200 overflow-y-auto">
                     <!-- Link sidebar akan disuntikkan di sini -->
                 </nav>
 
@@ -302,13 +293,13 @@
             </div>
 
              <!-- Footer -->
-            <div class="flex-shrink-0 p-4 border-t border-[var(--neu-dark-shadow)] flex justify-between items-center">
-                <span id="draft-status" class="text-sm italic"></span>
+            <div class="flex-shrink-0 p-4 bg-white/80 backdrop-blur-sm border-t border-slate-200 flex justify-between items-center">
+                <span id="draft-status" class="text-sm text-slate-500 italic"></span>
                 <div class="flex gap-4">
                     <button type="button" id="save-draft-btn" class="btn btn-secondary text-base py-3 px-6">
                         <i class="fas fa-save mr-2"></i>Simpan Draft
                     </button>
-                    <button type="submit" form="curation-form" id="submit-curation-btn" class="btn text-base py-3 px-6">
+                    <button type="submit" form="curation-form" id="submit-curation-btn" class="btn btn-primary text-base py-3 px-6">
                         <i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi
                     </button>
                 </div>
@@ -317,17 +308,17 @@
     </div>
     
     <!-- === Modal Alert / Konfirmasi Kustom === -->
-    <div id="alert-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm h-full w-full hidden z-[100] p-4 items-center justify-center modal-backdrop">
-         <div class="relative w-full max-w-md flex flex-col modal-content p-8 text-center">
-            <h4 id="alert-modal-title" class="text-xl font-bold mb-2">Judul</h4>
-            <p id="alert-modal-message" class="mb-6">Pesan akan muncul di sini.</p>
+    <div id="alert-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm h-full w-full hidden z-[100] p-4 items-center justify-center modal-backdrop">
+         <div class="relative w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col modal-content p-8 text-center">
+            <h4 id="alert-modal-title" class="text-xl font-bold text-slate-800 mb-2">Judul</h4>
+            <p id="alert-modal-message" class="text-slate-600 mb-6">Pesan akan muncul di sini.</p>
             <div id="alert-modal-buttons" class="flex gap-4 justify-center">
                 <!-- Tombol ditambahkan secara dinamis -->
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK (Tidak ada perubahan pada logika JavaScript) -->
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, serverTimestamp, query, where, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -411,8 +402,8 @@
                 <section id="group-${group.id}" class="indicator-section scroll-mt-8">
                     <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                         <div class="flex-grow">
-                            <h3 class="text-xl font-bold">${group.title}</h3>
-                            <p class="text-sm mt-1">Pilih status dan berikan catatan untuk setiap poin di bawah.</p>
+                            <h3 class="text-xl font-bold text-slate-800">${group.title}</h3>
+                            <p class="text-sm text-slate-500 mt-1">Pilih status dan berikan catatan untuk setiap poin di bawah.</p>
                         </div>
                         <div class="w-full md:w-auto md:min-w-[280px] mt-4 md:mt-0 flex-shrink-0">
                             <label for="select-${group.id}" class="form-label mb-1.5">Status Indikator</label>
@@ -428,8 +419,8 @@
                     </header>
                     <div class="mt-4 space-y-6">
                     ${(group.items || []).map(item => `
-                        <div class="py-5 border-t border-[var(--neu-dark-shadow)] first:border-t-0 first:pt-0">
-                            <label for="textarea-${group.id}-${item.id}" class="text-sm font-medium mb-2 block">${item.text}</label>
+                        <div class="py-5 border-t border-slate-200 first:border-t-0 first:pt-0">
+                            <label for="textarea-${group.id}-${item.id}" class="text-sm text-slate-700 font-medium mb-2 block">${item.text}</label>
                             <textarea id="textarea-${group.id}-${item.id}" rows="3" class="form-textarea w-full text-sm" placeholder="Catatan perbaikan atau justifikasi..."></textarea>
                         </div>
                     `).join('')}
@@ -440,10 +431,10 @@
             formHTML += `
                 <section id="group-D1" class="indicator-section scroll-mt-8">
                     <header class="mb-6">
-                        <h3 class="text-xl font-bold">D.1 Simpulan Umum</h3>
-                        <p class="text-sm mt-1">Berikan ringkasan dari hasil kurasi Anda.</p>
+                        <h3 class="text-xl font-bold text-slate-800">D.1 Simpulan Umum</h3>
+                        <p class="text-sm text-slate-500 mt-1">Berikan ringkasan dari hasil kurasi Anda.</p>
                     </header>
-                    <div class="space-y-6 pt-6 border-t border-[var(--neu-dark-shadow)]">
+                    <div class="space-y-6 pt-6 border-t border-slate-200">
                         <div>
                             <label for="final-kelebihan" class="form-label font-semibold mb-1.5">Kelebihan Konten</label>
                             <textarea id="final-kelebihan" rows="5" class="form-textarea w-full text-sm" placeholder="Contoh: Penjelasan materi sangat mudah dipahami..." required></textarea>
@@ -460,10 +451,10 @@
                 </section>
                  <section id="group-D2" class="indicator-section scroll-mt-8">
                     <header class="mb-6">
-                        <h3 class="text-xl font-bold">D.2 Keputusan Final</h3>
-                        <p class="text-sm mt-1">Tentukan kelayakan konten berdasarkan analisis keseluruhan.</p>
+                        <h3 class="text-xl font-bold text-slate-800">D.2 Keputusan Final</h3>
+                        <p class="text-sm text-slate-500 mt-1">Tentukan kelayakan konten berdasarkan analisis keseluruhan.</p>
                     </header>
-                    <div class="space-y-6 pt-6 border-t border-[var(--neu-dark-shadow)]">
+                    <div class="space-y-6 pt-6 border-t border-slate-200">
                         <div>
                             <label for="final-keputusan" class="form-label font-semibold mb-1.5">Keputusan Final</label>
                             <select id="final-keputusan" class="form-select" required>
@@ -566,25 +557,24 @@
                     const hasDraft = draftedContentIds.includes(content.id);
                     
                     let buttonText = '<i class="fas fa-edit mr-2"></i>Kurasi';
-                    let buttonClass = 'btn-primary';
                     if (isCurated) {
                         buttonText = '<i class="fas fa-check-circle mr-2"></i>Selesai';
-                        buttonClass = 'disabled';
                     } else if (hasDraft) {
                         buttonText = '<i class="fas fa-file-alt mr-2"></i>Lanjutkan Draft';
                     }
 
                     return `
-                        <div class="content-card flex flex-col">
+                        <div class="content-card bg-white rounded-xl shadow-lg overflow-hidden flex flex-col border border-slate-200">
                             <div class="p-6 flex-grow">
-                                <p class="text-sm font-medium" style="color: var(--c-primary);">${content.subject || 'Umum'}</p>
-                                <h3 class="font-semibold text-lg mt-1">${content.title}</h3>
+                                <p class="text-sm text-violet-600 font-medium">${content.subject || 'Umum'}</p>
+                                <h3 class="font-semibold text-lg text-slate-800 mt-1">${content.title}</h3>
                             </div>
-                            <div class="p-4 grid grid-cols-2 gap-3 border-t border-[var(--neu-dark-shadow)]">
+                            <div class="p-4 bg-slate-50 grid grid-cols-2 gap-3 border-t border-slate-200">
                                 <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary text-sm">
                                     <i class="fas fa-external-link-alt mr-2 text-xs"></i>Buka
                                 </a>
-                                <button class="start-curation-btn btn ${buttonClass} text-sm"
+                                <button class="start-curation-btn btn btn-primary text-sm
+                                    ${isCurated ? 'bg-slate-200 text-slate-500 cursor-not-allowed !bg-none !shadow-none' : ''}"
                                     data-content-id="${content.id}" 
                                     data-content-title="${content.title}"
                                     ${isCurated ? 'disabled' : ''}>
@@ -768,7 +758,7 @@
         
         document.body.addEventListener('click', (e) => {
             const startBtn = e.target.closest('.start-curation-btn');
-            if (startBtn && !startBtn.disabled) {
+            if (startBtn) {
                 openCurationModal(startBtn.dataset.contentId, startBtn.dataset.contentTitle);
             }
         });
