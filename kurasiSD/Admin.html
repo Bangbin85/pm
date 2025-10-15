@@ -6,6 +6,8 @@
     <title>Panel Admin Kurasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Library untuk membaca file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         .sidebar-link.active {
             background-color: #3182CE; /* blue-500 */
@@ -44,8 +46,8 @@
                 <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="users">
                     <i class="fas fa-users-cog w-6"></i><span>Manajemen Pengguna</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="videos">
-                    <i class="fas fa-video w-6"></i><span>Manajemen Video</span>
+                <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="content">
+                    <i class="fas fa-file-alt w-6"></i><span>Manajemen Konten</span>
                 </a>
                 <a href="#" class="sidebar-link flex items-center py-2 px-4 rounded-lg transition-colors hover:bg-slate-700" data-target="assignments">
                     <i class="fas fa-tasks w-6"></i><span>Penugasan</span>
@@ -71,10 +73,10 @@
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
-                        <i class="fas fa-video text-4xl text-green-500"></i>
+                        <i class="fas fa-file-alt text-4xl text-green-500"></i>
                         <div>
-                            <p class="text-slate-500">Total Video</p>
-                            <p id="total-videos" class="text-3xl font-bold">0</p>
+                            <p class="text-slate-500">Total Konten</p>
+                            <p id="total-content" class="text-3xl font-bold">0</p>
                         </div>
                     </div>
                 </div>
@@ -104,11 +106,18 @@
                 </div>
             </div>
 
-            <!-- Videos Page -->
-            <div id="videos-page" class="page-content hidden">
+            <!-- Content Page -->
+            <div id="content-page" class="page-content hidden">
                  <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-slate-800">Manajemen Video</h2>
-                    <button id="add-video-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-plus mr-2"></i>Tambah Video</button>
+                    <h2 class="text-3xl font-bold text-slate-800">Manajemen Konten</h2>
+                    <div class="flex space-x-2">
+                         <button id="download-template-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-download mr-2"></i>Unduh Template</button>
+                         <button id="upload-excel-btn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-file-excel mr-2"></i>Upload Excel</button>
+                         <button id="add-content-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-plus mr-2"></i>Tambah Konten</button>
+                         <!-- Tombol Baru Untuk Hapus Semua Konten -->
+                         <button id="delete-all-content-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-trash mr-2"></i>Hapus Semua Konten</button>
+                         <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls">
+                    </div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <table class="w-full text-left">
@@ -120,14 +129,19 @@
                                 <th class="py-2">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="videos-table-body"></tbody>
+                        <tbody id="content-table-body"></tbody>
                     </table>
                 </div>
             </div>
             
             <!-- Assignments Page -->
             <div id="assignments-page" class="page-content hidden">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Penugasan Video</h2>
+                 <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-slate-800">Penugasan Konten</h2>
+                    <button id="random-assign-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                        <i class="fas fa-random mr-2"></i>Bagikan Penugasan Acak
+                    </button>
+                </div>
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <div class="mb-4">
                         <label for="user-select" class="block text-sm font-medium text-slate-700">Pilih Pengguna (Role Kurator):</label>
@@ -137,12 +151,12 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
-                            <h3 class="font-bold text-lg mb-2">Video yang Ditugaskan</h3>
-                            <ul id="assigned-videos-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
+                            <h3 class="font-bold text-lg mb-2">Konten yang Ditugaskan</h3>
+                            <ul id="assigned-content-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
                         </div>
                         <div>
-                            <h3 class="font-bold text-lg mb-2">Video yang Tersedia</h3>
-                             <ul id="available-videos-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
+                            <h3 class="font-bold text-lg mb-2">Konten yang Tersedia</h3>
+                             <ul id="available-content-list" class="border rounded-md p-2 h-64 overflow-y-auto"></ul>
                         </div>
                     </div>
                 </div>
@@ -154,7 +168,7 @@
                  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-auto">
                     <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md mb-6" role="alert">
                         <p class="font-bold">Zona Berbahaya!</p>
-                        <p>Tindakan reset akan menghapus koleksi `users`, `videos`, `assignments`, dan `curations` lalu mengisinya dengan data default sesuai daftar yang ditentukan.</p>
+                        <p>Tindakan reset akan menghapus koleksi `users`, `contents`, `assignments`, dan `curations` lalu mengisinya dengan data default.</p>
                     </div>
                     <button id="resetButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default</button>
                     <div class="mt-6">
@@ -165,6 +179,8 @@
             </div>
         </main>
     </div>
+
+    <!-- Modals -->
 
     <!-- User Modal -->
     <div id="user-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
@@ -195,22 +211,69 @@
       </div>
     </div>
     
-    <!-- Video Modal -->
-    <div id="video-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-          <h3 class="text-lg leading-6 font-medium text-gray-900" id="video-modal-title">Tambah Video Baru</h3>
+    <!-- Content Modal -->
+    <div id="content-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+      <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 text-center" id="content-modal-title">Tambah Konten Baru</h3>
           <div class="mt-2 px-7 py-3">
-            <form id="video-form">
-              <input type="hidden" id="video-id">
-              <input type="text" id="video-title" placeholder="Judul Video" class="form-input" required>
-              <input type="url" id="video-url" placeholder="URL Video (e.g., https://...)" class="form-input" required>
-              <input type="text" id="video-subject" placeholder="Subjek" class="form-input" required>
-              <div class="items-center px-4 py-3">
+            <form id="content-form" class="space-y-4">
+              <input type="hidden" id="content-id">
+              <div><label class="block text-sm font-medium">Judul Konten</label><input type="text" id="content-title" class="form-input" required></div>
+              <div><label class="block text-sm font-medium">URL Konten</label><input type="url" id="content-url" placeholder="https://..." class="form-input" required></div>
+              <div><label class="block text-sm font-medium">Subjek</label><input type="text" id="content-subject" class="form-input" required></div>
+              <div class="items-center px-4 py-3 space-y-2">
                 <button type="submit" class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-600">Simpan</button>
-                <button type="button" id="cancel-video-modal" class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">Batal</button>
+                <button type="button" id="cancel-content-modal" class="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">Batal</button>
               </div>
             </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+      <div class="relative top-20 mx-auto p-5 border w-full max-w-sm shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+          </div>
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mt-2" id="confirm-modal-title">Konfirmasi</h3>
+          <div class="mt-2 px-7 py-3">
+            <p class="text-sm text-gray-500" id="confirm-modal-body">
+              Apakah Anda yakin?
+            </p>
+          </div>
+          <div class="items-center px-4 py-3 sm:flex">
+            <button id="confirm-modal-yes" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full sm:w-auto shadow-sm hover:bg-red-600">
+              Ya, Lanjutkan
+            </button>
+            <button id="confirm-modal-no" class="mt-3 sm:mt-0 sm:ml-3 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full sm:w-auto shadow-sm hover:bg-gray-300">
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Info Modal -->
+    <div id="info-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+      <div class="relative top-20 mx-auto p-5 border w-full max-w-sm shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+            <i class="fas fa-info-circle text-blue-600 text-xl"></i>
+          </div>
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mt-2" id="info-modal-title">Informasi</h3>
+          <div class="mt-2 px-7 py-3">
+            <p class="text-sm text-gray-500" id="info-modal-body">
+              Pesan info.
+            </p>
+          </div>
+          <div class="items-center px-4 py-3">
+            <button id="info-modal-ok" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600">
+              OK
+            </button>
           </div>
         </div>
       </div>
@@ -236,16 +299,53 @@
 
         // --- State Management ---
         let allUsers = [];
-        let allVideos = [];
+        let allContent = [];
         let allAssignments = {};
 
         // --- UI Elements ---
         const pageContents = document.querySelectorAll('.page-content');
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
         const userModal = document.getElementById('user-modal');
-        const videoModal = document.getElementById('video-modal');
+        const contentModal = document.getElementById('content-modal');
         const userForm = document.getElementById('user-form');
-        const videoForm = document.getElementById('video-form');
+        const contentForm = document.getElementById('content-form');
+        const logBox = document.getElementById('logBox');
+        
+        // Confirmation Modal Elements
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmModalYes = document.getElementById('confirm-modal-yes');
+        const confirmModalNo = document.getElementById('confirm-modal-no');
+        let confirmCallback = null;
+        
+        // Info Modal Elements
+        const infoModal = document.getElementById('info-modal');
+
+        // --- Modal Logic ---
+        function showConfirm(title, body, callback) {
+            document.getElementById('confirm-modal-title').textContent = title;
+            document.getElementById('confirm-modal-body').textContent = body;
+            confirmCallback = callback;
+            confirmModal.classList.remove('hidden');
+        }
+
+        confirmModalYes.addEventListener('click', () => {
+            if (confirmCallback) confirmCallback();
+            confirmModal.classList.add('hidden');
+        });
+
+        confirmModalNo.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+        
+        function showInfo(title, body) {
+            document.getElementById('info-modal-title').textContent = title;
+            document.getElementById('info-modal-body').textContent = body;
+            infoModal.classList.remove('hidden');
+        }
+
+        document.getElementById('info-modal-ok').addEventListener('click', () => {
+            infoModal.classList.add('hidden');
+        });
 
         // --- Navigation Logic ---
         sidebarLinks.forEach(link => {
@@ -257,10 +357,6 @@
                 pageContents.forEach(page => {
                     page.id === `${target}-page` ? page.classList.remove('hidden') : page.classList.add('hidden');
                 });
-                // Rename target for correct page id
-                const newTarget = (target === 'curators') ? 'users' : target;
-                document.getElementById(`${newTarget}-page`)?.classList.remove('hidden');
-
             });
         });
         
@@ -273,16 +369,16 @@
             renderUserSelect();
         });
 
-        onSnapshot(collection(db, "videos"), (snapshot) => {
-            allVideos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            document.getElementById('total-videos').textContent = allVideos.length;
-            renderVideosTable();
+        onSnapshot(collection(db, "contents"), (snapshot) => {
+            allContent = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            document.getElementById('total-content').textContent = allContent.length;
+            renderContentTable();
         });
 
         onSnapshot(collection(db, "assignments"), (snapshot) => {
             allAssignments = {};
             snapshot.docs.forEach(doc => {
-                allAssignments[doc.id] = doc.data().videoIds || [];
+                allAssignments[doc.id] = doc.data().contentIds || [];
             });
             const selectedUserId = document.getElementById('user-select').value;
             if (selectedUserId) {
@@ -306,16 +402,16 @@
             `).join('');
         }
         
-        function renderVideosTable() {
-            const tbody = document.getElementById('videos-table-body');
-            tbody.innerHTML = allVideos.map(v => `
+        function renderContentTable() {
+            const tbody = document.getElementById('content-table-body');
+            tbody.innerHTML = allContent.map(c => `
                 <tr class="border-b hover:bg-slate-50">
-                    <td class="py-2">${v.title}</td>
-                    <td class="py-2 truncate max-w-xs">${v.url}</td>
-                    <td class="py-2">${v.subject}</td>
+                    <td class="py-2">${c.title}</td>
+                    <td class="py-2 truncate max-w-xs">${c.url}</td>
+                    <td class="py-2">${c.subject}</td>
                     <td class="py-2">
-                        <button class="edit-video-btn text-blue-500 hover:text-blue-700" data-id="${v.id}"><i class="fas fa-edit"></i></button>
-                        <button class="delete-video-btn text-red-500 hover:text-red-700 ml-2" data-id="${v.id}"><i class="fas fa-trash"></i></button>
+                        <button class="edit-content-btn text-blue-500 hover:text-blue-700" data-id="${c.id}"><i class="fas fa-edit"></i></button>
+                        <button class="delete-content-btn text-red-500 hover:text-red-700 ml-2" data-id="${c.id}"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -334,22 +430,23 @@
 
         function renderAssignmentLists(username) {
             const assignedIds = allAssignments[username] || [];
-            const assignedVideos = allVideos.filter(v => assignedIds.includes(v.id));
-            const availableVideos = allVideos.filter(v => !assignedIds.includes(v.id));
+            const assignedContent = allContent.filter(c => assignedIds.includes(c.id));
+            const availableContent = allContent.filter(c => !assignedIds.includes(c.id));
 
-            document.getElementById('assigned-videos-list').innerHTML = assignedVideos.map(v => `
-                <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded"><span>${v.title}</span><button class="unassign-btn text-red-500 text-xs" data-video-id="${v.id}">Lepas</button></li>`).join('');
-            document.getElementById('available-videos-list').innerHTML = availableVideos.map(v => `
-                 <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded"><span>${v.title}</span><button class="assign-btn text-green-500 text-xs" data-video-id="${v.id}">Tugas</button></li>`).join('');
+            document.getElementById('assigned-content-list').innerHTML = assignedContent.map(c => `
+                <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded"><span>${c.title}</span><button class="unassign-btn text-red-500 text-xs" data-content-id="${c.id}">Lepas</button></li>`).join('');
+            document.getElementById('available-content-list').innerHTML = availableContent.map(c => `
+                 <li class="flex justify-between items-center p-2 hover:bg-gray-100 rounded"><span>${c.title}</span><button class="assign-btn text-green-500 text-xs" data-content-id="${c.id}">Tugas</button></li>`).join('');
         }
 
-        // --- Event Listeners for CRUD and Assignments ---
+        // --- Event Listeners ---
         
         // User Modal
         document.getElementById('add-user-btn').addEventListener('click', () => {
             userForm.reset();
             document.getElementById('user-id').value = '';
             document.getElementById('user-modal-title').textContent = 'Tambah Pengguna Baru';
+            document.getElementById('user-password').required = true;
             userModal.classList.remove('hidden');
         });
         document.getElementById('cancel-user-modal').addEventListener('click', () => userModal.classList.add('hidden'));
@@ -361,34 +458,36 @@
                 nama: document.getElementById('user-nama').value,
                 instansi: document.getElementById('user-instansi').value,
                 username: document.getElementById('user-username').value,
-                password: document.getElementById('user-password').value,
                 role: document.getElementById('user-role').value,
             };
+            const password = document.getElementById('user-password').value;
+            if (password) userData.password = password;
 
-            if (id) { // Update
+            if (id) {
                 await setDoc(doc(db, 'users', id), userData, { merge: true });
-            } else { // Create
+            } else {
                 await addDoc(collection(db, 'users'), userData);
             }
             userModal.classList.add('hidden');
         });
 
-        // Video Modal
-        document.getElementById('add-video-btn').addEventListener('click', () => {
-            videoForm.reset(); document.getElementById('video-id').value = '';
-            document.getElementById('video-modal-title').textContent = 'Tambah Video Baru';
-            videoModal.classList.remove('hidden');
+        // Content Modal
+        document.getElementById('add-content-btn').addEventListener('click', () => {
+            contentForm.reset(); document.getElementById('content-id').value = '';
+            document.getElementById('content-modal-title').textContent = 'Tambah Konten Baru';
+            contentModal.classList.remove('hidden');
         });
-        document.getElementById('cancel-video-modal').addEventListener('click', () => videoModal.classList.add('hidden'));
-        videoForm.addEventListener('submit', async (e) => {
+        document.getElementById('cancel-content-modal').addEventListener('click', () => contentModal.classList.add('hidden'));
+        contentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = document.getElementById('video-id').value;
-            const videoData = { title: document.getElementById('video-title').value, url: document.getElementById('video-url').value, subject: document.getElementById('video-subject').value };
-            if (id) { await setDoc(doc(db, 'videos', id), videoData, { merge: true }); } 
-            else { await addDoc(collection(db, 'videos'), {...videoData, status: 'pending'}); }
-            videoModal.classList.add('hidden');
+            const id = document.getElementById('content-id').value;
+            const contentData = { title: document.getElementById('content-title').value, url: document.getElementById('content-url').value, subject: document.getElementById('content-subject').value };
+            if (id) { await setDoc(doc(db, 'contents', id), contentData, { merge: true }); } 
+            else { await addDoc(collection(db, 'contents'), {...contentData, status: 'pending'}); }
+            contentModal.classList.add('hidden');
         });
         
+        // Main Click Handler for Edit/Delete/Assign
         document.body.addEventListener('click', async (e) => {
             const target = e.target.closest('button');
             if (!target) return;
@@ -401,37 +500,42 @@
                 document.getElementById('user-nama').value = user.nama;
                 document.getElementById('user-instansi').value = user.instansi;
                 document.getElementById('user-username').value = user.username;
-                document.getElementById('user-password').value = user.password;
+                document.getElementById('user-password').value = ''; // Clear password for security
+                document.getElementById('user-password').required = false; // Not required on edit
                 document.getElementById('user-role').value = user.role;
                 document.getElementById('user-modal-title').textContent = 'Edit Pengguna';
                 userModal.classList.remove('hidden');
             }
             if (target.matches('.delete-user-btn')) {
-                if(confirm('Yakin ingin menghapus pengguna ini?')) await deleteDoc(doc(db, 'users', target.dataset.id));
+                 showConfirm('Hapus Pengguna', 'Yakin ingin menghapus pengguna ini?', () => {
+                    deleteDoc(doc(db, 'users', target.dataset.id));
+                });
             }
-            // Video Actions
-            if (target.matches('.edit-video-btn')) {
+            // Content Actions
+            if (target.matches('.edit-content-btn')) {
                 const id = target.dataset.id;
-                const video = allVideos.find(v => v.id === id);
-                document.getElementById('video-id').value = id;
-                document.getElementById('video-title').value = video.title;
-                document.getElementById('video-url').value = video.url;
-                document.getElementById('video-subject').value = video.subject;
-                document.getElementById('video-modal-title').textContent = 'Edit Video';
-                videoModal.classList.remove('hidden');
+                const content = allContent.find(c => c.id === id);
+                document.getElementById('content-id').value = id;
+                document.getElementById('content-title').value = content.title;
+                document.getElementById('content-url').value = content.url;
+                document.getElementById('content-subject').value = content.subject;
+                document.getElementById('content-modal-title').textContent = 'Edit Konten';
+                contentModal.classList.remove('hidden');
             }
-            if (target.matches('.delete-video-btn')) {
-                if(confirm('Yakin ingin menghapus video ini?')) await deleteDoc(doc(db, 'videos', target.dataset.id));
+            if (target.matches('.delete-content-btn')) {
+                showConfirm('Hapus Konten', 'Yakin ingin menghapus konten ini?', () => {
+                    deleteDoc(doc(db, 'contents', target.dataset.id));
+                });
             }
             // Assignment Actions
             const username = document.getElementById('user-select').value;
             if (!username) return;
             const assignmentRef = doc(db, 'assignments', username);
             if (target.matches('.assign-btn')) {
-                await setDoc(assignmentRef, { videoIds: arrayUnion(target.dataset.videoId) }, { merge: true });
+                await setDoc(assignmentRef, { contentIds: arrayUnion(target.dataset.contentId) }, { merge: true });
             }
             if (target.matches('.unassign-btn')) {
-                await updateDoc(assignmentRef, { videoIds: arrayRemove(target.dataset.videoId) });
+                await updateDoc(assignmentRef, { contentIds: arrayRemove(target.dataset.contentId) });
             }
         });
 
@@ -439,14 +543,150 @@
             const username = e.target.value;
             if (username) { renderAssignmentLists(username); } 
             else {
-                document.getElementById('assigned-videos-list').innerHTML = '';
-                document.getElementById('available-videos-list').innerHTML = '';
+                document.getElementById('assigned-content-list').innerHTML = '';
+                document.getElementById('available-content-list').innerHTML = '';
             }
         });
 
+        // Event listener untuk tombol Hapus Semua Konten
+        document.getElementById('delete-all-content-btn').addEventListener('click', () => {
+            showConfirm(
+                'Hapus Semua Konten',
+                'PERINGATAN! Anda yakin akan menghapus SEMUA data konten secara permanen? Tindakan ini tidak dapat dibatalkan.',
+                async () => {
+                    await clearCollection('contents');
+                }
+            );
+        });
+
+        // --- Random Assignment ---
+        document.getElementById('random-assign-btn').addEventListener('click', () => {
+            showConfirm(
+                'Bagikan Penugasan Acak?',
+                'PERINGATAN! Ini akan MENGHAPUS semua penugasan yang ada dan membuat yang baru secara acak. Setiap kurator akan mendapatkan 12 konten. Lanjutkan?',
+                async () => {
+                    const curators = allUsers.filter(u => u.role === 'Kurator');
+                    const contentIds = allContent.map(c => c.id);
+
+                    if (curators.length === 0) {
+                        showInfo('Gagal', 'Tidak ada pengguna dengan role "Kurator" ditemukan.');
+                        return;
+                    }
+                    if (contentIds.length === 0) {
+                        showInfo('Gagal', 'Tidak ada konten yang tersedia untuk ditugaskan.');
+                        return;
+                    }
+
+                    const assignmentPool = [];
+                    contentIds.forEach(id => {
+                        assignmentPool.push(id, id, id); // Setiap konten dikurasi 3 kali
+                    });
+
+                    function shuffleArray(array) {
+                        for (let i = array.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [array[i], array[j]] = [array[j], array[i]];
+                        }
+                    }
+                    shuffleArray(assignmentPool);
+                    
+                    if (curators.length * 12 > assignmentPool.length) {
+                        console.warn("Tidak cukup konten untuk memberikan 12 ke setiap kurator. Beberapa kurator mungkin mendapatkan kurang dari 12.");
+                    }
+
+                    const batch = writeBatch(db);
+                    const assignmentsSnapshot = await getDocs(collection(db, 'assignments'));
+                    assignmentsSnapshot.docs.forEach(d => batch.delete(d.ref));
+                    
+                    curators.forEach(curator => {
+                        const assignedContentForCurator = assignmentPool.splice(0, 12);
+                        if (assignedContentForCurator.length > 0) {
+                            const assignmentRef = doc(db, 'assignments', curator.username);
+                            const uniqueContent = [...new Set(assignedContentForCurator)];
+                            batch.set(assignmentRef, { contentIds: uniqueContent });
+                        }
+                    });
+
+                    try {
+                        await batch.commit();
+                        showInfo('Berhasil', 'Penugasan acak telah berhasil dibuat dan disimpan.');
+                    } catch (error) {
+                        console.error("Gagal membuat penugasan acak:", error);
+                        showInfo('Error', `Terjadi kesalahan: ${error.message}`);
+                    }
+                }
+            );
+        });
+
+
+        // --- Excel Upload/Download ---
+        document.getElementById('download-template-btn').addEventListener('click', () => {
+            const sampleData = [{ title: "Contoh Judul Konten", url: "https://www.youtube.com/watch?v=example", subject: "Matematika" }];
+            const ws = XLSX.utils.json_to_sheet(sampleData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Template Konten");
+            XLSX.writeFile(wb, "template_konten.xlsx");
+        });
+
+        document.getElementById('upload-excel-btn').addEventListener('click', () => {
+            document.getElementById('excel-file-input').click();
+        });
+
+        document.getElementById('excel-file-input').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                log(`Membaca file ${file.name}...`);
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (json.length === 0) {
+                        log('❌ Gagal: File Excel kosong atau format tidak didukung.');
+                        return;
+                    }
+
+                    const firstRow = json[0];
+                    if (!('title' in firstRow && 'url' in firstRow && 'subject' in firstRow)) {
+                        log('❌ Gagal: Format template tidak sesuai. Pastikan ada kolom "title", "url", dan "subject".');
+                        return;
+                    }
+                    
+                    log(`Ditemukan ${json.length} baris data. Memulai proses unggah...`);
+                    const batch = writeBatch(db);
+                    json.forEach(item => {
+                        if (item.title && item.url) { // Basic validation
+                            const contentRef = doc(collection(db, "contents"));
+                            batch.set(contentRef, {
+                                title: String(item.title),
+                                url: String(item.url),
+                                subject: String(item.subject || 'Umum'),
+                                status: 'pending'
+                            });
+                        }
+                    });
+
+                    await batch.commit();
+                    log(`✅ Berhasil: ${json.length} konten baru berhasil diunggah.`);
+                    event.target.value = ''; // Reset file input
+
+                } catch (error) {
+                    log(`❌ Terjadi kesalahan: ${error.message}`);
+                    console.error("Error processing Excel file:", error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+
         // --- RESET LOGIC ---
-        const logBox = document.getElementById('logBox');
         function log(message) { logBox.innerHTML += `\n> ${message}`; logBox.scrollTop = logBox.scrollHeight; }
+        
         async function clearCollection(name) {
             log(`Membersihkan koleksi '${name}'...`);
             const snapshot = await getDocs(collection(db, name));
@@ -458,7 +698,7 @@
         }
         
         const defaultUsers = [
-            { nama: "Nurul Afifah", instansi: "Sekolah Cikal Serpong", password: "123456", username: "DirSD001", role: "Kurator" },
+             { nama: "Nurul Afifah", instansi: "Sekolah Cikal Serpong", password: "123456", username: "DirSD001", role: "Kurator" },
             { nama: "Eka Annisa", instansi: "TK Al Hariki Depok", password: "123456", username: "DirSD002", role: "Kurator" },
             { nama: "Yudi Kustiana", instansi: "SMPN 4 Lembang", password: "123456", username: "DirSD003", role: "Kurator" },
             { nama: "1 orang Perwakilan Guru SMP", instansi: "", password: "123456", username: "DirSD004", role: "Kurator" },
@@ -506,72 +746,68 @@
             { nama: "Admin", instansi: "Instansi Admin", password: "Admin123", username: "Admin", role: "Admin" },
         ];
 
-        document.getElementById('resetButton').addEventListener('click', async () => {
-            if (!confirm("Peringatan Keras!\nAnda akan MENGHAPUS SEMUA data dan membuat ulang database default. Lanjutkan?")) return;
-            
-            const btn = document.getElementById('resetButton');
-            btn.disabled = true;
-            btn.innerText = 'Sedang Memproses...';
-            logBox.innerHTML = 'Memulai proses reset...';
+        document.getElementById('resetButton').addEventListener('click', () => {
+             showConfirm(
+                'Reset Database',
+                'PERINGATAN! Anda akan menghapus SEMUA data dan membuat ulang database default. Lanjutkan?',
+                async () => {
+                    const btn = document.getElementById('resetButton');
+                    btn.disabled = true;
+                    btn.innerText = 'Sedang Memproses...';
+                    logBox.innerHTML = 'Memulai proses reset...';
 
-            try {
-                await clearCollection('users');
-                await clearCollection('videos');
-                await clearCollection('assignments');
-                await clearCollection('curations');
+                    try {
+                        await clearCollection('users');
+                        await clearCollection('contents');
+                        await clearCollection('assignments');
+                        await clearCollection('curations');
 
-                log(`Membuat ${defaultUsers.length} data pengguna default...`);
-                const usersBatch = writeBatch(db);
-                defaultUsers.forEach(user => {
-                    const userRef = doc(collection(db, "users"));
-                    usersBatch.set(userRef, user);
-                });
-                await usersBatch.commit();
-                log(`✅ ${defaultUsers.length} pengguna berhasil dibuat.`);
+                        log(`Membuat ${defaultUsers.length} data pengguna default...`);
+                        const usersBatch = writeBatch(db);
+                        defaultUsers.forEach(user => {
+                            const userRef = doc(collection(db, "users"));
+                            usersBatch.set(userRef, user);
+                        });
+                        await usersBatch.commit();
+                        log(`✅ ${defaultUsers.length} pengguna berhasil dibuat.`);
 
-                log('Membuat 200 data video default...');
-                const videosBatch = writeBatch(db);
-                const videoIds = [];
-                for (let i = 1; i <= 200; i++) {
-                    const videoRef = doc(collection(db, "videos"));
-                    videoIds.push(videoRef.id);
-                    videosBatch.set(videoRef, { title: `Video Pembelajaran #${i}`, url: `https://youtube.com/watch?v=example${i}`, subject: "Umum", status: "pending" });
-                }
-                await videosBatch.commit();
-                log('✅ 200 video berhasil dibuat.');
+                        log('Membuat 200 data konten default...');
+                        const contentsBatch = writeBatch(db);
+                        const contentIds = [];
+                        for (let i = 1; i <= 200; i++) {
+                            const contentRef = doc(collection(db, "contents"));
+                            contentIds.push(contentRef.id);
+                            contentsBatch.set(contentRef, { title: `Konten Pembelajaran #${i}`, url: `https://youtube.com/watch?v=example${i}`, subject: "Umum", status: "pending" });
+                        }
+                        await contentsBatch.commit();
+                        log('✅ 200 konten berhasil dibuat.');
 
-                log('Membuat penugasan untuk kurator...');
-                const assignmentsBatch = writeBatch(db);
-                let videoIndex = 0;
-                const curators = defaultUsers.filter(u => u.role === 'Kurator');
-                curators.forEach(curator => {
-                    const assignmentRef = doc(db, "assignments", curator.username);
-                    const assignedVideoIds = videoIds.slice(videoIndex, videoIndex + 5);
-                    if(assignedVideoIds.length > 0) {
-                        videoIndex += 5;
-                        assignmentsBatch.set(assignmentRef, { videoIds: assignedVideoIds });
+                        log('Membuat penugasan untuk kurator...');
+                        const assignmentsBatch = writeBatch(db);
+                        let contentIndex = 0;
+                        const curators = defaultUsers.filter(u => u.role === 'Kurator');
+                        curators.forEach(curator => {
+                            const assignmentRef = doc(db, "assignments", curator.username);
+                            const assignedContentIds = contentIds.slice(contentIndex, contentIndex + 5);
+                            if(assignedContentIds.length > 0) {
+                                contentIndex += 5;
+                                assignmentsBatch.set(assignmentRef, { contentIds: assignedContentIds });
+                            }
+                        });
+                        await assignmentsBatch.commit();
+                        log('✅ Penugasan berhasil dibuat.');
+                        log('\n🎉 SEMUA PROSES SELESAI!');
+
+                    } catch (error) {
+                        log(`\n❌ TERJADI ERROR: ${error.message}`);
+                        console.error(error);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default';
                     }
-                });
-                await assignmentsBatch.commit();
-                log('✅ Penugasan berhasil dibuat.');
-                log('\n🎉 SEMUA PROSES SELESAI!');
-
-            } catch (error) {
-                log(`\n❌ TERJADI ERROR: ${error.message}`);
-                console.error(error);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default';
-            }
+                }
+            );
         });
-
-        // Initial setup for sidebar click to handle renamed page
-        document.querySelector('.sidebar-link[data-target="curators"]').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.getElementById('users-page').classList.remove('hidden');
-        });
-
 
     </script>
 </body>
