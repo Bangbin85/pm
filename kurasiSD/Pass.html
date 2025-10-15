@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* Styling tetap sama */
+        /* Styling tambahan bisa diletakkan di sini jika perlu */
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 font-sans">
@@ -85,7 +85,10 @@
 
             userListContainer.innerHTML = users.map((user, index) => `
                 <div class="user-card bg-slate-700/50 p-4 rounded-lg border border-slate-600 transition-all duration-300 hover:border-indigo-500">
-                    <h3 class="text-lg font-bold text-white mb-3">${user.nama || 'Tanpa Nama'}</h3>
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-lg font-bold text-white">${user.nama || 'Tanpa Nama'}</h3>
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded ${user.role === 'Kurator' ? 'bg-sky-200 text-sky-800' : 'bg-emerald-200 text-emerald-800'}">${user.role || 'Tanpa Role'}</span>
+                    </div>
                     <div class="space-y-3">
                         <!-- Username Field -->
                         <div class="flex items-center gap-3">
@@ -120,7 +123,8 @@
         async function fetchUsers() {
             try {
                 const usersCollection = collection(db, 'users');
-                const q = query(usersCollection, where("password", "!=", null));
+                // MODIFIED: Query diubah untuk hanya mengambil pengguna dengan role Kurator atau Supervisor.
+                const q = query(usersCollection, where("role", "in", ["Kurator", "Supervisor"]));
                 const userSnapshot = await getDocs(q);
                 allUsers = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
@@ -197,4 +201,3 @@
 
 </body>
 </html>
-
