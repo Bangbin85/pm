@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Supervisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-label { @apply block text-sm font-medium text-slate-700; }
+        .form-input { 
+            @apply block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 
+                   focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 focus:border-indigo-500 
+                   transition-all duration-150 sm:text-sm;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- === LOGIN SECTION === -->
+    <div id="login-section" class="flex items-center justify-center min-h-screen p-4 bg-slate-100">
+        <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-sm text-center border border-slate-200">
+            <i class="fas fa-user-tie text-5xl text-indigo-500 mb-4"></i>
+            <h1 class="text-2xl font-bold text-slate-800">Login Supervisor</h1>
+            <p class="text-slate-500 mb-6">Gunakan ID dan Password Anda.</p>
+            <form id="login-form">
+                <div class="w-full mb-4 text-left">
+                    <label for="username-input" class="form-label">ID / Username</label>
+                    <input type="text" id="username-input" class="form-input" placeholder="e.g., DirSD041" required>
+                </div>
+                <div class="w-full mb-6 text-left">
+                    <label for="password-input" class="form-label">Password</label>
+                    <input type="password" id="password-input" class="form-input" placeholder="••••••••" required>
+                </div>
+                 <p id="login-error" class="text-red-500 text-sm mb-4 h-4"></p>
+                <button id="login-btn" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Masuk
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- === MAIN DASHBOARD (HIDDEN BY DEFAULT) === -->
+    <main id="main-dashboard" class="hidden">
+        <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-20 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 id="welcome-message" class="text-xl font-bold text-slate-800">Dashboard Supervisor</h1>
+                <button id="logout-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="py-10">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <h2 class="text-2xl font-semibold text-slate-800 mb-6 px-4 sm:px-0">Tinjauan Hasil Kurasi Konten</h2>
+                <div class="bg-white rounded-lg shadow-md overflow-x-auto border border-slate-200">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-4 font-semibold text-slate-600">ID & Judul Konten</th>
+                                <th class="py-3 px-4 font-semibold text-slate-600">Detail Kurasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <!-- Data akan dimuat di sini oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
+            authDomain: "kurasisd.firebaseapp.com",
+            projectId: "kurasisd",
+            storageBucket: "kurasisd.firebasestorage.app",
+            messagingSenderId: "520054778765",
+            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- UI Elements ---
+        const loginSection = document.getElementById('login-section');
+        const mainDashboard = document.getElementById('main-dashboard');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const resultsTableBody = document.getElementById('results-table-body');
+
+        // --- Login & Authentication ---
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            const loginBtn = document.getElementById('login-btn');
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengecek...';
+            loginError.textContent = '';
+
+            if (!username || !password) {
+                loginError.textContent = 'Username dan Password harus diisi.';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Masuk';
+                return;
+            }
+
+            try {
+                const q = query(collection(db, "users"), 
+                    where("username", "==", username),
+                    where("password", "==", password),
+                    where("role", "==", "Supervisor")
+                );
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    throw new Error("Username, password, atau role tidak sesuai.");
+                }
+
+                const userDoc = querySnapshot.docs[0];
+                const supervisorData = { id: userDoc.id, ...userDoc.data() };
+                
+                sessionStorage.setItem('supervisorUser', JSON.stringify(supervisorData));
+                await displayDashboard(supervisorData);
+
+            } catch (error) {
+                console.error("Login Gagal!", error);
+                loginError.textContent = error.message;
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Masuk';
+            }
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem('supervisorUser');
+            mainDashboard.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+        }
+
+        // --- Data Fetching and Rendering ---
+        async function displayDashboard(supervisor) {
+            loginSection.classList.add('hidden');
+            mainDashboard.classList.remove('hidden');
+            welcomeMessage.textContent = `Selamat Datang, ${supervisor.nama}!`;
+            resultsTableBody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-slate-500">Memuat data kurasi... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+
+            try {
+                // 1. Fetch semua data yang dibutuhkan secara paralel
+                const [usersSnap, contentsSnap, assignmentsSnap, curationsSnap] = await Promise.all([
+                    getDocs(collection(db, "users")),
+                    getDocs(collection(db, "contents")),
+                    getDocs(collection(db, "assignments")),
+                    getDocs(collection(db, "curations"))
+                ]);
+
+                // 2. Proses data menjadi struktur yang mudah digunakan
+                const usersMap = new Map(usersSnap.docs.map(doc => [doc.id, doc.data()]));
+                
+                // Buat map dari username ke userId untuk assignment
+                const usernameToIdMap = new Map();
+                usersSnap.docs.forEach(doc => {
+                    usernameToIdMap.set(doc.data().username, doc.id);
+                });
+
+                const curationsMap = new Map(curationsSnap.docs.map(doc => [doc.id, doc.data()]));
+
+                // 3. Gabungkan data untuk setiap konten
+                let tableHTML = '';
+                for (const contentDoc of contentsSnap.docs) {
+                    const content = { id: contentDoc.id, ...contentDoc.data() };
+                    
+                    const assignedCuratorUsernames = [];
+                    assignmentsSnap.docs.forEach(assignDoc => {
+                        const assignment = assignDoc.data();
+                        if (assignment.contentIds && assignment.contentIds.includes(content.id)) {
+                            assignedCuratorUsernames.push(assignDoc.id); // doc.id adalah username
+                        }
+                    });
+
+                    let curatorDetailsHTML = '<div class="space-y-2">';
+                    if (assignedCuratorUsernames.length === 0) {
+                        curatorDetailsHTML += '<span class="text-xs text-slate-400 italic">Belum ada kurator ditugaskan.</span>';
+                    } else {
+                        for (const username of assignedCuratorUsernames) {
+                            const userId = usernameToIdMap.get(username);
+                            const user = usersMap.get(userId);
+                            const curatorName = user ? user.nama : 'Kurator Tidak Dikenal';
+                            
+                            // Cek apakah kurasi sudah selesai
+                            const curationId = `${userId}_${content.id}`;
+                            const curationData = curationsMap.get(curationId);
+                            
+                            if (curationData) {
+                                const finalScore = curationData.answers?.D2_Keputusan_Final?.keputusan || 'N/A';
+                                curatorDetailsHTML += `
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        <span class="font-semibold text-green-700">${curatorName}:</span>
+                                        <span class="ml-2 text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full">${finalScore}</span>
+                                    </div>
+                                `;
+                            } else {
+                                curatorDetailsHTML += `
+                                    <div class="flex items-center text-slate-500">
+                                        <i class="far fa-circle text-slate-400 mr-2"></i>
+                                        <span class="font-medium">${curatorName}:</span>
+                                        <span class="ml-2 text-sm italic">Belum dikurasi</span>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+                    curatorDetailsHTML += '</div>';
+
+                    tableHTML += `
+                        <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top">
+                                <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline break-all">
+                                    ${content.id}
+                                </a>
+                                <p class="text-sm text-slate-700 mt-1">${content.title}</p>
+                            </td>
+                            <td class="p-4 align-top">
+                                ${curatorDetailsHTML}
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                resultsTableBody.innerHTML = tableHTML || `<tr><td colspan="2" class="text-center p-4 text-slate-500">Tidak ada konten yang ditemukan.</td></tr>`;
+
+            } catch (error) {
+                console.error("Error displaying dashboard:", error);
+                resultsTableBody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr>`;
+            }
+        }
+
+        // --- Initialize App ---
+        window.addEventListener('load', () => {
+            const savedUser = sessionStorage.getItem('supervisorUser');
+            if (savedUser) {
+                displayDashboard(JSON.parse(savedUser));
+            }
+
+            loginForm.addEventListener('submit', handleLogin);
+            logoutBtn.addEventListener('click', handleLogout);
+        });
+    </script>
+</body>
+</html>
