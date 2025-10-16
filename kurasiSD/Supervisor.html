@@ -273,15 +273,16 @@
         let contentsMap = new Map();
 
         // --- Struktur Pertanyaan Kurasi (diambil dari Kurator.html untuk konsistensi) ---
+        // CHANGED: Restructured the questions object
         const curationQuestions = [
-             { id: 'A1', title: 'A.1 Keamanan Materi'}, { id: 'A2', title: 'A.2 Copyright'},
-             { id: 'A3', title: 'A.3 Substansi Materi'}, { id: 'A4', title: 'A.4 Kebahasaan'},
-             { id: 'A5', title: 'A.5 Inklusivitas'}, { id: 'B1', title: 'B.1 Teks'},
-             { id: 'B2', title: 'B.2 Gambar'}, { id: 'B3', title: 'B.3 Video'},
-             { id: 'B4', title: 'B.4 Interaktif'}, { id: 'B5', title: 'B.5 Lab Maya'},
-             { id: 'B6', title: 'B.6 Gim Edukasi'}, { id: 'C1', title: 'C.1 Judul'},
-             { id: 'C2', title: 'C.2 Isi Materi'}, { id: 'C3', title: 'C.3 Deskripsi'},
-             { id: 'C4', title: 'C.4 Penulis'}, { id: 'C5', title: 'C.5 Prinsip Keselarasan'}
+             { id: 'A1', code: 'A.1', title: 'Keamanan Materi'}, { id: 'A2', code: 'A.2', title: 'Copyright'},
+             { id: 'A3', code: 'A.3', title: 'Substansi Materi'}, { id: 'A4', code: 'A.4', title: 'Kebahasaan'},
+             { id: 'A5', code: 'A.5', title: 'Inklusivitas'}, { id: 'B1', code: 'B.1', title: 'Teks'},
+             { id: 'B2', code: 'B.2', title: 'Gambar'}, { id: 'B3', code: 'B.3', title: 'Video'},
+             { id: 'B4', code: 'B.4', title: 'Interaktif'}, { id: 'B5', code: 'B.5', title: 'Lab Maya'},
+             { id: 'B6', code: 'B.6', title: 'Gim Edukasi'}, { id: 'C1', code: 'C.1', title: 'Judul'},
+             { id: 'C2', code: 'C.2', title: 'Isi Materi'}, { id: 'C3', code: 'C.3', title: 'Deskripsi'},
+             { id: 'C4', code: 'C.4', title: 'Penulis'}, { id: 'C5', code: 'C.5', title: 'Prinsip Keselarasan'}
         ];
 
         // --- Login & Authentication ---
@@ -411,7 +412,6 @@
                                 tableHTML += `
                                     <div class="flex items-center mt-1">
                                         <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                        <!-- CHANGED: removed data-content-title, added data-content-id -->
                                         <button class="view-details-btn text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full hover:bg-green-200 transition-all"
                                                 data-curation-id="${curationId}" 
                                                 data-content-id="${content.id}">
@@ -550,7 +550,6 @@
             document.getElementById('alert-modal').classList.remove('flex');
         }
 
-        // CHANGED: function signature and logic
         function openDetailsModal(curationId, contentId) {
             const curationData = curationsMap.get(curationId);
             const contentData = contentsMap.get(contentId);
@@ -568,13 +567,16 @@
 
             const indicatorContainer = document.getElementById('modal-indicator-values');
             indicatorContainer.innerHTML = ''; 
+            // CHANGED: Logic for rendering indicator values
             curationQuestions.forEach(q => {
                 const value = answers[q.id]?.value || 'N/A';
-                const shortTitle = q.title.split(' ')[0]; 
                 indicatorContainer.innerHTML += `
-                    <div class="neumorphism-input !shadow-none !bg-slate-100 p-3 rounded-lg">
-                        <p class="text-xs font-bold text-slate-500">${shortTitle}</p>
-                        <p class="text-sm font-semibold text-slate-800">${value}</p>
+                    <div class="neumorphism-input !shadow-none !bg-slate-100 p-3 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-500">${q.code}</p>
+                            <p class="text-sm font-medium text-slate-800 leading-tight">${q.title}</p>
+                        </div>
+                        <p class="text-lg font-bold text-slate-900 text-right mt-2">${value}</p>
                     </div>
                 `;
             });
@@ -613,7 +615,6 @@
             document.body.addEventListener('click', function(event) {
                 const viewBtn = event.target.closest('.view-details-btn');
                 if (viewBtn) {
-                    // CHANGED: Pass contentId instead of contentTitle
                     const curationId = viewBtn.dataset.curationId;
                     const contentId = viewBtn.dataset.contentId;
                     openDetailsModal(curationId, contentId);
@@ -650,3 +651,4 @@
     </script>
 </body>
 </html>
+
