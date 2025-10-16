@@ -18,7 +18,7 @@
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.5);
         }
-        #logBox {
+        #logBox, #cacheLogBox {
             font-family: 'Courier New', Courier, monospace;
             white-space: pre-wrap;
             height: 300px;
@@ -74,6 +74,9 @@
                         Masuk
                     </button>
                 </div>
+                 <div class="mt-4 text-center">
+                    <a href="./" class="text-indigo-400 hover:text-indigo-300 text-sm transition-colors">Kembali ke Home</a>
+                </div>
             </form>
             <p class="text-center text-gray-500 text-xs">
                 &copy;2024 Kurasi Konten.
@@ -122,28 +125,50 @@
                 
                 <!-- Dashboard Page -->
                 <div id="dashboard-page" class="page-content">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-6">Dashboard</h2>
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-slate-800">Dashboard</h2>
+                         <button id="refresh-data-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                            <i class="fas fa-sync-alt mr-2"></i><span>Muat Ulang Data</span>
+                        </button>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
                             <i class="fas fa-users text-4xl text-blue-500"></i>
                             <div>
                                 <p class="text-slate-500">Total Pengguna</p>
-                                <p id="total-users" class="text-3xl font-bold">0</p>
+                                <p id="total-users" class="text-3xl font-bold">...</p>
                             </div>
                         </div>
                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
                             <i class="fas fa-file-alt text-4xl text-green-500"></i>
                             <div>
                                 <p class="text-slate-500">Total Konten</p>
-                                <p id="total-content" class="text-3xl font-bold">0</p>
+                                <p id="total-content" class="text-3xl font-bold">...</p>
                             </div>
                         </div>
                          <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
                             <i class="fas fa-check-double text-4xl text-indigo-500"></i>
                             <div>
                                 <p class="text-slate-500">Total Kurasi</p>
-                                <p id="total-curations" class="text-3xl font-bold">0</p>
+                                <p id="total-curations" class="text-3xl font-bold">...</p>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Cache Update Section -->
+                    <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Pembaruan Cache Dashboard Publik</h3>
+                        <p class="text-slate-600 mb-4">
+                            Klik tombol di bawah untuk mengambil semua data terbaru, menghitung statistik, dan memperbarui tampilan di halaman utama (`index.html`). 
+                            Proses ini akan menggunakan banyak kuota 'read' untuk Anda sebagai admin, tetapi akan membuat halaman utama sangat hemat untuk pengunjung.
+                        </p>
+                        <button id="update-cache-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i>
+                            <span>Perbarui Cache Sekarang</span>
+                        </button>
+                         <div class="mt-4">
+                            <h4 class="text-md font-semibold text-slate-700 mb-2">Log Proses Cache:</h4>
+                            <div id="cacheLogBox">Menunggu perintah...</div>
                         </div>
                     </div>
                 </div>
@@ -169,7 +194,7 @@
                                 </tr>
                             </thead>
                             <tbody id="users-table-body">
-                                <!-- Data pengguna akan diisi oleh JavaScript -->
+                                <tr><td colspan="5" class="text-center p-4">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -183,7 +208,6 @@
                              <button id="download-template-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-download mr-2"></i>Unduh Template</button>
                              <button id="upload-excel-btn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-file-excel mr-2"></i>Upload Excel</button>
                              <button id="add-content-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-plus mr-2"></i>Tambah Konten</button>
-                             <!-- Tombol Baru Untuk Hapus Semua Konten -->
                              <button id="delete-all-content-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-trash mr-2"></i>Hapus Semua Konten</button>
                              <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls">
                         </div>
@@ -198,7 +222,9 @@
                                     <th class="py-2">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="content-table-body"></tbody>
+                            <tbody id="content-table-body">
+                                <tr><td colspan="4" class="text-center p-4">Memuat data...</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -240,17 +266,27 @@
                                 <!-- Header will be generated by JavaScript -->
                             </thead>
                             <tbody id="hasil-table-body">
-                                <!-- Data hasil kurasi akan diisi oleh JavaScript -->
+                                <tr><td colspan="3" class="text-center p-4">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
 
-                <!-- Settings Page (Reset) -->
+                <!-- Settings Page (Backup, Restore, Reset) -->
                 <div id="settings-page" class="page-content hidden">
-                     <h2 class="text-3xl font-bold text-slate-800 mb-6">Pengaturan & Reset</h2>
+                     <h2 class="text-3xl font-bold text-slate-800 mb-6">Pengaturan & Data</h2>
                      <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-auto">
+                        <div class="border-b pb-6 mb-6">
+                            <h3 class="text-xl font-semibold text-slate-800 mb-4">Backup & Restore Data</h3>
+                            <p class="text-sm text-slate-500 mb-4">Simpan seluruh data (pengguna, konten, penugasan, kurasi) ke dalam satu file JSON, atau pulihkan data dari file backup.</p>
+                            <div class="flex space-x-4">
+                                <button id="backupButton" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"><i class="fas fa-download mr-2"></i>Backup Seluruh Data</button>
+                                <button id="restoreButtonTrigger" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"><i class="fas fa-upload mr-2"></i>Restore Dari File</button>
+                                <input type="file" id="restoreFileInput" class="hidden" accept="application/json">
+                            </div>
+                        </div>
+
                         <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md mb-6" role="alert">
                             <p class="font-bold">Zona Berbahaya!</p>
                             <p>Tindakan reset akan menghapus koleksi `users`, `contents`, `assignments`, dan `curations` lalu mengisinya dengan data default.</p>
@@ -267,10 +303,8 @@
     </div>
 
 
-    <!-- Modals -->
-    <!-- (Modal content remains the same as your original file) -->
     <!-- User Modal -->
-    <div id="user-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div id="user-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-20">
       <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg leading-6 font-medium text-gray-900 text-center" id="user-modal-title">Tambah Pengguna Baru</h3>
@@ -299,7 +333,7 @@
     </div>
     
     <!-- Content Modal -->
-    <div id="content-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div id="content-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-20">
       <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg leading-6 font-medium text-gray-900 text-center" id="content-modal-title">Tambah Konten Baru</h3>
@@ -370,94 +404,19 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, writeBatch, onSnapshot, updateDoc, arrayUnion, arrayRemove, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, writeBatch, updateDoc, arrayUnion, arrayRemove, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
-            authDomain: "kurasisd.firebaseapp.com",
-            projectId: "kurasisd",
-            storageBucket: "kurasisd.firebasestorage.app",
-            messagingSenderId: "520054778765",
-            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
-        };
+		const firebaseConfig = {
+		  apiKey: "AIzaSyB0biVlYEZg7p5UntYRDnyjdQCfe15_vmk",
+		  authDomain: "kurasidirsd.firebaseapp.com",
+		  projectId: "kurasidirsd",
+		  storageBucket: "kurasidirsd.firebasestorage.app",
+		  messagingSenderId: "168494524685",
+		  appId: "1:168494524685:web:b209da5c5fec9e7d5be844"
+		};
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        // --- NEW LOGIN & AUTH LOGIC ---
-        const loginScreen = document.getElementById('login-screen');
-        const adminPanel = document.getElementById('admin-panel');
-        const loginForm = document.getElementById('login-form');
-        const loginError = document.getElementById('login-error');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // Check session on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
-                showAdminPanel();
-            } else {
-                showLoginScreen();
-            }
-        });
-
-        function showAdminPanel() {
-            loginScreen.classList.add('hidden');
-            adminPanel.classList.remove('hidden');
-            document.querySelector('body').classList.remove('bg-slate-900');
-            document.querySelector('body').classList.add('bg-slate-100');
-        }
-        
-        function showLoginScreen() {
-            adminPanel.classList.add('hidden');
-            loginScreen.classList.remove('hidden');
-            document.querySelector('body').classList.add('bg-slate-900');
-            document.querySelector('body').classList.remove('bg-slate-100');
-        }
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loginError.textContent = '';
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const loginButton = loginForm.querySelector('button[type="submit"]');
-            const originalButtonText = loginButton.innerHTML;
-            
-            loginButton.disabled = true;
-            loginButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Mencoba Masuk...`;
-
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, 
-                where("username", "==", username), 
-                where("password", "==", password),
-                where("role", "==", "Admin")
-            );
-
-            try {
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                    // Admin found
-                    sessionStorage.setItem('isAdminLoggedIn', 'true');
-                    showAdminPanel();
-                } else {
-                    // Not found or not an admin
-                    loginError.textContent = 'Username, password, atau role tidak valid.';
-                    loginButton.disabled = false;
-                    loginButton.innerHTML = originalButtonText;
-                }
-            } catch (error) {
-                console.error("Error logging in: ", error);
-                loginError.textContent = 'Terjadi kesalahan saat login.';
-                loginButton.disabled = false;
-                loginButton.innerHTML = originalButtonText;
-            }
-        });
-
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            sessionStorage.removeItem('isAdminLoggedIn');
-            showLoginScreen();
-        });
-
 
         // --- State Management ---
         let allUsers = [];
@@ -466,6 +425,11 @@
         let allCurations = [];
 
         // --- UI Elements ---
+        const loginScreen = document.getElementById('login-screen');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
         const pageContents = document.querySelectorAll('.page-content');
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
         const userModal = document.getElementById('user-modal');
@@ -473,15 +437,73 @@
         const userForm = document.getElementById('user-form');
         const contentForm = document.getElementById('content-form');
         const logBox = document.getElementById('logBox');
-        
-        // Confirmation Modal Elements
+        const cacheLogBox = document.getElementById('cacheLogBox');
         const confirmModal = document.getElementById('confirm-modal');
         const confirmModalYes = document.getElementById('confirm-modal-yes');
         const confirmModalNo = document.getElementById('confirm-modal-no');
-        let confirmCallback = null;
-        
-        // Info Modal Elements
         const infoModal = document.getElementById('info-modal');
+        let confirmCallback = null;
+
+        // --- Login & Authentication Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                showAdminPanel();
+                fetchData(); // Automatically fetch data on load if logged in
+            } else {
+                showLoginScreen();
+            }
+        });
+
+        function showAdminPanel() {
+            loginScreen.classList.add('hidden');
+            adminPanel.classList.remove('hidden');
+            document.body.classList.remove('bg-slate-900');
+            document.body.classList.add('bg-slate-100');
+        }
+        
+        function showLoginScreen() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            adminPanel.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+            document.body.classList.add('bg-slate-900');
+            document.body.classList.remove('bg-slate-100');
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.textContent = '';
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginButton = loginForm.querySelector('button[type="submit"]');
+            
+            loginButton.disabled = true;
+            loginButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Mencoba Masuk...`;
+
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("username", "==", username), where("password", "==", password), where("role", "==", "Admin"));
+
+            try {
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    sessionStorage.setItem('isAdminLoggedIn', 'true');
+                    showAdminPanel();
+                    await fetchData();
+                } else {
+                    loginError.textContent = 'Username, password, atau role tidak valid.';
+                }
+            } catch (error) {
+                console.error("Error logging in: ", error);
+                loginError.textContent = 'Terjadi kesalahan saat login.';
+            } finally {
+                loginButton.disabled = false;
+                loginButton.innerHTML = `Masuk`;
+            }
+        });
+
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoginScreen();
+        });
 
         // --- Modal Logic ---
         function showConfirm(title, body, callback) {
@@ -524,48 +546,60 @@
         });
         
         // --- Data Fetching & Rendering ---
-        
-        onSnapshot(collection(db, "users"), (snapshot) => {
-            allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            document.getElementById('total-users').textContent = allUsers.length;
-            renderUsersTable();
-            renderUserSelect();
-            renderHasilTable();
-        });
+        async function fetchData() {
+            const refreshBtn = document.getElementById('refresh-data-btn');
+            refreshBtn.disabled = true;
+            refreshBtn.querySelector('span').textContent = 'Memuat...';
+            try {
+                const [usersSnap, contentSnap, assignmentsSnap, curationsSnap] = await Promise.all([
+                    getDocs(collection(db, "users")),
+                    getDocs(collection(db, "contents")),
+                    getDocs(collection(db, "assignments")),
+                    getDocs(collection(db, "curations"))
+                ]);
+                
+                allUsers = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                allContent = contentSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                allCurations = curationsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                allAssignments = {};
+                assignmentsSnap.docs.forEach(doc => {
+                    allAssignments[doc.id] = doc.data().contentIds || [];
+                });
+                
+                updateDashboardStats();
+                renderUsersTable();
+                renderContentTable();
+                renderUserSelect();
+                renderHasilTable();
+                // When a user is selected in dropdown, refresh their assignment list
+                const selectedUser = document.getElementById('user-select').value;
+                if(selectedUser) renderAssignmentLists(selectedUser);
 
-        onSnapshot(collection(db, "contents"), (snapshot) => {
-            allContent = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            document.getElementById('total-content').textContent = allContent.length;
-            renderContentTable();
-            renderHasilTable();
-        });
-
-        onSnapshot(collection(db, "assignments"), (snapshot) => {
-            allAssignments = {};
-            snapshot.docs.forEach(doc => {
-                allAssignments[doc.id] = doc.data().contentIds || [];
-            });
-            const selectedUserId = document.getElementById('user-select').value;
-            if (selectedUserId) {
-                renderAssignmentLists(selectedUserId);
+            } catch (error) {
+                console.error("Gagal mengambil data:", error);
+                showInfo('Error', `Gagal memuat data dari database: ${error.message}`);
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.querySelector('span').textContent = 'Muat Ulang Data';
             }
-            renderHasilTable();
+        }
+        
+        document.getElementById('refresh-data-btn').addEventListener('click', async () => {
+            await fetchData();
+            showInfo('Sukses', 'Semua data telah berhasil dimuat ulang.');
         });
 
-        onSnapshot(collection(db, "curations"), (snapshot) => {
-            allCurations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        function updateDashboardStats() {
+            document.getElementById('total-users').textContent = allUsers.length;
+            document.getElementById('total-content').textContent = allContent.length;
             document.getElementById('total-curations').textContent = allCurations.length;
-            renderHasilTable();
-        });
-
+        }
 
         function renderUsersTable() {
             const tbody = document.getElementById('users-table-body');
             const searchTerm = document.getElementById('search-user-input').value.toLowerCase();
-
-            const filteredUsers = allUsers.filter(user =>
-                user.nama.toLowerCase().includes(searchTerm)
-            );
+            const filteredUsers = allUsers.filter(user => user.nama.toLowerCase().includes(searchTerm));
 
             if (filteredUsers.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">Pengguna tidak ditemukan.</td></tr>`;
@@ -632,7 +666,7 @@
         function renderHasilTable() {
             const thead = document.getElementById('hasil-table-head');
             const tbody = document.getElementById('hasil-table-body');
-            if (!thead || !tbody || allContent.length === 0) return;
+            if (!thead || !tbody) return;
 
             const contentStats = {};
             allContent.forEach(content => {
@@ -694,7 +728,7 @@
             }).join('');
         }
 
-        // --- Event Listeners ---
+        // --- Event Listeners for CRUD & Actions ---
         
         document.getElementById('search-user-input').addEventListener('input', renderUsersTable);
 
@@ -724,6 +758,7 @@
             } else {
                 await addDoc(collection(db, 'users'), userData);
             }
+            await fetchData();
             userModal.classList.add('hidden');
         });
 
@@ -739,6 +774,7 @@
             const contentData = { title: document.getElementById('content-title').value, url: document.getElementById('content-url').value, subject: document.getElementById('content-subject').value };
             if (id) { await setDoc(doc(db, 'contents', id), contentData, { merge: true }); } 
             else { await addDoc(collection(db, 'contents'), {...contentData, status: 'pending'}); }
+            await fetchData();
             contentModal.classList.add('hidden');
         });
         
@@ -760,8 +796,9 @@
                 userModal.classList.remove('hidden');
             }
             if (target.matches('.delete-user-btn')) {
-                 showConfirm('Hapus Pengguna', 'Yakin ingin menghapus pengguna ini?', () => {
-                    deleteDoc(doc(db, 'users', target.dataset.id));
+                 showConfirm('Hapus Pengguna', 'Yakin ingin menghapus pengguna ini?', async () => {
+                    await deleteDoc(doc(db, 'users', target.dataset.id));
+                    await fetchData();
                 });
             }
             if (target.matches('.edit-content-btn')) {
@@ -775,8 +812,9 @@
                 contentModal.classList.remove('hidden');
             }
             if (target.matches('.delete-content-btn')) {
-                showConfirm('Hapus Konten', 'Yakin ingin menghapus konten ini?', () => {
-                    deleteDoc(doc(db, 'contents', target.dataset.id));
+                showConfirm('Hapus Konten', 'Yakin ingin menghapus konten ini?', async () => {
+                    await deleteDoc(doc(db, 'contents', target.dataset.id));
+                    await fetchData();
                 });
             }
             const username = document.getElementById('user-select').value;
@@ -784,9 +822,11 @@
                 const assignmentRef = doc(db, 'assignments', username);
                 if (target.matches('.assign-btn')) {
                     await setDoc(assignmentRef, { contentIds: arrayUnion(target.dataset.contentId) }, { merge: true });
+                    await fetchData();
                 }
                 if (target.matches('.unassign-btn')) {
                     await updateDoc(assignmentRef, { contentIds: arrayRemove(target.dataset.contentId) });
+                    await fetchData();
                 }
             }
         });
@@ -806,6 +846,7 @@
                 'PERINGATAN! Anda yakin akan menghapus SEMUA data konten secara permanen? Tindakan ini tidak dapat dibatalkan.',
                 async () => {
                     await clearCollection('contents');
+                    await fetchData();
                 }
             );
         });
@@ -818,32 +859,13 @@
                     const curators = allUsers.filter(u => u.role === 'Kurator');
                     const contentIds = allContent.map(c => c.id);
 
-                    if (curators.length === 0) {
-                        showInfo('Gagal', 'Tidak ada pengguna dengan role "Kurator" ditemukan.');
-                        return;
-                    }
-                    if (contentIds.length === 0) {
-                        showInfo('Gagal', 'Tidak ada konten yang tersedia untuk ditugaskan.');
-                        return;
-                    }
+                    if (curators.length === 0) { showInfo('Gagal', 'Tidak ada pengguna dengan role "Kurator" ditemukan.'); return; }
+                    if (contentIds.length === 0) { showInfo('Gagal', 'Tidak ada konten yang tersedia untuk ditugaskan.'); return; }
 
                     const assignmentPool = [];
-                    contentIds.forEach(id => {
-                        assignmentPool.push(id, id, id);
-                    });
-
-                    function shuffleArray(array) {
-                        for (let i = array.length - 1; i > 0; i--) {
-                            const j = Math.floor(Math.random() * (i + 1));
-                            [array[i], array[j]] = [array[j], array[i]];
-                        }
-                    }
-                    shuffleArray(assignmentPool);
+                    contentIds.forEach(id => { assignmentPool.push(id, id, id); });
+                    for (let i = assignmentPool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [assignmentPool[i], assignmentPool[j]] = [assignmentPool[j], assignmentPool[i]]; }
                     
-                    if (curators.length * 12 > assignmentPool.length) {
-                        console.warn("Tidak cukup konten untuk memberikan 12 ke setiap kurator.");
-                    }
-
                     const batch = writeBatch(db);
                     const assignmentsSnapshot = await getDocs(collection(db, 'assignments'));
                     assignmentsSnapshot.docs.forEach(d => batch.delete(d.ref));
@@ -852,13 +874,13 @@
                         const assignedContentForCurator = assignmentPool.splice(0, 12);
                         if (assignedContentForCurator.length > 0) {
                             const assignmentRef = doc(db, 'assignments', curator.username);
-                            const uniqueContent = [...new Set(assignedContentForCurator)];
-                            batch.set(assignmentRef, { contentIds: uniqueContent });
+                            batch.set(assignmentRef, { contentIds: [...new Set(assignedContentForCurator)] });
                         }
                     });
 
                     try {
                         await batch.commit();
+                        await fetchData();
                         showInfo('Berhasil', 'Penugasan acak telah berhasil dibuat dan disimpan.');
                     } catch (error) {
                         console.error("Gagal membuat penugasan acak:", error);
@@ -868,6 +890,80 @@
             );
         });
 
+        // --- Cache Update Logic ---
+        function cacheLog(message) {
+            cacheLogBox.innerHTML += `\n> ${message}`;
+            cacheLogBox.scrollTop = cacheLogBox.scrollHeight;
+        }
+
+        async function handleUpdateCache() {
+            const updateBtn = document.getElementById('update-cache-btn');
+            updateBtn.disabled = true;
+            updateBtn.querySelector('span').textContent = 'Sedang Memproses...';
+            cacheLogBox.innerHTML = 'Memulai proses pembaruan cache...';
+            try {
+                cacheLog(`Menggunakan data yang telah dimuat: ${allUsers.length} pengguna, ${allContent.length} konten, ${allCurations.length} kurasi.`);
+                cacheLog('Menghitung statistik...');
+                const totalContentCount = allContent.length;
+                const curatedContentCount = new Set(allCurations.map(c => c.contentId)).size;
+                const curators = allUsers.filter(u => u.role === 'Kurator');
+                const curatorCount = curators.length;
+                
+                cacheLog('Menyiapkan data tabel progres per individu...');
+                const curatedSet = new Set(allCurations.map(c => `${c.userId}_${c.contentId}`));
+                const progressTableData = curators
+                    .sort((a, b) => a.nama.localeCompare(b.nama))
+                    .map(curator => {
+                        const assignedContentIds = allAssignments[curator.username] || [];
+                        const tasks = [];
+                        for (let i = 0; i < 12; i++) {
+                            const contentId = assignedContentIds[i];
+                            if (contentId) {
+                                tasks.push(curatedSet.has(`${curator.id}_${contentId}`) ? 'completed' : 'pending');
+                            } else {
+                                tasks.push('empty');
+                            }
+                        }
+                        return { curatorName: curator.nama, tasks: tasks };
+                    });
+
+                cacheLog('Menyusun data final untuk disimpan...');
+                const cacheData = {
+                    totalContent: totalContentCount,
+                    curatedContent: curatedContentCount,
+                    totalKurator: curatorCount,
+                    lastUpdated: serverTimestamp(),
+                    progressTableData: progressTableData
+                };
+
+                const cacheDocRef = doc(db, "dashboard_cache", "summary_stats");
+                cacheLog('Menyimpan data ke `dashboard_cache/summary_stats`...');
+                await setDoc(cacheDocRef, cacheData);
+
+                cacheLog('\n✅ BERHASIL! Cache untuk dashboard publik telah berhasil diperbarui.');
+            } catch (error) {
+                cacheLog(`\n❌ TERJADI KESALAHAN: ${error.message}`);
+                console.error("Gagal memperbarui cache:", error);
+            } finally {
+                updateBtn.disabled = false;
+                updateBtn.querySelector('span').textContent = 'Perbarui Cache Sekarang';
+            }
+        }
+        document.getElementById('update-cache-btn').addEventListener('click', handleUpdateCache);
+
+        // --- Settings Page Logic ---
+        function log(message) { logBox.innerHTML += `\n> ${message}`; logBox.scrollTop = logBox.scrollHeight; }
+        
+        async function clearCollection(name) {
+            log(`Membersihkan koleksi '${name}'...`);
+            const snapshot = await getDocs(collection(db, name));
+            if (snapshot.empty) { log(`Koleksi '${name}' sudah kosong.`); return; }
+            const batch = writeBatch(db);
+            snapshot.docs.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+            log(`✅ Koleksi '${name}' berhasil dibersihkan.`);
+        }
+
         document.getElementById('download-template-btn').addEventListener('click', () => {
             const sampleData = [{ title: "Contoh Judul Konten", url: "https://www.youtube.com/watch?v=example", subject: "Matematika" }];
             const ws = XLSX.utils.json_to_sheet(sampleData);
@@ -876,10 +972,8 @@
             XLSX.writeFile(wb, "template_konten.xlsx");
         });
 
-        document.getElementById('upload-excel-btn').addEventListener('click', () => {
-            document.getElementById('excel-file-input').click();
-        });
-
+        document.getElementById('upload-excel-btn').addEventListener('click', () => document.getElementById('excel-file-input').click());
+        
         document.getElementById('excel-file-input').addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -921,6 +1015,7 @@
 
                     await batch.commit();
                     log(`✅ Berhasil: ${json.length} konten baru berhasil diunggah.`);
+                    await fetchData(); // Refresh data after upload
                     event.target.value = '';
 
                 } catch (error) {
@@ -931,69 +1026,8 @@
             reader.readAsArrayBuffer(file);
         });
 
-        function log(message) { logBox.innerHTML += `\n> ${message}`; logBox.scrollTop = logBox.scrollHeight; }
-        
-        async function clearCollection(name) {
-            log(`Membersihkan koleksi '${name}'...`);
-            const snapshot = await getDocs(collection(db, name));
-            if (snapshot.empty) { log(`Koleksi '${name}' sudah kosong.`); return; }
-            const batch = writeBatch(db);
-            snapshot.docs.forEach(d => batch.delete(d.ref));
-            await batch.commit();
-            log(`✅ Koleksi '${name}' berhasil dibersihkan.`);
-        }
-        
-        const defaultUsers = [
-             { nama: "Nurul Afifah", instansi: "Sekolah Cikal Serpong", password: "123456", username: "DirSD001", role: "Kurator" },
-            { nama: "Eka Annisa", instansi: "TK Al Hariki Depok", password: "123456", username: "DirSD002", role: "Kurator" },
-            { nama: "Yudi Kustiana", instansi: "SMPN 4 Lembang", password: "123456", username: "DirSD003", role: "Kurator" },
-            { nama: "1 orang Perwakilan Guru SMP", instansi: "", password: "123456", username: "DirSD004", role: "Kurator" },
-            { nama: "Novita Handayani", instansi: "SMA Cikal Amri Jakarta Timur", password: "123456", username: "DirSD005", role: "Kurator" },
-            { nama: "1 orang Perwakilan Guru SMA", instansi: "", password: "123456", username: "DirSD006", role: "Kurator" },
-            { nama: "Ari Setyani", instansi: "SDN Cipinang Besar Selatan 01 Pagi", password: "123456", username: "DirSD007", role: "Kurator" },
-            { nama: "Maulana Yusuf", instansi: "SDN Menteng Atas 21", password: "123456", username: "DirSD008", role: "Kurator" },
-            { nama: "Shodiq Fathoni", instansi: "SDN Batu Ampar 05", password: "123456", username: "DirSD009", role: "Kurator" },
-            { nama: "Yusuf Kurniawan", instansi: "SDN Petemburan 01", password: "123456", username: "DirSD010", role: "Kurator" },
-            { nama: "Deliana Sagitalia", instansi: "SDIT Rahmaniyah 1 Kota Depok", password: "123456", username: "DirSD011", role: "Kurator" },
-            { nama: "Rizal Listyo Mahardhika", instansi: "SDN Mampang Prapatan 02 Pagi", password: "123456", username: "DirSD012", role: "Kurator" },
-            { nama: "Muhammad Muslim Machbub Sulhtony", instansi: "SDN Cibubur 10, Jakarta Timur", password: "123456", username: "DirSD013", role: "Kurator" },
-            { nama: "Ronald Stevanus SS", instansi: "SDN Kayuringin XIX,Kota Bekasi", password: "123456", username: "DirSD014", role: "Kurator" },
-            { nama: "Fajar Sidiq Setiawan", instansi: "SDN Sukamakmur 02, Kabupaten Bogor", password: "123456", username: "DirSD015", role: "Kurator" },
-            { nama: "Bintang Adhi Permana", instansi: "SDN Lubang Buaya 01, Jakarta Timur", password: "123456", username: "DirSD016", role: "Kurator" },
-            { nama: "Didik Rahmadi", instansi: "SDN Pejaten Timur 11, Jakarta Selatan", password: "123456", username: "DirSD017", role: "Kurator" },
-            { nama: "Jul Rasdi", instansi: "SDN Menteng Atas 21", password: "123456", username: "DirSD018", role: "Kurator" },
-            { nama: "Citra Dewi Nurlela Afni", instansi: "SDN Parapat 1, Kota Tangerang", password: "123456", username: "DirSD019", role: "Kurator" },
-            { nama: "Rahardian Adi Nugroho", instansi: "SDN Sungai Bambu 01, Jakarta Utara", password: "123456", username: "DirSD020", role: "Kurator" },
-            { nama: "Resti Ningsih", instansi: "SD Mutiara Hati, Kota Tangerang", password: "123456", username: "DirSD021", role: "Kurator" },
-            { nama: "Ujang Edi Brata", instansi: "SDN 2 Perdana, Kab. Pandeglang", password: "123456", username: "DirSD022", role: "Kurator" },
-            { nama: "Errisca Tri Oktavianasari", instansi: "SDN Batu Ampar 11 Pagi, Jakarta Timur", password: "123456", username: "DirSD023", role: "Kurator" },
-            { nama: "Yogi Permana", instansi: "SDN 4 Depok, Kota Depok", password: "123456", username: "DirSD024", role: "Kurator" },
-            { nama: "Asmaul Husnah", instansi: "SDN Cijantung 01, Jakarta Timur", password: "123456", username: "DirSD025", role: "Kurator" },
-            { nama: "Irfanda Fathan", instansi: "SDN Pekayon 16 Pagi, Jakarta Timur", password: "123456", username: "DirSD026", role: "Kurator" },
-            { nama: "Yoga Adi Pratama", instansi: "SDN Harapan 1, Kota Cimahi", password: "123456", username: "DirSD027", role: "Kurator" },
-            { nama: "Oryza Sativa N", instansi: "SDN Ulujami 06 Pagi, Jakarta Selatan", password: "123456", username: "DirSD028", role: "Kurator" },
-            { nama: "Hidayat", instansi: "SDN Peulau Kelapa 02 Pagi, Kab. Kep. Seribu", password: "123456", username: "DirSD029", role: "Kurator" },
-            { nama: "Desi Erfan", instansi: "SDN Cipinang Besar Utara 08", password: "123456", username: "DirSD030", role: "Kurator" },
-            { nama: "Hizbul Pahman", instansi: "SDN Kalibaru 1 Kota Depok", password: "123456", username: "DirSD031", role: "Kurator" },
-            { nama: "Firman Rizkiana", instansi: "SDN Utan Kayu Utara 11 Pagi, Jakarta Timur", password: "123456", username: "DirSD032", role: "Kurator" },
-            { nama: "Emat Sulaemat", instansi: "Sekolah Bosowa Binda Insani, Kota Bogor", password: "123456", username: "DirSD033", role: "Kurator" },
-            { nama: "Dimas Wijaya", instansi: "SD Labschool Cibubur", password: "123456", username: "DirSD034", role: "Kurator" },
-            { nama: "Kurator 35", instansi: "instansi Kurator 35", password: "123456", username: "DirSD035", role: "Kurator" },
-            { nama: "Kurator 36", instansi: "instansi Kurator 36", password: "123456", username: "DirSD036", role: "Kurator" },
-            { nama: "Kurator 37", instansi: "instansi Kurator 37", password: "123456", username: "DirSD037", role: "Kurator" },
-            { nama: "Kurator 38", instansi: "instansi Kurator 38", password: "123456", username: "DirSD038", role: "Kurator" },
-            { nama: "Kurator 39", instansi: "instansi Kurator 39", password: "123456", username: "DirSD039", role: "Kurator" },
-            { nama: "Kurator 40", instansi: "instansi Kurator 40", password: "123456", username: "DirSD040", role: "Kurator" },
-            { nama: "Supervisor1", instansi: "Instansi Supervisor 1", password: "123456", username: "DirSD041", role: "Supervisor" },
-            { nama: "Supervisor2", instansi: "Instansi Supervisor 2", password: "123456", username: "DirSD042", role: "Supervisor" },
-            { nama: "Supervisor3", instansi: "Instansi Supervisor 3", password: "123456", username: "DirSD043", role: "Supervisor" },
-            { nama: "Supervisor4", instansi: "Instansi Supervisor 4", password: "123456", username: "DirSD044", role: "Supervisor" },
-            { nama: "Supervisor5", instansi: "Instansi Supervisor 5", password: "123456", username: "DirSD045", role: "Supervisor" },
-            { nama: "Admin", instansi: "Instansi Admin", password: "Admin123", username: "Admin", role: "Admin" },
-        ];
-
         document.getElementById('resetButton').addEventListener('click', () => {
-             showConfirm(
+            showConfirm(
                 'Reset Database',
                 'PERINGATAN! Anda akan menghapus SEMUA data dan membuat ulang database default. Lanjutkan?',
                 async () => {
@@ -1008,40 +1042,22 @@
                         await clearCollection('assignments');
                         await clearCollection('curations');
 
-                        log(`Membuat ${defaultUsers.length} data pengguna default...`);
+                        log(`Membuat pengguna default...`);
+                        const defaultUsers = [
+                            { nama: "Nurul Afifah", instansi: "Sekolah Cikal Serpong", password: "123456", username: "DirSD001", role: "Kurator" },
+                            { nama: "Bintang Adhi Permana", instansi: "SDN Lubang Buaya 01", password: "Bangbin0103", username: "DirSD016", role: "Kurator" },
+                            { nama: "Supervisor1", instansi: "Instansi Supervisor", password: "123456", username: "DirSD041", role: "Supervisor" },
+                            { nama: "Admin", instansi: "Instansi Admin", password: "Admin1234", username: "Admin", role: "Admin" },
+                        ];
                         const usersBatch = writeBatch(db);
                         defaultUsers.forEach(user => {
                             const userRef = doc(collection(db, "users"));
                             usersBatch.set(userRef, user);
                         });
                         await usersBatch.commit();
-                        log(`✅ ${defaultUsers.length} pengguna berhasil dibuat.`);
+                        log(`✅ Pengguna default berhasil dibuat.`);
 
-                        log('Membuat 200 data konten default...');
-                        const contentsBatch = writeBatch(db);
-                        const contentIds = [];
-                        for (let i = 1; i <= 200; i++) {
-                            const contentRef = doc(collection(db, "contents"));
-                            contentIds.push(contentRef.id);
-                            contentsBatch.set(contentRef, { title: `Konten Pembelajaran #${i}`, url: `https://youtube.com/watch?v=example${i}`, subject: "Umum", status: "pending" });
-                        }
-                        await contentsBatch.commit();
-                        log('✅ 200 konten berhasil dibuat.');
-
-                        log('Membuat penugasan untuk kurator...');
-                        const assignmentsBatch = writeBatch(db);
-                        let contentIndex = 0;
-                        const curators = defaultUsers.filter(u => u.role === 'Kurator');
-                        curators.forEach(curator => {
-                            const assignmentRef = doc(db, "assignments", curator.username);
-                            const assignedContentIds = contentIds.slice(contentIndex, contentIndex + 5);
-                            if(assignedContentIds.length > 0) {
-                                contentIndex += 5;
-                                assignmentsBatch.set(assignmentRef, { contentIds: assignedContentIds });
-                            }
-                        });
-                        await assignmentsBatch.commit();
-                        log('✅ Penugasan berhasil dibuat.');
+                        await fetchData(); // Refresh data after reset
                         log('\n🎉 SEMUA PROSES SELESAI!');
 
                     } catch (error) {
@@ -1054,6 +1070,118 @@
                 }
             );
         });
+
+        document.getElementById('backupButton').addEventListener('click', async () => {
+            log('Memulai proses backup...');
+            const backupData = {};
+            const collectionsToBackup = ['users', 'contents', 'assignments', 'curations'];
+            
+            try {
+                for (const collectionName of collectionsToBackup) {
+                    log(`Mengekspor koleksi '${collectionName}'...`);
+                    const data = collectionName === 'users' ? allUsers :
+                                 collectionName === 'contents' ? allContent :
+                                 collectionName === 'curations' ? allCurations : [];
+                    
+                    if (collectionName === 'assignments') {
+                        backupData[collectionName] = Object.entries(allAssignments).map(([id, contentIds]) => ({ id, contentIds }));
+                    } else {
+                        backupData[collectionName] = data;
+                    }
+                    log(`✅ Koleksi '${collectionName}' berhasil diekspor.`);
+                }
+
+                const jsonString = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                const date = new Date().toISOString().slice(0, 10);
+                a.download = `backup-kurasi-${date}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                log('\n🎉 BACKUP BERHASIL! File telah diunduh.');
+
+            } catch (error) {
+                log(`\n❌ TERJADI ERROR saat backup: ${error.message}`);
+                console.error("Backup failed:", error);
+            }
+        });
+        
+        document.getElementById('restoreButtonTrigger').addEventListener('click', () => document.getElementById('restoreFileInput').click());
+        
+        document.getElementById('restoreFileInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file && file.type === "application/json") {
+                handleRestore(file);
+            } else if (file) {
+                log('❌ Gagal: Harap pilih file backup JSON yang valid.');
+            }
+            event.target.value = '';
+        });
+
+        async function handleRestore(file) {
+            showConfirm(
+                'Restore Data?',
+                'PERINGATAN! Ini akan MENGHAPUS SEMUA data yang ada saat ini dan menggantinya dengan data dari file backup. Lanjutkan?',
+                async () => {
+                    log('\nMemulai proses restore...');
+                    const reader = new FileReader();
+                    
+                    reader.onload = async (e) => {
+                        try {
+                            const backupData = JSON.parse(e.target.result);
+                            const requiredCollections = ['users', 'contents', 'assignments', 'curations'];
+                            
+                            const missingCollections = requiredCollections.filter(c => !backupData.hasOwnProperty(c) || !Array.isArray(backupData[c]));
+                            if (missingCollections.length > 0) {
+                                log(`❌ Gagal: File backup tidak valid. Koleksi yang hilang: ${missingCollections.join(', ')}`);
+                                return;
+                            }
+
+                            log('File backup valid. Menghapus data lama...');
+                            for (const collectionName of requiredCollections) {
+                                await clearCollection(collectionName);
+                            }
+
+                            log('Memulai penulisan data baru...');
+                            for (const collectionName of requiredCollections) {
+                                log(`Me-restore koleksi '${collectionName}'...`);
+                                const data = backupData[collectionName];
+                                if (data.length === 0) {
+                                    log(`Koleksi '${collectionName}' kosong, dilewati.`);
+                                    continue;
+                                }
+                                
+                                const batch = writeBatch(db);
+                                data.forEach(item => {
+                                    const docId = item.id;
+                                    const docData = { ...item };
+                                    delete docData.id;
+                                    const docRef = doc(db, collectionName, docId);
+                                    batch.set(docRef, docData);
+                                });
+                                
+                                await batch.commit();
+                                log(`✅ Koleksi '${collectionName}' berhasil di-restore.`);
+                            }
+                            await fetchData();
+                            log('\n🎉 RESTORE BERHASIL!');
+
+                        } catch (error) {
+                            log(`\n❌ TERJADI ERROR saat restore: ${error.message}`);
+                            console.error("Restore failed:", error);
+                        }
+                    };
+                    
+                    reader.readAsText(file);
+                }
+            );
+        }
 
     </script>
 </body>
