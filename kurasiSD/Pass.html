@@ -24,7 +24,7 @@
         <main class="max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border border-slate-700">
             <!-- Search Input -->
             <div class="mb-6 relative">
-                <input type="search" id="search-input" placeholder="Ketik nama pengguna untuk mencari..." class="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300">
+                <input type="search" id="search-input" placeholder="Ketik nama pengguna untuk mencari..." class="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300" disabled>
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <i class="fas fa-search text-slate-400"></i>
                 </span>
@@ -56,6 +56,7 @@
 		  appId: "1:168494524685:web:b209da5c5fec9e7d5be844"
 		};
 
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -63,17 +64,9 @@
         const searchInput = document.getElementById('search-input');
         const initialMessage = document.getElementById('initial-message');
         
-        // Fungsi untuk menunda eksekusi (agar tidak query setiap ketikan)
-        function debounce(func, delay) {
-            let timeout;
-            return function(...args) {
-                const context = this;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), delay);
-            };
-        }
+        let allUsers = [];
 
-        // Fungsi untuk merender daftar pengguna (tidak berubah)
+        // Fungsi untuk merender daftar pengguna
         function renderUsers(users) {
             if (searchInput.value.trim() === '') {
                 userListContainer.innerHTML = '';
@@ -124,54 +117,45 @@
             `).join('');
         }
         
-        // Fungsi baru untuk melakukan pencarian ke Firestore
-        async function performSearch() {
-            const searchTerm = searchInput.value.trim();
-
-            if (searchTerm === '') {
-                renderUsers([]); // Mengosongkan daftar jika input kosong
-                return;
-            }
-
-            initialMessage.classList.remove('hidden');
-            initialMessage.textContent = 'Mencari...';
-            initialMessage.classList.remove('text-red-500');
-            userListContainer.innerHTML = ''; // Kosongkan hasil sebelumnya
-
+        async function fetchUsers() {
             try {
-                // Membuat query untuk mencari nama yang dimulai dengan `searchTerm` (case-sensitive)
-                const capitalizedSearchTerm = searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1).toLowerCase();
                 const usersCollection = collection(db, 'users');
-                const q = query(usersCollection, 
-                    where("nama", ">=", capitalizedSearchTerm), 
-                    where("nama", "<=", capitalizedSearchTerm + '\uf8ff'),
-                    where("password", "!=", null)
-                );
-                
+                const q = query(usersCollection, where("password", "!=", null));
                 const userSnapshot = await getDocs(q);
-                const foundUsers = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                allUsers = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
-                renderUsers(foundUsers);
+                searchInput.disabled = false;
+                searchInput.placeholder = 'Ketik nama pengguna untuk mencari...';
+                initialMessage.textContent = 'Data siap. Silakan mulai mencari.';
 
             } catch (error) {
-                console.error("Gagal melakukan pencarian:", error);
-                initialMessage.textContent = 'Terjadi kesalahan saat mencari. Coba lagi.';
+                console.error("Gagal mengambil data pengguna: ", error);
+                initialMessage.textContent = 'Gagal memuat data pengguna. Coba muat ulang halaman.';
                 initialMessage.classList.add('text-red-500');
-                userListContainer.innerHTML = '';
             }
         }
 
-        // --- Inisialisasi Halaman ---
-        document.addEventListener('DOMContentLoaded', () => {
-            searchInput.disabled = false; // Langsung aktifkan input
-            
-            // Gunakan fungsi debounce untuk event input
-            searchInput.addEventListener('input', debounce(performSearch, 500));
+        function handleSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            if (searchTerm === '') {
+                renderUsers([]); 
+                return;
+            }
+            const filteredUsers = allUsers.filter(user => 
+                user.nama && user.nama.toLowerCase().includes(searchTerm)
+            );
+            renderUsers(filteredUsers);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            searchInput.placeholder = 'Sedang memuat data...';
+            await fetchUsers();
+            searchInput.addEventListener('input', handleSearch);
         });
     </script>
     
     <script>
-        // Fungsi helper (copy & toggle visibility) tidak berubah dan tetap di sini
+        // Fungsi helper ini tidak memerlukan module, jadi dipisah agar tetap berfungsi
         function copyToClipboard(elementId, buttonElement) {
             const input = document.getElementById(elementId);
             if (navigator.clipboard && window.isSecureContext) {
