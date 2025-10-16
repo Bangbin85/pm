@@ -438,7 +438,6 @@
         let allAssignments = {};
         let allCurations = [];
         
-        // === PERUBAHAN DI SINI: State untuk paginasi konten ===
         let contentCurrentPage = 1;
         const contentItemsPerPage = 15;
 
@@ -466,7 +465,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
                 showAdminPanel();
-                fetchData(); // Automatically fetch data on load if logged in
+                fetchData();
             } else {
                 showLoginScreen();
             }
@@ -590,7 +589,7 @@
                 renderContentTable();
                 renderUserSelect();
                 renderHasilTable();
-                // When a user is selected in dropdown, refresh their assignment list
+                
                 const selectedUser = document.getElementById('user-select').value;
                 if(selectedUser) renderAssignmentLists(selectedUser);
 
@@ -638,7 +637,6 @@
             `).join('');
         }
         
-        // === FUNGSI YANG DIPERBARUI: renderContentTable dengan Paginasi dan Search ===
         function renderContentTable() {
             const tbody = document.getElementById('content-table-body');
             const searchInput = document.getElementById('search-content-input');
@@ -792,7 +790,6 @@
         
         document.getElementById('search-user-input').addEventListener('input', renderUsersTable);
 
-        // === PERUBAHAN DI SINI: Event Listener untuk search dan paginasi konten ===
         document.getElementById('search-content-input').addEventListener('input', () => {
             contentCurrentPage = 1;
             renderContentTable();
@@ -970,39 +967,82 @@
             cacheLogBox.scrollTop = cacheLogBox.scrollHeight;
         }
 
+        // --- CORRECTED: Analysis calculation helpers ---
+        const scoreMap = {
+            "Lulus Kurasi": 5, "Kurang Sesuai": 4, "Perbaikan Minor": 3,
+            "Perbaikan Mayor": 2, "Tidak Lulus Kurasi": 1
+        };
+        const resultCategories = ["Lulus Kurasi", "Kurang Sesuai", "Perbaikan Minor", "Perbaikan Mayor", "Tidak Lulus Kurasi", "Belum Dinilai"];
+
+        function getResultFromScore(score) {
+            const roundedScore = Math.round(score);
+            switch (roundedScore) {
+                case 5: return "Lulus Kurasi";
+                case 4: return "Kurang Sesuai";
+                case 3: return "Perbaikan Minor";
+                case 2: return "Perbaikan Mayor";
+                case 1: return "Tidak Lulus Kurasi";
+                default: return "Belum Dinilai";
+            }
+        }
+
+        function calculateAverageResult(content, assignmentsByContent, allCurationsMap, usernameToIdMap) {
+            const assignedCuratorIds = assignmentsByContent.get(content.id) || [];
+            let scores = [];
+            
+            for (const curatorId of assignedCuratorIds) {
+                const curationId = `${curatorId}_${content.id}`;
+                const curationData = allCurationsMap.get(curationId);
+                if (curationData) {
+                    const finalScoreText = (curationData.answers?.D2_Keputusan_Final?.keputusan || '').trim();
+                    const numericScore = scoreMap[finalScoreText];
+                    if (numericScore !== undefined) {
+                        scores.push(numericScore);
+                    }
+                }
+            }
+
+            if (scores.length > 0) {
+                const sum = scores.reduce((a, b) => a + b, 0);
+                const averageScore = sum / scores.length;
+                return { averageResultText: getResultFromScore(averageScore), averageScore };
+            }
+            return { averageResultText: "Belum Dinilai", averageScore: 0 };
+        }
+
+
         async function handleUpdateCache() {
             const updateBtn = document.getElementById('update-cache-btn');
             updateBtn.disabled = true;
             updateBtn.querySelector('span').textContent = 'Sedang Memproses...';
             cacheLogBox.innerHTML = 'Memulai proses pembaruan cache...';
+            
             try {
                 cacheLog(`Menggunakan data yang telah dimuat: ${allUsers.length} pengguna, ${allContent.length} konten, ${allCurations.length} kurasi.`);
-                cacheLog('Menghitung statistik...');
+                
+                // --- PART 1: summary_stats cache ---
+                cacheLog('Menghitung statistik utama...');
                 const totalContentCount = allContent.length;
                 const curatedContentCount = new Set(allCurations.map(c => c.contentId)).size;
                 const curators = allUsers.filter(u => u.role === 'Kurator');
                 const curatorCount = curators.length;
                 
-                cacheLog('Menyiapkan data tabel progres per individu...');
+                cacheLog('Menyiapkan data tabel progres...');
                 const curatedSet = new Set(allCurations.map(c => `${c.userId}_${c.contentId}`));
                 const progressTableData = curators
                     .sort((a, b) => a.nama.localeCompare(b.nama))
                     .map(curator => {
                         const assignedContentIds = allAssignments[curator.username] || [];
-                        const tasks = [];
-                        for (let i = 0; i < 12; i++) {
-                            const contentId = assignedContentIds[i];
-                            if (contentId) {
-                                tasks.push(curatedSet.has(`${curator.id}_${contentId}`) ? 'completed' : 'pending');
-                            } else {
-                                tasks.push('empty');
+                        const tasks = Array(12).fill('empty');
+                        assignedContentIds.forEach((contentId, i) => {
+                            if (i < 12) {
+                                tasks[i] = curatedSet.has(`${curator.id}_${contentId}`) ? 'completed' : 'pending';
                             }
-                        }
-                        return { curatorName: curator.nama, tasks: tasks };
+                        });
+                        return { curatorName: curator.nama, tasks };
                     });
 
-                cacheLog('Menyusun data final untuk disimpan...');
-                const cacheData = {
+                const summaryCacheData = {
                     totalContent: totalContentCount,
                     curatedContent: curatedContentCount,
                     totalKurator: curatorCount,
@@ -1010,11 +1050,49 @@
                     progressTableData: progressTableData
                 };
 
-                const cacheDocRef = doc(db, "dashboard_cache", "summary_stats");
+                const summaryCacheRef = doc(db, "dashboard_cache", "summary_stats");
                 cacheLog('Menyimpan data ke `dashboard_cache/summary_stats`...');
-                await setDoc(cacheDocRef, cacheData);
+                await setDoc(summaryCacheRef, summaryCacheData);
+                cacheLog('✅ Cache ringkasan berhasil diperbarui.');
 
-                cacheLog('\n✅ BERHASIL! Cache untuk dashboard publik telah berhasil diperbarui.');
+                // --- PART 2: analysis_summary cache ---
+                cacheLog('\nMemulai perhitungan untuk cache analisis...');
+                const allContentMap = new Map(allContent.map(c => [c.id, c]));
+                const allCurationsMap = new Map(allCurations.map(c => [c.id, c]));
+                const usernameToIdMap = new Map(allUsers.map(u => [u.username, u.id]));
+                const assignmentsByContent = new Map();
+                
+                for (const username in allAssignments) {
+                    const userId = usernameToIdMap.get(username);
+                    if(userId) {
+                        allAssignments[username].forEach(contentId => {
+                            if (!assignmentsByContent.has(contentId)) assignmentsByContent.set(contentId, []);
+                            assignmentsByContent.get(contentId).push(userId);
+                        });
+                    }
+                }
+                
+                const stats = Object.fromEntries(resultCategories.map(cat => [cat, 0]));
+                allContentMap.forEach(content => {
+                    const { averageResultText } = calculateAverageResult(content, assignmentsByContent, allCurationsMap, usernameToIdMap);
+                    if (stats.hasOwnProperty(averageResultText)) {
+                        stats[averageResultText]++;
+                    }
+                });
+
+                cacheLog('Menyusun data final untuk cache analisis...');
+                const analysisCacheData = {
+                    stats: stats,
+                    totalContent: totalContentCount,
+                    lastUpdated: serverTimestamp()
+                };
+                
+                const analysisCacheRef = doc(db, "dashboard_cache", "analysis_summary");
+                cacheLog('Menyimpan data ke `dashboard_cache/analysis_summary`...');
+                await setDoc(analysisCacheRef, analysisCacheData);
+                cacheLog('✅ Cache analisis berhasil diperbarui.');
+
+                cacheLog('\n🎉 SEMUA PROSES SELESAI! Kedua cache telah berhasil diperbarui.');
             } catch (error) {
                 cacheLog(`\n❌ TERJADI KESALAHAN: ${error.message}`);
                 console.error("Gagal memperbarui cache:", error);
@@ -1024,7 +1102,7 @@
             }
         }
         document.getElementById('update-cache-btn').addEventListener('click', handleUpdateCache);
-
+        
         // --- Settings Page Logic ---
         function log(message) { logBox.innerHTML += `\n> ${message}`; logBox.scrollTop = logBox.scrollHeight; }
         
