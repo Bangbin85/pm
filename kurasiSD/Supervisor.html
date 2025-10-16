@@ -139,7 +139,7 @@
     </div>
 
     <!-- === HEADER === -->
-    <header id="main-header" class="hidden bg-white/80 backdrop-blur-lg shadow-sm z-30 border-b border-slate-200">
+    <header id="main-header" class="hidden bg-white/80 backdrop-blur-lg shadow-sm z-30 border-b border-slate-200 sticky top-0">
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <h1 id="welcome-message" class="text-xl font-bold text-slate-800">Dashboard Supervisor</h1>
             <div class="flex items-center space-x-2">
@@ -154,12 +154,13 @@
     </header>
 
     <!-- === MAIN DASHBOARD === -->
-    <main id="main-dashboard" class="hidden bg-slate-50">
+    <main id="main-dashboard" class="hidden">
         <div class="py-10">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <h2 class="text-2xl font-semibold text-slate-800 mb-6 px-4 sm:px-0">Tinjauan Hasil Kurasi Konten</h2>
                 <div id="table-wrapper" class="neumorphism-table-container">
                     <table id="results-table" class="w-full neumorphism-table">
+                        <!-- Konten akan di-render oleh Javascript -->
                     </table>
                 </div>
             </div>
@@ -226,17 +227,17 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase Anda
-        const firebaseConfig = {
-            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
-            authDomain: "kurasisd.firebaseapp.com",
-            projectId: "kurasisd",
-            storageBucket: "kurasisd.firebasestorage.app",
-            messagingSenderId: "520054778765",
-            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
-        };
+		const firebaseConfig = {
+		  apiKey: "AIzaSyB0biVlYEZg7p5UntYRDnyjdQCfe15_vmk",
+		  authDomain: "kurasidirsd.firebaseapp.com",
+		  projectId: "kurasidirsd",
+		  storageBucket: "kurasidirsd.firebasestorage.app",
+		  messagingSenderId: "168494524685",
+		  appId: "1:168494524685:web:b209da5c5fec9e7d5be844"
+		};
+
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -253,9 +254,11 @@
         const detailsModal = document.getElementById('details-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
 
-        let curationsMap = new Map();
+        // --- State Management ---
+        let supervisorReportCache = [];
+        let latestCacheData = null; // Variable to hold the latest data from cache
 
-        // --- Struktur Pertanyaan Kurasi (diambil dari Kurator.html untuk konsistensi) ---
+        // --- Curation Questions Structure (for consistency) ---
         const curationQuestions = [
              { id: 'A1', title: 'A.1 Keamanan Materi'}, { id: 'A2', title: 'A.2 Copyright'},
              { id: 'A3', title: 'A.3 Substansi Materi'}, { id: 'A4', title: 'A.4 Kebahasaan'},
@@ -302,7 +305,13 @@
                 const supervisorData = { id: userDoc.id, ...userDoc.data() };
                 
                 sessionStorage.setItem('supervisorUser', JSON.stringify(supervisorData));
-                await displayDashboard(supervisorData);
+                showDashboard(supervisorData);
+
+                // --- FIX: Manually trigger render after successful login ---
+                if (latestCacheData) {
+                    renderDashboardFromCache(latestCacheData.reportData);
+                }
+                // --- END FIX ---
 
             } catch (error) {
                 console.error("Login Gagal!", error);
@@ -312,6 +321,16 @@
                 loginBtn.textContent = 'Masuk';
             }
         }
+        
+        function showDashboard(supervisor) {
+            loginSection.classList.add('hidden');
+            mainHeader.classList.remove('hidden');
+            mainDashboard.classList.remove('hidden');
+            document.body.style.backgroundColor = '';
+            welcomeMessage.textContent = `Selamat Datang, ${supervisor.nama}!`;
+            resultsTable.innerHTML = `<tbody><tr><td colspan="4" class="text-center p-4 text-slate-500">Menunggu data dari cache... <i class="fas fa-spinner fa-spin"></i></td></tr></tbody>`;
+        }
+
 
         function handleLogout() {
             sessionStorage.removeItem('supervisorUser');
@@ -321,125 +340,88 @@
             loginSection.classList.remove('hidden');
         }
 
-        // --- Data Fetching and Rendering ---
-        async function displayDashboard(supervisor) {
-            loginSection.classList.add('hidden');
-            mainHeader.classList.remove('hidden');
-            mainDashboard.classList.remove('hidden');
-            document.body.style.backgroundColor = '';
-            welcomeMessage.textContent = `Selamat Datang, ${supervisor.nama}!`;
-            resultsTable.innerHTML = `<tbody><tr><td colspan="4" class="text-center p-4 text-slate-500">Memuat data kurasi... <i class="fas fa-spinner fa-spin"></i></td></tr></tbody>`;
-
-            try {
-                const [usersSnap, contentsSnap, assignmentsSnap, curationsSnap] = await Promise.all([
-                    getDocs(collection(db, "users")),
-                    getDocs(collection(db, "contents")),
-                    getDocs(collection(db, "assignments")),
-                    getDocs(collection(db, "curations"))
-                ]);
-                
-                const usersMap = new Map(usersSnap.docs.map(doc => [doc.id, doc.data()]));
-                const usernameToIdMap = new Map(usersSnap.docs.map(doc => [doc.data().username, doc.id]));
-                curationsMap = new Map(curationsSnap.docs.map(doc => [doc.id, doc.data()]));
-
-                const assignmentsByContent = new Map();
-                assignmentsSnap.docs.forEach(assignDoc => {
-                    const assignment = assignDoc.data();
-                    const username = assignDoc.id;
-                    const userId = usernameToIdMap.get(username);
-                    if (userId && assignment.contentIds) {
-                        assignment.contentIds.forEach(contentId => {
-                            if (!assignmentsByContent.has(contentId)) {
-                                assignmentsByContent.set(contentId, []);
-                            }
-                            assignmentsByContent.get(contentId).push(userId);
-                        });
-                    }
-                });
-
-                const MAX_CURATORS_COLUMNS = 3;
-                let tableHTML = '<thead><tr><th>Konten</th>';
-                for (let i = 1; i <= MAX_CURATORS_COLUMNS; i++) {
-                    tableHTML += `<th>Kurator ${i}</th>`;
-                }
-                tableHTML += '</tr></thead><tbody>';
-
-                contentsSnap.docs.forEach(contentDoc => {
-                    const content = { id: contentDoc.id, ...contentDoc.data() };
-                    const assignedCuratorIds = assignmentsByContent.get(content.id) || [];
-
-                    tableHTML += `<tr>`;
-                    tableHTML += `
-                        <td class="content-cell">
-                            <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline">
-                                ${content.id}
-                            </a>
-                            <p class="text-sm text-slate-700 mt-1">${content.title}</p>
-                        </td>
-                    `;
-                    
-                    for (let i = 0; i < MAX_CURATORS_COLUMNS; i++) {
-                        if (i < assignedCuratorIds.length) {
-                            const curatorId = assignedCuratorIds[i];
-                            const curator = usersMap.get(curatorId);
-                            const curatorName = curator ? curator.nama : 'Kurator Tdk Dikenal';
-                            const curationId = `${curatorId}_${content.id}`;
-                            const curationData = curationsMap.get(curationId);
-                            
-                            tableHTML += `<td class="curator-cell">`;
-                            tableHTML += `<div class="font-semibold text-slate-800">${curatorName}</div>`;
-
-                            if (curationData) {
-                                const finalScore = curationData.answers?.D2_Keputusan_Final?.keputusan || 'N/A';
-                                tableHTML += `
-                                    <div class="flex items-center mt-1">
-                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                        <button class="view-details-btn text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full hover:bg-green-200 transition-all"
-                                                data-curation-id="${curationId}" 
-                                                data-content-title="${content.title}">
-                                            ${finalScore}
-                                        </button>
-                                    </div>
-                                `;
-                            } else {
-                                tableHTML += `<div class="mt-1"><span class="text-sm italic text-slate-500">Belum dikurasi</span></div>`;
-                            }
-                            tableHTML += `</td>`;
-                        } else {
-                            tableHTML += `<td class="text-center align-middle"><span class="text-slate-400">—</span></td>`;
-                        }
-                    }
-
-                    tableHTML += `</tr>`;
-                });
-
-                tableHTML += '</tbody>';
-                resultsTable.innerHTML = tableHTML || '<tbody><tr><td colspan="4" class="text-center">Tidak ada data konten ditemukan.</td></tr></tbody>';
-
-            } catch (error) {
-                console.error("Error displaying dashboard:", error);
-                resultsTable.innerHTML = `<tbody><tr><td colspan="4" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr></tbody>`;
+        // --- Data Rendering from Cache ---
+        function renderDashboardFromCache(reportData) {
+            if (!reportData) {
+                console.error("renderDashboardFromCache called with empty data.");
+                return;
             }
+            supervisorReportCache = reportData; // Store data in global state for modal access
+
+            const MAX_CURATORS_COLUMNS = 3;
+            let tableHTML = '<thead><tr><th>Konten</th>';
+            for (let i = 1; i <= MAX_CURATORS_COLUMNS; i++) {
+                tableHTML += `<th>Kurator ${i}</th>`;
+            }
+            tableHTML += '</tr></thead><tbody>';
+            
+            if (reportData.length === 0) {
+                 resultsTable.innerHTML = '<tbody><tr><td colspan="4" class="text-center p-4">Cache kosong atau belum dibuat. Silakan perbarui dari panel Admin.</td></tr></tbody>';
+                 return;
+            }
+
+            reportData.forEach((content, contentIndex) => {
+                tableHTML += `<tr>`;
+                tableHTML += `
+                    <td class="content-cell">
+                        <a href="${content.contentUrl}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline">
+                            ${content.contentId}
+                        </a>
+                        <p class="text-sm text-slate-700 mt-1">${content.contentTitle}</p>
+                    </td>
+                `;
+
+                for (let i = 0; i < MAX_CURATORS_COLUMNS; i++) {
+                    const assignment = content.assignments[i];
+                    if (assignment) {
+                        tableHTML += `<td class="curator-cell">`;
+                        tableHTML += `<div class="font-semibold text-slate-800">${assignment.curatorName}</div>`;
+
+                        if (assignment.status === 'completed') {
+                            const finalScore = assignment.curationData?.answers?.D2_Keputusan_Final?.keputusan || 'N/A';
+                            tableHTML += `
+                                <div class="flex items-center mt-1">
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <button class="view-details-btn text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full hover:bg-green-200 transition-all"
+                                            data-content-index="${contentIndex}"
+                                            data-curator-index="${i}">
+                                        ${finalScore}
+                                    </button>
+                                </div>
+                            `;
+                        } else { // pending
+                            tableHTML += `<div class="mt-1"><span class="text-sm italic text-slate-500">Belum dikurasi</span></div>`;
+                        }
+                        tableHTML += `</td>`;
+                    } else {
+                        tableHTML += `<td class="text-center align-middle"><span class="text-slate-400">—</span></td>`;
+                    }
+                }
+                tableHTML += `</tr>`;
+            });
+
+            tableHTML += '</tbody>';
+            resultsTable.innerHTML = tableHTML;
         }
 
         // --- Modal Logic ---
-        function openDetailsModal(curationId, contentTitle) {
-            const curationData = curationsMap.get(curationId);
-            if (!curationData || !curationData.answers) {
+        function openDetailsModal(contentIndex, curatorIndex) {
+            const content = supervisorReportCache[contentIndex];
+            const assignment = content.assignments[curatorIndex];
+
+            if (!assignment || !assignment.curationData || !assignment.curationData.answers) {
                 alert("Data kurasi tidak ditemukan!");
                 return;
             }
-            const answers = curationData.answers;
+            const answers = assignment.curationData.answers;
 
-            // Set Judul Konten
-            document.getElementById('modal-content-title').textContent = contentTitle;
+            document.getElementById('modal-content-title').textContent = content.contentTitle;
 
-            // Set Nilai Indikator (A1-C5)
             const indicatorContainer = document.getElementById('modal-indicator-values');
-            indicatorContainer.innerHTML = ''; // Kosongkan dulu
+            indicatorContainer.innerHTML = '';
             curationQuestions.forEach(q => {
                 const value = answers[q.id]?.value || 'N/A';
-                const shortTitle = q.title.split(' ')[0]; // Ambil kode seperti "A.1"
+                const shortTitle = q.title.split(' ')[0];
                 indicatorContainer.innerHTML += `
                     <div class="neumorphism-input !shadow-none !bg-slate-100 p-3 rounded-lg">
                         <p class="text-xs font-bold text-slate-500">${shortTitle}</p>
@@ -448,12 +430,9 @@
                 `;
             });
             
-            // Set D1 Simpulan Umum
             document.getElementById('modal-d1-kelebihan').value = answers.D1_Simpulan_Umum?.kelebihan || '';
             document.getElementById('modal-d1-kekurangan').value = answers.D1_Simpulan_Umum?.kekurangan || '';
             document.getElementById('modal-d1-saran').value = answers.D1_Simpulan_Umum?.saran || '';
-
-            // Set D2 Keputusan Final
             document.getElementById('modal-d2-keputusan').textContent = answers.D2_Keputusan_Final?.keputusan || 'N/A';
             document.getElementById('modal-d2-deskripsi').value = answers.D2_Keputusan_Final?.nilai_deskripsi || '';
 
@@ -470,7 +449,7 @@
         window.addEventListener('load', () => {
             const savedUser = sessionStorage.getItem('supervisorUser');
             if (savedUser) {
-                displayDashboard(JSON.parse(savedUser));
+                showDashboard(JSON.parse(savedUser));
             } else {
                  document.body.style.backgroundColor = 'var(--neu-bg)';
             }
@@ -479,16 +458,36 @@
             logoutBtn.addEventListener('click', handleLogout);
             closeModalBtn.addEventListener('click', closeDetailsModal);
 
-            // Event listener untuk tombol detail
             document.body.addEventListener('click', function(event) {
                 const target = event.target.closest('.view-details-btn');
                 if (target) {
-                    const curationId = target.dataset.curationId;
-                    const contentTitle = target.dataset.contentTitle;
-                    openDetailsModal(curationId, contentTitle);
+                    const contentIndex = target.dataset.contentIndex;
+                    const curatorIndex = target.dataset.curatorIndex;
+                    openDetailsModal(contentIndex, curatorIndex);
+                }
+            });
+
+            // --- REVISED Realtime listener for cache (MODE HEMAT) ---
+            const cacheDocRef = doc(db, "supervisor_cache", "full_report");
+            onSnapshot(cacheDocRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    latestCacheData = snapshot.data(); // Always store the latest data
+                } else {
+                    latestCacheData = null; // Clear if document is deleted
+                    console.error("Dokumen cache supervisor tidak ditemukan.");
+                }
+
+                // Only render if a supervisor is already logged in
+                if (sessionStorage.getItem('supervisorUser')) {
+                    if (latestCacheData) {
+                        renderDashboardFromCache(latestCacheData.reportData);
+                    } else {
+                        resultsTable.innerHTML = `<tbody><tr><td colspan="4" class="text-center p-4 text-red-500"><strong>Error:</strong> Dokumen cache supervisor tidak ditemukan. Mohon jalankan proses pembaruan dari panel <strong>Admin</strong>.</td></tr></tbody>`;
+                    }
                 }
             });
         });
     </script>
 </body>
 </html>
+
