@@ -224,6 +224,16 @@
             </div>
         </div>
     </div>
+    
+    <!-- === Alert Modal === -->
+    <div id="alert-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-backdrop">
+        <div class="neumorphism-card w-full max-w-sm p-6 text-center">
+            <h3 id="alert-modal-title" class="text-xl font-bold text-slate-800 mb-2">Error</h3>
+            <p id="alert-modal-message" class="text-slate-600 mb-6">Pesan error akan muncul di sini.</p>
+            <button id="alert-modal-ok" class="neumorphism-button !w-1/2 mx-auto">OK</button>
+        </div>
+    </div>
+
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -514,6 +524,7 @@
 
             } catch (error) {
                 console.error("Gagal menyimpan saran: ", error);
+                showAlert('Gagal Menyimpan', `Terjadi kesalahan: ${error.message}. Periksa koneksi Anda dan hak akses database.`);
                 // Kembalikan ke UI awal jika terjadi error
                 cell.innerHTML = generateSuggestionDisplay(content.supervisorSuggestion);
             }
@@ -521,6 +532,19 @@
 
 
         // --- Modal Logic ---
+        function showAlert(title, message) {
+            document.getElementById('alert-modal-title').textContent = title;
+            document.getElementById('alert-modal-message').textContent = message;
+            detailsModal.classList.add('hidden'); // Sembunyikan modal lain untuk menghindari tumpang tindih
+            document.getElementById('alert-modal').classList.remove('hidden');
+            document.getElementById('alert-modal').classList.add('flex');
+        }
+
+        function hideAlert() {
+            document.getElementById('alert-modal').classList.add('hidden');
+            document.getElementById('alert-modal').classList.remove('flex');
+        }
+
         function openDetailsModal(curationId, contentTitle) {
             const curationData = curationsMap.get(curationId);
             if (!curationData || !curationData.answers) {
@@ -572,6 +596,8 @@
             loginForm.addEventListener('submit', handleLogin);
             logoutBtn.addEventListener('click', handleLogout);
             closeModalBtn.addEventListener('click', closeDetailsModal);
+            document.getElementById('alert-modal-ok').addEventListener('click', hideAlert);
+
 
             document.body.addEventListener('click', function(event) {
                 const viewBtn = event.target.closest('.view-details-btn');
@@ -612,4 +638,3 @@
     </script>
 </body>
 </html>
-
