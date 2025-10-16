@@ -135,7 +135,10 @@
 
             <!-- Right Column: Progress Table -->
             <main class="lg:col-span-2 bg-white p-6 md:p-8 rounded-xl shadow-lg w-full border border-slate-200 fade-in fade-in-delay-5">
-                <h2 class="text-2xl font-bold text-slate-700 mb-6">Progres Kurasi per Individu</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-700">Progres Kurasi per Individu</h2>
+                    <p class="text-sm text-slate-500">Diperbarui: <span id="last-updated">...</span></p>
+                </div>
                 <div class="overflow-x-auto table-container border rounded-lg">
                     <table class="w-full text-left whitespace-nowrap">
                         <thead id="hasil-table-head" class="bg-slate-50">
@@ -146,7 +149,7 @@
                                 <td colspan="13" class="text-center py-10">
                                     <div class="flex flex-col items-center text-slate-500">
                                         <i class="fas fa-spinner fa-spin text-2xl"></i>
-                                        <p class="mt-2">Memuat data...</p>
+                                        <p class="mt-2">Memuat data cache...</p>
                                     </div>
                                 </td>
                             </tr>
@@ -159,26 +162,24 @@
 
     <!-- Firebase SDK -->
     <script type="module">
+        // --- PERUBAHAN UTAMA: Hanya import 'doc' dan 'onSnapshot' ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
-            authDomain: "kurasisd.firebaseapp.com",
-            projectId: "kurasisd",
-            storageBucket: "kurasisd.firebasestorage.app",
-            messagingSenderId: "520054778765",
-            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
-        };
+		const firebaseConfig = {
+		  apiKey: "AIzaSyB0biVlYEZg7p5UntYRDnyjdQCfe15_vmk",
+		  authDomain: "kurasidirsd.firebaseapp.com",
+		  projectId: "kurasidirsd",
+		  storageBucket: "kurasidirsd.firebasestorage.app",
+		  messagingSenderId: "168494524685",
+		  appId: "1:168494524685:web:b209da5c5fec9e7d5be844"
+		};
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // --- State ---
-        let allUsers = [];
-        let allAssignments = {};
-        let allCurations = [];
-        let allContent = [];
+        // --- DIHAPUS: State `allUsers`, `allAssignments`, dll. tidak lagi diperlukan. ---
         let curationChart;
 
         // --- Chart Initialization ---
@@ -189,7 +190,7 @@
                 data: {
                     labels: ['Konten Selesai', 'Konten Sisa'],
                     datasets: [{
-                        data: [0, 1],
+                        data: [0, 1], // Data awal
                         backgroundColor: ['#22c55e', '#e2e8f0'],
                         borderColor: '#ffffff',
                         borderWidth: 4,
@@ -205,17 +206,17 @@
             });
         }
 
-        // --- UI Update Functions ---
-        function updateDashboardStats() {
+        // --- UI Update Functions (Sekarang menerima data cache) ---
+        function updateDashboardStats(cacheData) {
             const totalContentEl = document.getElementById('total-content');
             const curatedContentEl = document.getElementById('curated-content');
             const totalKuratorEl = document.getElementById('total-kurator');
             const chartPercentageEl = document.getElementById('chart-percentage');
+            const lastUpdatedEl = document.getElementById('last-updated');
 
-            const totalContentCount = allContent.length;
-            const uniqueCuratedIds = new Set(allCurations.map(c => c.contentId));
-            const curatedContentCount = uniqueCuratedIds.size;
-            const curatorCount = allUsers.filter(u => u.role === 'Kurator').length;
+            const totalContentCount = cacheData.totalContent || 0;
+            const curatedContentCount = cacheData.curatedContent || 0;
+            const curatorCount = cacheData.totalKurator || 0;
             
             totalContentEl.textContent = totalContentCount;
             curatedContentEl.textContent = curatedContentCount;
@@ -223,6 +224,12 @@
 
             const percentage = totalContentCount > 0 ? ((curatedContentCount / totalContentCount) * 100) : 0;
             chartPercentageEl.textContent = `${percentage.toFixed(0)}%`;
+            
+            if (cacheData.lastUpdated) {
+                lastUpdatedEl.textContent = new Date(cacheData.lastUpdated.seconds * 1000).toLocaleString('id-ID');
+            } else {
+                lastUpdatedEl.textContent = 'Belum pernah';
+            }
 
             if (curationChart) {
                 curationChart.data.datasets[0].data = [curatedContentCount, totalContentCount - curatedContentCount];
@@ -230,12 +237,11 @@
             }
         }
 
-        function renderHasilTable() {
+        function renderHasilTable(cacheData) {
             const thead = document.getElementById('hasil-table-head');
             const tbody = document.getElementById('hasil-table-body');
             if (!thead || !tbody) return;
 
-            // Build the header with 12 content columns
             let headerHTML = `
                 <tr>
                     <th class="py-3 px-4 font-semibold text-slate-600 text-left sticky left-0 z-20 bg-slate-50">Nama Kurator</th>`;
@@ -245,32 +251,25 @@
             headerHTML += `</tr>`;
             thead.innerHTML = headerHTML;
 
-            const curators = allUsers.filter(u => u.role === 'Kurator').sort((a, b) => a.nama.localeCompare(b.nama));
-            const curatedSet = new Set(allCurations.map(c => `${c.userId}_${c.contentId}`));
-
-            if (curators.length === 0) {
-                 tbody.innerHTML = `<tr><td colspan="13" class="text-center py-10 text-slate-500">Belum ada data kurator.</td></tr>`;
+            const progressData = cacheData.progressTableData || [];
+            if (progressData.length === 0) {
+                 tbody.innerHTML = `<tr><td colspan="13" class="text-center py-10 text-slate-500">Data progres belum tersedia. Silakan perbarui cache dari Panel Admin.</td></tr>`;
                  return;
             }
 
-            tbody.innerHTML = curators.map(curator => {
-                // Add group class for hover effect on sticky column
+            tbody.innerHTML = progressData.map(curator => {
                 let rowHTML = `<tr class="group border-b transition-colors duration-200 hover:bg-slate-50">
-                                <td class="py-3 px-4 font-medium text-slate-800 sticky left-0 z-10 bg-white group-hover:bg-slate-50">${curator.nama}</td>`;
+                                <td class="py-3 px-4 font-medium text-slate-800 sticky left-0 z-10 bg-white group-hover:bg-slate-50">${curator.curatorName}</td>`;
                 
-                const assignedContentIds = allAssignments[curator.username] || [];
-                
+                // Data progres sudah siap pakai dari cache
                 for (let i = 0; i < 12; i++) {
-                    const contentId = assignedContentIds[i];
-                    if (contentId) {
-                        const compositeKey = `${curator.id}_${contentId}`;
-                        const isCurated = curatedSet.has(compositeKey);
-                        
-                        rowHTML += `<td class="py-2 px-4 text-center">
-                                        <i class="fas ${isCurated ? 'fa-check-circle text-green-500' : 'fa-times-circle text-slate-300'}" 
-                                           title="${isCurated ? 'Selesai' : 'Belum Selesai'}"></i>
-                                    </td>`;
-                    } else {
+                    const taskStatus = curator.tasks[i]; // Bisa 'completed', 'pending', atau 'empty'
+                    
+                    if (taskStatus === 'completed') {
+                        rowHTML += `<td class="py-2 px-4 text-center"><i class="fas fa-check-circle text-green-500" title="Selesai"></i></td>`;
+                    } else if (taskStatus === 'pending') {
+                         rowHTML += `<td class="py-2 px-4 text-center"><i class="fas fa-times-circle text-slate-300" title="Belum Selesai"></i></td>`;
+                    } else { // 'empty'
                         rowHTML += `<td class="py-2 px-4 text-center text-slate-400">-</td>`;
                     }
                 }
@@ -281,33 +280,26 @@
         }
         
         // Combined update function
-        function updateAllUI() {
-            updateDashboardStats();
-            renderHasilTable();
+        function updateAllUI(cacheData) {
+            updateDashboardStats(cacheData);
+            renderHasilTable(cacheData);
         }
 
-        // --- Realtime Listeners ---
-        onSnapshot(collection(db, "users"), (snapshot) => {
-            allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            updateAllUI();
-        });
-
-        onSnapshot(collection(db, "assignments"), (snapshot) => {
-            allAssignments = {};
-            snapshot.docs.forEach(doc => {
-                allAssignments[doc.id] = doc.data().contentIds || [];
-            });
-            updateAllUI();
-        });
+        // --- Realtime Listener (HEMAT MODE) ---
+        // --- HANYA MENDENGARKAN 1 DOKUMEN, BUKAN 4 KOLEKSI ---
+        const cacheDocRef = doc(db, "dashboard_cache", "summary_stats");
         
-        onSnapshot(collection(db, "contents"), (snapshot) => {
-            allContent = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            updateAllUI();
-        });
-
-        onSnapshot(collection(db, "curations"), (snapshot) => {
-            allCurations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            updateAllUI();
+        onSnapshot(cacheDocRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const cacheData = snapshot.data();
+                updateAllUI(cacheData);
+            } else {
+                console.error("Dokumen cache 'dashboard_cache/summary_stats' tidak ditemukan!");
+                const tbody = document.getElementById('hasil-table-body');
+                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-10 text-red-500">
+                    <strong>Error:</strong> Dokumen cache tidak ditemukan. Mohon jalankan proses inisialisasi dari halaman <strong>bangbin.html</strong> terlebih dahulu.
+                </td></tr>`;
+            }
         });
 
         // --- Initial Load ---
@@ -316,4 +308,3 @@
     </script>
 </body>
 </html>
-
