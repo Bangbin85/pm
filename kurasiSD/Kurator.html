@@ -264,8 +264,8 @@
     </main>
     
     <!-- === MODAL KURASI (TERSEMBUNYI) === -->
-    <div id="curation-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 p-4 flex items-center justify-center modal-backdrop">
-        <div class="relative w-full h-[95vh] bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col overflow-hidden modal-content">
+    <div id="curation-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 p-4 items-center justify-center modal-backdrop">
+        <div class="relative w-full max-w-7xl h-[95vh] bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col overflow-hidden modal-content">
             <!-- Header -->
             <div class="flex-shrink-0 px-6 py-4 flex justify-between items-center border-b border-slate-200">
                 <h3 class="text-lg font-semibold text-slate-900" id="curation-modal-title">Formulir Kurasi Konten</h3>
@@ -323,15 +323,15 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, serverTimestamp, query, where, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase Anda
-        const firebaseConfig = {
-            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
-            authDomain: "kurasisd.firebaseapp.com",
-            projectId: "kurasisd",
-            storageBucket: "kurasisd.firebasestorage.app",
-            messagingSenderId: "520054778765",
-            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
-        };
+		const firebaseConfig = {
+		  apiKey: "AIzaSyB0biVlYEZg7p5UntYRDnyjdQCfe15_vmk",
+		  authDomain: "kurasidirsd.firebaseapp.com",
+		  projectId: "kurasidirsd",
+		  storageBucket: "kurasidirsd.firebasestorage.app",
+		  messagingSenderId: "168494524685",
+		  appId: "1:168494524685:web:b209da5c5fec9e7d5be844"
+		};
+
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -837,3 +837,4 @@
     </script>
 </body>
 </html>
+
