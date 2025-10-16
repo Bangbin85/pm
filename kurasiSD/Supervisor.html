@@ -95,6 +95,8 @@
         
         .content-cell { min-width: 300px; max-width: 450px; white-space: normal; word-break: break-word; }
         .curator-cell { min-width: 200px; white-space: normal; }
+        .suggestion-cell { min-width: 250px; white-space: normal; vertical-align: middle; }
+
 
         /* Gaya Modal */
         .modal-backdrop {
@@ -226,9 +228,8 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, doc, updateDoc, serverTimestamp, deleteField } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase Anda
 		const firebaseConfig = {
 		  apiKey: "AIzaSyB0biVlYEZg7p5UntYRDnyjdQCfe15_vmk",
 		  authDomain: "kurasidirsd.firebaseapp.com",
@@ -237,6 +238,7 @@
 		  messagingSenderId: "168494524685",
 		  appId: "1:168494524685:web:b209da5c5fec9e7d5be844"
 		};
+
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -254,6 +256,7 @@
         const closeModalBtn = document.getElementById('close-modal-btn');
 
         let curationsMap = new Map();
+        let contentsMap = new Map();
 
         // --- Struktur Pertanyaan Kurasi (diambil dari Kurator.html untuk konsistensi) ---
         const curationQuestions = [
@@ -328,7 +331,7 @@
             mainDashboard.classList.remove('hidden');
             document.body.style.backgroundColor = '';
             welcomeMessage.textContent = `Selamat Datang, ${supervisor.nama}!`;
-            resultsTable.innerHTML = `<tbody><tr><td colspan="4" class="text-center p-4 text-slate-500">Memuat data kurasi... <i class="fas fa-spinner fa-spin"></i></td></tr></tbody>`;
+            resultsTable.innerHTML = `<tbody><tr><td colspan="5" class="text-center p-4 text-slate-500">Memuat data kurasi... <i class="fas fa-spinner fa-spin"></i></td></tr></tbody>`;
 
             try {
                 const [usersSnap, contentsSnap, assignmentsSnap, curationsSnap] = await Promise.all([
@@ -339,6 +342,7 @@
                 ]);
                 
                 const usersMap = new Map(usersSnap.docs.map(doc => [doc.id, doc.data()]));
+                contentsMap = new Map(contentsSnap.docs.map(doc => [doc.id, { id: doc.id, ...doc.data() }]));
                 const usernameToIdMap = new Map(usersSnap.docs.map(doc => [doc.data().username, doc.id]));
                 curationsMap = new Map(curationsSnap.docs.map(doc => [doc.id, doc.data()]));
 
@@ -362,10 +366,9 @@
                 for (let i = 1; i <= MAX_CURATORS_COLUMNS; i++) {
                     tableHTML += `<th>Kurator ${i}</th>`;
                 }
-                tableHTML += '</tr></thead><tbody>';
+                tableHTML += '<th>Pesan dan Saran</th></tr></thead><tbody>';
 
-                contentsSnap.docs.forEach(contentDoc => {
-                    const content = { id: contentDoc.id, ...contentDoc.data() };
+                contentsMap.forEach(content => {
                     const assignedCuratorIds = assignmentsByContent.get(content.id) || [];
 
                     tableHTML += `<tr>`;
@@ -409,37 +412,130 @@
                             tableHTML += `<td class="text-center align-middle"><span class="text-slate-400">—</span></td>`;
                         }
                     }
+                    
+                    // Kolom Pesan dan Saran
+                    tableHTML += `<td class="suggestion-cell" data-content-id="${content.id}">
+                                    ${generateSuggestionDisplay(content.supervisorSuggestion)}
+                                  </td>`;
 
                     tableHTML += `</tr>`;
                 });
 
                 tableHTML += '</tbody>';
-                resultsTable.innerHTML = tableHTML || '<tbody><tr><td colspan="4" class="text-center">Tidak ada data konten ditemukan.</td></tr></tbody>';
+                resultsTable.innerHTML = tableHTML || '<tbody><tr><td colspan="5" class="text-center">Tidak ada data konten ditemukan.</td></tr></tbody>';
 
             } catch (error) {
                 console.error("Error displaying dashboard:", error);
-                resultsTable.innerHTML = `<tbody><tr><td colspan="4" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr></tbody>`;
+                resultsTable.innerHTML = `<tbody><tr><td colspan="5" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr></tbody>`;
             }
         }
+
+        // --- Suggestion Logic ---
+        function generateSuggestionDisplay(suggestion) {
+            if (suggestion && suggestion.message) {
+                return `
+                    <div class="suggestion-display">
+                        <p class="text-sm text-slate-600" style="white-space: pre-wrap;">${suggestion.message}</p>
+                        <p class="text-xs text-slate-400 mt-1">Oleh: ${suggestion.supervisorName}</p>
+                        <button class="edit-suggestion-btn text-blue-500 hover:text-blue-700 mt-2 text-sm p-1 rounded-full hover:bg-blue-100">
+                            <i class="fas fa-pencil-alt fa-fw"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="suggestion-display">
+                        <button class="add-suggestion-btn text-green-500 hover:text-green-700 text-sm flex items-center gap-2 p-2 rounded-lg hover:bg-green-100">
+                            <i class="fas fa-plus-circle"></i> Tambah Saran
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        function showSuggestionEditor(cell, existingSuggestion) {
+            const message = existingSuggestion ? existingSuggestion.message : '';
+            const editorHTML = `
+                <div class="suggestion-editor">
+                    <textarea class="neumorphism-textarea text-sm w-full" rows="5" placeholder="Tuliskan pesan atau saran Anda di sini...">${message}</textarea>
+                    <div class="flex items-center justify-end space-x-2 mt-2">
+                        <button class="cancel-suggestion-btn text-sm text-slate-500 hover:text-slate-700 p-2">Batal</button>
+                        <button class="save-suggestion-btn text-sm bg-indigo-500 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-600 flex items-center gap-2">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </div>
+            `;
+            cell.innerHTML = editorHTML;
+            cell.querySelector('textarea').focus();
+        }
+
+        async function saveSuggestion(cell, contentId) {
+            const textarea = cell.querySelector('textarea');
+            const message = textarea.value.trim();
+            const supervisor = JSON.parse(sessionStorage.getItem('supervisorUser'));
+            const content = contentsMap.get(contentId);
+
+            const saveButton = cell.querySelector('.save-suggestion-btn');
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                const contentRef = doc(db, "contents", contentId);
+                let updatedSuggestion;
+                
+                if (message) {
+                    // Membuat atau memperbarui saran
+                    const suggestionData = {
+                        supervisorName: supervisor.nama,
+                        message: message,
+                        timestamp: serverTimestamp()
+                    };
+                    await updateDoc(contentRef, { supervisorSuggestion: suggestionData });
+                    // Data lokal untuk pembaruan UI instan
+                    updatedSuggestion = { ...suggestionData, timestamp: new Date(), supervisorName: supervisor.nama };
+                } else {
+                    // Jika pesan kosong, hapus field dari Firestore
+                    await updateDoc(contentRef, { supervisorSuggestion: deleteField() });
+                    updatedSuggestion = null;
+                }
+
+                // Perbarui state lokal (cache)
+                const updatedContent = contentsMap.get(contentId);
+                if (updatedSuggestion) {
+                    updatedContent.supervisorSuggestion = updatedSuggestion;
+                } else {
+                    delete updatedContent.supervisorSuggestion;
+                }
+                contentsMap.set(contentId, updatedContent);
+
+                // Perbarui UI di sel yang spesifik
+                cell.innerHTML = generateSuggestionDisplay(updatedContent.supervisorSuggestion);
+
+            } catch (error) {
+                console.error("Gagal menyimpan saran: ", error);
+                // Kembalikan ke UI awal jika terjadi error
+                cell.innerHTML = generateSuggestionDisplay(content.supervisorSuggestion);
+            }
+        }
+
 
         // --- Modal Logic ---
         function openDetailsModal(curationId, contentTitle) {
             const curationData = curationsMap.get(curationId);
             if (!curationData || !curationData.answers) {
-                alert("Data kurasi tidak ditemukan!");
+                console.error("Data kurasi tidak ditemukan!");
                 return;
             }
             const answers = curationData.answers;
 
-            // Set Judul Konten
             document.getElementById('modal-content-title').textContent = contentTitle;
 
-            // Set Nilai Indikator (A1-C5)
             const indicatorContainer = document.getElementById('modal-indicator-values');
-            indicatorContainer.innerHTML = ''; // Kosongkan dulu
+            indicatorContainer.innerHTML = ''; 
             curationQuestions.forEach(q => {
                 const value = answers[q.id]?.value || 'N/A';
-                const shortTitle = q.title.split(' ')[0]; // Ambil kode seperti "A.1"
+                const shortTitle = q.title.split(' ')[0]; 
                 indicatorContainer.innerHTML += `
                     <div class="neumorphism-input !shadow-none !bg-slate-100 p-3 rounded-lg">
                         <p class="text-xs font-bold text-slate-500">${shortTitle}</p>
@@ -448,12 +544,10 @@
                 `;
             });
             
-            // Set D1 Simpulan Umum
             document.getElementById('modal-d1-kelebihan').value = answers.D1_Simpulan_Umum?.kelebihan || '';
             document.getElementById('modal-d1-kekurangan').value = answers.D1_Simpulan_Umum?.kekurangan || '';
             document.getElementById('modal-d1-saran').value = answers.D1_Simpulan_Umum?.saran || '';
 
-            // Set D2 Keputusan Final
             document.getElementById('modal-d2-keputusan').textContent = answers.D2_Keputusan_Final?.keputusan || 'N/A';
             document.getElementById('modal-d2-deskripsi').value = answers.D2_Keputusan_Final?.nilai_deskripsi || '';
 
@@ -479,16 +573,43 @@
             logoutBtn.addEventListener('click', handleLogout);
             closeModalBtn.addEventListener('click', closeDetailsModal);
 
-            // Event listener untuk tombol detail
             document.body.addEventListener('click', function(event) {
-                const target = event.target.closest('.view-details-btn');
-                if (target) {
-                    const curationId = target.dataset.curationId;
-                    const contentTitle = target.dataset.contentTitle;
+                const viewBtn = event.target.closest('.view-details-btn');
+                if (viewBtn) {
+                    const curationId = viewBtn.dataset.curationId;
+                    const contentTitle = viewBtn.dataset.contentTitle;
                     openDetailsModal(curationId, contentTitle);
+                    return;
+                }
+                
+                const suggestionBtn = event.target.closest('.edit-suggestion-btn, .add-suggestion-btn');
+                if (suggestionBtn) {
+                    const cell = suggestionBtn.closest('.suggestion-cell');
+                    const contentId = cell.dataset.contentId;
+                    const content = contentsMap.get(contentId);
+                    showSuggestionEditor(cell, content.supervisorSuggestion);
+                    return;
+                }
+
+                const saveBtn = event.target.closest('.save-suggestion-btn');
+                if (saveBtn) {
+                    const cell = saveBtn.closest('.suggestion-cell');
+                    const contentId = cell.dataset.contentId;
+                    saveSuggestion(cell, contentId);
+                    return;
+                }
+
+                const cancelBtn = event.target.closest('.cancel-suggestion-btn');
+                if (cancelBtn) {
+                    const cell = cancelBtn.closest('.suggestion-cell');
+                    const contentId = cell.dataset.contentId;
+                    const content = contentsMap.get(contentId);
+                    cell.innerHTML = generateSuggestionDisplay(content.supervisorSuggestion);
+                    return;
                 }
             });
         });
     </script>
 </body>
 </html>
+
