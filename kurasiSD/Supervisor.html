@@ -182,7 +182,11 @@
             <div class="flex-grow p-6 overflow-y-auto space-y-6">
                 <div>
                     <h4 class="font-bold text-lg text-slate-800 mb-1">Judul Konten</h4>
-                    <p id="modal-content-title" class="text-slate-600">Memuat...</p>
+                    <!-- CHANGED: from <p> to <a> tag -->
+                    <a id="modal-content-title" href="#" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline break-words inline-flex items-center gap-2">
+                        <span>Memuat...</span>
+                        <i class="fas fa-external-link-alt fa-xs"></i>
+                    </a>
                 </div>
                 <!-- Nilai Indikator -->
                 <div>
@@ -407,9 +411,10 @@
                                 tableHTML += `
                                     <div class="flex items-center mt-1">
                                         <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                        <!-- CHANGED: removed data-content-title, added data-content-id -->
                                         <button class="view-details-btn text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full hover:bg-green-200 transition-all"
                                                 data-curation-id="${curationId}" 
-                                                data-content-title="${content.title}">
+                                                data-content-id="${content.id}">
                                             ${finalScore}
                                         </button>
                                     </div>
@@ -545,15 +550,21 @@
             document.getElementById('alert-modal').classList.remove('flex');
         }
 
-        function openDetailsModal(curationId, contentTitle) {
+        // CHANGED: function signature and logic
+        function openDetailsModal(curationId, contentId) {
             const curationData = curationsMap.get(curationId);
-            if (!curationData || !curationData.answers) {
-                console.error("Data kurasi tidak ditemukan!");
+            const contentData = contentsMap.get(contentId);
+
+            if (!curationData || !curationData.answers || !contentData) {
+                console.error("Data kurasi atau konten tidak ditemukan!", {curationId, contentId});
+                showAlert('Data Tidak Ditemukan', 'Detail untuk kurasi atau konten ini tidak dapat dimuat.');
                 return;
             }
             const answers = curationData.answers;
 
-            document.getElementById('modal-content-title').textContent = contentTitle;
+            const modalTitleLink = document.getElementById('modal-content-title');
+            modalTitleLink.querySelector('span').textContent = contentData.title;
+            modalTitleLink.href = contentData.url;
 
             const indicatorContainer = document.getElementById('modal-indicator-values');
             indicatorContainer.innerHTML = ''; 
@@ -602,9 +613,10 @@
             document.body.addEventListener('click', function(event) {
                 const viewBtn = event.target.closest('.view-details-btn');
                 if (viewBtn) {
+                    // CHANGED: Pass contentId instead of contentTitle
                     const curationId = viewBtn.dataset.curationId;
-                    const contentTitle = viewBtn.dataset.contentTitle;
-                    openDetailsModal(curationId, contentTitle);
+                    const contentId = viewBtn.dataset.contentId;
+                    openDetailsModal(curationId, contentId);
                     return;
                 }
                 
