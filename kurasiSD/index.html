@@ -48,6 +48,12 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        
+        /* Gaya Modal */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 <body class="p-4 sm:p-6 lg:p-8 min-h-screen">
@@ -73,12 +79,17 @@
             </a>
             <a href="Supervisor.html" class="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 hover:shadow-lg">
                 <i class="fas fa-chalkboard-teacher mr-2"></i>
-                <span>Supervisor</span>
+                <span>Analisis Detail</span>
             </a>
             <a href="Pass.html" class="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 hover:shadow-lg">
                 <i class="fas fa-key mr-2"></i>
                 <span>Pass</span>
             </a>
+            <!-- Tombol Baru untuk Analisis -->
+            <button id="show-analysis-btn" class="flex items-center justify-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 hover:shadow-lg">
+                <i class="fas fa-chart-bar mr-2"></i>
+                <span>Analisis Rata-rata</span>
+            </button>
         </div>
 
         <!-- Main Grid Layout -->
@@ -159,12 +170,32 @@
             </main>
         </div>
     </div>
+    
+    <!-- === Analysis Modal === -->
+    <div id="analysis-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[80vh] transform transition-all duration-300 scale-95 opacity-0">
+            <div class="flex-shrink-0 p-5 flex justify-between items-center border-b border-slate-200">
+                <h3 class="text-xl font-bold text-slate-800">Analisis Hasil Kurasi Rata-rata</h3>
+                <button id="close-analysis-modal-btn" class="text-slate-500 hover:text-red-600 text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex-grow p-6 overflow-y-auto">
+                <div id="analysis-chart-container" class="space-y-3">
+                    <div class="text-center text-slate-500 py-10">
+                        <i class="fas fa-spinner fa-spin text-3xl"></i>
+                        <p class="mt-3">Memuat data analisis lengkap...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Firebase SDK -->
     <script type="module">
-        // --- PERUBAHAN UTAMA: Hanya import 'doc' dan 'onSnapshot' ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 		const firebaseConfig = {
 		  apiKey: "AIzaSyB0biVlYEZg7p5UntYRDnyjdQCfe15_vmk",
@@ -177,9 +208,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        // --- State ---
-        // --- DIHAPUS: State `allUsers`, `allAssignments`, dll. tidak lagi diperlukan. ---
+        
         let curationChart;
 
         // --- Chart Initialization ---
@@ -187,52 +216,23 @@
             const ctx = document.getElementById('curationChart').getContext('2d');
             curationChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Konten Selesai', 'Konten Sisa'],
-                    datasets: [{
-                        data: [0, 1], // Data awal
-                        backgroundColor: ['#22c55e', '#e2e8f0'],
-                        borderColor: '#ffffff',
-                        borderWidth: 4,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '80%',
-                    plugins: { legend: { display: false }, tooltip: { enabled: true } }
-                }
+                data: { labels: ['Konten Selesai', 'Konten Sisa'], datasets: [{ data: [0, 1], backgroundColor: ['#22c55e', '#e2e8f0'], borderColor: '#ffffff', borderWidth: 4, hoverOffset: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { display: false }, tooltip: { enabled: true } } }
             });
         }
 
-        // --- UI Update Functions (Sekarang menerima data cache) ---
+        // --- UI Update Functions (from cache) ---
         function updateDashboardStats(cacheData) {
-            const totalContentEl = document.getElementById('total-content');
-            const curatedContentEl = document.getElementById('curated-content');
-            const totalKuratorEl = document.getElementById('total-kurator');
-            const chartPercentageEl = document.getElementById('chart-percentage');
-            const lastUpdatedEl = document.getElementById('last-updated');
-
-            const totalContentCount = cacheData.totalContent || 0;
-            const curatedContentCount = cacheData.curatedContent || 0;
-            const curatorCount = cacheData.totalKurator || 0;
-            
-            totalContentEl.textContent = totalContentCount;
-            curatedContentEl.textContent = curatedContentCount;
-            totalKuratorEl.textContent = curatorCount;
-
-            const percentage = totalContentCount > 0 ? ((curatedContentCount / totalContentCount) * 100) : 0;
-            chartPercentageEl.textContent = `${percentage.toFixed(0)}%`;
-            
+            document.getElementById('total-content').textContent = cacheData.totalContent || 0;
+            document.getElementById('curated-content').textContent = cacheData.curatedContent || 0;
+            document.getElementById('total-kurator').textContent = cacheData.totalKurator || 0;
+            const percentage = (cacheData.totalContent || 0) > 0 ? ((cacheData.curatedContent || 0) / (cacheData.totalContent) * 100) : 0;
+            document.getElementById('chart-percentage').textContent = `${percentage.toFixed(0)}%`;
             if (cacheData.lastUpdated) {
-                lastUpdatedEl.textContent = new Date(cacheData.lastUpdated.seconds * 1000).toLocaleString('id-ID');
-            } else {
-                lastUpdatedEl.textContent = 'Belum pernah';
+                document.getElementById('last-updated').textContent = new Date(cacheData.lastUpdated.seconds * 1000).toLocaleString('id-ID');
             }
-
             if (curationChart) {
-                curationChart.data.datasets[0].data = [curatedContentCount, totalContentCount - curatedContentCount];
+                curationChart.data.datasets[0].data = [(cacheData.curatedContent || 0), (cacheData.totalContent || 0) - (cacheData.curatedContent || 0)];
                 curationChart.update();
             }
         }
@@ -240,71 +240,104 @@
         function renderHasilTable(cacheData) {
             const thead = document.getElementById('hasil-table-head');
             const tbody = document.getElementById('hasil-table-body');
-            if (!thead || !tbody) return;
-
-            let headerHTML = `
-                <tr>
-                    <th class="py-3 px-4 font-semibold text-slate-600 text-left sticky left-0 z-20 bg-slate-50">Nama Kurator</th>`;
-            for (let i = 1; i <= 12; i++) {
-                headerHTML += `<th class="py-3 px-4 font-semibold text-slate-600 text-center">Konten ${i}</th>`;
-            }
-            headerHTML += `</tr>`;
-            thead.innerHTML = headerHTML;
-
+            thead.innerHTML = `<tr><th class="py-3 px-4 font-semibold text-slate-600 text-left sticky left-0 z-20 bg-slate-50">Nama Kurator</th>${Array.from({length: 12}, (_, i) => `<th class="py-3 px-4 font-semibold text-slate-600 text-center">Konten ${i+1}</th>`).join('')}</tr>`;
             const progressData = cacheData.progressTableData || [];
             if (progressData.length === 0) {
-                 tbody.innerHTML = `<tr><td colspan="13" class="text-center py-10 text-slate-500">Data progres belum tersedia. Silakan perbarui cache dari Panel Admin.</td></tr>`;
-                 return;
+                 tbody.innerHTML = `<tr><td colspan="13" class="text-center py-10 text-slate-500">Data progres belum tersedia.</td></tr>`; return;
             }
-
             tbody.innerHTML = progressData.map(curator => {
-                let rowHTML = `<tr class="group border-b transition-colors duration-200 hover:bg-slate-50">
-                                <td class="py-3 px-4 font-medium text-slate-800 sticky left-0 z-10 bg-white group-hover:bg-slate-50">${curator.curatorName}</td>`;
-                
-                // Data progres sudah siap pakai dari cache
+                let rowHTML = `<tr class="group border-b transition-colors duration-200 hover:bg-slate-50"><td class="py-3 px-4 font-medium text-slate-800 sticky left-0 z-10 bg-white group-hover:bg-slate-50">${curator.curatorName}</td>`;
                 for (let i = 0; i < 12; i++) {
-                    const taskStatus = curator.tasks[i]; // Bisa 'completed', 'pending', atau 'empty'
-                    
-                    if (taskStatus === 'completed') {
-                        rowHTML += `<td class="py-2 px-4 text-center"><i class="fas fa-check-circle text-green-500" title="Selesai"></i></td>`;
-                    } else if (taskStatus === 'pending') {
-                         rowHTML += `<td class="py-2 px-4 text-center"><i class="fas fa-times-circle text-slate-300" title="Belum Selesai"></i></td>`;
-                    } else { // 'empty'
-                        rowHTML += `<td class="py-2 px-4 text-center text-slate-400">-</td>`;
-                    }
+                    const status = curator.tasks[i];
+                    if (status === 'completed') rowHTML += `<td class="py-2 px-4 text-center"><i class="fas fa-check-circle text-green-500" title="Selesai"></i></td>`;
+                    else if (status === 'pending') rowHTML += `<td class="py-2 px-4 text-center"><i class="fas fa-times-circle text-slate-300" title="Belum Selesai"></i></td>`;
+                    else rowHTML += `<td class="py-2 px-4 text-center text-slate-400">-</td>`;
                 }
-                
-                rowHTML += '</tr>';
-                return rowHTML;
+                return rowHTML + '</tr>';
             }).join('');
         }
         
-        // Combined update function
-        function updateAllUI(cacheData) {
-            updateDashboardStats(cacheData);
-            renderHasilTable(cacheData);
-        }
-
-        // --- Realtime Listener (HEMAT MODE) ---
-        // --- HANYA MENDENGARKAN 1 DOKUMEN, BUKAN 4 KOLEKSI ---
-        const cacheDocRef = doc(db, "dashboard_cache", "summary_stats");
-        
-        onSnapshot(cacheDocRef, (snapshot) => {
+        // --- Realtime Listener (Efficient Mode) ---
+        onSnapshot(doc(db, "dashboard_cache", "summary_stats"), (snapshot) => {
             if (snapshot.exists()) {
                 const cacheData = snapshot.data();
-                updateAllUI(cacheData);
+                updateDashboardStats(cacheData);
+                renderHasilTable(cacheData);
             } else {
                 console.error("Dokumen cache 'dashboard_cache/summary_stats' tidak ditemukan!");
-                const tbody = document.getElementById('hasil-table-body');
-                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-10 text-red-500">
-                    <strong>Error:</strong> Dokumen cache tidak ditemukan. Mohon jalankan proses inisialisasi dari halaman <strong>bangbin.html</strong> terlebih dahulu.
-                </td></tr>`;
+                document.getElementById('hasil-table-body').innerHTML = `<tr><td colspan="13" class="text-center py-10 text-red-500"><strong>Error:</strong> Cache tidak ditemukan. Jalankan pembaruan cache dari halaman Admin.</td></tr>`;
             }
         });
 
-        // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', initChart);
+        // --- Analysis Modal Logic (Optimized with Cache) ---
+        function renderAnalysisChartFromCache(cacheData) {
+            const stats = cacheData.stats || {};
+            const totalContent = cacheData.totalContent || 0;
+            const resultCategories = ["Lulus Kurasi", "Kurang Sesuai", "Perbaikan Minor", "Perbaikan Mayor", "Tidak Lulus Kurasi", "Belum Dinilai"];
+
+            const container = document.getElementById('analysis-chart-container');
+            if (totalContent === 0 || Object.values(stats).reduce((a,b) => a+b, 0) === 0) {
+                container.innerHTML = `<p class="text-slate-500 text-center py-10">Tidak ada data analisis untuk ditampilkan.</p>`;
+                return;
+            }
+            
+            const colors = { "Lulus Kurasi": "bg-emerald-500", "Kurang Sesuai": "bg-sky-500", "Perbaikan Minor": "bg-amber-500", "Perbaikan Mayor": "bg-orange-600", "Tidak Lulus Kurasi": "bg-red-600", "Belum Dinilai": "bg-slate-400" };
+            
+            container.innerHTML = resultCategories.filter(cat => stats[cat] > 0).map(category => {
+                const count = stats[category];
+                const percentage = ((count / totalContent) * 100).toFixed(1);
+                return `<div class="bar-item">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-slate-700">${category}</span>
+                                <span class="text-sm font-bold text-slate-600">${count} dari ${totalContent} (${percentage}%)</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-4 shadow-inner">
+                                <div class="${colors[category] || 'bg-gray-500'} h-4 rounded-full" style="width: ${percentage}%;"></div>
+                            </div>
+                        </div>`;
+            }).join('');
+        }
+
+        async function openAnalysisModal() {
+            const modal = document.getElementById('analysis-modal');
+            const modalContent = modal.querySelector('div');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modalContent.classList.remove('scale-95', 'opacity-0'); }, 10);
+
+            const container = document.getElementById('analysis-chart-container');
+            container.innerHTML = `<div class="text-center text-slate-500 py-10"><i class="fas fa-spinner fa-spin text-3xl"></i><p class="mt-3">Memuat data analisis...</p></div>`;
+
+            try {
+                const analysisCacheRef = doc(db, "dashboard_cache", "analysis_summary");
+                const docSnap = await getDoc(analysisCacheRef);
+
+                if (docSnap.exists()) {
+                    renderAnalysisChartFromCache(docSnap.data());
+                } else {
+                    container.innerHTML = `<p class="text-orange-600 text-center py-10"><strong>Data Analisis Belum Ada</strong><br>Silakan perbarui cache dari Panel Admin untuk membuat laporan ini.</p>`;
+                }
+            } catch (error) {
+                console.error("Gagal memuat data analisis:", error);
+                container.innerHTML = `<p class="text-red-500 text-center py-10">Gagal memuat data. Periksa konsol untuk detailnya.</p>`;
+            }
+        }
+        
+        function closeAnalysisModal() {
+            const modal = document.getElementById('analysis-modal');
+            const modalContent = modal.querySelector('div');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        // --- Initial Load & Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            document.getElementById('show-analysis-btn').addEventListener('click', openAnalysisModal);
+            document.getElementById('close-analysis-modal-btn').addEventListener('click', closeAnalysisModal);
+        });
 
     </script>
 </body>
 </html>
+
