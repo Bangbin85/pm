@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* Styling tambahan bisa diletakkan di sini jika perlu */
+        /* Styling tetap sama */
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 font-sans">
@@ -24,7 +24,7 @@
         <main class="max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border border-slate-700">
             <!-- Search Input -->
             <div class="mb-6 relative">
-                <input type="search" id="search-input" placeholder="Ketik nama pengguna untuk mencari..." class="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300" disabled>
+                <input type="search" id="search-input" placeholder="Ketik nama pengguna untuk mencari..." class="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <i class="fas fa-search text-slate-400"></i>
                 </span>
@@ -47,15 +47,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase dari Admin.html
-        const firebaseConfig = {
-            apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
-            authDomain: "kurasisd.firebaseapp.com",
-            projectId: "kurasisd",
-            storageBucket: "kurasisd.firebasestorage.app",
-            messagingSenderId: "520054778765",
-            appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
-        };
+		const firebaseConfig = {
+		  apiKey: "AIzaSyB0biVlYEZg7p5UntYRDnyjdQCfe15_vmk",
+		  authDomain: "kurasidirsd.firebaseapp.com",
+		  projectId: "kurasidirsd",
+		  storageBucket: "kurasidirsd.firebasestorage.app",
+		  messagingSenderId: "168494524685",
+		  appId: "1:168494524685:web:b209da5c5fec9e7d5be844"
+		};
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -64,9 +63,17 @@
         const searchInput = document.getElementById('search-input');
         const initialMessage = document.getElementById('initial-message');
         
-        let allUsers = [];
+        // Fungsi untuk menunda eksekusi (agar tidak query setiap ketikan)
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
 
-        // Fungsi untuk merender daftar pengguna
+        // Fungsi untuk merender daftar pengguna (tidak berubah)
         function renderUsers(users) {
             if (searchInput.value.trim() === '') {
                 userListContainer.innerHTML = '';
@@ -85,10 +92,7 @@
 
             userListContainer.innerHTML = users.map((user, index) => `
                 <div class="user-card bg-slate-700/50 p-4 rounded-lg border border-slate-600 transition-all duration-300 hover:border-indigo-500">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-lg font-bold text-white">${user.nama || 'Tanpa Nama'}</h3>
-                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded ${user.role === 'Kurator' ? 'bg-sky-200 text-sky-800' : 'bg-emerald-200 text-emerald-800'}">${user.role || 'Tanpa Role'}</span>
-                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">${user.nama || 'Tanpa Nama'}</h3>
                     <div class="space-y-3">
                         <!-- Username Field -->
                         <div class="flex items-center gap-3">
@@ -120,46 +124,54 @@
             `).join('');
         }
         
-        async function fetchUsers() {
-            try {
-                const usersCollection = collection(db, 'users');
-                // MODIFIED: Query diubah untuk hanya mengambil pengguna dengan role Kurator atau Supervisor.
-                const q = query(usersCollection, where("role", "in", ["Kurator", "Supervisor"]));
-                const userSnapshot = await getDocs(q);
-                allUsers = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                searchInput.disabled = false;
-                searchInput.placeholder = 'Ketik nama pengguna untuk mencari...';
-                initialMessage.textContent = 'Data siap. Silakan mulai mencari.';
+        // Fungsi baru untuk melakukan pencarian ke Firestore
+        async function performSearch() {
+            const searchTerm = searchInput.value.trim();
 
-            } catch (error) {
-                console.error("Gagal mengambil data pengguna: ", error);
-                initialMessage.textContent = 'Gagal memuat data pengguna. Coba muat ulang halaman.';
-                initialMessage.classList.add('text-red-500');
-            }
-        }
-
-        function handleSearch() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
             if (searchTerm === '') {
-                renderUsers([]); 
+                renderUsers([]); // Mengosongkan daftar jika input kosong
                 return;
             }
-            const filteredUsers = allUsers.filter(user => 
-                user.nama && user.nama.toLowerCase().includes(searchTerm)
-            );
-            renderUsers(filteredUsers);
+
+            initialMessage.classList.remove('hidden');
+            initialMessage.textContent = 'Mencari...';
+            initialMessage.classList.remove('text-red-500');
+            userListContainer.innerHTML = ''; // Kosongkan hasil sebelumnya
+
+            try {
+                // Membuat query untuk mencari nama yang dimulai dengan `searchTerm` (case-sensitive)
+                const capitalizedSearchTerm = searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1).toLowerCase();
+                const usersCollection = collection(db, 'users');
+                const q = query(usersCollection, 
+                    where("nama", ">=", capitalizedSearchTerm), 
+                    where("nama", "<=", capitalizedSearchTerm + '\uf8ff'),
+                    where("password", "!=", null)
+                );
+                
+                const userSnapshot = await getDocs(q);
+                const foundUsers = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                renderUsers(foundUsers);
+
+            } catch (error) {
+                console.error("Gagal melakukan pencarian:", error);
+                initialMessage.textContent = 'Terjadi kesalahan saat mencari. Coba lagi.';
+                initialMessage.classList.add('text-red-500');
+                userListContainer.innerHTML = '';
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            searchInput.placeholder = 'Sedang memuat data...';
-            await fetchUsers();
-            searchInput.addEventListener('input', handleSearch);
+        // --- Inisialisasi Halaman ---
+        document.addEventListener('DOMContentLoaded', () => {
+            searchInput.disabled = false; // Langsung aktifkan input
+            
+            // Gunakan fungsi debounce untuk event input
+            searchInput.addEventListener('input', debounce(performSearch, 500));
         });
     </script>
     
     <script>
-        // Fungsi helper ini tidak memerlukan module, jadi dipisah agar tetap berfungsi
+        // Fungsi helper (copy & toggle visibility) tidak berubah dan tetap di sini
         function copyToClipboard(elementId, buttonElement) {
             const input = document.getElementById(elementId);
             if (navigator.clipboard && window.isSecureContext) {
