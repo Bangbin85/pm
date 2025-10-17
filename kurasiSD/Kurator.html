@@ -635,8 +635,11 @@
                     const hasDraft = draftedContentIds.includes(content.id);
                     
                     let buttonText = '<i class="fas fa-edit mr-2"></i>Kurasi';
+                    let buttonClasses = 'btn-primary';
+                    
                     if (isCurated) {
-                        buttonText = '<i class="fas fa-check-circle mr-2"></i>Selesai';
+                        buttonText = '<i class="fas fa-pencil-alt mr-2"></i>Edit Hasil';
+                        buttonClasses = 'btn-secondary'; // Ganti gaya untuk tombol edit
                     } else if (hasDraft) {
                         buttonText = '<i class="fas fa-file-alt mr-2"></i>Lanjutkan Draft';
                     }
@@ -651,11 +654,9 @@
                                 <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary text-sm">
                                     <i class="fas fa-external-link-alt mr-2 text-xs"></i>Buka
                                 </a>
-                                <button class="start-curation-btn btn btn-primary text-sm
-                                    ${isCurated ? 'bg-slate-200 text-slate-500 cursor-not-allowed !bg-none !shadow-none' : ''}"
+                                <button class="start-curation-btn btn ${buttonClasses} text-sm"
                                     data-content-id="${content.id}" 
-                                    data-content-title="${content.title}"
-                                    ${isCurated ? 'disabled' : ''}>
+                                    data-content-title="${content.title}">
                                     ${buttonText}
                                 </button>
                             </div>
@@ -702,8 +703,8 @@
             return answers;
         }
 
-        function populateFormWithDraft(draftData) {
-            const { answers } = draftData;
+        function populateFormWithData(data) {
+            const { answers } = data;
             if (!answers) return;
 
             curationQuestions.forEach(group => {
@@ -744,13 +745,22 @@
             document.getElementById('curation-content-id').value = contentId;
             document.getElementById('curation-user-id').value = currentUser.id;
             
-            // Cek dan muat draf jika ada
+            // Cek dan muat draf atau hasil kurasi final
             const curationDocId = `${currentUser.id}_${contentId}`;
             const draftDocRef = doc(db, "curation_drafts", curationDocId);
             const draftDocSnap = await getDoc(draftDocRef);
+
             if (draftDocSnap.exists()) {
-                populateFormWithDraft(draftDocSnap.data());
+                populateFormWithData(draftDocSnap.data());
                 draftStatus.textContent = 'Draf sebelumnya telah dimuat.';
+            } else {
+                 // Jika tidak ada draf, cek kurasi final yang sudah ada
+                const curationDocRef = doc(db, "curations", curationDocId);
+                const curationDocSnap = await getDoc(curationDocRef);
+                if (curationDocSnap.exists()) {
+                    populateFormWithData(curationDocSnap.data());
+                    draftStatus.textContent = 'Mengedit hasil kurasi yang telah dikirim.';
+                }
             }
 
             modalFormContent.scrollTop = 0; 
