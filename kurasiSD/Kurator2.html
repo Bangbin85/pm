@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Kurator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	<link rel="icon" type="image/x-icon" href="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* === TEMA MODERN & ANIMASI === */
+        :root {
+            --c-primary: #7c3aed; /* violet-600 */
+            --c-secondary: #3b82f6; /* blue-500 */
+            --c-primary-light: #a78bfa; /* violet-400 */
+            --c-glow: rgba(124, 58, 237, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .animated-gradient-bg {
+            background: linear-gradient(-45deg, #f5f3ff, #eef2ff, #eff6ff, #f0f9ff);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* === Animasi Umum === */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes modal-backdrop-show { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modal-backdrop-hide { to { opacity: 0; } }
+        @keyframes modal-content-show {
+            from { opacity: 0; transform: translateY(50px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes modal-content-hide {
+            to { opacity: 0; transform: translateY(50px) scale(0.95); }
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px var(--c-primary-light); }
+            50% { box-shadow: 0 0 20px var(--c-primary-light); }
+            100% { box-shadow: 0 0 5px var(--c-primary-light); }
+        }
+
+        .modal-backdrop.show { animation: modal-backdrop-show 0.3s ease-out forwards; }
+        .modal-backdrop.hide { animation: modal-backdrop-hide 0.3s ease-out forwards; }
+        .modal-content.show { animation: modal-content-show 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .modal-content.hide { animation: modal-content-hide 0.3s ease-in forwards; }
+
+        /* === Gaya Komponen === */
+
+        /* Kartu Login */
+        .login-card-container {
+            opacity: 0;
+            animation: fadeInDown 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Kartu Konten */
+        .content-card {
+            opacity: 0; /* Mulai tersembunyi, diaktifkan oleh JS */
+            animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            @apply transition-all duration-300 ease-in-out;
+        }
+         .content-card:hover {
+            @apply shadow-2xl shadow-violet-200 transform -translate-y-2;
+        }
+
+
+        /* Formulir dengan gaya Neumorphism / Claymorphism */
+        .form-label { @apply block text-sm font-medium text-slate-700 mb-1; }
+        .form-input, .form-select, .form-textarea {
+            @apply block w-full px-4 py-3 rounded-xl placeholder-slate-400 text-slate-600 transition-all duration-300;
+            background-color: #eef2ff; /* Warna terang dari background gradien halaman */
+            border: none;
+            /* Bayangan gaya Neumorphism untuk efek 'cekung ke dalam' */
+            box-shadow: inset 5px 5px 10px #dbe1f2,
+                        inset -5px -5px 10px #ffffff;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            /* Saat fokus, kembali ke gaya yang lebih jelas untuk usabilitas */
+            @apply outline-none ring-2 ring-violet-400 ring-offset-2 ring-offset-white;
+            box-shadow: none;
+            background-color: white;
+        }
+        
+        /* Gaya spesifik untuk input foto */
+        .form-input-sm {
+            @apply px-3 py-2 text-sm rounded-lg;
+            background-color: #f8fafc; /* slate-50 */
+             box-shadow: inset 2px 2px 4px #dbe1f2,
+                        inset -2px -2px 4px #ffffff;
+        }
+        .form-input-sm:focus {
+             @apply ring-1 ring-violet-400;
+             background-color: white;
+        }
+
+
+        /* Tombol dengan gaya Claymorphism / Menonjol */
+        .btn {
+            @apply font-bold py-2.5 px-5 rounded-xl transition-all duration-100 transform focus:outline-none text-center relative;
+        }
+        .btn:active {
+            @apply top-1; /* Efek ditekan */
+        }
+
+        .btn-primary {
+            @apply text-white bg-gradient-to-r from-violet-500 to-blue-500 border-none;
+            box-shadow: 0px 5px 0px 0px #6d28d9; /* bayangan 3D */
+            @apply focus:ring-2 focus:ring-offset-2 focus:ring-violet-500;
+        }
+        .btn-primary:active {
+            box-shadow: 0px 2px 0px 0px #6d28d9;
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            @apply bg-white text-slate-700 border border-slate-300;
+            box-shadow: 0px 5px 0px 0px #cbd5e1; /* bayangan 3D */
+            @apply focus:ring-2 focus:ring-offset-2 focus:ring-slate-400;
+        }
+        .btn-secondary:active {
+            box-shadow: 0px 2px 0px 0px #cbd5e1;
+        }
+        .btn-secondary:hover {
+            @apply bg-slate-50;
+        }
+
+        .btn-home {
+            @apply bg-green-600 text-white font-semibold py-2 px-4 text-sm flex items-center border-none;
+             box-shadow: 0px 5px 0px 0px #166534; /* bayangan 3D */
+             @apply focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
+        }
+        .btn-home:hover {
+            @apply bg-green-700;
+        }
+        .btn-home:active {
+            box-shadow: 0px 2px 0px 0px #166534;
+        }
+        
+        .btn-sm {
+            @apply py-1.5 px-3 rounded-lg text-xs;
+            box-shadow: 0px 3px 0px 0px #cbd5e1;
+        }
+         .btn-sm:active {
+            box-shadow: 0px 1px 0px 0px #cbd5e1;
+        }
+         .btn-danger-sm {
+            @apply bg-red-500 text-white;
+             box-shadow: 0px 3px 0px 0px #b91c1c;
+         }
+         .btn-danger-sm:active {
+             box-shadow: 0px 1px 0px 0px #b91c1c;
+         }
+    
+        /* Modal Kurasi */
+        #curation-progress-bar {
+            animation: glow 2s linear infinite;
+        }
+
+        #modal-sidebar {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem; /* 12px */
+            align-content: start;
+            perspective: 1500px;
+            padding: 1.5rem 1rem;
+        }
+        #modal-sidebar .sidebar-link {
+            @apply flex items-center justify-center w-full text-center p-3 text-slate-800 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] font-bold text-lg;
+            @apply bg-white border border-slate-200 shadow-lg;
+            transform: rotateY(-20deg) scale(0.9);
+            opacity: 0.8;
+        }
+         #modal-sidebar .sidebar-link-content {
+            transform: rotateY(15deg);
+            transition: transform 0.5s ease;
+        }
+        #modal-sidebar .sidebar-link:hover {
+            @apply bg-gradient-to-r from-violet-500 to-blue-500 text-white border-transparent;
+            transform: scale(1.1) rotateY(0deg) translateX(10px);
+            box-shadow: 0 15px 30px var(--c-glow);
+            z-index: 10;
+            position: relative;
+            opacity: 1;
+        }
+         #modal-sidebar .sidebar-link:hover .sidebar-link-content,
+         #modal-sidebar .sidebar-link.active .sidebar-link-content {
+            transform: rotateY(0deg);
+        }
+        #modal-sidebar .sidebar-link.active {
+            @apply bg-slate-800 text-white shadow-2xl border-slate-900;
+            transform: scale(1.05) rotateY(0deg) translateX(5px);
+            z-index: 5;
+            position: relative;
+            opacity: 1;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; } /* slate-100 */
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; } /* gray-300 */
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; } /* gray-400 */
+    </style>
+</head>
+<body class="animated-gradient-bg text-slate-800">
+
+    <!-- === BAGIAN LOGIN === -->
+    <div id="login-section" class="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 bg-slate-100">
+        <div class="login-card-container w-full max-w-5xl mx-auto flex flex-col md:flex-row bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <!-- Kolom Kiri - Ilustrasi -->
+            <div class="hidden md:flex flex-col justify-center items-center w-full md:w-1/2 p-10 lg:p-12 bg-gradient-to-br from-violet-500 to-blue-500 text-white">
+                 <div class="text-center">
+                    <i class="fas fa-book-reader text-7xl mb-6 opacity-80"></i>
+                    <h2 class="text-3xl lg:text-4xl font-bold leading-tight">Panel Kurasi Konten</h2>
+                    <p class="mt-4 text-violet-200 text-lg">Mewujudkan materi pembelajaran berkualitas untuk masa depan pendidikan Indonesia.</p>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan - Formulir -->
+            <div class="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
+                <div class="w-full max-w-md mx-auto">
+                    <div class="text-center md:text-left mb-8">
+                         <h1 class="text-3xl font-bold text-slate-800">Login Kurator</h1>
+                         <p class="text-slate-500 mt-2">Selamat datang kembali! Silakan masuk.</p>
+                    </div>
+                    <form id="login-form">
+                        <div class="w-full mb-5">
+                            <input type="text" id="username-input" class="form-input w-full" placeholder="Username, DirSD001" required>
+                        </div>
+                        <div class="w-full mb-6">
+                            <input type="password" id="password-input" class="form-input w-full" placeholder="123**6" required>
+                        </div>
+                         <p id="login-error" class="text-red-500 text-sm mb-4 hidden"></p>
+                        <div class="flex flex-col sm:flex-row gap-3 items-center">
+                            <button id="login-btn" type="submit" class="btn btn-primary w-full sm:w-auto flex-grow text-xl">
+                                Masuk
+                            </button>
+                            <a href="./" class="btn btn-home w-full sm:w-auto">
+                                <i class="fas fa-home mr-2"></i>Home
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === DASBOR UTAMA (TERSEMBUNYI) === -->
+    <main id="main-dashboard" class="hidden">
+        <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-20 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 id="welcome-message" class="text-xl font-bold text-slate-800">Dashboard Kurator</h1>
+                <div class="flex items-center gap-4">
+                    <a href="./" class="btn btn-home">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                    <button id="logout-btn" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="py-10">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <h2 class="text-2xl font-semibold text-slate-700 mb-6 px-4 sm:px-0">Konten yang Ditugaskan:</h2>
+                <div id="content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Kartu konten akan dimuat di sini oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- === MODAL KURASI (TERSEMBUNYI) === -->
+    <div id="curation-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 p-4 flex items-center justify-center modal-backdrop">
+        <div class="relative w-full max-w-7xl h-[95vh] bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col overflow-hidden modal-content">
+            <!-- Header -->
+            <div class="flex-shrink-0 px-6 py-4 flex justify-between items-center border-b border-slate-200">
+                <h3 class="text-lg font-semibold text-slate-900" id="curation-modal-title">Formulir Kurasi Konten</h3>
+                <button id="close-modal-btn" class="text-slate-500 hover:bg-red-100 hover:text-red-500 rounded-full h-10 w-10 flex items-center justify-center transition-all duration-300 text-3xl leading-none focus:outline-none hover:rotate-90">&times;</button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="flex-shrink-0 w-full bg-slate-200 h-1.5">
+                <div id="curation-progress-bar" class="bg-gradient-to-r from-violet-500 to-blue-500 h-1.5 rounded-r-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            
+            <!-- Konten Utama -->
+            <div class="flex-grow flex overflow-hidden">
+                <!-- Sidebar -->
+                <nav id="modal-sidebar" class="w-72 flex-shrink-0 bg-slate-50 border-r border-slate-200 overflow-y-auto">
+                    <!-- Link sidebar akan disuntikkan di sini -->
+                </nav>
+
+                <!-- Area Formulir -->
+                <div id="modal-form-content" class="flex-grow p-8 overflow-y-auto">
+                    <form id="curation-form" class="max-w-4xl mx-auto">
+                        <!-- Konten formulir dinamis akan disuntikkan di sini -->
+                    </form>
+                </div>
+            </div>
+
+             <!-- Footer -->
+            <div class="flex-shrink-0 p-4 bg-white/80 backdrop-blur-sm border-t border-slate-200 flex justify-between items-center">
+                <span id="draft-status" class="text-sm text-slate-500 italic"></span>
+                <div class="flex gap-4">
+                    <button type="button" id="save-draft-btn" class="btn btn-secondary text-base py-3 px-6">
+                        <i class="fas fa-save mr-2"></i>Simpan Draft
+                    </button>
+                    <button type="submit" form="curation-form" id="submit-curation-btn" class="btn btn-primary text-base py-3 px-6">
+                        <i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- === Modal Alert / Konfirmasi Kustom === -->
+    <div id="alert-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm h-full w-full hidden z-[100] p-4 flex items-center justify-center modal-backdrop">
+         <div class="relative w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col modal-content p-8 text-center">
+            <h4 id="alert-modal-title" class="text-xl font-bold text-slate-800 mb-2">Judul</h4>
+            <p id="alert-modal-message" class="text-slate-600 mb-6">Pesan akan muncul di sini.</p>
+            <div id="alert-modal-buttons" class="flex gap-4 justify-center">
+                <!-- Tombol ditambahkan secara dinamis -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, serverTimestamp, query, where, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+		const firebaseConfig = {
+		  apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
+		  authDomain: "kurasisd.firebaseapp.com",
+		  projectId: "kurasisd",
+		  storageBucket: "kurasisd.firebasestorage.app",
+		  messagingSenderId: "520054778765",
+		  appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
+		};
+
+        // URL Google Apps Script Web App
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEZno0Vk8E2gIGaEGaD1TuXbhPf9fvdsnm8jSoOgSBNnh-pjDmCb5rYXDeVeuVS5pl/exec";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- Elemen UI ---
+        const loginSection = document.getElementById('login-section');
+        const mainDashboard = document.getElementById('main-dashboard');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+        const contentGrid = document.getElementById('content-grid');
+        const curationModal = document.getElementById('curation-modal');
+        const curationForm = document.getElementById('curation-form');
+        const modalSidebar = document.getElementById('modal-sidebar');
+        const modalFormContent = document.getElementById('modal-form-content');
+        const progressBar = document.getElementById('curation-progress-bar');
+        const alertModal = document.getElementById('alert-modal');
+        const saveDraftBtn = document.getElementById('save-draft-btn');
+        const draftStatus = document.getElementById('draft-status');
+
+        let currentUser = null;
+
+        // --- Struktur Formulir Kurasi ---
+        const curationQuestions = [
+             { id: 'A1', title: 'A.1 Keamanan Materi', icon: 'fa-shield-halved', items: [ { id: 'radikalisme', text: 'Materi bebas dari unsur radikalisme, ekstremisme, dan terorisme' }, { id: 'pornografi', text: 'Materi bebas dari pornografi atau ketelanjangan yang tidak sesuai konteks' }, { id: 'diskriminasi', text: 'Materi bebas dari unsur perundungan atau diskriminasi' }, { id: 'promosi', text: 'Materi bebas dari promosi produk komersial' }, { id: 'sara', text: 'Materi bebas dari unsur SARA' }, { id: 'kekerasan', text: 'Materi bebas dari unsur kekerasan atau isu politik kontroversial' }, { id: 'komersial', text: 'Materi bebas dari unsur komersial (logo/identitas bisa diburamkan)' } ]},
+             { id: 'A2', title: 'A.2 Copyright', icon: 'fa-copyright', items: [ { id: 'sumber', text: 'Mencantumkan sumber/referensi/credit' }, { id: 'ai', text: 'Jika dibuat oleh AI perlu dituliskan keterangan' } ]},
+             { id: 'A3', title: 'A.3 Substansi Materi', icon: 'fa-book-open', items: [ { id: 'konsumsi', text: 'Materi dapat dikonsumsi langsung oleh murid' }, { id: 'mapel', text: 'Materi mendukung mata pelajaran secara spesifik' }, { id: 'kurikulum', text: 'Materi relevan dengan kurikulum yang berlaku' }, { id: 'akurat', text: 'Isi materi (visual, audio, dll) berisi informasi akurat' }, { id: 'sistematis', text: 'Materi disusun sistematis sesuai perkembangan kompetensi' }, { id: 'kesulitan', text: 'Tingkat kesulitan materi sesuai jenjang pendidikan' }, { id: 'asesmen', text: 'Materi memuat asesmen yang sesuai (bisa berupa pertanyaan reflektif)' }, ]},
+             { id: 'A4', title: 'A.4 Kebahasaan', icon: 'fa-language', items: [ { id: 'sopan', text: 'Menggunakan bahasa yang sopan, baik, dan benar' }, { id: 'struktur', text: 'Struktur kalimat disesuaikan dengan tingkat pemahaman pengguna' }, ]},
+             { id: 'A5', title: 'A.5 Inklusivitas', icon: 'fa-users-viewfinder', items: [ { id: 'bias', text: 'Materi bebas dari bias gender, sosial, ekonomi, dan budaya' }, { id: 'prinsip', text: 'Materi tidak bertentangan dengan prinsip inklusivitas' }, { id: 'akses', text: 'Materi dapat diakses oleh murid dengan berbagai kebutuhan' }, { id: 'ilustrasi', text: 'Ilustrasi mencerminkan keberagaman murid' }, ]},
+             { id: 'B1', title: 'B.1 Teks', icon: 'fa-file-alt', items: [ { id: 'teks_kontras', text: 'Teks memiliki kontras yang tinggi dengan latar belakang' }, { id: 'teks_ilustrasi', text: 'Ilustrasi mendukung isi materi dengan teks sebagai elemen utama' }, { id: 'teks_resolusi', text: 'Ilustrasi memiliki resolusi yang baik' } ]},
+             { id: 'B2', title: 'B.2 Gambar', icon: 'fa-image', items: [ { id: 'gambar_elemen_utama', text: 'Gambar sebagai elemen utama untuk mendukung pemahaman' }, { id: 'gambar_teks_pendukung', text: 'Teks berfungsi untuk mendukung isi materi' }, { id: 'gambar_kualitas', text: 'Gambar memiliki kualitas yang baik' }, { id: 'gambar_mudah_dipahami', text: 'Gambar mudah dipahami dan tidak multitafsir' }, { id: 'gambar_warna', text: 'Penggunaan warna penuh/hitam putih/gradasi sesuai' }, { id: 'gambar_kontras', text: 'Kontras warna tinggi dan latar belakang tidak mengganggu' } ]},
+             { id: 'B3', title: 'B.3 Video', icon: 'fa-video', items: [ { id: 'video_musik', text: 'Musik latar (backsound) tidak mengganggu suara utama' }, { id: 'video_suara', text: 'Suara narator atau presenter jelas' }, { id: 'video_tulisan', text: 'Tulisan pada video terbaca dengan baik' }, { id: 'video_takarir', text: 'Takarir (jika ada) jelas dan sinkron' }, { id: 'video_visual', text: 'Visual terang, jelas, dan fokus' }, { id: 'video_skala', text: 'Video menggunakan skala 16:9' }, { id: 'video_resolusi', text: 'Resolusi minimum 720p' }, { id: 'video_kontras', text: 'Kontras warna tinggi dan latar belakang tidak ramai' }, { id: 'video_durasi', text: 'Durasi Video tidak terlalu panjang/pendek' } ]},
+             { id: 'B4', title: 'B.4 Interaktif', icon: 'fa-mouse-pointer', items: [ { id: 'interaktif_relevansi', text: 'Konten interaktif relevan dengan materi' }, { id: 'interaktif_aktivitas', text: 'Aktivitas interaktif minimal (memilih, mencocokkan, dll)' }, { id: 'interaktif_navigasi', text: 'Materi mudah dinavigasi secara mandiri' }, { id: 'interaktif_visual', text: 'Visual jelas dan latar belakang tidak mengganggu' }, { id: 'interaktif_kontras', text: 'Kontras jelas antara teks, ikon, dan latar belakang' }, { id: 'interaktif_tombol', text: 'Tombol dan elemen interaktif ukurannya sesuai' }, { id: 'interaktif_ikon', text: 'Ikon dan warna konsisten' }, { id: 'interaktif_umpan_balik', text: 'Umpan balik langsung, jelas, dan mudah dipahami' }, { id: 'interaktif_ilustrasi', text: 'Ilustrasi relevan dan menarik minat murid' }, { id: 'interaktif_min_aktivitas', text: 'Memiliki minimal 3 aktivitas interaktif' } ]},
+             { id: 'B5', title: 'B.5 Lab Maya', icon: 'fa-flask-vial', items: [ { id: 'lab_simulasi', text: 'Simulasi bersifat interaktif dua arah' }, { id: 'lab_umpan_balik_interaktif', text: 'Umpan balik interaktif ditampilkan secara langsung' }, { id: 'lab_navigasi', text: 'Navigasi intuitif dan memudahkan pengguna' }, { id: 'lab_desain', text: 'Desain antarmuka bersih dan terstruktur' }, { id: 'lab_umpan_balik_langsung', text: 'Umpan balik langsung, jelas, dan mudah dipahami' }, { id: 'lab_warna', text: 'Warna dan elemen visual selaras' }, { id: 'lab_tombol', text: 'Tombol, alat, dan indikator mudah dikenali' }, { id: 'lab_interaksi_dinamis', text: 'Interaksi dinamis dan drag-drop yang logis' }, { id: 'lab_pertanyaan_lanjutan', text: 'Pertanyaan lanjutan berbasis konteks' }, { id: 'lab_akses_kembali', text: 'Setiap tahapan dapat diakses kembali' }, { id: 'lab_indikator_progres', text: 'Tersedia indikator progres atau panduan langkah' } ]},
+             { id: 'B6', title: 'B.6 Gim Edukasi', icon: 'fa-gamepad', items: [ { id: 'gim_navigasi', text: 'Navigasi permainan bersifat intuitif' }, { id: 'gim_aktivitas', text: 'Memuat aktivitas interaktif (drag-drop, fill-in-the-blank, dll)' }, { id: 'gim_respons', text: 'Setiap interaksi memberikan respons/umpan balik' }, { id: 'gim_elemen_visual', text: 'Elemen visual jelas, konsisten, dan kontras memadai' }, { id: 'gim_teks', text: 'Teks mudah dibaca dengan ukuran proporsional' }, { id: 'gim_animasi', text: 'Animasi dan efek visual digunakan secara proporsional' }, { id: 'gim_alur', text: 'Tersedia alur penyelesaian misi (pathway) yang jelas' }, { id: 'gim_indikator_progres', text: 'Tersedia indikator progres yang jelas' }, { id: 'gim_hasil_akhir', text: 'Hasil akhir dan skor ditampilkan secara informatif' }, { id: 'gim_efek_suara', text: 'Efek suara dan animasi memperkuat pengalaman interaktif' }, { id: 'gim_min_aktivitas', text: 'Memiliki minimal 3 aktivitas interaktif' } ]},
+             { id: 'C1', title: 'C.1 Judul', icon: 'fa-heading', items: [ { id: 'judul_topik', text: 'Judul menggambarkan topik bahasan' }, { id: 'judul_kata_kunci', text: 'Memuat 1 - 3 kata kunci penting' }, { id: 'judul_kapitalisasi', text: 'Kapitalisasi judul sesuai kaidah tata bahasa' }, { id: 'judul_istilah', text: 'Istilah selaras dengan buku teks/kurikulum' }, { id: 'judul_ringkas', text: 'Ringkas, maksimal 55 karakter' } ]},
+             { id: 'C2', title: 'C.2 Isi Materi', icon: 'fa-file-lines', items: [ { id: 'isi_langsung_digunakan', text: 'Berisi materi belajar yang bisa langsung digunakan murid' }, { id: 'isi_tanpa_info_kelas', text: 'Tidak ada informasi kelas dalam isi materi' } ]},
+             { id: 'C3', title: 'C.3 Deskripsi', icon: 'fa-quote-left', items: [ { id: 'deskripsi_tujuan', text: 'Memuat tujuan belajar dan manfaat bagi murid' }, { id: 'deskripsi_bahasa', text: 'Bahasa baik, benar, dan mudah dipahami murid' }, { id: 'deskripsi_ringkas', text: 'Ringkas dan padat, 400-800 karakter' }, { id: 'deskripsi_tanpa_info_kelas', text: 'Tidak ada informasi kelas dalam deskripsi' }, { id: 'deskripsi_persuasif', text: 'Deskripsi persuasif dengan kata sapaan (adik-adik, kamu)' } ]},
+             { id: 'C4', title: 'C.4 Penulis', icon: 'fa-user-pen', items: [ { id: 'penulis_nama', text: 'Nama penulis lengkap tanpa gelar' }, { id: 'penulis_kolaborasi', text: 'Jika kolaborasi, cantumkan satu nama utama' }, { id: 'penulis_instansi', text: 'Jika dari instansi, nama penulis bisa nama instansi' } ]},
+             { id: 'C5', title: 'C.5 Prinsip Keselarasan', icon: 'fa-check-double', items: [ { id: 'keselarasan_prinsip', text: 'Keselarasan antara tujuan, langkah, dan asesmen pembelajaran' } ]}
+        ];
+
+        function buildCurationForm() {
+            let formHTML = `<input type="hidden" id="curation-content-id"><input type="hidden" id="curation-user-id">`;
+            let sidebarHTML = ''; 
+            
+            const allSections = [...curationQuestions, 
+                { id: 'D1', title: 'D.1 Simpulan Umum', icon: 'fa-clipboard-check' }, 
+                { id: 'D2', title: 'D.2 Keputusan Final', icon: 'fa-gavel' }
+            ];
+
+            const groupSeparators = ['B1', 'C1', 'D1'];
+
+            allSections.forEach(group => {
+                if (groupSeparators.includes(group.id)) {
+                    sidebarHTML += `<div class="col-span-3 pt-2 pb-1"><hr class="border-slate-300"></div>`;
+                }
+                
+                const code = group.title.split(' ')[0];
+
+                sidebarHTML += `
+                    <a href="#group-${group.id}" class="sidebar-link" data-target="group-${group.id}">
+                        <span class="sidebar-link-content">${code}</span>
+                    </a>`;
+            });
+            
+            formHTML += curationQuestions.map(group => `
+                <section id="group-${group.id}" class="indicator-section scroll-mt-8">
+                    <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-bold text-slate-800">${group.title}</h3>
+                            <p class="text-sm text-slate-500 mt-1">Pilih status dan berikan catatan untuk setiap poin di bawah.</p>
+                        </div>
+                        <div class="w-full md:w-auto md:min-w-[280px] mt-4 md:mt-0 flex-shrink-0">
+                            <label for="select-${group.id}" class="form-label mb-1.5">Status Indikator</label>
+                            <select id="select-${group.id}" class="form-select w-full" required>
+                                <option value="">Nilai</option>
+                                <option value="Lulus Kurasi">Lulus Kurasi</option>
+                                <option value="Kurang Sesuai">Kurang Sesuai</option>
+                                <option value="Perbaikan Minor">Perbaikan Minor</option>
+                                <option value="Perbaikan Mayor">Perbaikan Mayor</option>
+                                <option value="Tidak Lulus Kurasi">Tidak Lulus Kurasi</option>
+                            </select>
+                         </div>
+                    </header>
+                    
+                    <div class="mt-4 space-y-6">
+                    ${(group.items || []).map(item => `
+                        <div id="item-${group.id}-${item.id}" class="py-5 border-t border-slate-200 first:border-t-0 first:pt-0">
+                            <label for="textarea-${group.id}-${item.id}" class="text-sm text-slate-700 font-medium mb-2 block">${item.text}</label>
+                            <textarea id="textarea-${group.id}-${item.id}" rows="3" class="form-textarea w-full text-sm" placeholder="Catatan perbaikan atau justifikasi..."></textarea>
+                        </div>
+                    `).join('')}
+                    </div>
+                </section>
+            `).join('');
+
+            formHTML += `
+                <section id="group-D1" class="indicator-section scroll-mt-8">
+                    <header class="mb-6">
+                        <h3 class="text-xl font-bold text-slate-800">D.1 Simpulan Umum</h3>
+                        <p class="text-sm text-slate-500 mt-1">Berikan ringkasan dari hasil kurasi Anda.</p>
+                    </header>
+                    <div class="space-y-6 pt-6 border-t border-slate-200">
+                        <div>
+                            <label for="final-kelebihan" class="form-label font-semibold mb-1.5">Kelebihan Konten</label>
+                            <textarea id="final-kelebihan" rows="5" class="form-textarea w-full text-sm" placeholder="Contoh: Penjelasan materi sangat mudah dipahami..." required></textarea>
+                        </div>
+                        <div>
+                            <label for="final-kekurangan" class="form-label font-semibold mb-1.5">Kekurangan Konten</label>
+                            <textarea id="final-kekurangan" rows="5" class="form-textarea w-full text-sm" placeholder="Contoh: Kualitas audio kurang jernih pada menit ke-2..." required></textarea>
+                        </div>
+                        <div>
+                            <label for="final-saran" class="form-label font-semibold mb-1.5">Saran Perbaikan</label>
+                            <textarea id="final-saran" rows="5" class="form-textarea w-full text-sm" placeholder="Contoh: Sebaiknya audio diperbaiki dan ditambahkan takarir..." required></textarea>
+                        </div>
+                    </div>
+                </section>
+                 <section id="group-D2" class="indicator-section scroll-mt-8">
+                    <header class="mb-6">
+                        <h3 class="text-xl font-bold text-slate-800">D.2 Keputusan Final</h3>
+                        <p class="text-sm text-slate-500 mt-1">Tentukan kelayakan konten berdasarkan analisis keseluruhan.</p>
+                    </header>
+                    <div class="space-y-6 pt-6 border-t border-slate-200">
+                        <div>
+                            <label for="final-keputusan" class="form-label font-semibold mb-1.5">Keputusan Final</label>
+                            <select id="final-keputusan" class="form-select" required>
+                                <option value="">Nilai Akhir</option>
+                                <option value="Lulus Kurasi">Lulus Kurasi</option>
+                                <option value="Kurang Sesuai">Kurang Sesuai</option>
+                                <option value="Perbaikan Minor">Perbaikan Minor</option>
+                                <option value="Perbaikan Mayor">Perbaikan Mayor</option>
+                                <option value="Tidak Lulus Kurasi">Tidak Lulus Kurasi</option>
+                            </select>
+                        </div>
+                        <div>
+                             <label for="final-nilai-deskripsi" class="form-label font-semibold mb-1.5">Deskripsi Nilai Akhir</label>
+                             <textarea id="final-nilai-deskripsi" class="form-textarea w-full text-sm" rows="5" placeholder="Tuliskan justifikasi untuk keputusan final Anda di sini..." required></textarea>
+                        </div>
+                        
+                        <!-- BAGIAN UPLOAD FOTO FINAL -->
+                        <div class="mt-6 pt-6 border-t border-slate-200">
+                            <div id="final-photo-uploader" class="p-4 rounded-xl bg-slate-100 border photo-uploader-container">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Lampiran Dokumen (Opsional)</label>
+                                <p class="text-xs text-slate-600 mb-3 bg-white p-3 rounded-lg border border-yellow-300 shadow-sm">
+                                    <b>Penting:</b> Pastikan nama file yang Anda kirimkan sesuai format: <b>Nama Kurator_Kode Konten</b><br>(Contoh: <b>Bangbin_TB-G4SDDD.pdf</b>)
+                                </p>
+                                <div class="photo-display hidden flex items-center gap-4 p-2 rounded-lg bg-white border">
+                                    <img src="" class="photo-preview w-16 h-16 object-cover rounded-md border bg-white">
+                                    <div class="flex-grow">
+                                        <a href="" target="_blank" class="photo-link text-blue-600 text-xs break-all hover:underline" rel="noopener noreferrer"></a>
+                                        <input type="hidden" class="photo-link-input">
+                                    </div>
+                                    <button type="button" class="btn btn-danger-sm btn-sm remove-photo-btn flex-shrink-0">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="photo-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm add-photo-btn">
+                                        <i class="fas fa-paperclip mr-1"></i> Tambah Lampiran
+                                    </button>
+                                </div>
+
+                                <div class="photo-input-options hidden space-y-2 mt-2">
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" placeholder="Tempel tautan file..." class="form-input-sm w-full photo-url-input">
+                                        <button type="button" class="btn btn-secondary btn-sm set-link-btn flex-shrink-0">OK</button>
+                                    </div>
+                                    <div class="text-center text-xs text-slate-400">atau</div>
+                                    <div>
+                                        <label class="btn btn-secondary btn-sm w-full cursor-pointer">
+                                            <i class="fas fa-upload mr-2"></i> Pilih File untuk Diunggah
+                                            <input type="file" class="photo-file-input hidden" accept="image/png, image/jpeg, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="photo-upload-status hidden mt-2 text-sm text-slate-600">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i><span>Mengunggah file...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- AKHIR BAGIAN UPLOAD FOTO FINAL -->
+
+                    </div>
+                </section>`;
+            
+            curationForm.innerHTML = formHTML;
+            modalSidebar.innerHTML = sidebarHTML;
+            setupSidebarNavigation();
+            setupScrollObserver();
+            setupPhotoUploaderEvents(); // Inisialisasi event listener untuk upload foto
+        }
+        
+        // --- Fungsi-fungsi ---
+        async function handleLogin(e) { e.preventDefault();
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengecek...';
+            loginError.classList.add('hidden');
+            if (!username || !password) {
+                loginError.textContent = 'Username dan Password harus diisi.';
+                loginError.classList.remove('hidden');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Masuk';
+                return;
+            }
+            try {
+                const q = query(collection(db, "users"), where("username", "==", username));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) throw new Error("Username atau password salah.");
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+                if (userData.password !== password) throw new Error("Username atau password salah.");
+                localStorage.setItem('userId', userDoc.id);
+                await displayUserDashboard(userDoc.id);
+            } catch (error) {
+                console.error("Login Gagal!", error);
+                loginError.textContent = error.message;
+                loginError.classList.remove('hidden');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Masuk';
+            }
+        }
+
+        async function displayUserDashboard(userId) {
+            loginSection.classList.add('hidden');
+            mainDashboard.classList.remove('hidden');
+            contentGrid.innerHTML = '<p class="text-slate-500 px-4 sm:px-0 col-span-full">Memuat konten...</p>';
+            try {
+                const userDoc = await getDoc(doc(db, 'users', userId));
+                if (!userDoc.exists()) throw new Error("User not found");
+                currentUser = { id: userDoc.id, ...userDoc.data() };
+                document.getElementById('welcome-message').textContent = `Selamat Bekerja, ${currentUser.nama}!`;
+                const assignmentDoc = await getDoc(doc(db, 'assignments', currentUser.username));
+                
+                if (!assignmentDoc.exists() || !assignmentDoc.data().contentIds) {
+                    contentGrid.innerHTML = '<p class="px-4 sm:px-0 text-slate-500 col-span-full">Tidak ada konten yang ditugaskan untuk Anda saat ini.</p>';
+                    return;
+                }
+                const contentIds = assignmentDoc.data().contentIds;
+                
+                // Ambil data kurasi yang sudah selesai dan draf sekaligus
+                const curationsQuery = query(collection(db, "curations"), where("userId", "==", userId));
+                const draftsQuery = query(collection(db, "curation_drafts"), where("userId", "==", userId));
+                
+                const [curationsSnapshot, draftsSnapshot] = await Promise.all([
+                    getDocs(curationsQuery),
+                    getDocs(draftsQuery)
+                ]);
+
+                const curatedContentIds = curationsSnapshot.docs.map(doc => doc.data().contentId);
+                const draftedContentIds = draftsSnapshot.docs.map(doc => doc.data().contentId);
+
+                if (contentIds.length === 0) {
+                     contentGrid.innerHTML = '<p class="px-4 sm:px-0 text-slate-500 col-span-full">Tidak ada konten yang ditugaskan untuk Anda saat ini.</p>';
+                     return;
+                }
+
+                const contentPromises = contentIds.map(id => getDoc(doc(db, 'contents', id)));
+                const contentDocs = await Promise.all(contentPromises);
+                
+                contentGrid.innerHTML = contentDocs.map(doc => {
+                    if (!doc.exists()) return '';
+                    const content = { id: doc.id, ...doc.data() };
+                    const isCurated = curatedContentIds.includes(content.id);
+                    const hasDraft = draftedContentIds.includes(content.id);
+                    
+                    let buttonText = '<i class="fas fa-edit mr-2"></i>Kurasi';
+                    if (isCurated) {
+                        buttonText = '<i class="fas fa-check-circle mr-2"></i>Selesai';
+                    } else if (hasDraft) {
+                        buttonText = '<i class="fas fa-file-alt mr-2"></i>Lanjutkan Draft';
+                    }
+
+                    return `
+                        <div class="content-card bg-white rounded-xl shadow-lg overflow-hidden flex flex-col border border-slate-200">
+                            <div class="p-6 flex-grow">
+                                <p class="text-sm text-violet-600 font-medium">${content.subject || 'Umum'}</p>
+                                <h3 class="font-semibold text-lg text-slate-800 mt-1">${content.title}</h3>
+                            </div>
+                            <div class="p-4 bg-slate-50 grid grid-cols-2 gap-3 border-t border-slate-200">
+                                <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary text-sm">
+                                    <i class="fas fa-external-link-alt mr-2 text-xs"></i>Buka
+                                </a>
+                                <button class="start-curation-btn btn btn-primary text-sm
+                                    ${isCurated ? 'bg-slate-200 text-slate-500 cursor-not-allowed !bg-none !shadow-none' : ''}"
+                                    data-content-id="${content.id}" 
+                                    data-content-title="${content.title}"
+                                    ${isCurated ? 'disabled' : ''}>
+                                    ${buttonText}
+                                </button>
+                            </div>
+                        </div>`;
+                }).join('');
+
+                // Terapkan animasi staggered setelah konten di-render
+                const contentCards = contentGrid.querySelectorAll('.content-card');
+                contentCards.forEach((card, index) => {
+                    card.style.animationDelay = `${index * 100}ms`;
+                });
+
+            } catch (error) {
+                console.error("Error displaying dashboard: ", error);
+                contentGrid.innerHTML = `<p class="text-red-500 px-4 sm:px-0 col-span-full">Terjadi kesalahan: ${error.message}</p>`;
+            }
+        }
+        
+        // --- Logika Modal & Navigasi ---
+        function getAnswersFromForm() {
+            const answers = {};
+            curationQuestions.forEach(group => {
+                answers[group.id] = { 
+                    value: document.getElementById(`select-${group.id}`).value, 
+                    items: Object.fromEntries(group.items.map(item => {
+                        const itemContainer = document.getElementById(`item-${group.id}-${item.id}`);
+                        const notes = itemContainer.querySelector(`#textarea-${group.id}-${item.id}`).value;
+                        return [item.id, { notes }];
+                    }))
+                };
+            });
+
+            const finalPhotoUrl = document.querySelector('#final-photo-uploader .photo-link-input').value;
+            answers.D1_Simpulan_Umum = { 
+                kelebihan: document.getElementById('final-kelebihan').value, 
+                kekurangan: document.getElementById('final-kekurangan').value, 
+                saran: document.getElementById('final-saran').value 
+            };
+            answers.D2_Keputusan_Final = { 
+                keputusan: document.getElementById('final-keputusan').value, 
+                nilai_deskripsi: document.getElementById('final-nilai-deskripsi').value,
+                photoUrl: finalPhotoUrl
+            };
+            return answers;
+        }
+
+        function populateFormWithDraft(draftData) {
+            const { answers } = draftData;
+            if (!answers) return;
+
+            curationQuestions.forEach(group => {
+                const groupData = answers[group.id];
+                if (groupData) {
+                    document.getElementById(`select-${group.id}`).value = groupData.value || '';
+                    group.items.forEach(item => {
+                        const itemData = groupData.items?.[item.id];
+                        if (itemData) {
+                             document.getElementById(`textarea-${group.id}-${item.id}`).value = itemData.notes || '';
+                        }
+                    });
+                }
+            });
+
+            if (answers.D1_Simpulan_Umum) {
+                document.getElementById('final-kelebihan').value = answers.D1_Simpulan_Umum.kelebihan || '';
+                document.getElementById('final-kekurangan').value = answers.D1_Simpulan_Umum.kekurangan || '';
+                document.getElementById('final-saran').value = answers.D1_Simpulan_Umum.saran || '';
+            }
+             if (answers.D2_Keputusan_Final) {
+                document.getElementById('final-keputusan').value = answers.D2_Keputusan_Final.keputusan || '';
+                document.getElementById('final-nilai-deskripsi').value = answers.D2_Keputusan_Final.nilai_deskripsi || '';
+                if (answers.D2_Keputusan_Final.photoUrl) {
+                    const finalUploader = document.getElementById('final-photo-uploader');
+                    updatePhotoDisplay(finalUploader, answers.D2_Keputusan_Final.photoUrl);
+                }
+            }
+        }
+
+        async function openCurationModal(contentId, contentTitle) {
+            curationForm.reset();
+            // Reset semua tampilan foto
+            curationForm.querySelectorAll('.photo-uploader-container').forEach(container => resetPhotoDisplay(container));
+            
+            draftStatus.textContent = '';
+            document.getElementById('curation-modal-title').textContent = `Kurasi Konten: ${contentTitle}`;
+            document.getElementById('curation-content-id').value = contentId;
+            document.getElementById('curation-user-id').value = currentUser.id;
+            
+            // Cek dan muat draf jika ada
+            const curationDocId = `${currentUser.id}_${contentId}`;
+            const draftDocRef = doc(db, "curation_drafts", curationDocId);
+            const draftDocSnap = await getDoc(draftDocRef);
+            if (draftDocSnap.exists()) {
+                populateFormWithDraft(draftDocSnap.data());
+                draftStatus.textContent = 'Draf sebelumnya telah dimuat.';
+            }
+
+            modalFormContent.scrollTop = 0; 
+            const modalContent = curationModal.querySelector('.modal-content');
+            curationModal.classList.remove('hidden');
+            curationModal.classList.remove('hide');
+            modalContent.classList.remove('hide');
+            curationModal.classList.add('show');
+            modalContent.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCurationModal() {
+            const modalContent = curationModal.querySelector('.modal-content');
+            curationModal.classList.remove('show');
+            modalContent.classList.remove('show');
+            curationModal.classList.add('hide');
+            modalContent.classList.add('hide');
+            setTimeout(() => {
+                curationModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300); 
+        }
+
+        function setupSidebarNavigation() {
+            modalSidebar.addEventListener('click', (e) => {
+                const link = e.target.closest('.sidebar-link');
+                if (link) {
+                    e.preventDefault();
+                    const targetId = link.dataset.target;
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        }
+        
+        function setupScrollObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                let firstVisibleId = null;
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !firstVisibleId) {
+                        firstVisibleId = entry.target.getAttribute('id');
+                    }
+                });
+
+                if (firstVisibleId) {
+                    modalSidebar.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                    const activeLink = modalSidebar.querySelector(`.sidebar-link[data-target="${firstVisibleId}"]`);
+                    if (activeLink) activeLink.classList.add('active');
+                }
+                
+                const scrollableHeight = modalFormContent.scrollHeight - modalFormContent.clientHeight;
+                const progress = scrollableHeight > 0 ? (modalFormContent.scrollTop / scrollableHeight) * 100 : 100;
+                progressBar.style.width = `${progress}%`;
+
+            }, { root: modalFormContent, threshold: 0.1, rootMargin: "-40% 0px -60% 0px" });
+
+            curationForm.querySelectorAll('.indicator-section').forEach(section => {
+                observer.observe(section);
+            });
+        }
+        
+        // --- Fungsi Upload Foto ---
+
+        function setupPhotoUploaderEvents() {
+            curationForm.addEventListener('click', e => {
+                const container = e.target.closest('.photo-uploader-container');
+                if (!container) return;
+
+                if (e.target.closest('.add-photo-btn')) {
+                    container.querySelector('.photo-actions').classList.add('hidden');
+                    container.querySelector('.photo-input-options').classList.remove('hidden');
+                }
+                if (e.target.closest('.remove-photo-btn')) {
+                    resetPhotoDisplay(container);
+                }
+                if (e.target.closest('.set-link-btn')) {
+                    const url = container.querySelector('.photo-url-input').value.trim();
+                    if(url) {
+                        updatePhotoDisplay(container, url);
+                    }
+                }
+            });
+
+            curationForm.addEventListener('change', e => {
+                const fileInput = e.target.closest('.photo-file-input');
+                if (fileInput && fileInput.files[0]) {
+                    handleFileUpload(fileInput.files[0], fileInput.closest('.photo-uploader-container'));
+                }
+            });
+        }
+
+        function handleFileUpload(file, container) {
+            const statusDiv = container.querySelector('.photo-upload-status');
+            container.querySelector('.photo-input-options').classList.add('hidden');
+            statusDiv.classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const fileData = reader.result.split(',')[1]; // Ambil hanya data base64
+                
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        mimeType: file.type,
+                        fileData: fileData
+                    }),
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.url) {
+                        updatePhotoDisplay(container, data.url);
+                    } else {
+                        throw new Error(data.message || 'Gagal mengunggah file.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Upload failed:', err);
+                    showAlert('Upload Gagal', `Terjadi kesalahan: ${err.message}`);
+                    container.querySelector('.photo-actions').classList.remove('hidden');
+                })
+                .finally(() => {
+                    statusDiv.classList.add('hidden');
+                });
+            };
+            reader.onerror = error => {
+                console.error('File Reader Error:', error);
+                showAlert('Gagal Membaca File', 'Tidak dapat membaca file yang dipilih.');
+                statusDiv.classList.add('hidden');
+                container.querySelector('.photo-actions').classList.remove('hidden');
+            }
+        }
+
+        function updatePhotoDisplay(container, url) {
+            const displayDiv = container.querySelector('.photo-display');
+            const previewImg = displayDiv.querySelector('.photo-preview');
+            const link = displayDiv.querySelector('.photo-link');
+            const linkInput = displayDiv.querySelector('.photo-link-input');
+
+            // Set the src to the URL. If it's an image, it will show.
+            previewImg.src = url;
+            // If the src link is not an image (e.g., a PDF), the onerror event will trigger.
+            previewImg.onerror = () => {
+                // Display a generic file placeholder icon instead.
+                previewImg.src = 'https://placehold.co/64x64/e2e8f0/475569?text=FILE';
+                previewImg.onerror = null; // Prevent potential infinite loops
+            };
+
+            link.href = url;
+            link.textContent = url.length > 50 ? url.substring(0, 50) + '...' : url;
+            linkInput.value = url;
+            
+            displayDiv.classList.remove('hidden');
+            container.querySelector('.photo-actions').classList.add('hidden');
+            container.querySelector('.photo-input-options').classList.add('hidden');
+            container.querySelector('.photo-url-input').value = '';
+        }
+        
+        function resetPhotoDisplay(container) {
+            const displayDiv = container.querySelector('.photo-display');
+            displayDiv.querySelector('.photo-preview').src = '';
+            displayDiv.querySelector('.photo-link').href = '';
+            displayDiv.querySelector('.photo-link').textContent = '';
+            displayDiv.querySelector('.photo-link-input').value = '';
+
+            displayDiv.classList.add('hidden');
+            container.querySelector('.photo-actions').classList.remove('hidden');
+            container.querySelector('.photo-input-options').classList.add('hidden');
+            container.querySelector('.photo-url-input').value = '';
+            // Reset juga file input untuk memungkinkan re-upload file yang sama
+            container.querySelector('.photo-file-input').value = '';
+        }
+
+        function showConfirmation(title, message, onConfirm) {
+            showAlert(title, message, [
+                { text: 'Batal', class: 'btn-secondary', callback: hideAlert },
+                { text: 'Ya, Lanjutkan', class: 'btn-primary', callback: () => { hideAlert(); onConfirm(); } }
+            ]);
+        }
+
+        function showAlert(title, message, buttons = [{ text: 'OK', class: 'btn-primary', callback: hideAlert }]) {
+            document.getElementById('alert-modal-title').textContent = title;
+            document.getElementById('alert-modal-message').textContent = message;
+            const buttonsContainer = document.getElementById('alert-modal-buttons');
+            buttonsContainer.innerHTML = '';
+            
+            buttons.forEach(btnInfo => {
+                const button = document.createElement('button');
+                button.textContent = btnInfo.text;
+                button.className = `btn w-full ${btnInfo.class}`;
+                button.onclick = btnInfo.callback;
+                buttonsContainer.appendChild(button);
+            });
+
+            const modalContent = alertModal.querySelector('.modal-content');
+            alertModal.classList.remove('hidden');
+            alertModal.classList.add('show');
+            modalContent.classList.add('show');
+        }
+
+        function hideAlert() {
+            const modalContent = alertModal.querySelector('.modal-content');
+            alertModal.classList.remove('show');
+            modalContent.classList.remove('show');
+            alertModal.classList.add('hide');
+            modalContent.classList.add('hide');
+            setTimeout(() => {
+                alertModal.classList.add('hidden');
+            }, 200);
+        }
+
+        // --- Event Listeners ---
+        loginForm.addEventListener('submit', handleLogin);
+        logoutBtn.addEventListener('click', () => { localStorage.removeItem('userId'); currentUser = null; mainDashboard.classList.add('hidden'); loginSection.classList.remove('hidden'); });
+        
+        document.body.addEventListener('click', (e) => {
+            const startBtn = e.target.closest('.start-curation-btn');
+            if (startBtn) {
+                openCurationModal(startBtn.dataset.contentId, startBtn.dataset.contentTitle);
+            }
+        });
+
+        document.getElementById('close-modal-btn').addEventListener('click', closeCurationModal);
+        
+        saveDraftBtn.addEventListener('click', async () => {
+            saveDraftBtn.disabled = true;
+            saveDraftBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+            draftStatus.textContent = '';
+            
+            try {
+                const answers = getAnswersFromForm();
+                const contentId = document.getElementById('curation-content-id').value;
+                const userId = document.getElementById('curation-user-id').value;
+                const curationDocId = `${userId}_${contentId}`;
+
+                await setDoc(doc(db, "curation_drafts", curationDocId), { userId, contentId, timestamp: serverTimestamp(), answers });
+                
+                draftStatus.textContent = `Draf disimpan pada ${new Date().toLocaleTimeString()}.`;
+                await displayUserDashboard(currentUser.id); // Refresh dashboard to update button text
+            } catch (error) {
+                console.error("Error saving draft: ", error);
+                draftStatus.textContent = 'Gagal menyimpan draf.';
+            } finally {
+                saveDraftBtn.disabled = false;
+                saveDraftBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Simpan Draft';
+            }
+        });
+
+        curationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submit-curation-btn');
+            
+            showConfirmation('Konfirmasi Pengiriman', 'Apakah Anda yakin ingin mengirim hasil kurasi ini? Data tidak dapat diubah setelah dikirim.', async () => {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+
+                try {
+                    const answers = getAnswersFromForm();
+                    const contentId = document.getElementById('curation-content-id').value;
+                    const userId = document.getElementById('curation-user-id').value;
+                    const curationDocId = `${userId}_${contentId}`;
+
+                    // Simpan ke koleksi kurasi final
+                    await setDoc(doc(db, "curations", curationDocId), { userId, contentId, timestamp: serverTimestamp(), answers });
+                    
+                    // Hapus draf jika ada
+                    const draftDocRef = doc(db, "curation_drafts", curationDocId);
+                    await deleteDoc(draftDocRef).catch(err => console.log("No draft to delete or error:", err));
+                    
+                    closeCurationModal();
+                    setTimeout(() => {
+                        showAlert('Berhasil', 'Hasil kurasi telah berhasil disimpan.');
+                        displayUserDashboard(currentUser.id);
+                    }, 250)
+
+                } catch (error) {
+                    console.error("Error submitting curation: ", error);
+                    showAlert('Gagal', 'Terjadi kesalahan saat menyimpan. Silakan coba lagi.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Kirim Hasil Kurasi';
+                }
+            });
+        });
+
+        // Inisialisasi Aplikasi
+        window.addEventListener('load', () => {
+            buildCurationForm();
+            const savedUserId = localStorage.getItem('userId');
+            if (savedUserId) {
+                displayUserDashboard(savedUserId);
+            }
+        });
+    </script>
+</body>
+</html>
