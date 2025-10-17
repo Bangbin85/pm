@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabel Predikat Rata-Rata per Indikator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Menambahkan library SheetJS untuk ekspor ke Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- ADDED: Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --neu-bg: #e0e5ec;
+            --neu-light: #ffffff;
+            --neu-dark: #a3b1c6;
+            --neu-primary: #4f46e5;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--neu-bg);
+        }
+
+        .neumorphism-card {
+            background: var(--neu-bg);
+            border-radius: 20px;
+            box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5);
+        }
+        
+        .neumorphism-input {
+            width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
+            background: var(--neu-bg); color: #555; font-size: 1rem;
+            box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #ffffff;
+            transition: box-shadow 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        .neumorphism-input::placeholder { color: #999; }
+        .neumorphism-input:focus { box-shadow: inset 7px 7px 12px #cbced1, inset -7px -7px 12px #ffffff; }
+
+        .neumorphism-button {
+            width: auto; padding: 0.75rem 1.5rem; border: none; outline: none; border-radius: 12px;
+            background-color: var(--neu-bg); color: var(--neu-primary);
+            font-weight: bold; font-size: 0.875rem; cursor: pointer;
+            box-shadow: 6px 6px 12px #b8bcc2, -6px -6px 12px #ffffff;
+            transition: all 0.2s ease-in-out;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .neumorphism-button:hover { box-shadow: 4px 4px 10px #b8bcc2, -4px -4px 10px #ffffff; color: #3c34d0; }
+        .neumorphism-button:active, .neumorphism-button:disabled {
+            box-shadow: inset 4px 4px 8px #b8bcc2, inset -4px -4px 8px #ffffff;
+            color: #6a63f1;
+        }
+
+        .neumorphism-table-container {
+            background: var(--neu-bg);
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5);
+            overflow: auto;
+            max-height: 70vh;
+        }
+        .neumorphism-table {
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        .neumorphism-table thead th {
+            position: sticky; 
+            top: 0;
+            z-index: 10;
+            background-color: var(--neu-bg);
+            padding: 1rem 1.5rem; text-align: left; font-weight: 600; color: #555;
+            white-space: nowrap; 
+            box-shadow: none;
+            border-bottom: 2px solid var(--neu-dark);
+        }
+        .neumorphism-table tbody tr {
+             box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
+             border-radius: 10px;
+        }
+        .neumorphism-table tbody td {
+            background: var(--neu-bg); padding: 1rem 1.5rem; vertical-align: middle;
+        }
+        .neumorphism-table tbody td:first-child { border-radius: 10px 0 0 10px; }
+        .neumorphism-table tbody td:last-child { border-radius: 0 10px 10px 0; }
+        
+        .content-cell { min-width: 300px; max-width: 450px; white-space: normal; word-break: break-word; }
+    </style>
+</head>
+<body class="text-slate-800 p-4 sm:p-6 md:p-8">
+
+    <main class="w-[95%] mx-auto">
+        <div class="neumorphism-card p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <h1 class="text-2xl font-bold text-slate-800 mb-4 sm:mb-0">Analisis Rata-Rata per Indikator</h1>
+                <div class="flex flex-wrap gap-2">
+                    <a href="Analisis.html" class="neumorphism-button">
+                        <i class="fas fa-chart-line mr-2"></i> Halaman Analisis
+                    </a>
+                    <button id="export-btn" class="neumorphism-button">
+                        <i class="fas fa-file-excel mr-2"></i> Export ke Excel
+                    </button>
+                     <a href="./" class="neumorphism-button">
+                        <i class="fas fa-home mr-2"></i> 
+                    </a>
+                </div>
+            </div>
+
+            <!-- MODIFIED: Chart Container with Filter -->
+            <div class="neumorphism-card p-6 mb-8">
+                <div class="mb-4">
+                    <label for="chart-indicator-filter" class="block text-sm font-medium text-slate-700 mb-2">Filter Grafik per Indikator:</label>
+                    <select id="chart-indicator-filter" class="neumorphism-input">
+                        <option value="">-- Tampilkan Semua Indikator --</option>
+                        <!-- Opsi akan diisi oleh JavaScript -->
+                    </select>
+                </div>
+                <div class="relative h-96">
+                     <canvas id="indicatorChart"></canvas>
+                </div>
+            </div>
+
+
+            <div class="mb-6">
+                 <label for="search-dropdown" class="block text-sm font-medium text-slate-700 mb-2">Filter Tabel per Judul Konten:</label>
+                 <select id="search-dropdown" class="neumorphism-input">
+                    <option value="">-- Tampilkan Semua Judul --</option>
+                    <!-- Opsi judul akan diisi oleh JavaScript -->
+                </select>
+            </div>
+
+            <div id="table-wrapper" class="neumorphism-table-container">
+                <table id="indicator-table" class="w-full neumorphism-table">
+                    <!-- Konten tabel akan diisi oleh JavaScript -->
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    		const firebaseConfig = {
+    		  apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
+    		  authDomain: "kurasisd.firebaseapp.com",
+    		  projectId: "kurasisd",
+    		  storageBucket: "kurasisd.firebasestorage.app",
+    		  messagingSenderId: "520054778765",
+    		  appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
+    		};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        const indicatorTable = document.getElementById('indicator-table');
+        let indicatorChartInstance = null; // To hold the chart instance
+        let calculatedAverageData = []; // To store calculated data globally
+
+        const scoreMap = {
+            "Lulus Kurasi": 5, "Kurang Sesuai": 4, "Perbaikan Minor": 3,
+            "Perbaikan Mayor": 2, "Tidak Lulus Kurasi": 1
+        };
+
+        const predicateMap = {
+            5: "Lulus Kurasi", 4: "Kurang Sesuai", 3: "Perbaikan Minor",
+            2: "Perbaikan Mayor", 1: "Tidak Lulus Kurasi"
+        };
+
+        const curationQuestions = [
+             { id: 'A1', code: 'A.1', title: 'Keamanan Materi'}, { id: 'A2', code: 'A.2', title: 'Copyright'},
+             { id: 'A3', code: 'A.3', title: 'Substansi Materi'}, { id: 'A4', code: 'A.4', title: 'Kebahasaan'},
+             { id: 'A5', code: 'A.5', title: 'Inklusivitas'}, { id: 'B1', code: 'B.1', title: 'Teks'},
+             { id: 'B2', code: 'B.2', title: 'Gambar'}, { id: 'B3', code: 'B.3', title: 'Video'},
+             { id: 'B4', code: 'B.4', title: 'Interaktif'}, { id: 'B5', code: 'B.5', title: 'Lab Maya'},
+             { id: 'B6', code: 'B.6', title: 'Gim Edukasi'}, { id: 'C1', code: 'C.1', title: 'Judul'},
+             { id: 'C2', code: 'C.2', title: 'Isi Materi'}, { id: 'C3', code: 'C.3', title: 'Deskripsi'},
+             { id: 'C4', code: 'C.4', title: 'Penulis'}, { id: 'C5', code: 'C.5', title: 'Prinsip Keselarasan'}
+        ];
+
+        function getPredicateFromScore(score) {
+            if (score === null || score === undefined || isNaN(score)) return '';
+            const roundedScore = Math.round(score);
+            return predicateMap[roundedScore] || '';
+        }
+
+        // MODIFIED: Function to render chart with percentages and detailed tooltips
+        function renderIndicatorChart(fullData, filterIndicatorId = null) {
+            const ctx = document.getElementById('indicatorChart').getContext('2d');
+            
+            if (indicatorChartInstance) {
+                indicatorChartInstance.destroy();
+            }
+
+            const questionsToDisplay = filterIndicatorId 
+                ? curationQuestions.filter(q => q.id === filterIndicatorId)
+                : curationQuestions;
+            
+            const indicatorStats = {}; // To store raw counts
+            const indicatorTotals = {}; // To store total counts per indicator
+            const predicateKeys = Object.values(predicateMap).reverse();
+            
+            questionsToDisplay.forEach(q => {
+                indicatorStats[q.id] = Object.fromEntries(predicateKeys.map(p => [p, 0]));
+                indicatorTotals[q.id] = 0;
+            });
+
+            // Calculate raw counts and totals
+            fullData.forEach(row => {
+                questionsToDisplay.forEach(q => {
+                    const predicate = row.predicates[q.id];
+                    if (predicate) { // Only count if there's a predicate
+                        if (indicatorStats[q.id].hasOwnProperty(predicate)) {
+                            indicatorStats[q.id][predicate]++;
+                            indicatorTotals[q.id]++;
+                        }
+                    }
+                });
+            });
+
+            const labels = questionsToDisplay.map(q => q.code);
+            const colors = {
+                "Lulus Kurasi": 'rgba(74, 222, 128, 0.8)', "Kurang Sesuai": 'rgba(59, 130, 246, 0.8)',
+                "Perbaikan Minor": 'rgba(251, 191, 36, 0.8)', "Perbaikan Mayor": 'rgba(249, 115, 22, 0.8)',
+                "Tidak Lulus Kurasi": 'rgba(239, 68, 68, 0.8)'
+            };
+
+            // Create datasets with percentage values and store raw counts
+            const datasets = predicateKeys.map(predicate => {
+                const percentageData = questionsToDisplay.map(q => {
+                    const total = indicatorTotals[q.id];
+                    const count = indicatorStats[q.id][predicate];
+                    return total > 0 ? (count / total) * 100 : 0;
+                });
+                const rawData = questionsToDisplay.map(q => indicatorStats[q.id][predicate]);
+
+                return {
+                    label: predicate,
+                    data: percentageData,
+                    rawData: rawData, // Store raw counts here
+                    backgroundColor: colors[predicate],
+                    borderRadius: 4
+                };
+            });
+
+            indicatorChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Distribusi Persentase Predikat per Indikator',
+                            font: { size: 16, weight: 'bold' },
+                            color: '#334155',
+                            padding: { bottom: 20 }
+                        },
+                        tooltip: { 
+                            mode: 'index', 
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const rawValue = context.dataset.rawData[context.dataIndex];
+                                    const percentageValue = context.parsed.y;
+                                    if (label) {
+                                        // Show raw count and percentage in tooltip
+                                        return `${label}: ${rawValue} (${percentageValue.toFixed(1)}%)`;
+                                    }
+                                    return null;
+                                }
+                            }
+                        },
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { 
+                            stacked: true, 
+                            min: 0,
+                            max: 100, // Y-axis is now 0-100%
+                            ticks: { 
+                                precision: 0,
+                                // Add '%' suffix to y-axis labels
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            } 
+                        }
+                    }
+                }
+            });
+        }
+
+
+        async function processAndRenderData() {
+            const loadingHTML = `<tbody><tr><td colspan="${curationQuestions.length + 1}" class="text-center p-4 text-slate-500">Memuat dan menghitung rata-rata... <i class="fas fa-spinner fa-spin"></i></td></tr></tbody>`;
+            indicatorTable.innerHTML = loadingHTML;
+
+            try {
+                const [contentsSnap, curationsSnap] = await Promise.all([
+                    getDocs(collection(db, "contents")),
+                    getDocs(collection(db, "curations"))
+                ]);
+                const contentsMap = new Map(contentsSnap.docs.map(doc => [doc.id, { id: doc.id, ...doc.data() }]));
+                const curations = curationsSnap.docs.map(doc => doc.data());
+
+                const contentScores = new Map();
+                curations.forEach(curation => {
+                    const contentId = curation.contentId;
+                    if (!contentsMap.has(contentId)) return;
+                    const contentData = contentsMap.get(contentId);
+                    if (!contentScores.has(contentId)) {
+                        contentScores.set(contentId, {
+                            title: contentData.title,
+                            url: contentData.url, // <-- Added URL
+                            scores: Object.fromEntries(curationQuestions.map(q => [q.id, []]))
+                        });
+                    }
+                    const currentContent = contentScores.get(contentId);
+                    curationQuestions.forEach(q => {
+                        const answer = curation.answers?.[q.id];
+                        if (answer && scoreMap.hasOwnProperty(answer.value)) {
+                            currentContent.scores[q.id].push(scoreMap[answer.value]);
+                        }
+                    });
+                });
+
+                const averageData = [];
+                contentScores.forEach((data) => {
+                    const row = { 
+                        contentTitle: data.title, 
+                        contentUrl: data.url, // <-- Added URL
+                        predicates: {} 
+                    };
+                    curationQuestions.forEach(q => {
+                        const scores = data.scores[q.id];
+                        row.predicates[q.id] = (scores.length > 0) 
+                            ? getPredicateFromScore(scores.reduce((a, b) => a + b, 0) / scores.length)
+                            : '';
+                    });
+                    averageData.push(row);
+                });
+                
+                averageData.sort((a, b) => a.contentTitle.localeCompare(b.contentTitle));
+                calculatedAverageData = averageData; // Store globally
+
+                // Render Chart
+                renderIndicatorChart(calculatedAverageData);
+
+                // Populate Table
+                const searchDropdown = document.getElementById('search-dropdown');
+                let tbodyHTML = '<tbody>';
+                if (averageData.length > 0) {
+                    averageData.forEach(row => {
+                        const option = document.createElement('option');
+                        option.value = row.contentTitle;
+                        option.textContent = row.contentTitle;
+                        searchDropdown.appendChild(option);
+
+                        tbodyHTML += `<tr><td class="content-cell font-semibold">
+                                        <a href="${row.contentUrl || '#'}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">${row.contentTitle}</a>
+                                      </td>`;
+                        curationQuestions.forEach(q => {
+                            tbodyHTML += `<td class="text-center font-medium">${row.predicates[q.id]}</td>`;
+                        });
+                        tbodyHTML += `</tr>`;
+                    });
+                } else {
+                     tbodyHTML += `<tr><td colspan="${curationQuestions.length + 1}" class="text-center p-4 text-slate-500">Tidak ada data.</td></tr>`;
+                }
+                tbodyHTML += '</tbody>';
+                
+                let theadHTML = '<thead><tr><th>Judul Konten</th>';
+                curationQuestions.forEach(q => {
+                    theadHTML += `<th class="text-center" title="${q.title}">${q.code}<br><span class="font-normal text-xs text-slate-600">${q.title}</span></th>`;
+                });
+                theadHTML += '</tr></thead>';
+                indicatorTable.innerHTML = theadHTML + tbodyHTML;
+
+            } catch (error) {
+                console.error("Gagal memuat data:", error);
+                const errorHTML = `<tbody><tr><td colspan="${curationQuestions.length + 1}" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr></tbody>`;
+                indicatorTable.innerHTML = errorHTML;
+            }
+        }
+        
+        function exportTableToExcel(tableID, filename = ''){
+            const table = document.getElementById(tableID);
+            if (!table) return;
+            const ws = XLSX.utils.table_to_sheet(table);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Predikat Rata-Rata');
+            const finalFilename = filename ? `${filename}_${new Date().toISOString().slice(0,10)}.xlsx` : 'laporan.xlsx';
+            XLSX.writeFile(wb, finalFilename);
+        }
+
+        // --- Setup Filter Functions ---
+        function populateIndicatorFilter() {
+            const filterDropdown = document.getElementById('chart-indicator-filter');
+            curationQuestions.forEach(q => {
+                const option = document.createElement('option');
+                option.value = q.id;
+                option.textContent = `${q.code} - ${q.title}`; // Display code and title
+                filterDropdown.appendChild(option);
+            });
+        }
+
+        function setupFilters() {
+            // Table Filter
+            document.getElementById('search-dropdown').addEventListener('change', (e) => {
+                const selectedTitle = e.target.value;
+                indicatorTable.querySelectorAll('tbody tr').forEach(row => {
+                    const titleCell = row.querySelector('td:first-child a'); // Target the link inside the cell
+                    if (titleCell) {
+                        row.style.display = (selectedTitle === "" || titleCell.textContent === selectedTitle) ? '' : 'none';
+                    }
+                });
+            });
+
+            // Chart Filter
+            document.getElementById('chart-indicator-filter').addEventListener('change', (e) => {
+                const selectedIndicatorId = e.target.value;
+                renderIndicatorChart(calculatedAverageData, selectedIndicatorId || null);
+            });
+        }
+
+        // --- Initialize App ---
+        window.addEventListener('load', async () => {
+            await processAndRenderData();
+            populateIndicatorFilter();
+            setupFilters();
+            
+            document.getElementById('export-btn').addEventListener('click', () => {
+                exportTableToExcel('indicator-table', 'Laporan_Predikat_Rata_Rata_Indikator');
+            });
+        });
+
+    </script>
+</body>
+</html>
+
