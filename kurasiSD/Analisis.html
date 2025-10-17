@@ -135,7 +135,7 @@
                     </div>
                 </div>
                 
-                <!-- PERUBAHAN: Summary Table Section dengan Tombol Export -->
+                <!-- Summary Table Section dengan Tombol Export -->
                 <div class="flex justify-between items-center mb-6 px-4 sm:px-0">
                     <h2 class="text-2xl font-semibold text-slate-800">Tinjauan Hasil Kurasi Konten</h2>
                     <button id="export-summary-btn" class="neumorphism-button !w-auto py-2 px-4 text-sm">
@@ -235,6 +235,24 @@
             <button id="alert-modal-ok" class="neumorphism-button !w-1/2 mx-auto">OK</button>
         </div>
     </div>
+    
+    <!-- === MODAL DETAIL INDIKATOR SPESIFIK === -->
+    <div id="indicator-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="neumorphism-card w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl overflow-hidden">
+            <!-- Header Modal -->
+            <div class="flex-shrink-0 p-5 flex justify-between items-center border-b border-slate-300/50">
+                <h3 id="indicator-modal-title" class="text-xl font-bold text-slate-800">Detail Jawaban Indikator</h3>
+                <button id="close-indicator-modal-btn" class="neumorphism-button !w-10 !h-10 !p-0 !rounded-full !text-xl hover:!text-red-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Konten Modal -->
+            <div id="indicator-modal-content" class="flex-grow p-6 overflow-y-auto space-y-4">
+                <!-- Konten dinamis akan dimasukkan di sini -->
+                <p class="text-center text-slate-500">Memuat detail...</p>
+            </div>
+        </div>
+    </div>
 
 
     <!-- Firebase SDK -->
@@ -258,20 +276,31 @@
         const resultsTable = document.getElementById('results-table');
         const detailsModal = document.getElementById('details-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
+        const indicatorDetailModal = document.getElementById('indicator-detail-modal');
+        const closeIndicatorModalBtn = document.getElementById('close-indicator-modal-btn');
 
         let curationsMap = new Map();
         let contentsMap = new Map();
+        let usersMap = new Map();
 
         // --- Struktur Pertanyaan Kurasi ---
         const curationQuestions = [
-             { id: 'A1', code: 'A.1', title: 'Keamanan Materi'}, { id: 'A2', code: 'A.2', title: 'Copyright'},
-             { id: 'A3', code: 'A.3', title: 'Substansi Materi'}, { id: 'A4', code: 'A.4', title: 'Kebahasaan'},
-             { id: 'A5', code: 'A.5', title: 'Inklusivitas'}, { id: 'B1', code: 'B.1', title: 'Teks'},
-             { id: 'B2', code: 'B.2', title: 'Gambar'}, { id: 'B3', code: 'B.3', title: 'Video'},
-             { id: 'B4', code: 'B.4', title: 'Interaktif'}, { id: 'B5', code: 'B.5', title: 'Lab Maya'},
-             { id: 'B6', code: 'B.6', title: 'Gim Edukasi'}, { id: 'C1', code: 'C.1', title: 'Judul'},
-             { id: 'C2', code: 'C.2', title: 'Isi Materi'}, { id: 'C3', code: 'C.3', title: 'Deskripsi'},
-             { id: 'C4', code: 'C.4', title: 'Penulis'}, { id: 'C5', code: 'C.5', title: 'Prinsip Keselarasan'}
+             { id: 'A1', code: 'A.1', title: 'Keamanan Materi', items: [ { id: 'radikalisme', text: 'Materi bebas dari unsur radikalisme, ekstremisme, dan terorisme' }, { id: 'pornografi', text: 'Materi bebas dari pornografi atau ketelanjangan yang tidak sesuai konteks' }, { id: 'diskriminasi', text: 'Materi bebas dari unsur perundungan atau diskriminasi' }, { id: 'promosi', text: 'Materi bebas dari promosi produk komersial' }, { id: 'sara', text: 'Materi bebas dari unsur SARA' }, { id: 'kekerasan', text: 'Materi bebas dari unsur kekerasan atau isu politik kontroversial' }, { id: 'komersial', text: 'Materi bebas dari unsur komersial (logo/identitas bisa diburamkan)' } ]},
+             { id: 'A2', code: 'A.2', title: 'Copyright', items: [ { id: 'sumber', text: 'Mencantumkan sumber/referensi/credit' }, { id: 'ai', text: 'Jika dibuat oleh AI perlu dituliskan keterangan' } ]},
+             { id: 'A3', code: 'A.3', title: 'Substansi Materi', items: [ { id: 'konsumsi', text: 'Materi dapat dikonsumsi langsung oleh murid' }, { id: 'mapel', text: 'Materi mendukung mata pelajaran secara spesifik' }, { id: 'kurikulum', text: 'Materi relevan dengan kurikulum yang berlaku' }, { id: 'akurat', text: 'Isi materi (visual, audio, dll) berisi informasi akurat' }, { id: 'sistematis', text: 'Materi disusun sistematis sesuai perkembangan kompetensi' }, { id: 'kesulitan', text: 'Tingkat kesulitan materi sesuai jenjang pendidikan' }, { id: 'asesmen', text: 'Materi memuat asesmen yang sesuai (bisa berupa pertanyaan reflektif)' }, ]},
+             { id: 'A4', code: 'A.4', title: 'Kebahasaan', items: [ { id: 'sopan', text: 'Menggunakan bahasa yang sopan, baik, dan benar' }, { id: 'struktur', text: 'Struktur kalimat disesuaikan dengan tingkat pemahaman pengguna' }, ]},
+             { id: 'A5', code: 'A.5', title: 'Inklusivitas', items: [ { id: 'bias', text: 'Materi bebas dari bias gender, sosial, ekonomi, dan budaya' }, { id: 'prinsip', text: 'Materi tidak bertentangan dengan prinsip inklusivitas' }, { id: 'akses', text: 'Materi dapat diakses oleh murid dengan berbagai kebutuhan' }, { id: 'ilustrasi', text: 'Ilustrasi mencerminkan keberagaman murid' }, ]},
+             { id: 'B1', code: 'B.1', title: 'Teks', items: [ { id: 'teks_kontras', text: 'Teks memiliki kontras yang tinggi dengan latar belakang' }, { id: 'teks_ilustrasi', text: 'Ilustrasi mendukung isi materi dengan teks sebagai elemen utama' }, { id: 'teks_resolusi', text: 'Ilustrasi memiliki resolusi yang baik' } ]},
+             { id: 'B2', code: 'B.2', title: 'Gambar', items: [ { id: 'gambar_elemen_utama', text: 'Gambar sebagai elemen utama untuk mendukung pemahaman' }, { id: 'gambar_teks_pendukung', text: 'Teks berfungsi untuk mendukung isi materi' }, { id: 'gambar_kualitas', text: 'Gambar memiliki kualitas yang baik' }, { id: 'gambar_mudah_dipahami', text: 'Gambar mudah dipahami dan tidak multitafsir' }, { id: 'gambar_warna', text: 'Penggunaan warna penuh/hitam putih/gradasi sesuai' }, { id: 'gambar_kontras', text: 'Kontras warna tinggi dan latar belakang tidak mengganggu' } ]},
+             { id: 'B3', code: 'B.3', title: 'Video', items: [ { id: 'video_musik', text: 'Musik latar (backsound) tidak mengganggu suara utama' }, { id: 'video_suara', text: 'Suara narator atau presenter jelas' }, { id: 'video_tulisan', text: 'Tulisan pada video terbaca dengan baik' }, { id: 'video_takarir', text: 'Takarir (jika ada) jelas dan sinkron' }, { id: 'video_visual', text: 'Visual terang, jelas, dan fokus' }, { id: 'video_skala', text: 'Video menggunakan skala 16:9' }, { id: 'video_resolusi', text: 'Resolusi minimum 720p' }, { id: 'video_kontras', text: 'Kontras warna tinggi dan latar belakang tidak ramai' }, { id: 'video_durasi', text: 'Durasi Video tidak terlalu panjang/pendek' } ]},
+             { id: 'B4', code: 'B.4', title: 'Interaktif', items: [ { id: 'interaktif_relevansi', text: 'Konten interaktif relevan dengan materi' }, { id: 'interaktif_aktivitas', text: 'Aktivitas interaktif minimal (memilih, mencocokkan, dll)' }, { id: 'interaktif_navigasi', text: 'Materi mudah dinavigasi secara mandiri' }, { id: 'interaktif_visual', text: 'Visual jelas dan latar belakang tidak mengganggu' }, { id: 'interaktif_kontras', text: 'Kontras jelas antara teks, ikon, dan latar belakang' }, { id: 'interaktif_tombol', text: 'Tombol dan elemen interaktif ukurannya sesuai' }, { id: 'interaktif_ikon', text: 'Ikon dan warna konsisten' }, { id: 'interaktif_umpan_balik', text: 'Umpan balik langsung, jelas, dan mudah dipahami' }, { id: 'interaktif_ilustrasi', text: 'Ilustrasi relevan dan menarik minat murid' }, { id: 'interaktif_min_aktivitas', text: 'Memiliki minimal 3 aktivitas interaktif' } ]},
+             { id: 'B5', code: 'B.5', title: 'Lab Maya', items: [ { id: 'lab_simulasi', text: 'Simulasi bersifat interaktif dua arah' }, { id: 'lab_umpan_balik_interaktif', text: 'Umpan balik interaktif ditampilkan secara langsung' }, { id: 'lab_navigasi', text: 'Navigasi intuitif dan memudahkan pengguna' }, { id: 'lab_desain', text: 'Desain antarmuka bersih dan terstruktur' }, { id: 'lab_umpan_balik_langsung', text: 'Umpan balik langsung, jelas, dan mudah dipahami' }, { id: 'lab_warna', text: 'Warna dan elemen visual selaras' }, { id: 'lab_tombol', text: 'Tombol, alat, dan indikator mudah dikenali' }, { id: 'lab_interaksi_dinamis', text: 'Interaksi dinamis dan drag-drop yang logis' }, { id: 'lab_pertanyaan_lanjutan', text: 'Pertanyaan lanjutan berbasis konteks' }, { id: 'lab_akses_kembali', text: 'Setiap tahapan dapat diakses kembali' }, { id: 'lab_indikator_progres', text: 'Tersedia indikator progres atau panduan langkah' } ]},
+             { id: 'B6', code: 'B.6', title: 'Gim Edukasi', items: [ { id: 'gim_navigasi', text: 'Navigasi permainan bersifat intuitif' }, { id: 'gim_aktivitas', text: 'Memuat aktivitas interaktif (drag-drop, fill-in-the-blank, dll)' }, { id: 'gim_respons', text: 'Setiap interaksi memberikan respons/umpan balik' }, { id: 'gim_elemen_visual', text: 'Elemen visual jelas, konsisten, dan kontras memadai' }, { id: 'gim_teks', text: 'Teks mudah dibaca dengan ukuran proporsional' }, { id: 'gim_animasi', text: 'Animasi dan efek visual digunakan secara proporsional' }, { id: 'gim_alur', text: 'Tersedia alur penyelesaian misi (pathway) yang jelas' }, { id: 'gim_indikator_progres', text: 'Tersedia indikator progres yang jelas' }, { id: 'gim_hasil_akhir', text: 'Hasil akhir dan skor ditampilkan secara informatif' }, { id: 'gim_efek_suara', text: 'Efek suara dan animasi memperkuat pengalaman interaktif' }, { id: 'gim_min_aktivitas', text: 'Memiliki minimal 3 aktivitas interaktif' } ]},
+             { id: 'C1', code: 'C.1', title: 'Judul', items: [ { id: 'judul_topik', text: 'Judul menggambarkan topik bahasan' }, { id: 'judul_kata_kunci', text: 'Memuat 1 - 3 kata kunci penting' }, { id: 'judul_kapitalisasi', text: 'Kapitalisasi judul sesuai kaidah tata bahasa' }, { id: 'judul_istilah', text: 'Istilah selaras dengan buku teks/kurikulum' }, { id: 'judul_ringkas', text: 'Ringkas, maksimal 55 karakter' } ]},
+             { id: 'C2', code: 'C.2', title: 'Isi Materi', items: [ { id: 'isi_langsung_digunakan', text: 'Berisi materi belajar yang bisa langsung digunakan murid' }, { id: 'isi_tanpa_info_kelas', text: 'Tidak ada informasi kelas dalam isi materi' } ]},
+             { id: 'C3', code: 'C.3', title: 'Deskripsi', items: [ { id: 'deskripsi_tujuan', text: 'Memuat tujuan belajar dan manfaat bagi murid' }, { id: 'deskripsi_bahasa', text: 'Bahasa baik, benar, dan mudah dipahami murid' }, { id: 'deskripsi_ringkas', text: 'Ringkas dan padat, 400-800 karakter' }, { id: 'deskripsi_tanpa_info_kelas', text: 'Tidak ada informasi kelas dalam deskripsi' }, { id: 'deskripsi_persuasif', text: 'Deskripsi persuasif dengan kata sapaan (adik-adik, kamu)' } ]},
+             { id: 'C4', code: 'C.4', title: 'Penulis', items: [ { id: 'penulis_nama', text: 'Nama penulis lengkap tanpa gelar' }, { id: 'penulis_kolaborasi', text: 'Jika kolaborasi, cantumkan satu nama utama' }, { id: 'penulis_instansi', text: 'Jika dari instansi, nama penulis bisa nama instansi' } ]},
+             { id: 'C5', code: 'C.5', title: 'Prinsip Keselarasan', items: [ { id: 'keselarasan_prinsip', text: 'Keselarasan antara tujuan, langkah, dan asesmen pembelajaran' } ]}
         ];
 
         // --- Score Mapping ---
@@ -377,7 +406,8 @@
             // 1. Buat Header Tabel
             let theadHTML = '<thead><tr><th>Judul Konten</th><th>Nama Kurator</th>';
             curationQuestions.forEach(q => {
-                theadHTML += `<th class="text-center">${q.code}</th>`;
+                // Menambahkan judul indikator di header
+                theadHTML += `<th class="text-center" title="${q.title}">${q.code}<br><span class="font-normal text-xs text-slate-600">${q.title}</span></th>`;
             });
             theadHTML += '</tr></thead>';
 
@@ -406,11 +436,23 @@
                         tbodyHTML += `<td class="curator-cell">${curator ? curator.nama : 'ID Kurator Tidak Dikenal'}</td>`;
 
                         curationQuestions.forEach(q => {
-                            const value = curationData 
-                                ? (curationData.answers[q.id]?.value || '<span class="text-orange-600 font-bold">N/A</span>') 
-                                : '<span class="italic text-slate-500">Belum Dinilai</span>';
-                            
-                            tbodyHTML += `<td class="text-center font-medium">${value}</td>`;
+                            if (curationData && curationData.answers[q.id]) {
+                                const answer = curationData.answers[q.id];
+                                // Menambahkan class dan data attributes untuk membuat sel bisa diklik
+                                tbodyHTML += `
+                                    <td class="text-center font-medium cursor-pointer hover:bg-slate-200 transition-colors duration-200 indicator-cell-clickable" 
+                                        data-content-id="${content.id}" 
+                                        data-curator-id="${curatorId}" 
+                                        data-indicator-id="${q.id}"
+                                        title="Klik untuk melihat detail">
+                                        ${answer.value || '<span class="text-orange-600 font-bold">N/A</span>'}
+                                    </td>`;
+                            } else {
+                                const value = curationData 
+                                    ? '<span class="text-orange-600 font-bold">N/A</span>'
+                                    : '<span class="italic text-slate-500">Belum Dinilai</span>';
+                                tbodyHTML += `<td class="text-center font-medium">${value}</td>`;
+                            }
                         });
                         tbodyHTML += `</tr>`;
                     });
@@ -436,7 +478,7 @@
                     getDocs(collection(db, "curations"))
                 ]);
                 
-                const usersMap = new Map(usersSnap.docs.map(doc => [doc.id, doc.data()]));
+                usersMap = new Map(usersSnap.docs.map(doc => [doc.id, doc.data()]));
                 contentsMap = new Map(contentsSnap.docs.map(doc => [doc.id, { id: doc.id, ...doc.data() }]));
                 const usernameToIdMap = new Map(usersSnap.docs.map(doc => [doc.data().username, doc.id]));
                 curationsMap = new Map(curationsSnap.docs.map(doc => [doc.id, doc.data()]));
@@ -532,7 +574,7 @@
             }
         }
         
-        // --- PERUBAHAN: Fungsi untuk ekspor ke Excel yang lebih baik ---
+        // --- Fungsi untuk ekspor ke Excel ---
         function exportTableToExcel(tableID, filename = ''){
             const table = document.getElementById(tableID);
             if (!table) {
@@ -552,14 +594,12 @@
             table.querySelectorAll('tbody tr').forEach(tr => {
                 const rowData = [];
                 tr.querySelectorAll('td').forEach(td => {
-                    // Membersihkan spasi berlebih dan mengganti beberapa baris baru dengan spasi tunggal
                     const cellText = td.textContent.trim().replace(/\s\s+/g, ' ');
                     rowData.push(cellText);
                 });
                 data.push(rowData);
             });
 
-            // Membuat worksheet dari array of arrays
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Data');
@@ -625,6 +665,70 @@
             detailsModal.classList.add('hidden');
             detailsModal.classList.remove('flex');
         }
+        
+        // --- PERBAIKAN: Modal untuk detail per indikator ---
+        function openIndicatorDetailModal(contentId, curatorId, indicatorId) {
+            const contentData = contentsMap.get(contentId);
+            const curatorData = usersMap.get(curatorId);
+            const curationId = `${curatorId}_${contentId}`;
+            const curationData = curationsMap.get(curationId);
+            const questionData = curationQuestions.find(q => q.id === indicatorId);
+
+            if (!contentData || !curatorData || !curationData || !questionData) {
+                showAlert('Error', 'Gagal memuat detail data untuk indikator ini.');
+                return;
+            }
+            
+            const indicatorAnswer = curationData.answers[indicatorId];
+            if (!indicatorAnswer) {
+                 showAlert('Info', 'Kurator belum memberikan jawaban untuk indikator ini.');
+                return;
+            }
+
+            // Rincian catatan per poin
+            let notesHTML = (questionData.items || []).map(item => {
+                const note = indicatorAnswer.items?.[item.id]?.notes || 'Tidak ada catatan.';
+                return `
+                    <div class="mt-3">
+                        <label class="form-label text-sm text-slate-600">${item.text}</label>
+                        <textarea class="neumorphism-textarea text-sm" rows="2" readonly>${note}</textarea>
+                    </div>
+                `;
+            }).join('');
+
+            const modalContent = document.getElementById('indicator-modal-content');
+            modalContent.innerHTML = `
+                <div>
+                    <label class="form-label font-semibold">Judul Konten</label>
+                    <p class="neumorphism-input !shadow-none !bg-slate-200/80">${contentData.title}</p>
+                </div>
+                <div>
+                    <label class="form-label font-semibold">Nama Kurator</label>
+                    <p class="neumorphism-input !shadow-none !bg-slate-200/80">${curatorData.nama}</p>
+                </div>
+                <hr class="border-slate-300/60 my-4">
+                <div>
+                    <label class="form-label font-semibold">Indikator yang Dinilai</label>
+                    <p class="neumorphism-input !shadow-none !bg-slate-200/80 font-bold">${questionData.code} - ${questionData.title}</p>
+                </div>
+                <div>
+                    <label class="form-label font-semibold">Nilai Keseluruhan Indikator</label>
+                    <p class="neumorphism-input !shadow-none !bg-slate-200/80 text-center text-lg font-bold">${indicatorAnswer.value || 'N/A'}</p>
+                </div>
+                <div class="mt-4">
+                     <h4 class="font-bold text-slate-800">Rincian Catatan per Poin</h4>
+                     <div class="mt-2 space-y-2">${notesHTML || '<p class="text-slate-500">Tidak ada rincian poin untuk indikator ini.</p>'}</div>
+                </div>
+            `;
+
+            indicatorDetailModal.classList.remove('hidden');
+            indicatorDetailModal.classList.add('flex');
+        }
+
+        function closeIndicatorDetailModal() {
+            indicatorDetailModal.classList.add('hidden');
+            indicatorDetailModal.classList.remove('flex');
+        }
 
         // --- Initialize App ---
         window.addEventListener('load', () => {
@@ -632,6 +736,7 @@
             document.body.style.backgroundColor = ''; 
 
             closeModalBtn.addEventListener('click', closeDetailsModal);
+            closeIndicatorModalBtn.addEventListener('click', closeIndicatorDetailModal);
             document.getElementById('alert-modal-ok').addEventListener('click', hideAlert);
 
             document.body.addEventListener('click', function(event) {
@@ -640,6 +745,13 @@
                     const curationId = viewBtn.dataset.curationId;
                     const contentId = viewBtn.dataset.contentId;
                     openDetailsModal(curationId, contentId);
+                    return;
+                }
+
+                const indicatorCell = event.target.closest('.indicator-cell-clickable');
+                if (indicatorCell) {
+                    const { contentId, curatorId, indicatorId } = indicatorCell.dataset;
+                    openIndicatorDetailModal(contentId, curatorId, indicatorId);
                     return;
                 }
             });
@@ -652,7 +764,7 @@
                 });
             }
             
-            // PERUBAHAN: Event listener untuk tombol ekspor tabel ringkasan
+            // Event listener untuk tombol ekspor tabel ringkasan
             const exportSummaryBtn = document.getElementById('export-summary-btn');
             if(exportSummaryBtn) {
                 exportSummaryBtn.addEventListener('click', function() {
