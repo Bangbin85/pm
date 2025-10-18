@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Supervisor</title>
+    <title>Analisis Hasil Kurasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="https://kemendikdasmen.go.id/web/image/website/21/favicon?unique=c3563e4">
@@ -37,14 +37,14 @@
             animation: fadeInScale 0.5s ease-out forwards;
         }
 
-        .neumorphism-input, .neumorphism-textarea {
+        .neumorphism-input, .neumorphism-textarea, .neumorphism-select {
             width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
             background: var(--neu-bg); color: #555; font-size: 1rem;
             box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #ffffff;
             transition: box-shadow 0.3s ease;
         }
         .neumorphism-input::placeholder, .neumorphism-textarea::placeholder { color: #999; }
-        .neumorphism-input:focus, .neumorphism-textarea:focus { box-shadow: inset 7px 7px 12px #cbced1, inset -7px -7px 12px #ffffff; }
+        .neumorphism-input:focus, .neumorphism-textarea:focus, .neumorphism-select:focus { box-shadow: inset 7px 7px 12px #cbced1, inset -7px -7px 12px #ffffff; }
 
         .neumorphism-button {
             width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
@@ -75,8 +75,8 @@
             border-radius: 15px;
             padding: 1rem;
             box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5);
-            overflow-x: auto;
-            max-height: 80vh;
+            overflow-y: auto; /* Memungkinkan scroll vertikal */
+            max-height: 80vh; /* Batas tinggi maksimum */
         }
         .neumorphism-table {
             border-collapse: separate;
@@ -95,7 +95,7 @@
              border-radius: 10px;
         }
         .neumorphism-table tbody td {
-            background: var(--neu-bg); padding: 1rem 1.5rem; vertical-align: top;
+            background: var(--neu-bg); padding: 1rem 1.5rem; vertical-align: middle;
         }
         .neumorphism-table tbody td:first-child { border-radius: 10px 0 0 10px; }
         .neumorphism-table tbody td:last-child { border-radius: 0 10px 10px 0; }
@@ -114,17 +114,31 @@
         .neumorphism-table tfoot th:first-child { border-radius: 10px 0 0 10px; }
         .neumorphism-table tfoot th:last-child { border-radius: 0 10px 10px 0; }
 
-
         .content-cell { min-width: 300px; max-width: 450px; white-space: normal; word-break: break-word; }
         .curator-cell { min-width: 150px; white-space: normal; }
         .suggestion-cell { min-width: 250px; white-space: normal; vertical-align: middle; }
 
-
-        /* Gaya Modal */
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
         }
+
+        .neumorphism-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em 1.5em;
+        }
+        .document-icon {
+            color: var(--neu-primary);
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        .document-icon:hover {
+            color: #3c34d0;
+        }
+
     </style>
 </head>
 <body class="text-slate-800">
@@ -137,6 +151,7 @@
                 <a href="#ringkasan-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Ringkasan</a>
                 <a href="#tinjauan-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Tinjauan Konten</a>
                 <a href="#indikator-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Detail Indikator</a>
+				<a href="#dokumen-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Daftar Dokumen</a>
 				<a href="AnalisisPerButir.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Analisis Data Perbutir</a>
             </nav>
             <div class="flex items-center space-x-2">
@@ -186,6 +201,37 @@
                     <div id="indicator-table-wrapper" class="neumorphism-table-container">
                         <table id="indicator-details-table" class="w-full neumorphism-table">
                             <!-- Konten tabel akan diisi oleh JavaScript -->
+                        </table>
+                    </div>
+                </div>
+
+                <!-- BARU: Tabel Daftar Dokumen -->
+                <div id="dokumen-section" class="mt-12 scroll-mt-24">
+                    <div class="flex justify-between items-center mb-6 px-4 sm:px-0">
+                        <h2 class="text-2xl font-semibold text-slate-800">Tabel Daftar Dokumen Temuan</h2>
+                        <button id="export-documents-btn" class="neumorphism-button !w-auto py-2 px-4 text-sm">
+                            <i class="fas fa-file-excel mr-2"></i> Export ke Excel
+                        </button>
+                    </div>
+                     <div class="mb-6 neumorphism-card p-4">
+                        <label for="document-content-filter" class="block text-slate-700 font-semibold mb-2">Saring berdasarkan Nama Konten:</label>
+                        <select id="document-content-filter" class="neumorphism-select">
+                            <!-- Opsi akan diisi oleh JavaScript -->
+                        </select>
+                    </div>
+                    <div id="document-table-wrapper" class="neumorphism-table-container">
+                        <table id="documents-table" class="w-full neumorphism-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Konten</th>
+                                    <th class="text-center">Dokumen 1</th>
+                                    <th class="text-center">Dokumen 2</th>
+                                    <th class="text-center">Dokumen 3</th>
+                                </tr>
+                            </thead>
+                            <tbody id="document-table-body">
+                                <!-- Data akan dimuat di sini -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -285,7 +331,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where, doc, updateDoc, serverTimestamp, deleteField } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 		const firebaseConfig = {
 		  apiKey: "AIzaSyCOsQYueTyzUSmsY1H1P0k9nU1FtQCV__o",
@@ -309,6 +355,7 @@
         let curationsMap = new Map();
         let contentsMap = new Map();
         let usersMap = new Map();
+        let allContentsDataForDocs = []; // State untuk tabel dokumen
 
         // --- Struktur Pertanyaan Kurasi ---
         const curationQuestions = [
@@ -520,7 +567,7 @@
                 });
 
                 const mode = calculateMode(columnValues);
-                tfootHTML += `<th class="p-4 text-center font-bold text-slate-900">${mode || 'N/A'}</th>`;
+                tfootHTML += `<th class="p-4 text-center font-bold text-slate-900">${mode || ''}</th>`;
             });
             tfootHTML += '</tr></tfoot>';
 
@@ -614,13 +661,97 @@
 
                 // Panggil fungsi render tabel detail
                 renderIndicatorDetailsTable(contentsMap, usersMap, curationsMap, assignmentsByContent, curationQuestions);
-
+                
+                // BARU: Panggil fungsi untuk render tabel dokumen
+                displayDocumentsTable();
 
             } catch (error) {
                 console.error("Error displaying dashboard:", error);
                 const errorHTML = `<tbody><tr><td colspan="6" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr></tbody>`;
                 resultsTable.innerHTML = errorHTML;
                 document.getElementById('indicator-details-table').innerHTML = errorHTML.replace('colspan="6"', `colspan="${curationQuestions.length + 2}"`);
+            }
+        }
+
+        // --- Logika Tabel Dokumen ---
+        function populateDocumentFilterDropdown(contents) {
+            const filterSelect = document.getElementById('document-content-filter');
+            if (!filterSelect) return;
+            filterSelect.innerHTML = '<option value="all">Tampilkan Semua Konten</option>';
+            contents.forEach(content => {
+                const option = document.createElement('option');
+                option.value = content.id;
+                option.textContent = content.title || 'Tanpa Judul';
+                filterSelect.appendChild(option);
+            });
+        }
+
+        function renderDocumentsTable(contentsToRender) {
+            const tableBody = document.getElementById('document-table-body');
+            if (!tableBody) return;
+            
+            if (contentsToRender.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-slate-500">Tidak ada konten yang cocok.</td></tr>`;
+                return;
+            }
+
+            let tableHTML = '';
+            contentsToRender.forEach(content => {
+                tableHTML += `<tr>`;
+                tableHTML += `<td class="font-semibold">
+                                <a href="${content.url || '#'}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">
+                                    ${content.title || 'Tanpa Judul'}
+                                </a>
+                              </td>`;
+
+                const maxDocs = 3;
+                for (let i = 0; i < maxDocs; i++) {
+                    const curation = content.curations ? content.curations[i] : null;
+                    const photoUrl = curation ? curation.photoUrl : null;
+                    tableHTML += `<td class="text-center">`;
+                    if (photoUrl) {
+                        tableHTML += `<a href="${photoUrl}" target="_blank" rel="noopener noreferrer" title="Lihat Dokumen dari ${curation.curatorName || ''}">
+                                        <i class="fas fa-eye document-icon"></i>
+                                      </a>`;
+                    }
+                    tableHTML += `</td>`;
+                }
+                tableHTML += `</tr>`;
+            });
+            tableBody.innerHTML = tableHTML;
+        }
+
+        async function displayDocumentsTable() {
+            const tableBody = document.getElementById('document-table-body');
+            if (!tableBody) return;
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10"><i class="fas fa-spinner fa-spin text-2xl text-slate-500"></i></td></tr>`;
+
+            try {
+                const cacheRef = doc(db, "dashboard_cache", "content_details");
+                const docSnap = await getDoc(cacheRef);
+
+                if (!docSnap.exists() || !docSnap.data().contents) {
+                    throw new Error("Cache 'content_details' tidak ditemukan. Mohon jalankan pembaruan cache dari panel Admin.");
+                }
+                
+                allContentsDataForDocs = docSnap.data().contents;
+                
+                populateDocumentFilterDropdown(allContentsDataForDocs);
+                renderDocumentsTable(allContentsDataForDocs);
+
+                document.getElementById('document-content-filter').addEventListener('change', (e) => {
+                    const selectedId = e.target.value;
+                    if (selectedId === 'all') {
+                        renderDocumentsTable(allContentsDataForDocs);
+                    } else {
+                        const filteredContents = allContentsDataForDocs.filter(content => content.id === selectedId);
+                        renderDocumentsTable(filteredContents);
+                    }
+                });
+
+            } catch (error) {
+                console.error("Gagal memuat data dokumen:", error);
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-red-500">Terjadi kesalahan: ${error.message}</td></tr>`;
             }
         }
 
@@ -837,23 +968,11 @@
                 }
             });
             
-            // Event listener untuk tombol ekspor tabel indikator
-            const exportIndicatorBtn = document.getElementById('export-indicator-btn');
-            if(exportIndicatorBtn) {
-                exportIndicatorBtn.addEventListener('click', function() {
-                    exportTableToExcel('indicator-details-table', 'Nilai_Per_Indikator');
-                });
-            }
-            
-            // Event listener untuk tombol ekspor tabel ringkasan
-            const exportSummaryBtn = document.getElementById('export-summary-btn');
-            if(exportSummaryBtn) {
-                exportSummaryBtn.addEventListener('click', function() {
-                    exportTableToExcel('results-table', 'Tinjauan_Hasil_Kurasi');
-                });
-            }
+            // Event listener untuk tombol ekspor
+            document.getElementById('export-summary-btn').addEventListener('click', () => exportTableToExcel('results-table', 'Tinjauan_Hasil_Kurasi'));
+            document.getElementById('export-indicator-btn').addEventListener('click', () => exportTableToExcel('indicator-details-table', 'Nilai_Per_Indikator'));
+            document.getElementById('export-documents-btn').addEventListener('click', () => exportTableToExcel('documents-table', 'Daftar_Dokumen_Temuan'));
         });
     </script>
 </body>
 </html>
-
