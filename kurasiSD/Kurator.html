@@ -215,6 +215,14 @@
             opacity: 1;
         }
 
+        /* Gaya untuk Tab Unggah/URL */
+        .tab-btn {
+            @apply text-slate-500 border-b-2 border-transparent pb-2 transition-colors duration-200;
+        }
+        .tab-btn.active {
+            @apply text-violet-600 border-violet-600;
+        }
+
         /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; } /* slate-100 */
@@ -360,8 +368,8 @@
 		  appId: "1:520054778765:web:9c2d12e640a259b596ebc4"
 		};
 
-        // URL Google Apps Script Web App
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEZno0Vk8E2gIGaEGaD1TuXbhPf9fvdsnm8jSoOgSBNnh-pjDmCb5rYXDeVeuVS5pl/exec";
+        // --- PENTING: Ganti dengan URL Aplikasi Web Anda dari Google Apps Script ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUXTpTThoCL7NkFwtEgRg6Hzzsol7Z7W-UHht4O9w5if8CCkcSJ3JMD08G4m7_5Hub/exec";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -502,50 +510,53 @@
                              <textarea id="final-nilai-deskripsi" class="form-textarea w-full text-sm" rows="5" placeholder="Tuliskan justifikasi untuk keputusan final Anda di sini..." required></textarea>
                         </div>
                         
-                        <!-- BAGIAN UPLOAD FOTO FINAL -->
+                        <!-- BAGIAN UNGGAH DOKUMEN -->
                         <div class="mt-6 pt-6 border-t border-slate-200">
-                            <div id="final-photo-uploader" class="p-4 rounded-xl bg-slate-100 border photo-uploader-container">
+                            <div id="final-file-uploader" class="p-4 rounded-xl bg-slate-100 border file-uploader-container">
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Lampiran Dokumen (Opsional)</label>
                                 <p class="text-xs text-slate-600 mb-3 bg-white p-3 rounded-lg border border-yellow-300 shadow-sm">
-                                    <b>Penting:</b> Pastikan nama file yang Anda kirimkan sesuai format: <b>Nama Kurator_Kode Konten</b><br>(Contoh: <b>Bangbin_TB-G4SDDD.pdf</b>)
+                                    <b>Penting:</b> Jika mengunggah, pastikan nama file sesuai format: <b>Nama Kurator_Kode Konten</b><br>(Contoh: <b>Bintang_Adhi_Permana_TB-G4SDDD.pdf</b>)
                                 </p>
-                                <div class="photo-display hidden flex items-center gap-4 p-2 rounded-lg bg-white border">
-                                    <img src="" class="photo-preview w-16 h-16 object-cover rounded-md border bg-white">
-                                    <div class="flex-grow">
-                                        <a href="" target="_blank" class="photo-link text-blue-600 text-xs break-all hover:underline" rel="noopener noreferrer"></a>
-                                        <input type="hidden" class="photo-link-input">
+
+                                <!-- Container untuk Opsi Input (Upload/URL) -->
+                                <div class="input-options">
+                                    <div class="flex border-b border-slate-200 text-sm">
+                                        <button type="button" class="tab-btn active flex-1 py-2 font-medium" data-tab="upload"><i class="fas fa-upload mr-2"></i>Unggah File</button>
+                                        <button type="button" class="tab-btn flex-1 py-2 font-medium" data-tab="url"><i class="fas fa-link mr-2"></i>Sematkan URL</button>
                                     </div>
-                                    <button type="button" class="btn btn-danger-sm btn-sm remove-photo-btn flex-shrink-0">
+                                    <div class="pt-4">
+                                        <div id="upload-tab" class="tab-content">
+                                            <label class="btn btn-secondary btn-sm w-full cursor-pointer file-actions">
+                                                <i class="fas fa-upload mr-2"></i> Pilih File untuk Diunggah
+                                                <input type="file" class="file-input hidden" accept="image/png, image/jpeg, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, .doc, .docx">
+                                            </label>
+                                            <div class="file-upload-status hidden mt-2 text-sm text-slate-600">
+                                                <i class="fas fa-spinner fa-spin mr-2"></i><span>Mengunggah file...</span>
+                                            </div>
+                                        </div>
+                                        <div id="url-tab" class="tab-content hidden">
+                                            <div class="flex items-center gap-2">
+                                                <input type="url" class="form-input-sm url-input w-full" placeholder="https://docs.google.com/document/d/...">
+                                                <button type="button" class="btn btn-secondary btn-sm set-url-btn flex-shrink-0">Sematkan</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Area untuk menampilkan file yang sudah diunggah -->
+                                <div class="file-display hidden flex items-center gap-4 p-2 rounded-lg bg-white border mt-4">
+                                    <img src="" class="file-preview w-16 h-16 object-cover rounded-md border bg-white">
+                                    <div class="flex-grow">
+                                        <a href="" target="_blank" class="file-link text-blue-600 text-xs break-all hover:underline" rel="noopener noreferrer"></a>
+                                        <input type="hidden" class="file-link-input">
+                                    </div>
+                                    <button type="button" class="btn btn-danger-sm btn-sm remove-file-btn flex-shrink-0">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
-                                
-                                <div class="photo-actions">
-                                    <button type="button" class="btn btn-secondary btn-sm add-photo-btn">
-                                        <i class="fas fa-paperclip mr-1"></i> Tambah Lampiran
-                                    </button>
-                                </div>
-
-                                <div class="photo-input-options hidden space-y-2 mt-2">
-                                    <div class="flex items-center gap-2">
-                                        <input type="text" placeholder="Tempel tautan file..." class="form-input-sm w-full photo-url-input">
-                                        <button type="button" class="btn btn-secondary btn-sm set-link-btn flex-shrink-0">OK</button>
-                                    </div>
-                                    <div class="text-center text-xs text-slate-400">atau</div>
-                                    <div>
-                                        <label class="btn btn-secondary btn-sm w-full cursor-pointer">
-                                            <i class="fas fa-upload mr-2"></i> Pilih File untuk Diunggah
-                                            <input type="file" class="photo-file-input hidden" accept="image/png, image/jpeg, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="photo-upload-status hidden mt-2 text-sm text-slate-600">
-                                    <i class="fas fa-spinner fa-spin mr-2"></i><span>Mengunggah file...</span>
-                                </div>
                             </div>
                         </div>
-                        <!-- AKHIR BAGIAN UPLOAD FOTO FINAL -->
+                        <!-- AKHIR BAGIAN UNGGAH DOKUMEN -->
 
                     </div>
                 </section>`;
@@ -554,7 +565,7 @@
             modalSidebar.innerHTML = sidebarHTML;
             setupSidebarNavigation();
             setupScrollObserver();
-            setupPhotoUploaderEvents(); // Inisialisasi event listener untuk upload foto
+            setupFileUploaderEvents(); // Inisialisasi event listener untuk unggah file
         }
         
         // --- Fungsi-fungsi ---
@@ -689,7 +700,7 @@
                 };
             });
 
-            const finalPhotoUrl = document.querySelector('#final-photo-uploader .photo-link-input').value;
+            const finalFileUrl = document.querySelector('#final-file-uploader .file-link-input').value;
             answers.D1_Simpulan_Umum = { 
                 kelebihan: document.getElementById('final-kelebihan').value, 
                 kekurangan: document.getElementById('final-kekurangan').value, 
@@ -698,7 +709,7 @@
             answers.D2_Keputusan_Final = { 
                 keputusan: document.getElementById('final-keputusan').value, 
                 nilai_deskripsi: document.getElementById('final-nilai-deskripsi').value,
-                photoUrl: finalPhotoUrl
+                photoUrl: finalFileUrl
             };
             return answers;
         }
@@ -729,16 +740,19 @@
                 document.getElementById('final-keputusan').value = answers.D2_Keputusan_Final.keputusan || '';
                 document.getElementById('final-nilai-deskripsi').value = answers.D2_Keputusan_Final.nilai_deskripsi || '';
                 if (answers.D2_Keputusan_Final.photoUrl) {
-                    const finalUploader = document.getElementById('final-photo-uploader');
-                    updatePhotoDisplay(finalUploader, answers.D2_Keputusan_Final.photoUrl);
+                    const finalUploader = document.getElementById('final-file-uploader');
+                    updateFileDisplay(finalUploader, answers.D2_Keputusan_Final.photoUrl);
+                    // Juga isi kolom URL jika pengguna ingin melihatnya lagi setelah menghapus
+                    const urlInput = finalUploader.querySelector('.url-input');
+                    if(urlInput) urlInput.value = answers.D2_Keputusan_Final.photoUrl;
                 }
             }
         }
 
         async function openCurationModal(contentId, contentTitle) {
             curationForm.reset();
-            // Reset semua tampilan foto
-            curationForm.querySelectorAll('.photo-uploader-container').forEach(container => resetPhotoDisplay(container));
+            // Reset semua tampilan file
+            curationForm.querySelectorAll('.file-uploader-container').forEach(container => resetFileDisplay(container));
             
             draftStatus.textContent = '';
             document.getElementById('curation-modal-title').textContent = `Kurasi Konten: ${contentTitle}`;
@@ -825,45 +839,73 @@
             });
         }
         
-        // --- Fungsi Upload Foto ---
+        // --- Fungsi Unggah File ke Google Drive via Apps Script ---
 
-        function setupPhotoUploaderEvents() {
+        function setupFileUploaderEvents() {
             curationForm.addEventListener('click', e => {
-                const container = e.target.closest('.photo-uploader-container');
+                const container = e.target.closest('.file-uploader-container');
                 if (!container) return;
+                
+                // Menangani penghapusan file/url
+                if (e.target.closest('.remove-file-btn')) {
+                    resetFileDisplay(container);
+                }
 
-                if (e.target.closest('.add-photo-btn')) {
-                    container.querySelector('.photo-actions').classList.add('hidden');
-                    container.querySelector('.photo-input-options').classList.remove('hidden');
+                // Menangani perpindahan tab
+                const tabBtn = e.target.closest('.tab-btn');
+                if (tabBtn) {
+                    container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    tabBtn.classList.add('active');
+
+                    container.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                    const tabId = tabBtn.dataset.tab + '-tab';
+                    container.querySelector('#' + tabId).classList.remove('hidden');
                 }
-                if (e.target.closest('.remove-photo-btn')) {
-                    resetPhotoDisplay(container);
-                }
-                if (e.target.closest('.set-link-btn')) {
-                    const url = container.querySelector('.photo-url-input').value.trim();
-                    if(url) {
-                        updatePhotoDisplay(container, url);
+
+                // Menangani penyematan URL dari input
+                const setUrlBtn = e.target.closest('.set-url-btn');
+                if (setUrlBtn) {
+                    const urlInput = container.querySelector('.url-input');
+                    const url = urlInput.value.trim();
+                    if (url) {
+                        try {
+                            new URL(url); // Validasi dasar
+                            updateFileDisplay(container, url);
+                        } catch (_) {
+                            showAlert('URL Tidak Valid', 'Mohon masukkan URL yang valid.');
+                            urlInput.focus();
+                        }
+                    } else {
+                         showAlert('URL Kosong', 'Mohon masukkan URL terlebih dahulu.');
                     }
                 }
             });
 
             curationForm.addEventListener('change', e => {
-                const fileInput = e.target.closest('.photo-file-input');
+                const fileInput = e.target.closest('.file-input');
                 if (fileInput && fileInput.files[0]) {
-                    handleFileUpload(fileInput.files[0], fileInput.closest('.photo-uploader-container'));
+                    handleFileUpload(fileInput.files[0], fileInput.closest('.file-uploader-container'));
                 }
             });
         }
 
         function handleFileUpload(file, container) {
-            const statusDiv = container.querySelector('.photo-upload-status');
-            container.querySelector('.photo-input-options').classList.add('hidden');
+            if (SCRIPT_URL === "GANTI_DENGAN_URL_APPS_SCRIPT_ANDA") {
+                showAlert("Konfigurasi Belum Selesai", "URL Apps Script belum dimasukkan ke dalam kode Kurator.html. Unggahan tidak dapat dilanjutkan.");
+                container.querySelector('.file-input').value = '';
+                return;
+            }
+
+            const statusDiv = container.querySelector('.file-upload-status');
+            const actionsDiv = container.querySelector('.file-actions');
+            
+            actionsDiv.classList.add('hidden');
             statusDiv.classList.remove('hidden');
 
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                const fileData = reader.result.split(',')[1]; // Ambil hanya data base64
+                const fileData = reader.result.split(',')[1]; 
                 
                 fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -872,12 +914,12 @@
                         mimeType: file.type,
                         fileData: fileData
                     }),
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' },
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success' && data.url) {
-                        updatePhotoDisplay(container, data.url);
+                        updateFileDisplay(container, data.url);
                     } else {
                         throw new Error(data.message || 'Gagal mengunggah file.');
                     }
@@ -885,7 +927,7 @@
                 .catch(err => {
                     console.error('Upload failed:', err);
                     showAlert('Upload Gagal', `Terjadi kesalahan: ${err.message}`);
-                    container.querySelector('.photo-actions').classList.remove('hidden');
+                    actionsDiv.classList.remove('hidden');
                 })
                 .finally(() => {
                     statusDiv.classList.add('hidden');
@@ -895,48 +937,54 @@
                 console.error('File Reader Error:', error);
                 showAlert('Gagal Membaca File', 'Tidak dapat membaca file yang dipilih.');
                 statusDiv.classList.add('hidden');
-                container.querySelector('.photo-actions').classList.remove('hidden');
+                actionsDiv.classList.remove('hidden');
             }
         }
 
-        function updatePhotoDisplay(container, url) {
-            const displayDiv = container.querySelector('.photo-display');
-            const previewImg = displayDiv.querySelector('.photo-preview');
-            const link = displayDiv.querySelector('.photo-link');
-            const linkInput = displayDiv.querySelector('.photo-link-input');
+        function updateFileDisplay(container, url) {
+            const displayDiv = container.querySelector('.file-display');
+            const previewImg = displayDiv.querySelector('.file-preview');
+            const link = displayDiv.querySelector('.file-link');
+            const linkInput = displayDiv.querySelector('.file-link-input');
+            const inputOptionsDiv = container.querySelector('.input-options');
 
-            // Set the src to the URL. If it's an image, it will show.
-            previewImg.src = url;
-            // If the src link is not an image (e.g., a PDF), the onerror event will trigger.
-            previewImg.onerror = () => {
-                // Display a generic file placeholder icon instead.
-                previewImg.src = 'https://placehold.co/64x64/e2e8f0/475569?text=FILE';
-                previewImg.onerror = null; // Prevent potential infinite loops
-            };
-
+            const isImage = /\.(jpg|jpeg|png|gif)$/i.test(url);
+            const isDoc = /\.(pdf|doc|docx)$/i.test(url) || url.includes('docs.google.com') || url.includes('drive.google.com');
+            
+            if (isImage) {
+                 previewImg.src = url;
+            } else if (isDoc) {
+                 previewImg.src = 'https://placehold.co/64x64/e2e8f0/475569?text=DOC';
+            } else {
+                 previewImg.src = 'https://placehold.co/64x64/e2e8f0/475569?text=LINK';
+            }
+            
             link.href = url;
             link.textContent = url.length > 50 ? url.substring(0, 50) + '...' : url;
             linkInput.value = url;
             
             displayDiv.classList.remove('hidden');
-            container.querySelector('.photo-actions').classList.add('hidden');
-            container.querySelector('.photo-input-options').classList.add('hidden');
-            container.querySelector('.photo-url-input').value = '';
+            inputOptionsDiv.classList.add('hidden');
         }
         
-        function resetPhotoDisplay(container) {
-            const displayDiv = container.querySelector('.photo-display');
-            displayDiv.querySelector('.photo-preview').src = '';
-            displayDiv.querySelector('.photo-link').href = '';
-            displayDiv.querySelector('.photo-link').textContent = '';
-            displayDiv.querySelector('.photo-link-input').value = '';
+        function resetFileDisplay(container) {
+            const displayDiv = container.querySelector('.file-display');
+            displayDiv.querySelector('.file-preview').src = '';
+            displayDiv.querySelector('.file-link').href = '';
+            displayDiv.querySelector('.file-link').textContent = '';
+            displayDiv.querySelector('.file-link-input').value = '';
+            
+            const urlInput = container.querySelector('.url-input');
+            if(urlInput) urlInput.value = '';
+            
+            container.querySelector('.file-input').value = '';
 
             displayDiv.classList.add('hidden');
-            container.querySelector('.photo-actions').classList.remove('hidden');
-            container.querySelector('.photo-input-options').classList.add('hidden');
-            container.querySelector('.photo-url-input').value = '';
-            // Reset juga file input untuk memungkinkan re-upload file yang sama
-            container.querySelector('.photo-file-input').value = '';
+            container.querySelector('.input-options').classList.remove('hidden');
+
+            // Reset ke tab unggah
+            const uploadTabBtn = container.querySelector('.tab-btn[data-tab="upload"]');
+            if(uploadTabBtn) uploadTabBtn.click();
         }
 
         function showConfirmation(title, message, onConfirm) {
