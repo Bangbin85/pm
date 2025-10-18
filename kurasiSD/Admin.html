@@ -1092,7 +1092,58 @@
                 await setDoc(analysisCacheRef, analysisCacheData);
                 cacheLog('✅ Cache analisis berhasil diperbarui.');
 
-                cacheLog('\n🎉 SEMUA PROSES SELESAI! Kedua cache telah berhasil diperbarui.');
+                // --- PERBAIKAN: PART 3: content_details cache ---
+                cacheLog('\nMemulai perhitungan untuk cache detail konten...');
+                const idToUserMap = new Map(allUsers.map(u => [u.id, u]));
+
+                const contentDetails = allContent.map(content => {
+                    const { averageResultText, averageScore } = calculateAverageResult(content, assignmentsByContent, allCurationsMap, usernameToIdMap);
+                    
+                    const assignedCuratorIds = assignmentsByContent.get(content.id) || [];
+                    const curationsForThisContent = [];
+
+                    for (const curatorId of assignedCuratorIds) {
+                        const curationId = `${curatorId}_${content.id}`;
+                        const curationData = allCurationsMap.get(curationId);
+                        const curatorInfo = idToUserMap.get(curatorId);
+
+                        // Hanya tambahkan jika ada data kurasi dan info kurator
+                        if (curationData && curatorInfo) {
+                            const finalDecisionData = curationData.answers?.D2_Keputusan_Final || {};
+                            curationsForThisContent.push({
+                                curatorId: curatorId,
+                                curatorName: curatorInfo.nama,
+                                finalDecision: finalDecisionData.keputusan || 'Belum Dinilai',
+                                photoUrl: finalDecisionData.photoUrl || ''
+                            });
+                        }
+                    }
+
+                    return {
+                        id: content.id,
+                        title: content.title,
+                        subject: content.subject,
+                        url: content.url,
+                        averageResultText: averageResultText,
+                        averageScore: averageScore,
+                        curatorCount: assignedCuratorIds.length,
+                        curations: curationsForThisContent
+                    };
+                });
+
+                cacheLog('Menyusun data final untuk cache detail konten...');
+                const contentDetailsCacheData = {
+                    contents: contentDetails,
+                    lastUpdated: serverTimestamp()
+                };
+
+                const contentDetailsCacheRef = doc(db, "dashboard_cache", "content_details");
+                cacheLog('Menyimpan data ke `dashboard_cache/content_details`...');
+                await setDoc(contentDetailsCacheRef, contentDetailsCacheData);
+                cacheLog('✅ Cache detail konten (termasuk photoUrl) berhasil diperbarui.');
+
+
+                cacheLog('\n🎉 SEMUA PROSES SELESAI! Tiga cache telah berhasil diperbarui.');
             } catch (error) {
                 cacheLog(`\n❌ TERJADI KESALAHAN: ${error.message}`);
                 console.error("Gagal memperbarui cache:", error);
