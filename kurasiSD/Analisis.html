@@ -147,18 +147,42 @@
     <header id="main-header" class="bg-white/80 backdrop-blur-lg shadow-sm z-30 border-b border-slate-200 sticky top-0">
         <div class="max-w-[95%] mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <h1 class="text-xl font-bold text-slate-800">Analisis Hasil Kurasi</h1>
+            
+            <!-- Desktop Navigation -->
             <nav class="hidden md:flex items-center space-x-6">
                 <a href="#ringkasan-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Ringkasan</a>
                 <a href="#tinjauan-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Tinjauan Konten</a>
                 <a href="#indikator-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Detail Indikator</a>
-				<a href="#dokumen-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Daftar Dokumen</a>
-				<a href="AnalisisPerButir.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Analisis Data Perbutir</a>
+                <a href="#dokumen-section" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Daftar Dokumen</a>
+                <a href="AnalisisPerButir.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Analisis Data Perbutir</a>
             </nav>
+            
             <div class="flex items-center space-x-2">
-                <a href="./" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 flex items-center">
+                <!-- Desktop Home Button -->
+                <a href="./" class="hidden sm:flex bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition-all duration-200 items-center">
                     <i class="fas fa-home mr-2"></i>Home
                 </a>
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden neumorphism-button !w-10 !h-10 !p-0 !rounded-full !text-lg">
+                    <i id="mobile-menu-icon" class="fas fa-bars"></i>
+                </button>
             </div>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-md shadow-lg border-t border-slate-200">
+            <nav class="flex flex-col p-4 space-y-1">
+                <a href="#ringkasan-section" class="mobile-nav-link text-base font-medium text-slate-700 hover:bg-slate-100 p-3 rounded-lg transition-colors">Ringkasan</a>
+                <a href="#tinjauan-section" class="mobile-nav-link text-base font-medium text-slate-700 hover:bg-slate-100 p-3 rounded-lg transition-colors">Tinjauan Konten</a>
+                <a href="#indikator-section" class="mobile-nav-link text-base font-medium text-slate-700 hover:bg-slate-100 p-3 rounded-lg transition-colors">Detail Indikator</a>
+                <a href="#dokumen-section" class="mobile-nav-link text-base font-medium text-slate-700 hover:bg-slate-100 p-3 rounded-lg transition-colors">Daftar Dokumen</a>
+                <a href="AnalisisPerButir.html" class="mobile-nav-link text-base font-medium text-slate-700 hover:bg-slate-100 p-3 rounded-lg transition-colors">Analisis Data Perbutir</a>
+                <hr class="my-2 border-slate-200">
+                <!-- Mobile Home Button -->
+                <a href="./" class="mobile-nav-link flex sm:hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-200 items-center justify-center">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+            </nav>
         </div>
     </header>
 
@@ -963,6 +987,29 @@
             closeIndicatorModalBtn.addEventListener('click', closeIndicatorDetailModal);
             document.getElementById('alert-modal-ok').addEventListener('click', hideAlert);
 
+            // --- Mobile Menu Logic ---
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+
+            if (mobileMenuBtn && mobileMenu && mobileMenuIcon) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                    const isHidden = mobileMenu.classList.contains('hidden');
+                    mobileMenuIcon.classList.toggle('fa-bars', isHidden);
+                    mobileMenuIcon.classList.toggle('fa-times', !isHidden);
+                });
+
+                // Close menu when a link is clicked
+                mobileMenu.querySelectorAll('.mobile-nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuIcon.classList.remove('fa-times');
+                        mobileMenuIcon.classList.add('fa-bars');
+                    });
+                });
+            }
+
             document.body.addEventListener('click', function(event) {
                 const viewBtn = event.target.closest('.view-details-btn');
                 if (viewBtn) {
@@ -988,3 +1035,4 @@
     </script>
 </body>
 </html>
+
