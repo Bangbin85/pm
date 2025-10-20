@@ -770,53 +770,65 @@
         }
         
         // --- Fungsi untuk ekspor ke Excel ---
-        function exportTableToExcel(tableID, filename = ''){
+        // PERBAIKAN: Fungsi ini dimodifikasi untuk mengekspor URL pada tabel dokumen
+        function exportTableToExcel(tableID, filename = '') {
             const table = document.getElementById(tableID);
             if (!table) {
                 showAlert('Error', 'Tabel untuk diekspor tidak ditemukan.');
                 return;
             }
-        
-            // Clone tabel untuk dimodifikasi tanpa mengubah tampilan asli
-            const tableClone = table.cloneNode(true);
-        
-            // Hapus elemen yang tidak diinginkan dari kloningan
-            const unwantedElements = tableClone.querySelectorAll('span.font-normal.text-xs');
-            unwantedElements.forEach(el => el.remove());
-        
+
             const data = [];
-            
-            // Mengambil header dari thead
             const headers = [];
-            tableClone.querySelectorAll('thead th').forEach(th => {
+            table.querySelectorAll('thead th').forEach(th => {
                 headers.push(th.textContent.trim().replace(/\s+/g, ' '));
             });
             data.push(headers);
-        
-            // Mengambil baris data dari tbody
-            tableClone.querySelectorAll('tbody tr').forEach(tr => {
-                const rowData = [];
-                tr.querySelectorAll('td').forEach(td => {
-                    const cellText = td.textContent.trim().replace(/\s\s+/g, ' ');
-                    rowData.push(cellText);
+
+            // Logika khusus untuk tabel dokumen agar mengekspor URL
+            if (tableID === 'documents-table') {
+                table.querySelectorAll('tbody tr').forEach(tr => {
+                    const rowData = [];
+                    tr.querySelectorAll('td').forEach((td, index) => {
+                        if (index === 0) { // Kolom pertama (Nama Konten), ambil teksnya
+                            rowData.push(td.textContent.trim());
+                        } else { // Kolom D-1, D-2, D-3
+                            const link = td.querySelector('a');
+                            rowData.push(link ? link.href : ''); // Ambil URL dari atribut href
+                        }
+                    });
+                    data.push(rowData);
                 });
-                data.push(rowData);
-            });
-            
-            // Mengambil baris data dari tfoot
-             if (tableClone.querySelector('tfoot')) {
+            } else {
+                // Logika fallback untuk tabel lainnya
+                const tableClone = table.cloneNode(true);
+                 // Hapus elemen yang tidak diinginkan dari kloningan
+                const unwantedElements = tableClone.querySelectorAll('span.font-normal.text-xs');
+                unwantedElements.forEach(el => el.remove());
+
+                tableClone.querySelectorAll('tbody tr').forEach(tr => {
+                    const rowData = [];
+                    tr.querySelectorAll('td').forEach(td => {
+                        rowData.push(td.textContent.trim().replace(/\s\s+/g, ' '));
+                    });
+                    data.push(rowData);
+                });
+            }
+
+            // Mengambil baris data dari tfoot (jika ada)
+            if (table.querySelector('tfoot')) {
                 const footerRow = [];
-                tableClone.querySelectorAll('tfoot th').forEach(th => {
-                    footerRow.push(th.textContent.trim().replace(/\s\s+/g, ' '));
+                table.querySelectorAll('tfoot th').forEach(th => {
+                    footerRow.push(th.textContent.trim().replace(/\s+/g, ' '));
                 });
                 data.push(footerRow);
             }
-        
+
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Data');
-        
-            const finalFilename = filename ? `${filename}_${new Date().toISOString().slice(0,10)}.xlsx` : 'excel_data.xlsx';
+
+            const finalFilename = filename ? `${filename}_${new Date().toISOString().slice(0, 10)}.xlsx` : 'excel_data.xlsx';
             XLSX.writeFile(wb, finalFilename);
         }
 
