@@ -31,14 +31,25 @@
             animation: fadeInScale 0.5s ease-out forwards;
         }
 
-        .neumorphism-input, .neumorphism-textarea {
+        .neumorphism-input, .neumorphism-textarea, .neumorphism-select {
             width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
             background: var(--neu-bg); color: #555; font-size: 1rem;
             box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #ffffff;
             transition: box-shadow 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
+        .neumorphism-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        
         .neumorphism-input::placeholder, .neumorphism-textarea::placeholder { color: #999; }
-        .neumorphism-input:focus, .neumorphism-textarea:focus { box-shadow: inset 7px 7px 12px #cbced1, inset -7px -7px 12px #ffffff; }
+        .neumorphism-input:focus, .neumorphism-textarea:focus, .neumorphism-select:focus { box-shadow: inset 7px 7px 12px #cbced1, inset -7px -7px 12px #ffffff; }
 
         .neumorphism-button {
             width: 100%; padding: 1rem; border: none; outline: none; border-radius: 12px;
@@ -86,6 +97,7 @@
         .neumorphism-table tbody tr {
              box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
              border-radius: 10px;
+             transition: opacity 0.3s ease-in-out;
         }
         .neumorphism-table tbody td {
             background: var(--neu-bg); padding: 1rem 1.5rem; vertical-align: top;
@@ -159,8 +171,31 @@
     <main id="main-dashboard" class="hidden bg-slate-50">
         <div class="py-10">
             <div class="w-[95%] mx-auto sm:px-6 lg:px-8">
-                <h2 class="text-2xl font-semibold text-slate-800 mb-6 px-4 sm:px-0">Tinjauan Hasil Kurasi Konten</h2>
+                <h2 class="text-2xl font-semibold text-slate-800 mb-4 px-4 sm:px-0">Tinjauan Hasil Kurasi Konten</h2>
+                
+                <!-- === FILTER SECTION (BARU) === -->
+                <div id="filter-section" class="neumorphism-card p-4 md:p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                        <div>
+                            <label for="filter-content" class="form-label mb-2 ml-1">Nama Konten</label>
+                            <select id="filter-content" class="neumorphism-select text-sm"></select>
+                        </div>
+                        <div>
+                            <label for="filter-curator" class="form-label mb-2 ml-1">Nama Kurator</label>
+                            <select id="filter-curator" class="neumorphism-select text-sm"></select>
+                        </div>
+                        <div class="flex space-x-2 lg:col-start-4">
+                            <button id="reset-filter-btn" class="neumorphism-button !w-full !py-3 !text-sm" style="color: #555;">
+                                <i class="fas fa-undo mr-2"></i>Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="table-wrapper" class="neumorphism-table-container">
+                     <p id="filter-no-results" class="hidden text-center p-8 text-slate-500 font-semibold">
+                        Tidak ada hasil yang cocok dengan filter Anda.
+                    </p>
                     <table id="results-table" class="w-full neumorphism-table">
                     </table>
                 </div>
@@ -295,6 +330,11 @@
         const closeModalBtn = document.getElementById('close-modal-btn');
         const indicatorDetailModal = document.getElementById('indicator-detail-modal');
         const closeIndicatorModalBtn = document.getElementById('close-indicator-modal-btn');
+        // --- Filter Elements (BARU) ---
+        const filterContent = document.getElementById('filter-content');
+        const filterCurator = document.getElementById('filter-curator');
+        const resetFilterBtn = document.getElementById('reset-filter-btn');
+        const noResultsMessage = document.getElementById('filter-no-results');
 
         let curationsMap = new Map();
         let contentsMap = new Map();
@@ -412,6 +452,9 @@
                     }
                 });
 
+                // Panggil fungsi untuk mengisi filter (BARU)
+                populateFilters(assignmentsByContent);
+
                 const MAX_CURATORS_COLUMNS = 3;
                 let tableHTML = '<thead><tr><th>Konten</th>';
                 for (let i = 1; i <= MAX_CURATORS_COLUMNS; i++) {
@@ -421,8 +464,12 @@
 
                 contentsMap.forEach(content => {
                     const assignedCuratorIds = assignmentsByContent.get(content.id) || [];
+                     const assignedCuratorNames = assignedCuratorIds
+                        .map(id => usersMap.get(id)?.nama)
+                        .filter(Boolean);
 
-                    tableHTML += `<tr>`;
+                    // BARU: Tambahkan data-attributes untuk filtering
+                    tableHTML += `<tr data-content-id="${content.id}" data-curator-names="${assignedCuratorNames.join('|')}">`;
                     tableHTML += `
                         <td class="content-cell">
                             <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline">
@@ -474,11 +521,77 @@
 
                 tableHTML += '</tbody>';
                 resultsTable.innerHTML = tableHTML || '<tbody><tr><td colspan="5" class="text-center">Tidak ada data konten ditemukan.</td></tr></tbody>';
+                applyFilters(); // Terapkan filter awal (jika ada)
 
             } catch (error) {
                 console.error("Error displaying dashboard:", error);
                 resultsTable.innerHTML = `<tbody><tr><td colspan="5" class="text-center p-4 text-red-500">Gagal memuat data: ${error.message}</td></tr></tbody>`;
             }
+        }
+        
+        // --- Filter Logic (BARU) ---
+        function populateFilters(assignmentsByContent) {
+            // Isi filter nama konten
+            let contentOptions = '<option value="">Semua Konten</option>';
+            const sortedContents = [...contentsMap.values()].sort((a, b) => a.title.localeCompare(b.title));
+            sortedContents.forEach(content => {
+                contentOptions += `<option value="${content.id}">${content.title}</option>`;
+            });
+            filterContent.innerHTML = contentOptions;
+
+            // Isi filter nama kurator
+            const curatorNames = new Set();
+            assignmentsByContent.forEach(userIds => {
+                userIds.forEach(userId => {
+                    const user = usersMap.get(userId);
+                    if (user && user.role === 'Kurator') {
+                        curatorNames.add(user.nama);
+                    }
+                });
+            });
+            
+            let curatorOptions = '<option value="">Semua Kurator</option>';
+            const sortedCurators = [...curatorNames].sort();
+            sortedCurators.forEach(name => {
+                curatorOptions += `<option value="${name}">${name}</option>`;
+            });
+            filterCurator.innerHTML = curatorOptions;
+        }
+
+        function applyFilters() {
+            const selectedContentId = filterContent.value;
+            const selectedCuratorName = filterCurator.value;
+            const tableRows = document.querySelectorAll('#results-table tbody tr');
+            let visibleRowCount = 0;
+
+            tableRows.forEach(row => {
+                const rowContentId = row.dataset.contentId;
+                const rowCuratorNames = row.dataset.curatorNames;
+
+                const contentMatch = !selectedContentId || rowContentId === selectedContentId;
+                const curatorMatch = !selectedCuratorName || (rowCuratorNames && rowCuratorNames.includes(selectedCuratorName));
+                
+                if (contentMatch && curatorMatch) {
+                    row.style.display = '';
+                    visibleRowCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (visibleRowCount === 0) {
+                noResultsMessage.classList.remove('hidden');
+                resultsTable.classList.add('hidden');
+            } else {
+                noResultsMessage.classList.add('hidden');
+                resultsTable.classList.remove('hidden');
+            }
+        }
+
+        function resetFilters() {
+            filterContent.value = '';
+            filterCurator.value = '';
+            applyFilters();
         }
 
         // --- Suggestion Logic ---
@@ -727,6 +840,11 @@
             closeModalBtn.addEventListener('click', closeDetailsModal);
             closeIndicatorModalBtn.addEventListener('click', closeIndicatorDetailModal);
             document.getElementById('alert-modal-ok').addEventListener('click', hideAlert);
+            
+            // --- Event Listeners untuk Filter (BARU) ---
+            filterContent.addEventListener('change', applyFilters);
+            filterCurator.addEventListener('change', applyFilters);
+            resetFilterBtn.addEventListener('click', resetFilters);
 
 
             document.body.addEventListener('click', function(event) {
