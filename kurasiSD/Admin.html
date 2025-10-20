@@ -38,6 +38,10 @@
         .pagination-btn {
             @apply px-4 py-2 border rounded-md text-sm font-medium transition-colors;
         }
+        /* Transisi untuk sidebar */
+        #admin-sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-slate-900">
@@ -91,9 +95,12 @@
 
     <!-- === ADMIN PANEL (HIDDEN BY DEFAULT) === -->
     <div id="admin-panel" class="hidden">
-        <div class="flex min-h-screen bg-slate-100">
+        <div class="relative min-h-screen md:flex bg-slate-100">
+            <!-- Overlay untuk sidebar mobile -->
+            <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
             <!-- === SIDEBAR === -->
-            <aside class="w-64 bg-slate-800 text-slate-200 flex flex-col">
+            <aside id="admin-sidebar" class="w-64 bg-slate-800 text-slate-200 flex flex-col fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-40">
                 <div class="p-6 text-center border-b border-slate-700">
                     <h1 class="text-2xl font-bold text-white">Admin Kurasi</h1>
                 </div>
@@ -124,195 +131,205 @@
                 </div>
             </aside>
 
-            <!-- === MAIN CONTENT === -->
-            <main class="flex-1 p-8 overflow-y-auto">
+            <!-- === MAIN CONTENT WRAPPER === -->
+            <div class="flex-1 flex flex-col">
+                <!-- Header Mobile -->
+                <header class="md:hidden bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-20">
+                    <button id="sidebar-toggle-btn" class="text-slate-600 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-slate-800" id="mobile-page-title">Dashboard</h2>
+                     <div class="w-6"></div> <!-- Spacer -->
+                </header>
                 
-                <!-- Dashboard Page -->
-                <div id="dashboard-page" class="page-content">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-3xl font-bold text-slate-800">Dashboard</h2>
-                         <button id="refresh-data-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg flex items-center">
-                            <i class="fas fa-sync-alt mr-2"></i><span>Muat Ulang Data</span>
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
-                            <i class="fas fa-users text-4xl text-blue-500"></i>
-                            <div>
-                                <p class="text-slate-500">Total Pengguna</p>
-                                <p id="total-users" class="text-3xl font-bold">...</p>
+                <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+                    <!-- Dashboard Page -->
+                    <div id="dashboard-page" class="page-content">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-3xl font-bold text-slate-800">Dashboard</h2>
+                             <button id="refresh-data-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                                <i class="fas fa-sync-alt mr-2"></i><span>Muat Ulang Data</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                                <i class="fas fa-users text-4xl text-blue-500"></i>
+                                <div>
+                                    <p class="text-slate-500">Total Pengguna</p>
+                                    <p id="total-users" class="text-3xl font-bold">...</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                                <i class="fas fa-file-alt text-4xl text-green-500"></i>
+                                <div>
+                                    <p class="text-slate-500">Total Konten</p>
+                                    <p id="total-content" class="text-3xl font-bold">...</p>
+                                </div>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                                <i class="fas fa-check-double text-4xl text-indigo-500"></i>
+                                <div>
+                                    <p class="text-slate-500">Total Kurasi</p>
+                                    <p id="total-curations" class="text-3xl font-bold">...</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
-                            <i class="fas fa-file-alt text-4xl text-green-500"></i>
-                            <div>
-                                <p class="text-slate-500">Total Konten</p>
-                                <p id="total-content" class="text-3xl font-bold">...</p>
-                            </div>
-                        </div>
-                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
-                            <i class="fas fa-check-double text-4xl text-indigo-500"></i>
-                            <div>
-                                <p class="text-slate-500">Total Kurasi</p>
-                                <p id="total-curations" class="text-3xl font-bold">...</p>
+
+                        <!-- NEW: Cache Update Section -->
+                        <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-bold text-slate-800 mb-3">Pembaruan Cache Dashboard Publik</h3>
+                            <p class="text-slate-600 mb-4">
+                                Klik tombol di bawah untuk mengambil semua data terbaru, menghitung statistik, dan memperbarui tampilan di halaman utama (`index.html`). 
+                                Proses ini akan menggunakan banyak kuota 'read' untuk Anda sebagai admin, tetapi akan membuat halaman utama sangat hemat untuk pengunjung.
+                            </p>
+                            <button id="update-cache-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fas fa-cloud-upload-alt mr-2"></i>
+                                <span>Perbarui Cache Sekarang</span>
+                            </button>
+                             <div class="mt-4">
+                                <h4 class="text-md font-semibold text-slate-700 mb-2">Log Proses Cache:</h4>
+                                <div id="cacheLogBox">Menunggu perintah...</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- NEW: Cache Update Section -->
-                    <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-bold text-slate-800 mb-3">Pembaruan Cache Dashboard Publik</h3>
-                        <p class="text-slate-600 mb-4">
-                            Klik tombol di bawah untuk mengambil semua data terbaru, menghitung statistik, dan memperbarui tampilan di halaman utama (`index.html`). 
-                            Proses ini akan menggunakan banyak kuota 'read' untuk Anda sebagai admin, tetapi akan membuat halaman utama sangat hemat untuk pengunjung.
-                        </p>
-                        <button id="update-cache-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                            <i class="fas fa-cloud-upload-alt mr-2"></i>
-                            <span>Perbarui Cache Sekarang</span>
-                        </button>
-                         <div class="mt-4">
-                            <h4 class="text-md font-semibold text-slate-700 mb-2">Log Proses Cache:</h4>
-                            <div id="cacheLogBox">Menunggu perintah...</div>
+                    <!-- Users Page -->
+                    <div id="users-page" class="page-content hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-3xl font-bold text-slate-800">Manajemen Pengguna</h2>
+                            <button id="add-user-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-plus mr-2"></i>Tambah Pengguna</button>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Users Page -->
-                <div id="users-page" class="page-content hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-3xl font-bold text-slate-800">Manajemen Pengguna</h2>
-                        <button id="add-user-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-plus mr-2"></i>Tambah Pengguna</button>
-                    </div>
-                    <div class="mb-4">
-                        <input type="search" id="search-user-input" placeholder="Cari nama pengguna..." class="form-input w-full max-w-sm">
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="border-b">
-                                    <th class="py-2 px-4">Nama</th>
-                                    <th class="py-2 px-4">Instansi</th>
-                                    <th class="py-2 px-4">ID/Username</th>
-                                    <th class="py-2 px-4">Role</th>
-                                    <th class="py-2 px-4">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="users-table-body">
-                                <tr><td colspan="5" class="text-center p-4">Memuat data...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Content Page -->
-                <div id="content-page" class="page-content hidden">
-                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-3xl font-bold text-slate-800">Manajemen Konten</h2>
-                        <div class="flex space-x-2">
-                             <button id="download-template-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-download mr-2"></i>Unduh Template</button>
-                             <button id="upload-excel-btn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-file-excel mr-2"></i>Upload Excel</button>
-                             <button id="add-content-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-plus mr-2"></i>Tambah Konten</button>
-                             <button id="delete-all-content-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-trash mr-2"></i>Hapus Semua Konten</button>
-                             <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls">
+                        <div class="mb-4">
+                            <input type="search" id="search-user-input" placeholder="Cari nama pengguna..." class="form-input w-full max-w-sm">
                         </div>
-                    </div>
-                    <!-- === PERUBAHAN DI SINI: SEARCH BAR === -->
-                    <div class="mb-4">
-                        <input type="search" id="search-content-input" placeholder="Cari berdasarkan judul konten..." class="form-input w-full max-w-sm">
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <div class="overflow-x-auto">
+                        <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
                             <table class="w-full text-left">
                                 <thead>
                                     <tr class="border-b">
-                                        <th class="py-2 px-4">Judul</th>
-                                        <th class="py-2 px-4">URL</th>
-                                        <th class="py-2 px-4">Subjek</th>
+                                        <th class="py-2 px-4">Nama</th>
+                                        <th class="py-2 px-4">Instansi</th>
+                                        <th class="py-2 px-4">ID/Username</th>
+                                        <th class="py-2 px-4">Role</th>
                                         <th class="py-2 px-4">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="content-table-body">
-                                    <!-- Konten akan dirender oleh JavaScript -->
+                                <tbody id="users-table-body">
+                                    <tr><td colspan="5" class="text-center p-4">Memuat data...</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <!-- === PERUBAHAN DI SINI: PAGINATION CONTROLS === -->
-                    <div id="content-pagination-controls" class="mt-4 flex justify-between items-center">
-                        <!-- Paginasi akan dirender oleh JavaScript -->
-                    </div>
-                </div>
-                
-                <!-- Assignments Page -->
-                <div id="assignments-page" class="page-content hidden">
-                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-3xl font-bold text-slate-800">Penugasan Konten</h2>
-                        <button id="random-assign-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
-                            <i class="fas fa-random mr-2"></i>Bagikan Penugasan Acak
-                        </button>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md">
+
+                    <!-- Content Page -->
+                    <div id="content-page" class="page-content hidden">
+                         <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-3xl font-bold text-slate-800">Manajemen Konten</h2>
+                            <div class="flex space-x-2">
+                                 <button id="download-template-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-download mr-2"></i>Unduh Template</button>
+                                 <button id="upload-excel-btn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-file-excel mr-2"></i>Upload Excel</button>
+                                 <button id="add-content-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-plus mr-2"></i>Tambah Konten</button>
+                                 <button id="delete-all-content-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center"><i class="fas fa-trash mr-2"></i>Hapus Semua Konten</button>
+                                 <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls">
+                            </div>
+                        </div>
+                        <!-- === PERUBAHAN DI SINI: SEARCH BAR === -->
                         <div class="mb-4">
-                            <label for="user-select" class="block text-sm font-medium text-slate-700">Pilih Pengguna (Role Kurator):</label>
-                            <select id="user-select" class="form-input mt-1">
-                                <option value="">-- Pilih Kurator --</option>
-                            </select>
+                            <input type="search" id="search-content-input" placeholder="Cari berdasarkan judul konten..." class="form-input w-full max-w-sm">
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                            <div>
-                                <h3 class="font-bold text-lg mb-2">Konten yang Ditugaskan</h3>
-                                <ul id="assigned-content-list" class="border rounded-md p-2 h-96 overflow-y-auto"></ul>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="border-b">
+                                            <th class="py-2 px-4">Judul</th>
+                                            <th class="py-2 px-4">URL</th>
+                                            <th class="py-2 px-4">Subjek</th>
+                                            <th class="py-2 px-4">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="content-table-body">
+                                        <!-- Konten akan dirender oleh JavaScript -->
+                                    </tbody>
+                                </table>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-lg mb-2">Daftar Semua Konten</h3>
-                                <ul id="all-content-list" class="border rounded-md p-2 h-96 overflow-y-auto"></ul>
+                        </div>
+                        <!-- === PERUBAHAN DI SINI: PAGINATION CONTROLS === -->
+                        <div id="content-pagination-controls" class="mt-4 flex justify-between items-center">
+                            <!-- Paginasi akan dirender oleh JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Assignments Page -->
+                    <div id="assignments-page" class="page-content hidden">
+                         <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-3xl font-bold text-slate-800">Penugasan Konten</h2>
+                            <button id="random-assign-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                                <i class="fas fa-random mr-2"></i>Bagikan Penugasan Acak
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <div class="mb-4">
+                                <label for="user-select" class="block text-sm font-medium text-slate-700">Pilih Pengguna (Role Kurator):</label>
+                                <select id="user-select" class="form-input mt-1">
+                                    <option value="">-- Pilih Kurator --</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div>
+                                    <h3 class="font-bold text-lg mb-2">Konten yang Ditugaskan</h3>
+                                    <ul id="assigned-content-list" class="border rounded-md p-2 h-96 overflow-y-auto"></ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg mb-2">Daftar Semua Konten</h3>
+                                    <ul id="all-content-list" class="border rounded-md p-2 h-96 overflow-y-auto"></ul>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Hasil Kurasi Page -->
-                <div id="hasil-page" class="page-content hidden">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-6">Hasil dan Kemajuan Kurasi</h2>
-                    <div class="bg-white p-6 rounded-lg shadow-md overflow-auto max-h-[75vh]">
-                        <table class="w-full text-left whitespace-nowrap">
-                            <thead id="hasil-table-head">
-                                <!-- Header will be generated by JavaScript -->
-                            </thead>
-                            <tbody id="hasil-table-body">
-                                <tr><td colspan="3" class="text-center p-4">Memuat data...</td></tr>
-                            </tbody>
-                        </table>
+                    <!-- Hasil Kurasi Page -->
+                    <div id="hasil-page" class="page-content hidden">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Hasil dan Kemajuan Kurasi</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md overflow-auto max-h-[75vh]">
+                            <table class="w-full text-left whitespace-nowrap">
+                                <thead id="hasil-table-head">
+                                    <!-- Header will be generated by JavaScript -->
+                                </thead>
+                                <tbody id="hasil-table-body">
+                                    <tr><td colspan="3" class="text-center p-4">Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
 
 
-                <!-- Settings Page (Backup, Restore, Reset) -->
-                <div id="settings-page" class="page-content hidden">
-                     <h2 class="text-3xl font-bold text-slate-800 mb-6">Pengaturan & Data</h2>
-                     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-auto">
-                        <div class="border-b pb-6 mb-6">
-                            <h3 class="text-xl font-semibold text-slate-800 mb-4">Backup & Restore Data</h3>
-                            <p class="text-sm text-slate-500 mb-4">Simpan seluruh data (pengguna, konten, penugasan, kurasi) ke dalam satu file JSON, atau pulihkan data dari file backup.</p>
-                            <div class="flex space-x-4">
-                                <button id="backupButton" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"><i class="fas fa-download mr-2"></i>Backup Seluruh Data</button>
-                                <button id="restoreButtonTrigger" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"><i class="fas fa-upload mr-2"></i>Restore Dari File</button>
-                                <input type="file" id="restoreFileInput" class="hidden" accept="application/json">
+                    <!-- Settings Page (Backup, Restore, Reset) -->
+                    <div id="settings-page" class="page-content hidden">
+                         <h2 class="text-3xl font-bold text-slate-800 mb-6">Pengaturan & Data</h2>
+                         <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-auto">
+                            <div class="border-b pb-6 mb-6">
+                                <h3 class="text-xl font-semibold text-slate-800 mb-4">Backup & Restore Data</h3>
+                                <p class="text-sm text-slate-500 mb-4">Simpan seluruh data (pengguna, konten, penugasan, kurasi) ke dalam satu file JSON, atau pulihkan data dari file backup.</p>
+                                <div class="flex space-x-4">
+                                    <button id="backupButton" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"><i class="fas fa-download mr-2"></i>Backup Seluruh Data</button>
+                                    <button id="restoreButtonTrigger" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"><i class="fas fa-upload mr-2"></i>Restore Dari File</button>
+                                    <input type="file" id="restoreFileInput" class="hidden" accept="application/json">
+                                </div>
+                            </div>
+
+                            <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md mb-6" role="alert">
+                                <p class="font-bold">Zona Berbahaya!</p>
+                                <p>Tindakan reset akan menghapus koleksi `users`, `contents`, `assignments`, dan `curations` lalu mengisinya dengan data default.</p>
+                            </div>
+                            <button id="resetButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default</button>
+                            <div class="mt-6">
+                                <h3 class="text-lg font-semibold text-slate-700 mb-2">Log Proses:</h3>
+                                <div id="logBox">Menunggu perintah...</div>
                             </div>
                         </div>
-
-                        <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md mb-6" role="alert">
-                            <p class="font-bold">Zona Berbahaya!</p>
-                            <p>Tindakan reset akan menghapus koleksi `users`, `contents`, `assignments`, dan `curations` lalu mengisinya dengan data default.</p>
-                        </div>
-                        <button id="resetButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-sync-alt mr-2"></i>Reset & Buat Database Default</button>
-                        <div class="mt-6">
-                            <h3 class="text-lg font-semibold text-slate-700 mb-2">Log Proses:</h3>
-                            <div id="logBox">Menunggu perintah...</div>
-                        </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     </div>
 
@@ -460,6 +477,13 @@
         const confirmModalNo = document.getElementById('confirm-modal-no');
         const infoModal = document.getElementById('info-modal');
         let confirmCallback = null;
+        
+        // --- Elemen Baru untuk Navigasi Mobile ---
+        const sidebar = document.getElementById('admin-sidebar');
+        const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const mobilePageTitle = document.getElementById('mobile-page-title');
+
 
         // --- Login & Authentication Logic ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -550,15 +574,45 @@
         });
 
         // --- Navigation Logic ---
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        }
+
+        sidebarToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (sidebar.classList.contains('-translate-x-full')) {
+                openSidebar();
+            } else {
+                closeSidebar();
+            }
+        });
+
+        sidebarOverlay.addEventListener('click', closeSidebar);
+        
         sidebarLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const target = link.dataset.target;
+                const pageTitle = link.querySelector('span').textContent;
+
                 sidebarLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
+                
                 pageContents.forEach(page => {
                     page.id === `${target}-page` ? page.classList.remove('hidden') : page.classList.add('hidden');
                 });
+
+                mobilePageTitle.textContent = pageTitle;
+
+                if (window.innerWidth < 768) {
+                    closeSidebar();
+                }
             });
         });
         
