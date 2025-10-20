@@ -124,6 +124,8 @@
         }
 
         .neumorphism-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
@@ -222,7 +224,30 @@
                             <i class="fas fa-file-excel mr-2"></i> Export ke Excel
                         </button>
                     </div>
+                    
+                    <!-- === FILTER SECTION (BARU UNTUK TABEL INDIKATOR) === -->
+                    <div id="indicator-filter-section" class="neumorphism-card p-4 md:p-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label for="filter-indicator-content" class="form-label mb-2 ml-1">Nama Konten</label>
+                                <select id="filter-indicator-content" class="neumorphism-select text-sm"></select>
+                            </div>
+                            <div>
+                                <label for="filter-indicator-curator" class="form-label mb-2 ml-1">Nama Kurator</label>
+                                <select id="filter-indicator-curator" class="neumorphism-select text-sm"></select>
+                            </div>
+                            <div class="flex space-x-2 lg:col-start-4">
+                                <button id="reset-indicator-filter-btn" class="neumorphism-button !w-full !py-3 !text-sm" style="color: #555;">
+                                    <i class="fas fa-undo mr-2"></i>Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="indicator-table-wrapper" class="neumorphism-table-container">
+                         <p id="indicator-filter-no-results" class="hidden text-center p-8 text-slate-500 font-semibold">
+                            Tidak ada hasil yang cocok dengan filter Anda.
+                        </p>
                         <table id="indicator-details-table" class="w-full neumorphism-table">
                             <!-- Konten tabel akan diisi oleh JavaScript -->
                         </table>
@@ -375,6 +400,11 @@
         const closeModalBtn = document.getElementById('close-modal-btn');
         const indicatorDetailModal = document.getElementById('indicator-detail-modal');
         const closeIndicatorModalBtn = document.getElementById('close-indicator-modal-btn');
+        // --- Filter Elements (BARU) ---
+        const filterIndicatorContent = document.getElementById('filter-indicator-content');
+        const filterIndicatorCurator = document.getElementById('filter-indicator-curator');
+        const resetIndicatorFilterBtn = document.getElementById('reset-indicator-filter-btn');
+        const indicatorNoResultsMessage = document.getElementById('indicator-filter-no-results');
 
         let curationsMap = new Map();
         let contentsMap = new Map();
@@ -536,7 +566,7 @@
 
                 if (assignedCuratorIds.length === 0) {
                     tbodyHTML += `
-                        <tr>
+                        <tr data-content-id="${content.id}" data-curator-name="">
                             <td class="content-cell">${content.title}</td>
                             <td colspan="${curationQuestions.length + 1}" class="text-slate-500 italic text-center">
                                 Belum ada kurator yang ditugaskan untuk konten ini.
@@ -546,10 +576,11 @@
                 } else {
                     assignedCuratorIds.forEach(curatorId => {
                         const curator = usersMap.get(curatorId);
+                        const curatorName = curator ? curator.nama : '';
                         const curationId = `${curatorId}_${content.id}`;
                         const curationData = curationsMap.get(curationId);
 
-                        tbodyHTML += `<tr>`;
+                        tbodyHTML += `<tr data-content-id="${content.id}" data-curator-name="${curatorName}">`;
                         tbodyHTML += `<td class="content-cell">${content.title}</td>`;
                         tbodyHTML += `<td class="curator-cell">${curator ? curator.nama : 'ID Kurator Tidak Dikenal'}</td>`;
 
@@ -597,6 +628,70 @@
 
             // 4. Gabungkan dan render
             table.innerHTML = theadHTML + tbodyHTML + tfootHTML;
+        }
+
+        // --- Logika Filter untuk Tabel Indikator (BARU) ---
+        function populateIndicatorFilters(contentsMap, usersMap, assignmentsByContent) {
+            let contentOptions = '<option value="">Semua Konten</option>';
+            const sortedContents = [...contentsMap.values()].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+            sortedContents.forEach(content => {
+                contentOptions += `<option value="${content.id}">${content.title}</option>`;
+            });
+            filterIndicatorContent.innerHTML = contentOptions;
+
+            const curatorNames = new Set();
+            assignmentsByContent.forEach(userIds => {
+                userIds.forEach(userId => {
+                    const user = usersMap.get(userId);
+                    if (user && user.role === 'Kurator') {
+                        curatorNames.add(user.nama);
+                    }
+                });
+            });
+            
+            let curatorOptions = '<option value="">Semua Kurator</option>';
+            const sortedCurators = [...curatorNames].sort();
+            sortedCurators.forEach(name => {
+                curatorOptions += `<option value="${name}">${name}</option>`;
+            });
+            filterIndicatorCurator.innerHTML = curatorOptions;
+        }
+
+        function applyIndicatorFilters() {
+            const selectedContentId = filterIndicatorContent.value;
+            const selectedCuratorName = filterIndicatorCurator.value;
+            const tableRows = document.querySelectorAll('#indicator-details-table tbody tr');
+            const indicatorTable = document.getElementById('indicator-details-table');
+            let visibleRowCount = 0;
+
+            tableRows.forEach(row => {
+                const rowContentId = row.dataset.contentId;
+                const rowCuratorName = row.dataset.curatorName;
+
+                const contentMatch = !selectedContentId || rowContentId === selectedContentId;
+                const curatorMatch = !selectedCuratorName || rowCuratorName === selectedCuratorName;
+                
+                if (contentMatch && curatorMatch) {
+                    row.style.display = '';
+                    visibleRowCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (visibleRowCount === 0) {
+                indicatorNoResultsMessage.classList.remove('hidden');
+                if (indicatorTable) indicatorTable.classList.add('hidden');
+            } else {
+                indicatorNoResultsMessage.classList.add('hidden');
+                if (indicatorTable) indicatorTable.classList.remove('hidden');
+            }
+        }
+
+        function resetIndicatorFilters() {
+            filterIndicatorContent.value = '';
+            filterIndicatorCurator.value = '';
+            applyIndicatorFilters();
         }
 
         // --- Data Fetching and Rendering ---
@@ -686,7 +781,10 @@
                 // Panggil fungsi render tabel detail
                 renderIndicatorDetailsTable(contentsMap, usersMap, curationsMap, assignmentsByContent, curationQuestions);
                 
-                // BARU: Panggil fungsi untuk render tabel dokumen
+                // Panggil fungsi untuk mengisi filter tabel indikator
+                populateIndicatorFilters(contentsMap, usersMap, assignmentsByContent);
+
+                // Panggil fungsi untuk render tabel dokumen
                 displayDocumentsTable();
 
             } catch (error) {
@@ -715,7 +813,7 @@
             if (!tableBody) return;
             
             if (contentsToRender.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-slate-500">Tidak ada konten yang cocok.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-slate-500">Tidak ada konten dengan dokumen yang ditemukan.</td></tr>`;
                 return;
             }
 
@@ -758,7 +856,12 @@
                     throw new Error("Cache 'content_details' tidak ditemukan. Mohon jalankan pembaruan cache dari panel Admin.");
                 }
                 
-                allContentsDataForDocs = docSnap.data().contents;
+                const allData = docSnap.data().contents;
+
+                // Saring konten untuk hanya menampilkan yang memiliki dokumen
+                allContentsDataForDocs = allData.filter(content => 
+                    content.curations && content.curations.some(curation => curation.photoUrl)
+                );
                 
                 populateDocumentFilterDropdown(allContentsDataForDocs);
                 renderDocumentsTable(allContentsDataForDocs);
@@ -1031,6 +1134,11 @@
             document.getElementById('export-summary-btn').addEventListener('click', () => exportTableToExcel('results-table', 'Tinjauan_Hasil_Kurasi'));
             document.getElementById('export-indicator-btn').addEventListener('click', () => exportTableToExcel('indicator-details-table', 'Nilai_Per_Indikator'));
             document.getElementById('export-documents-btn').addEventListener('click', () => exportTableToExcel('documents-table', 'Daftar_Dokumen_Temuan'));
+            
+            // Event listener untuk filter tabel indikator
+            filterIndicatorContent.addEventListener('change', applyIndicatorFilters);
+            filterIndicatorCurator.addEventListener('change', applyIndicatorFilters);
+            resetIndicatorFilterBtn.addEventListener('click', resetIndicatorFilters);
         });
     </script>
 </body>
