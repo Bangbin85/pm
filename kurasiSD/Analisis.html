@@ -209,7 +209,30 @@
                             <i class="fas fa-file-excel mr-2"></i> Export ke Excel
                         </button>
                     </div>
+
+                    <!-- === FILTER SECTION (BARU UNTUK TABEL TINJAUAN) === -->
+                    <div id="summary-filter-section" class="neumorphism-card p-4 md:p-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label for="filter-summary-content" class="form-label mb-2 ml-1">Nama Konten</label>
+                                <select id="filter-summary-content" class="neumorphism-select text-sm"></select>
+                            </div>
+                            <div>
+                                <label for="filter-summary-result" class="form-label mb-2 ml-1">Hasil Rata-rata</label>
+                                <select id="filter-summary-result" class="neumorphism-select text-sm"></select>
+                            </div>
+                            <div class="flex space-x-2 lg:col-start-4">
+                                <button id="reset-summary-filter-btn" class="neumorphism-button !w-full !py-3 !text-sm" style="color: #555;">
+                                    <i class="fas fa-undo mr-2"></i>Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="table-wrapper" class="neumorphism-table-container">
+                        <p id="summary-filter-no-results" class="hidden text-center p-8 text-slate-500 font-semibold">
+                            Tidak ada hasil yang cocok dengan filter Anda.
+                        </p>
                         <table id="results-table" class="w-full neumorphism-table">
                             <!-- Content will be injected by JavaScript -->
                         </table>
@@ -225,7 +248,7 @@
                         </button>
                     </div>
                     
-                    <!-- === FILTER SECTION (BARU UNTUK TABEL INDIKATOR) === -->
+                    <!-- === FILTER SECTION (UNTUK TABEL INDIKATOR) === -->
                     <div id="indicator-filter-section" class="neumorphism-card p-4 md:p-6 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
                             <div>
@@ -254,7 +277,7 @@
                     </div>
                 </div>
 
-                <!-- BARU: Tabel Daftar Dokumen -->
+                <!-- Tabel Daftar Dokumen -->
                 <div id="dokumen-section" class="mt-12 scroll-mt-24">
                     <div class="flex justify-between items-center mb-6 px-4 sm:px-0">
                         <h2 class="text-2xl font-semibold text-slate-800">Tabel Daftar Dokumen Temuan</h2>
@@ -400,7 +423,14 @@
         const closeModalBtn = document.getElementById('close-modal-btn');
         const indicatorDetailModal = document.getElementById('indicator-detail-modal');
         const closeIndicatorModalBtn = document.getElementById('close-indicator-modal-btn');
-        // --- Filter Elements (BARU) ---
+        
+        // --- Filter Elements (Tinjauan) ---
+        const filterSummaryContent = document.getElementById('filter-summary-content');
+        const filterSummaryResult = document.getElementById('filter-summary-result');
+        const resetSummaryFilterBtn = document.getElementById('reset-summary-filter-btn');
+        const summaryNoResultsMessage = document.getElementById('summary-filter-no-results');
+
+        // --- Filter Elements (Indikator) ---
         const filterIndicatorContent = document.getElementById('filter-indicator-content');
         const filterIndicatorCurator = document.getElementById('filter-indicator-curator');
         const resetIndicatorFilterBtn = document.getElementById('reset-indicator-filter-btn');
@@ -630,7 +660,61 @@
             table.innerHTML = theadHTML + tbodyHTML + tfootHTML;
         }
 
-        // --- Logika Filter untuk Tabel Indikator (BARU) ---
+        // --- Logika Filter untuk Tabel Tinjauan (BARU) ---
+        function populateSummaryFilters(contentsMap) {
+            let contentOptions = '<option value="">Semua Konten</option>';
+            const sortedContents = [...contentsMap.values()].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+            sortedContents.forEach(content => {
+                contentOptions += `<option value="${content.id}">${content.title}</option>`;
+            });
+            filterSummaryContent.innerHTML = contentOptions;
+
+            let resultOptions = '<option value="">Semua Hasil</option>';
+            resultCategories.forEach(cat => {
+                 resultOptions += `<option value="${cat}">${cat}</option>`;
+            });
+            filterSummaryResult.innerHTML = resultOptions;
+        }
+
+        function applySummaryFilters() {
+            const selectedContentId = filterSummaryContent.value;
+            const selectedResult = filterSummaryResult.value;
+            const tableRows = document.querySelectorAll('#results-table tbody tr');
+            const summaryTable = document.getElementById('results-table');
+            let visibleRowCount = 0;
+
+            tableRows.forEach(row => {
+                const rowContentId = row.dataset.contentId;
+                const rowResult = row.dataset.averageResult;
+
+                const contentMatch = !selectedContentId || rowContentId === selectedContentId;
+                const resultMatch = !selectedResult || rowResult === selectedResult;
+                
+                if (contentMatch && resultMatch) {
+                    row.style.display = '';
+                    visibleRowCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+             if (visibleRowCount === 0) {
+                summaryNoResultsMessage.classList.remove('hidden');
+                if (summaryTable) summaryTable.classList.add('hidden');
+            } else {
+                summaryNoResultsMessage.classList.add('hidden');
+                if (summaryTable) summaryTable.classList.remove('hidden');
+            }
+        }
+
+        function resetSummaryFilters() {
+            filterSummaryContent.value = '';
+            filterSummaryResult.value = '';
+            applySummaryFilters();
+        }
+
+
+        // --- Logika Filter untuk Tabel Indikator ---
         function populateIndicatorFilters(contentsMap, usersMap, assignmentsByContent) {
             let contentOptions = '<option value="">Semua Konten</option>';
             const sortedContents = [...contentsMap.values()].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
@@ -736,6 +820,7 @@
 
                 contentsMap.forEach(content => {
                     const assignedCuratorIds = assignmentsByContent.get(content.id) || [];
+                    const { averageResultText, averageScore } = calculateAverageResult(content, assignmentsByContent, curationsMap);
                     
                     let curatorCellsHTML = '';
                     for (let i = 0; i < MAX_CURATORS_COLUMNS; i++) {
@@ -757,9 +842,7 @@
                         curatorCellsHTML += `</td>`;
                     }
                     
-                    const { averageResultText, averageScore } = calculateAverageResult(content, assignmentsByContent, curationsMap);
-                    
-                    tableHTML += `<tr>
+                    tableHTML += `<tr data-content-id="${content.id}" data-average-result="${averageResultText}">
                                     <td class="content-cell">
                                         <a href="${content.url}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline">${content.title}</a>
                                         <p class="text-sm text-slate-600 mt-1">${content.subject || ''}</p>
@@ -777,6 +860,9 @@
 
                 tableHTML += '</tbody>';
                 resultsTable.innerHTML = tableHTML || `<tbody><tr><td colspan="6" class="text-center">Tidak ada data konten ditemukan.</td></tr></tbody>`;
+                
+                // Panggil fungsi untuk mengisi filter tabel tinjauan
+                populateSummaryFilters(contentsMap);
 
                 // Panggil fungsi render tabel detail
                 renderIndicatorDetailsTable(contentsMap, usersMap, curationsMap, assignmentsByContent, curationQuestions);
@@ -897,7 +983,6 @@
         }
         
         // --- Fungsi untuk ekspor ke Excel ---
-        // PERBAIKAN: Fungsi ini dimodifikasi untuk mengekspor URL pada tabel dokumen
         function exportTableToExcel(tableID, filename = '') {
             const table = document.getElementById(tableID);
             if (!table) {
@@ -1135,6 +1220,11 @@
             document.getElementById('export-indicator-btn').addEventListener('click', () => exportTableToExcel('indicator-details-table', 'Nilai_Per_Indikator'));
             document.getElementById('export-documents-btn').addEventListener('click', () => exportTableToExcel('documents-table', 'Daftar_Dokumen_Temuan'));
             
+            // Event listener untuk filter tabel tinjauan
+            filterSummaryContent.addEventListener('change', applySummaryFilters);
+            filterSummaryResult.addEventListener('change', applySummaryFilters);
+            resetSummaryFilterBtn.addEventListener('click', resetSummaryFilters);
+
             // Event listener untuk filter tabel indikator
             filterIndicatorContent.addEventListener('change', applyIndicatorFilters);
             filterIndicatorCurator.addEventListener('change', applyIndicatorFilters);
