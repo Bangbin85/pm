@@ -565,6 +565,23 @@
         color: var(--success-color); /* Atau warna aksen lain */
     }
 
+#comingSoonModal .modal-content {
+        width: 700px;       /* Lebih ramping (fixed width), tidak mengikuti 80% layar */
+        max-width: 90vw;    /* Agar tetap aman di layar HP */
+        height: 500px;      /* Memaksa modal menjadi lebih tinggi */
+    }
+
+    /* Penyesuaian agar teks tidak tertutup gambar karena modal menyempit */
+    #comingSoonModal .modal-text-content {
+        flex: 1;            /* Memberi ruang teks yang proporsional */
+        padding-right: 10px;
+    }
+    
+    /* Memastikan container gambar mengikuti tinggi baru */
+    #comingSoonModal .modal-image-container {
+        width: 45%;         /* Sedikit dikurangi agar teks lebih lega */
+    }
+		
     </style>
 </head>
 <body>
@@ -889,4 +906,5 @@
     </script>
 </body>
 </html>
+
 
