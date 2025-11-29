@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BANGBIN-6.0</title>
+
     <link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/16rll5zsRdwTbR3nF_NmPKwY51tg4tnOn">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,9 +48,10 @@
         min-height: 100vh;
     }
     
+    /* PERBAIKAN: Container lebar 95% */
     .container {
-        width: 100%;
-        max-width: 900px;
+        width: 95%;
+        max-width: 95%; /* Memastikan lebar maksimal mengikuti 95% layar */
         margin: auto;
         padding: 25px 30px;
         border-radius: var(--border-radius);
@@ -147,17 +149,17 @@
         position: absolute;
         top: calc(100% + 5px);
         left: 0;
-        width: max-content; /* Lebar sesuai konten */
-        max-width: calc(100vw - 40px); /* Batas lebar maksimal */
+        width: max-content;
+        max-width: calc(100vw - 40px);
         z-index: 1000;
-        background: rgba(30, 40, 70, 0.8);
+        background: rgba(30, 40, 70, 0.95);
         backdrop-filter: blur(10px);
         border-radius: 10px;
         box-shadow: 0 8px 30px rgba(0,0,0,0.25);
         border: 1px solid var(--white-20);
         padding: 10px;
         display: grid;
-        grid-template-columns: repeat(3, minmax(160px, 1fr)); /* Pertahankan grid 3 kolom */
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
         gap: 5px;
         opacity: 0;
         transform: translateY(10px);
@@ -173,7 +175,7 @@
     .dropdown-menu a {
         padding: 8px 10px;
         border-radius: 6px;
-        font-size: 0.85em; /* Ukuran font disesuaikan */
+        font-size: 0.85em;
         background-color: transparent; border: none;
         text-align: left; transition: background-color 0.2s ease, color 0.2s ease;
         width: auto;
@@ -188,7 +190,7 @@
         margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--white-20);
         display: flex; justify-content: flex-end; align-items: center;
         gap: 12px;
-        flex-wrap: wrap; /* Memastikan tombol tidak keluar kontainer */
+        flex-wrap: wrap;
     }
     .footer-actions button, .restore-wrapper label {
         display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px;
@@ -215,14 +217,21 @@
         opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    
+    /* PERBAIKAN: Modal lebar 95% */
     .modal-content {
         background: linear-gradient(145deg, #2e416a, #202e50);
         border: 1px solid var(--white-20); border-radius: 20px;
-        width: 90%; max-width: 800px;
+        width: 95%; /* Lebar modal 95% */
+        max-width: 95%; /* Hapus batasan max-width pixel agar full responsive 95% */
         box-shadow: 0 10px 40px rgba(0,0,0,0.4); position: relative;
         transform: scale(0.95); transition: transform 0.3s ease;
+        overflow: hidden; /* Mencegah konten keluar */
+        display: flex;
+        flex-direction: column;
     }
     .modal-overlay.show .modal-content { transform: scale(1); }
+    
     .modal-close-btn {
         position: absolute; top: 15px; right: 20px; background: transparent;
         border: none; font-size: 28px; line-height: 1;
@@ -230,7 +239,14 @@
         z-index: 10;
     }
     .modal-close-btn:hover { color: white; }
-    .modal-body { display: flex; align-items: center; padding: 40px; gap: 35px; }
+    .modal-body { 
+        display: flex; 
+        align-items: center; 
+        padding: 40px; 
+        gap: 35px;
+        overflow-y: auto; /* Agar bisa di-scroll jika konten panjang */
+        max-height: 80vh; 
+    }
     .modal-text-container { flex: 1; text-align: left; }
     .modal-icon { font-size: 40px; color: #92c5ff; margin-bottom: 15px; }
     .modal-title { font-size: 2em; font-weight: 700; margin: 0 0 10px 0; color: white; }
@@ -243,9 +259,10 @@
         align-items: center;
         gap: 20px;
         padding: 20px;
+        height: 100%;
     }
     .modal-text-content {
-        flex: 1.2; /* Beri lebih banyak ruang untuk teks */
+        flex: 1.2;
         text-align: left;
         z-index: 2;
     }
@@ -254,12 +271,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        position: absolute; /* Posisikan absolut terhadap parent */
+        position: absolute;
         right: 0;
         top: 0;
         bottom: 0;
         width: 50%;
-        opacity: 0.90; /* Agak transparan */
+        opacity: 0.90;
         overflow: hidden;
         z-index: 1;
     }
@@ -267,11 +284,7 @@
         height: 100%;
         width: auto;
         min-width: 100%;
-        object-fit: content;
-    }
-    .modal-content {
-        position: relative; /* Diperlukan untuk positioning absolut child */
-        overflow: hidden; /* Sembunyikan gambar yang meluap */
+        object-fit: cover;
     }
     .modal-title-futuristic {
         font-size: 2em;
@@ -313,7 +326,7 @@
       to { opacity: 1; }
     }
 
-    /* === [BARU] CSS UNTUK MODAL PENGEMBANG & CAROUSEL === */
+    /* === MODAL PENGEMBANG & CAROUSEL === */
     #devModal .modal-content {
         background: transparent;
         border: none;
@@ -321,11 +334,11 @@
         width: auto;
         max-width: none;
         height: auto;
-        overflow: visible; /* Memastikan shadow tidak terpotong */
+        overflow: visible;
     }
 
     #devModal .modal-close-btn {
-        position: fixed; /* Selalu di pojok layar */
+        position: fixed;
         top: 20px;
         right: 20px;
         background: rgba(30,30,30,0.5);
@@ -338,7 +351,7 @@
     
     .dev-modal-title {
         position: absolute;
-        top: -80px; /* Posisi di atas kartu */
+        top: -80px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 2em;
@@ -352,7 +365,7 @@
         justify-content: center;
         align-items: center;
         perspective: 1200px;
-        padding: 40px 0; /* Memberi ruang untuk hover */
+        padding: 40px 0;
     }
 
     .dev-card {
@@ -373,16 +386,14 @@
         color: white;
         
         transition: transform 0.4s ease, z-index 0.4s ease;
-        margin: 0 -40px; /* Membuat kartu saling tumpang tindih */
+        margin: 0 -40px;
     }
 
-    /* Pengaturan awal posisi kartu agar terlihat semua */
     .dev-card:nth-child(1) { transform: translateX(60px) rotateY(20deg); }
     .dev-card:nth-child(2) { transform: translateX(20px) rotateY(10deg); z-index: 1; }
     .dev-card:nth-child(3) { transform: translateX(-20px) rotateY(-10deg); z-index: 2; }
     .dev-card:nth-child(4) { transform: translateX(-60px) rotateY(-20deg); z-index: 3; }
 
-    /* Efek hover untuk mengangkat kartu */
     .dev-card:hover {
         transform: scale(1.1) rotateY(0) translateY(-20px);
         z-index: 10;
@@ -421,10 +432,9 @@
         transform: scale(1.1);
     }
 
-    /* Gaya khusus untuk kartu pengembang pertama */
     .dev-card-special {
         overflow: hidden;
-        justify-content: flex-end; /* Dorong konten ke bawah */
+        justify-content: flex-end;
         padding-bottom: 2rem;
     }
 
@@ -434,21 +444,21 @@
         left: 70px;
         width: 100%;
         height: 120%;
-        background-image: url('https://lh3.googleusercontent.com/d/1eYOU8bwDvS1VmRBtWrIHyMqkvL1Foui0'); /* URL gambar */
+        background-image: url('https://lh3.googleusercontent.com/d/1eYOU8bwDvS1VmRBtWrIHyMqkvL1Foui0');
         background-size: cover;
         background-position: center;
-        z-index: 1; /* Di belakang konten */
+        z-index: 1;
         opacity: 0.4;
         transition: opacity 0.4s ease;
     }
 
     .dev-card-special:hover .dev-card-bg {
-        opacity: 0.6; /* Lebih jelas saat di-hover */
+        opacity: 0.6;
     }
 
     .dev-card-content {
         position: relative;
-        z-index: 2; /* Di atas background */
+        z-index: 2;
         text-align: center;
     }
 
@@ -460,75 +470,110 @@
     .dev-card-special .social-links a {
         text-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
-     /* === AKHIR [BARU] CSS === */
 
-/* === [BARU] CSS UNTUK MODAL AKSI PROFESIONAL === */
-.modal-body {
-    align-items: flex-start; /* Agar ikon dan teks sejajar di atas */
-}
-.modal-icon-large {
-    font-size: 3em;
-    color: var(--primary-glow);
-    padding-top: 5px;
-}
-.modal-icon-large .fa-check-circle { color: #28a745; }
-.modal-icon-large .fa-times-circle,
-.modal-icon-large .fa-exclamation-triangle { color: #df4759; }
+    /* === MODAL AKSI PROFESIONAL === */
+    .modal-body {
+        align-items: flex-start;
+    }
+    .modal-icon-large {
+        font-size: 3em;
+        color: var(--primary-glow);
+        padding-top: 5px;
+    }
+    .modal-icon-large .fa-check-circle { color: #28a745; }
+    .modal-icon-large .fa-times-circle,
+    .modal-icon-large .fa-exclamation-triangle { color: #df4759; }
 
-.modal-actions-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 20px 35px;
-    background-color: rgba(0,0,0,0.15);
-    border-top: 1px solid var(--white-20);
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-}
-.action-button {
-    padding: 10px 22px;
-    font-size: 0.9em;
-    font-weight: 600;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.action-button.primary {
-    background-color: #007bff;
-    color: white;
-    box-shadow: 0 4px 15px var(--primary-glow);
-}
-.action-button.primary:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-}
-.action-button.danger {
-    background-color: #dc3545;
-    color: white;
-    box-shadow: 0 4px 15px var(--danger-glow);
-}
-.action-button.danger:hover {
-    background-color: #c82333;
-    transform: translateY(-2px);
-}
-.action-button.secondary {
-    background-color: var(--white-20);
-    color: var(--white-70);
-}
-.action-button.secondary:hover {
-    background-color: var(--white-70);
-    color: #1d2b4b;
-}
-/* === AKHIR DARI CSS BARU === */
+    .modal-actions-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 20px 35px;
+        background-color: rgba(0,0,0,0.15);
+        border-top: 1px solid var(--white-20);
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+    }
+    .action-button {
+        padding: 10px 22px;
+        font-size: 0.9em;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .action-button.primary {
+        background-color: #007bff;
+        color: white;
+        box-shadow: 0 4px 15px var(--primary-glow);
+    }
+    .action-button.primary:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+    .action-button.danger {
+        background-color: #dc3545;
+        color: white;
+        box-shadow: 0 4px 15px var(--danger-glow);
+    }
+    .action-button.danger:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+    }
+    .action-button.secondary {
+        background-color: var(--white-20);
+        color: var(--white-70);
+    }
+    .action-button.secondary:hover {
+        background-color: var(--white-70);
+        color: #1d2b4b;
+    }
 
+    /* === CSS TAMBAHAN UNTUK CHANGELOG === */
+    .changelog-box {
+        margin-top: 25px;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        border: 1px solid var(--white-10);
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .changelog-title {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #92c5ff;
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--white-10);
+        padding-bottom: 5px;
+    }
+    .changelog-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.9em;
+        color: var(--white-70);
+    }
+    .changelog-list li {
+        margin-bottom: 5px;
+        padding-left: 15px;
+        position: relative;
+    }
+    .changelog-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--success-color); /* Atau warna aksen lain */
+    }
 
     </style>
 </head>
 <body>
     <div class="container">
         <div class="main-header">
-            <h1>BANGBIN 6.0</h1>
+            <h1>BANGBIN BETA 6.0</h1>
             <div class="class-selector">
                 <label for="pilihKelasAktif">Kelas Aktif:</label>
                 <select id="pilihKelasAktif">
@@ -578,10 +623,10 @@
             <button id="pesanButton"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M3.5 4A1.5 1.5 0 0 0 2 5.5v9A1.5 1.5 0 0 0 3.5 16h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 16.5 4h-13ZM10 11.25a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0v2.5ZM10 6a.75.75 0 0 0-1.5 0v.5a.75.75 0 0 0 1.5 0v-.5Z"></path><path d="M14.25 8.5a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5ZM5.75 8.5a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5Z"></path></svg>Pesan</button>
             <button id="backupButton"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z" /><path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5a1.25 1.25 0 0 1-1.25 1.25H4.75A1.25 1.25 0 0 1 3.5 15.25v-2.5Z" /></svg>Backup Data</button>
             <div class="restore-wrapper">
-                <label for="restoreFile">Restore</label>
+                <label for="restoreFile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 17.25a.75.75 0 0 0 1.5 0V8.636l2.955 3.129a.75.75 0 1 0 1.09-1.03l-4.25-4.5a.75.75 0 0 0-1.09 0l-4.25 4.5a.75.75 0 1 0 1.09 1.03l2.955-3.129v8.614Z" /><path d="M3.5 4.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 10h10.5A2.75 2.75 0 0 0 18 7.25v-2.5a.75.75 0 0 0-1.5 0v2.5A1.25 1.25 0 0 1 15.25 8.5H4.75A1.25 1.25 0 0 1 3.5 7.25v-2.5Z" /></svg>Restore</label>
                 <input type="file" id="restoreFile" accept=".json">
             </div>
-            <button id="resetButton" class="danger"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.58.22-2.365.426a.75.75 0 0 0-.585.746v8.265a.75.75 0 0 0 .585.746c.785.206 1.57.349 2.365.426v.443A2.75 2.75 0 0 0 8.75 17h2.5A2.75 2.75 0 0 0 14 14.25v-.443c.795-.077 1.58-.22 2.365-.426a.75.75 0 0 0 .585-.746V4.939a.75.75 0 0 0-.585-.746C15.58 3.986 14.795 3.842 14 3.765v-.443A2.75 2.75 0 0 0 11.25 1h-2.5ZM7.5 4.5v10A1.25 1.25 0 0 0 8.75 15.75h2.5A1.25 1.25 0 0 0 12.5 14.5v-10A1.25 1.25 0 0 0 11.25 3.25h-2.5A1.25 1.25 0 0 0 7.5 4.5Z" clip-rule="evenodd" /></svg>Reset</button>
+            <button id="resetButton" class="danger"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.58.22-2.365.426a.75.75 0 0 0-.585.746v8.265a.75.75 0 0 0 .585.746c.785.206 1.57.349 2.365.426v.443A2.75 2.75 0 0 0 8.75 17h2.5A2.75 2.75 0 0 0 14 14.25v-.443c.795-.077 1.58-.22 2.365-.426a.75.75 0 0 0 .585-.746V4.939a.75.75 0 0 0-.585-.746C15.58 3.986 14.795 3.842 14 3.765v-.443A2.75 2.75 0 0 0 11.25 1h-2.5ZM7.5 4.5v10A1.25 1.25 0 0 0 8.75 15.75h2.5A1.25 1.25 0 0 0 12.5 14.5v-10A1.25 1.25 0 0 0 11.25 3.25h-2.5A1.25 1.25 0 0 0 7.5 4.5Z" clip-rule="evenodd" /></svg>Reset Semua Data</button>
         </div>
     </div>
 
@@ -601,19 +646,35 @@
                         </div>
                     </div>
                     <div class="donasi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 100%; text-align: center;">
-                        <div class="donasi-item" style="background: var(--white-10); padding: 20px; border-radius: 10px;">
-                            <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/200px-BNI_logo.svg.png" alt="BNI" style="height: 30px; margin-bottom: 10px;">
+                        <div class="donasi-item" style="background: var(--white-10); padding: 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <!-- PERBAIKAN: Ganti Icon BNI yang lebih rapih/menarik (menggunakan Font Awesome dengan style brand) -->
+                            <div style="background: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 10px; display: inline-block;">
+                                <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/1200px-BNI_logo.svg.png" alt="BNI" style="height: 35px; width: auto; display: block;">
+                            </div>
                             <p style="margin: 5px 0; font-weight: 500;">BNI</p>
                             <p style="margin: 0; font-size: 1.1em; font-weight: 600; color: #92c5ff;">0430267613</p>
                             <p style="margin: 0; font-size: 0.9em;">a.n. BINTANG ADHI PERMANA</p>
                         </div>
-                        <div class="donasi-item" style="background: var(--white-10); padding: 20px; border-radius: 10px;">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/2560px-Gopay_logo.svg.png" alt="GoPay" style="height: 25px; margin-bottom: 15px;">
+                        <div class="donasi-item" style="background: var(--white-10); padding: 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                             <div style="background: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 10px; display: inline-block;">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/2560px-Gopay_logo.svg.png" alt="GoPay" style="height: 25px; width: auto; display: block;">
+                            </div>
                             <p style="margin: 5px 0; font-weight: 500;">Gopay / OVO / ShopeePay</p>
                             <p style="margin: 0; font-size: 1.1em; font-weight: 600; color: #92c5ff;">081310051985</p>
                              <p style="margin: 0; font-size: 0.9em;">a.n. BINTANG ADHI PERMANA</p>
                         </div>
                     </div>
+                    
+                    <!-- PERBAIKAN: Tambahkan Catatan Perbaikan -->
+                    <div class="changelog-box">
+                        <div class="changelog-title">Catatan Perbaikan</div>
+                        <ul class="changelog-list">
+                            <li>26-11-2025 - Hapus Pelajaran</li>
+                            <li>27-11-2025 - Modal Simpan Halaman Data Sekolah</li>
+                            <li>28-11-2025 - Impor Data Siswa</li>
+                        </ul>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -634,11 +695,11 @@
                         </div>
                     </div>
                     <form id="pesanForm" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <input type="text" id="namaPengirim" name="namaPengirim" placeholder="Nama Anda" required>
-                        <input type="tel" id="nomorWa" name="nomorWa" placeholder="Nomor WhatsApp" required>
-                        <input type="text" id="namaSekolah" name="namaSekolah" placeholder="Nama Sekolah" required>
-                        <input type="text" id="provinsi" name="provinsi" placeholder="Provinsi" required>
-                        <textarea id="isiPesan" name="isiPesan" placeholder="Tulis pesan Anda di sini..." required style="grid-column: 1 / -1; min-height: 120px;"></textarea>
+                        <input type="text" id="namaPengirim" name="namaPengirim" placeholder="Nama Anda" required style="padding: 10px; border-radius: 8px; border: 1px solid var(--white-20); background: var(--white-10); color: white;">
+                        <input type="tel" id="nomorWa" name="nomorWa" placeholder="Nomor WhatsApp" required style="padding: 10px; border-radius: 8px; border: 1px solid var(--white-20); background: var(--white-10); color: white;">
+                        <input type="text" id="namaSekolah" name="namaSekolah" placeholder="Nama Sekolah" required style="padding: 10px; border-radius: 8px; border: 1px solid var(--white-20); background: var(--white-10); color: white;">
+                        <input type="text" id="provinsi" name="provinsi" placeholder="Provinsi" required style="padding: 10px; border-radius: 8px; border: 1px solid var(--white-20); background: var(--white-10); color: white;">
+                        <textarea id="isiPesan" name="isiPesan" placeholder="Tulis pesan Anda di sini..." required style="grid-column: 1 / -1; min-height: 120px; padding: 10px; border-radius: 8px; border: 1px solid var(--white-20); background: var(--white-10); color: white;"></textarea>
                         <button type="submit" class="footer-actions button" style="grid-column: 1 / -1; justify-self: end; width: auto;">Kirim Pesan</button>
                     </form>
                 </div>
@@ -659,7 +720,7 @@
                         <div>
                             <h1 class="modal-title" style="font-size: 1.8em; margin: 0;">Panduan Penggunaan</h1>
                             <p class="modal-description" style="margin: 0; margin-bottom: 5px;">Aplikasi ini merupakan aplikasi buku nilai digital yang bisa dipergunakan oleh guru langsung tanpa melakukan instalasi. Anda tinggal menyesuaikan sesuai kebutuhan, untuk berjaga-jaga anda dapat melakukan proses backup data.</p>
-                            <p class="modal-description" style="margin: 0; margin-bottom: 15px;">Buku Nilai ini sesuai dengan Panduan Pembelajaran dan Asesmen 2025. <a href="https://kurikulum.kemdikbud.go.id/service/download.php?kategori=rujukan&id=120" target="_blank" rel="noopener noreferrer">Cek Di Sini</a></p>
+                            <p class="modal-description" style="margin: 0; margin-bottom: 15px;">Buku Nilai ini sesuai dengan Panduan Pembelajaran dan Asesmen 2025. <a href="https://kurikulum.kemdikbud.go.id/service/download.php?kategori=rujukan&id=120" target="_blank" rel="noopener noreferrer" style="color: #92c5ff;">Cek Di Sini</a></p>
                             <h1 class="modal-title" style="font-size: 1em; margin: 0; font-weight: bold; color: #d9534f;">GRATIS, TIDAK UNTUK DIKOMERSILKAN</h1>
                         </div>
                     </div>
@@ -760,10 +821,11 @@
                     </div>
                 </div>
                 <div class="dev-card">
-                    <img src="https://lh3.googleusercontent.com/d/1_uC-jmvtci56xL6RIUj2GC0GdPo_sk0B" alt="Foto Pengembang 2">
+                    <img src="https://i.pravatar.cc/150?u=jane" alt="Foto Pengembang 2">
                     <h3>Dhoy Edu</h3>
                     <div class="social-links">
                             <a href="https://wa.me/6281311031067" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            <a href="https://www.facebook.com/bintang.a.permana.1/" target="_blank"><i class="fab fa-facebook"></i></a>
                     </div>
                 </div>
                 <div class="dev-card">
@@ -775,20 +837,14 @@
                     </div>
                 </div>
                 <div class="dev-card">
-                    <img src="http://lh3.googleusercontent.com/d/1v4uahAArYf4QwJhDT82H0q4Rt4VpV3PK" alt="Foto Pengembang 4">
-                    <h3>Zul Pendri</h3>
+                    <img src="https://i.pravatar.cc/150?u=sara" alt="Foto Pengembang 4">
+                    <h3>Sara Lee</h3>
                     <div class="social-links">
-                            <a href="https://wa.me/6281368223945" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            <a href="https://wa.me/6281310051985" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            <a href="https://www.facebook.com/bintang.a.permana.1/" target="_blank"><i class="fab fa-facebook"></i></a>
                     </div>
                 </div>
-                <div class="dev-card">
-                    <img src="https://lh3.googleusercontent.com/d/1nJ_t8kGGk-oUfSFHGXLbdZyQ3LqJQa6u" alt="Foto Pengembang 4">
-                    <h3>Teh Channy</h3>
-                    <div class="social-links">
-                            <a href="https://wa.me/6287809068810" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
-			</div>
+            </div>
             <button id="closeDevBtn" class="modal-close-btn">×</button>
         </div>
     </div>
@@ -836,13 +892,7 @@
 
     <script src="bangbin_uhuuyy.js"></script>
     <script>
-function _0x34bc(_0x8be36e,_0x5c0747){const _0x2354d9=_0x2354();return _0x34bc=function(_0x34bcc6,_0x3a5702){_0x34bcc6=_0x34bcc6-0xfd;let _0x5894a5=_0x2354d9[_0x34bcc6];return _0x5894a5;},_0x34bc(_0x8be36e,_0x5c0747);}function _0x2354(){const _0x46fa3d=['nama','innerHTML','getElementById','pesanModal','nilaiDropdown','39biFyMM','pesanForm','Mengirim...','POST','pesanSuccessModal','then','closePesanSuccessBtn','appendChild','stopPropagation','closeDevBtn','classList','donasiButton','closeTutorialBtn','.dropdown','json','textContent','#777','Maaf,\x20terjadi\x20kesalahan\x20koneksi.\x20Periksa\x20internet\x20Anda\x20dan\x20coba\x20lagi.','closest','https://script.google.com/macros/s/AKfycbw_ugVlXmg7_s9157EAMTInowsDWL8xU0nc22DDklOrJp79KWvuKn7KSjjJYLgH-vQoNg/exec','infoDasar','submit','mataPelajaran','padding','24412CGumUL','44526BumQpX','6221484UBMCUS','kokuId','Maaf,\x20terjadi\x20kesalahan\x20di\x20server.\x20Pesan\x20tidak\x20terkirim.','finally','remove','preventDefault','function','bangbin_Kokurikuler.html','createElement','closeDonasiBtn','querySelector','comingSoonModal','pilihKelasAktif','disabled','addEventListener','href','1021225ErrLjz','style','mapelNama','querySelectorAll','tutorialButton','12px\x2016px','bangbin_Nilai.html','pesanButton','mapelId','14qIzTHa','tutorialModal','add','kelasAktif','click','donasiModal','2105792JlyTBv','109125uUTMdi','devButton','target','pahamTutorialBtn','show','.dropdown-menu.show','span','287916wajLXC','reset','10GctsMJ','error','1\x20/\x20-1','kelas-4','toggle','catch','DOMContentLoaded','forEach'];_0x2354=function(){return _0x46fa3d;};return _0x2354();}const _0x53b145=_0x34bc;(function(_0x4a898e,_0x4cb958){const _0x1bbb11=_0x34bc,_0x376ab9=_0x4a898e();while(!![]){try{const _0x2a5ec1=parseInt(_0x1bbb11(0x12e))/0x1+-parseInt(_0x1bbb11(0x10d))/0x2*(parseInt(_0x1bbb11(0x144))/0x3)+parseInt(_0x1bbb11(0x10c))/0x4+-parseInt(_0x1bbb11(0x11e))/0x5+-parseInt(_0x1bbb11(0x135))/0x6*(-parseInt(_0x1bbb11(0x127))/0x7)+-parseInt(_0x1bbb11(0x12d))/0x8+-parseInt(_0x1bbb11(0x10e))/0x9*(-parseInt(_0x1bbb11(0x137))/0xa);if(_0x2a5ec1===_0x4cb958)break;else _0x376ab9['push'](_0x376ab9['shift']());}catch(_0x3a603f){_0x376ab9['push'](_0x376ab9['shift']());}}}(_0x2354,0x238b4),document[_0x53b145(0x11c)](_0x53b145(0x13d),()=>{const _0x328c08=_0x53b145,_0x7aefd8=typeof loadData==='function'?loadData():{},_0x33ba8f=document[_0x328c08(0x141)](_0x328c08(0x11a));_0x7aefd8[_0x328c08(0x108)]&&(_0x33ba8f['value']=_0x7aefd8[_0x328c08(0x108)][_0x328c08(0x12a)]||_0x328c08(0x13a));_0x33ba8f[_0x328c08(0x11c)]('change',()=>{const _0x316099=_0x328c08;_0x7aefd8[_0x316099(0x108)]&&(_0x7aefd8[_0x316099(0x108)][_0x316099(0x12a)]=_0x33ba8f['value'],typeof saveData===_0x316099(0x114)&&saveData(_0x7aefd8),location['reload']());});const _0x3919f0=(_0x42f69d,_0x3afadb,_0x5132b4,_0x5d4c31,_0x284bd7)=>{const _0x49d7e4=_0x328c08,_0x27be8a=document[_0x49d7e4(0x141)](_0x42f69d);if(!_0x27be8a)return;_0x27be8a['innerHTML']='';if(_0x3afadb&&_0x3afadb['length']>0x0)_0x3afadb['forEach'](_0xde7819=>{const _0x5d0005=_0x49d7e4,_0x40f4fb=document['createElement']('a');_0x40f4fb[_0x5d0005(0x11d)]=_0x5132b4+'?'+_0x5d4c31+'='+_0xde7819['id']+'&'+_0x284bd7+'='+encodeURIComponent(_0xde7819[_0x5d0005(0x13f)]),_0x40f4fb[_0x5d0005(0x103)]=_0xde7819[_0x5d0005(0x13f)],_0x27be8a[_0x5d0005(0x14b)](_0x40f4fb);});else{const _0x4d9584=document[_0x49d7e4(0x116)](_0x49d7e4(0x134));_0x4d9584['textContent']='Input\x20data\x20dahulu',_0x4d9584[_0x49d7e4(0x11f)][_0x49d7e4(0x10b)]=_0x49d7e4(0x123),_0x4d9584[_0x49d7e4(0x11f)]['color']=_0x49d7e4(0x104),_0x4d9584[_0x49d7e4(0x11f)]['display']='block',_0x4d9584[_0x49d7e4(0x11f)]['gridColumn']=_0x49d7e4(0x139),_0x27be8a[_0x49d7e4(0x14b)](_0x4d9584);}};_0x3919f0(_0x328c08(0x143),_0x7aefd8[_0x328c08(0x10a)],_0x328c08(0x124),_0x328c08(0x126),_0x328c08(0x120)),_0x3919f0('kokuDropdown',_0x7aefd8['kokurikuler'],_0x328c08(0x115),_0x328c08(0x10f),'kokuNama'),document[_0x328c08(0x121)]('.dropdown-toggle')['forEach'](_0x3b72f3=>{const _0x2b34ca=_0x328c08;_0x3b72f3[_0x2b34ca(0x11c)]('click',_0x2bae5c=>{const _0x452519=_0x2b34ca;_0x2bae5c['preventDefault'](),_0x2bae5c[_0x452519(0x14c)]();const _0x28db4a=_0x3b72f3['nextElementSibling'];document[_0x452519(0x121)](_0x452519(0x133))[_0x452519(0x13e)](_0x59c15a=>{const _0x34b6d9=_0x452519;_0x59c15a!==_0x28db4a&&_0x59c15a[_0x34b6d9(0xfe)][_0x34b6d9(0x112)](_0x34b6d9(0x132));}),_0x28db4a&&_0x28db4a[_0x452519(0xfe)][_0x452519(0x13b)](_0x452519(0x132));});}),window[_0x328c08(0x11c)]('click',_0x30d14c=>{const _0x1cab83=_0x328c08;!_0x30d14c[_0x1cab83(0x130)][_0x1cab83(0x106)](_0x1cab83(0x101))&&document[_0x1cab83(0x121)]('.dropdown-menu.show')[_0x1cab83(0x13e)](_0xd07a44=>{const _0x83c241=_0x1cab83;_0xd07a44[_0x83c241(0xfe)][_0x83c241(0x112)](_0x83c241(0x132));});});const _0xfc6c7d=document['getElementById'](_0x328c08(0x119)),_0x21ac7f=document[_0x328c08(0x141)]('closeModalBtn'),_0x5d8a17=document[_0x328c08(0x121)]('.coming-soon'),_0x433f48=_0x3a87b5=>{const _0x1024b4=_0x328c08;_0x3a87b5[_0x1024b4(0x113)]();if(_0xfc6c7d)_0xfc6c7d['classList']['add']('show');},_0x391154=()=>{const _0x2f01a4=_0x328c08;if(_0xfc6c7d)_0xfc6c7d[_0x2f01a4(0xfe)]['remove']('show');};_0x5d8a17[_0x328c08(0x13e)](_0x1a1b1c=>{const _0x1b967b=_0x328c08;_0x1a1b1c[_0x1b967b(0x11c)]('click',_0x433f48);});_0x21ac7f&&_0x21ac7f[_0x328c08(0x11c)]('click',_0x391154);_0xfc6c7d&&_0xfc6c7d[_0x328c08(0x11c)]('click',_0x152f9d=>{_0x152f9d['target']===_0xfc6c7d&&_0x391154();});const _0x433359=document[_0x328c08(0x141)](_0x328c08(0x128)),_0x3a1455=document['getElementById'](_0x328c08(0x122)),_0x46efe7=document[_0x328c08(0x141)](_0x328c08(0x100)),_0x289769=document['getElementById'](_0x328c08(0x131)),_0x266160=()=>{const _0x38a48b=_0x328c08;if(_0x433359)_0x433359[_0x38a48b(0xfe)][_0x38a48b(0x129)]('show');},_0x2e6d93=()=>{const _0x40e800=_0x328c08;if(_0x433359)_0x433359[_0x40e800(0xfe)][_0x40e800(0x112)]('show');};_0x3a1455&&_0x3a1455[_0x328c08(0x11c)](_0x328c08(0x12b),_0x266160);_0x46efe7&&_0x46efe7['addEventListener']('click',_0x2e6d93);_0x289769&&_0x289769[_0x328c08(0x11c)](_0x328c08(0x12b),_0x2e6d93);_0x433359&&_0x433359[_0x328c08(0x11c)](_0x328c08(0x12b),_0x3adebb=>{const _0x39e63e=_0x328c08;_0x3adebb[_0x39e63e(0x130)]===_0x433359&&_0x2e6d93();});const _0x11780d=document['getElementById']('devModal'),_0x2b5b58=document[_0x328c08(0x141)](_0x328c08(0x12f)),_0x58d00f=document[_0x328c08(0x141)](_0x328c08(0xfd)),_0x319835=()=>{const _0x3cb30e=_0x328c08;if(_0x11780d)_0x11780d[_0x3cb30e(0xfe)]['add'](_0x3cb30e(0x132));},_0x5e3291=()=>{const _0x1e2afe=_0x328c08;if(_0x11780d)_0x11780d[_0x1e2afe(0xfe)][_0x1e2afe(0x112)]('show');};_0x2b5b58&&_0x2b5b58['addEventListener']('click',_0x319835);_0x58d00f&&_0x58d00f[_0x328c08(0x11c)](_0x328c08(0x12b),_0x5e3291);_0x11780d&&_0x11780d[_0x328c08(0x11c)]('click',_0x46d367=>{const _0x3ca3a9=_0x328c08;_0x46d367[_0x3ca3a9(0x130)]===_0x11780d&&_0x5e3291();});const _0x20fe5c=document[_0x328c08(0x141)](_0x328c08(0x12c)),_0x38113d=document[_0x328c08(0x141)](_0x328c08(0xff)),_0xc22923=document[_0x328c08(0x141)](_0x328c08(0x117)),_0xf251dc=()=>{const _0x18bc10=_0x328c08;if(_0x20fe5c)_0x20fe5c[_0x18bc10(0xfe)][_0x18bc10(0x129)](_0x18bc10(0x132));},_0x1b310c=()=>{const _0x232b43=_0x328c08;if(_0x20fe5c)_0x20fe5c[_0x232b43(0xfe)][_0x232b43(0x112)]('show');};_0x38113d&&_0x38113d[_0x328c08(0x11c)]('click',_0xf251dc);_0xc22923&&_0xc22923['addEventListener']('click',_0x1b310c);_0x20fe5c&&_0x20fe5c[_0x328c08(0x11c)]('click',_0x40a56c=>{const _0x669f4a=_0x328c08;_0x40a56c[_0x669f4a(0x130)]===_0x20fe5c&&_0x1b310c();});const _0x276b59=document[_0x328c08(0x141)](_0x328c08(0x142)),_0x5bef22=document[_0x328c08(0x141)](_0x328c08(0x125)),_0x2c1fda=document[_0x328c08(0x141)]('closePesanBtn'),_0x311c1c=document[_0x328c08(0x141)](_0x328c08(0x145)),_0x28b57a=document[_0x328c08(0x141)](_0x328c08(0x148)),_0x4dd8e1=document[_0x328c08(0x141)](_0x328c08(0x14a)),_0x5865bf=()=>{const _0xc9328f=_0x328c08;if(_0x276b59)_0x276b59['classList'][_0xc9328f(0x129)]('show');},_0x5ab242=()=>{const _0x53cbff=_0x328c08;if(_0x276b59)_0x276b59['classList'][_0x53cbff(0x112)](_0x53cbff(0x132));},_0x133977=()=>{const _0xa68387=_0x328c08;if(_0x28b57a)_0x28b57a[_0xa68387(0xfe)][_0xa68387(0x129)](_0xa68387(0x132));},_0x12b01e=()=>{const _0x5defe3=_0x328c08;if(_0x28b57a)_0x28b57a[_0x5defe3(0xfe)][_0x5defe3(0x112)]('show');};_0x5bef22&&_0x5bef22[_0x328c08(0x11c)](_0x328c08(0x12b),_0x5865bf),_0x2c1fda&&_0x2c1fda[_0x328c08(0x11c)]('click',_0x5ab242),_0x276b59&&_0x276b59[_0x328c08(0x11c)](_0x328c08(0x12b),_0x5b1615=>{const _0x1cb32b=_0x328c08;_0x5b1615[_0x1cb32b(0x130)]===_0x276b59&&_0x5ab242();}),_0x4dd8e1&&_0x4dd8e1[_0x328c08(0x11c)](_0x328c08(0x12b),_0x12b01e),_0x28b57a&&_0x28b57a[_0x328c08(0x11c)](_0x328c08(0x12b),_0xb07302=>{const _0x86a17d=_0x328c08;_0xb07302[_0x86a17d(0x130)]===_0x28b57a&&_0x12b01e();}),_0x311c1c&&_0x311c1c[_0x328c08(0x11c)](_0x328c08(0x109),_0x383820=>{const _0x536fba=_0x328c08;_0x383820[_0x536fba(0x113)]();const _0x2e95ea=_0x536fba(0x107),_0x4933b7=_0x383820[_0x536fba(0x130)],_0x1105da=_0x4933b7[_0x536fba(0x118)]('button[type=\x22submit\x22]'),_0x4104e4=_0x1105da[_0x536fba(0x140)];_0x1105da[_0x536fba(0x11b)]=!![],_0x1105da['innerHTML']=_0x536fba(0x146),fetch(_0x2e95ea,{'method':_0x536fba(0x147),'body':new FormData(_0x4933b7)})[_0x536fba(0x149)](_0x1e51f8=>{const _0x38d723=_0x536fba;_0x1e51f8['ok']?(_0x5ab242(),_0x133977(),_0x4933b7[_0x38d723(0x136)]()):_0x1e51f8[_0x38d723(0x102)]()[_0x38d723(0x149)](_0x46485e=>{const _0x2a16f3=_0x38d723;console['error']('Server\x20Error:',_0x46485e),alert(_0x2a16f3(0x110));})['catch'](()=>{alert('Maaf,\x20terjadi\x20kesalahan.\x20Pesan\x20tidak\x20terkirim\x20dan\x20respons\x20server\x20tidak\x20valid.');});})[_0x536fba(0x13c)](_0x15105a=>{const _0x3c4b7d=_0x536fba;console[_0x3c4b7d(0x138)]('Fetch\x20Error:',_0x15105a),alert(_0x3c4b7d(0x105));})[_0x536fba(0x111)](()=>{const _0x5cc678=_0x536fba;_0x1105da[_0x5cc678(0x11b)]=![],_0x1105da[_0x5cc678(0x140)]=_0x4104e4;});});}));
+		function _0x5c4a(_0x396a61,_0x4e638b){const _0x2624d7=_0x2624();return _0x5c4a=function(_0x5c4a4d,_0x55c13d){_0x5c4a4d=_0x5c4a4d-0x113;let _0x181352=_0x2624d7[_0x5c4a4d];return _0x181352;},_0x5c4a(_0x396a61,_0x4e638b);}const _0x4991b6=_0x5c4a;(function(_0x1bf26b,_0x2bb61d){const _0x1f37fb=_0x5c4a,_0x40c817=_0x1bf26b();while(!![]){try{const _0x4286c9=-parseInt(_0x1f37fb(0x13c))/0x1*(parseInt(_0x1f37fb(0x114))/0x2)+-parseInt(_0x1f37fb(0x116))/0x3*(-parseInt(_0x1f37fb(0x122))/0x4)+-parseInt(_0x1f37fb(0x121))/0x5+parseInt(_0x1f37fb(0x15e))/0x6+-parseInt(_0x1f37fb(0x141))/0x7+parseInt(_0x1f37fb(0x12e))/0x8*(-parseInt(_0x1f37fb(0x118))/0x9)+parseInt(_0x1f37fb(0x14b))/0xa;if(_0x4286c9===_0x2bb61d)break;else _0x40c817['push'](_0x40c817['shift']());}catch(_0x2ada19){_0x40c817['push'](_0x40c817['shift']());}}}(_0x2624,0x1e479),document[_0x4991b6(0x150)]('DOMContentLoaded',()=>{const _0xcc77c9=_0x4991b6,_0x1dedfa=typeof loadData===_0xcc77c9(0x145)?loadData():{},_0x2e861a=document[_0xcc77c9(0x161)]('pilihKelasAktif');_0x1dedfa[_0xcc77c9(0x154)]&&(_0x2e861a[_0xcc77c9(0x128)]=_0x1dedfa[_0xcc77c9(0x154)][_0xcc77c9(0x13f)]||_0xcc77c9(0x14e));_0x2e861a['addEventListener'](_0xcc77c9(0x148),()=>{const _0x4de784=_0xcc77c9;_0x1dedfa[_0x4de784(0x154)]&&(_0x1dedfa[_0x4de784(0x154)][_0x4de784(0x13f)]=_0x2e861a[_0x4de784(0x128)],typeof saveData===_0x4de784(0x145)&&saveData(_0x1dedfa),location['reload']());});const _0x320a5f=(_0x1b7267,_0x1eeddf,_0x55283b,_0x31c77a,_0xaed931)=>{const _0x5c690d=_0xcc77c9,_0x355214=document[_0x5c690d(0x161)](_0x1b7267);if(!_0x355214)return;_0x355214[_0x5c690d(0x156)]='';if(_0x1eeddf&&_0x1eeddf[_0x5c690d(0x135)]>0x0)_0x1eeddf[_0x5c690d(0x131)](_0xba9ce6=>{const _0x23ab05=_0x5c690d,_0x1924ed=document[_0x23ab05(0x162)]('a');_0x1924ed['href']=_0x55283b+'?'+_0x31c77a+'='+_0xba9ce6['id']+'&'+_0xaed931+'='+encodeURIComponent(_0xba9ce6[_0x23ab05(0x152)]),_0x1924ed['textContent']=_0xba9ce6[_0x23ab05(0x152)],_0x355214[_0x23ab05(0x142)](_0x1924ed);});else{const _0x33fa42=document[_0x5c690d(0x162)](_0x5c690d(0x113));_0x33fa42[_0x5c690d(0x115)]=_0x5c690d(0x12c),_0x33fa42[_0x5c690d(0x14a)][_0x5c690d(0x123)]=_0x5c690d(0x127),_0x33fa42['style'][_0x5c690d(0x137)]=_0x5c690d(0x133),_0x33fa42[_0x5c690d(0x14a)]['display']='block',_0x33fa42[_0x5c690d(0x14a)][_0x5c690d(0x11a)]='1\x20/\x20-1',_0x355214['appendChild'](_0x33fa42);}};_0x320a5f(_0xcc77c9(0x120),_0x1dedfa[_0xcc77c9(0x14d)],_0xcc77c9(0x144),_0xcc77c9(0x117),_0xcc77c9(0x11e)),_0x320a5f('kokuDropdown',_0x1dedfa['kokurikuler'],_0xcc77c9(0x140),_0xcc77c9(0x13b),_0xcc77c9(0x15a)),document['querySelectorAll']('.dropdown-toggle')[_0xcc77c9(0x131)](_0x441f14=>{const _0x587215=_0xcc77c9;_0x441f14[_0x587215(0x150)](_0x587215(0x15d),_0x3210e9=>{const _0x7007eb=_0x587215;_0x3210e9['preventDefault'](),_0x3210e9['stopPropagation']();const _0x455bdc=_0x441f14['nextElementSibling'];document[_0x7007eb(0x151)]('.dropdown-menu.show')[_0x7007eb(0x131)](_0xdbb1da=>{const _0x14fbf8=_0x7007eb;_0xdbb1da!==_0x455bdc&&_0xdbb1da[_0x14fbf8(0x11b)]['remove']('show');}),_0x455bdc&&_0x455bdc[_0x7007eb(0x11b)][_0x7007eb(0x124)](_0x7007eb(0x119));});}),window[_0xcc77c9(0x150)]('click',_0x2b18dc=>{const _0xaeee6d=_0xcc77c9;!_0x2b18dc[_0xaeee6d(0x157)][_0xaeee6d(0x164)](_0xaeee6d(0x134))&&document[_0xaeee6d(0x151)](_0xaeee6d(0x13a))[_0xaeee6d(0x131)](_0x4aed8a=>{const _0x4b5b5f=_0xaeee6d;_0x4aed8a[_0x4b5b5f(0x11b)]['remove'](_0x4b5b5f(0x119));});});const _0x5378f0=document[_0xcc77c9(0x161)](_0xcc77c9(0x11f)),_0x45937e=document['getElementById'](_0xcc77c9(0x12d)),_0xa1d8e0=document[_0xcc77c9(0x151)](_0xcc77c9(0x13e)),_0x25d340=_0x9bd537=>{const _0x4bbd1e=_0xcc77c9;_0x9bd537[_0x4bbd1e(0x15c)]();if(_0x5378f0)_0x5378f0[_0x4bbd1e(0x11b)][_0x4bbd1e(0x155)](_0x4bbd1e(0x119));},_0x11c922=()=>{const _0x413ff0=_0xcc77c9;if(_0x5378f0)_0x5378f0[_0x413ff0(0x11b)]['remove'](_0x413ff0(0x119));};_0xa1d8e0['forEach'](_0x11ac74=>{const _0x27d9d0=_0xcc77c9;_0x11ac74[_0x27d9d0(0x150)](_0x27d9d0(0x15d),_0x25d340);});_0x45937e&&_0x45937e['addEventListener'](_0xcc77c9(0x15d),_0x11c922);_0x5378f0&&_0x5378f0[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x8ccd44=>{_0x8ccd44['target']===_0x5378f0&&_0x11c922();});const _0x2c3b32=document['getElementById'](_0xcc77c9(0x132)),_0x1933a9=document[_0xcc77c9(0x161)]('tutorialButton'),_0xb32be9=document['getElementById'](_0xcc77c9(0x126)),_0x821cbc=document[_0xcc77c9(0x161)](_0xcc77c9(0x160)),_0x2eccd6=()=>{const _0x1e28c0=_0xcc77c9;if(_0x2c3b32)_0x2c3b32[_0x1e28c0(0x11b)]['add'](_0x1e28c0(0x119));},_0x40907e=()=>{const _0x337ee6=_0xcc77c9;if(_0x2c3b32)_0x2c3b32['classList']['remove'](_0x337ee6(0x119));};_0x1933a9&&_0x1933a9['addEventListener'](_0xcc77c9(0x15d),_0x2eccd6);_0xb32be9&&_0xb32be9[_0xcc77c9(0x150)]('click',_0x40907e);_0x821cbc&&_0x821cbc[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x40907e);_0x2c3b32&&_0x2c3b32[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x4b3c9b=>{const _0x3471dd=_0xcc77c9;_0x4b3c9b[_0x3471dd(0x157)]===_0x2c3b32&&_0x40907e();});const _0x2818a5=document[_0xcc77c9(0x161)](_0xcc77c9(0x129)),_0x1738cc=document[_0xcc77c9(0x161)](_0xcc77c9(0x15f)),_0x575b26=document[_0xcc77c9(0x161)]('closeDevBtn'),_0x547c30=()=>{const _0x100796=_0xcc77c9;if(_0x2818a5)_0x2818a5[_0x100796(0x11b)][_0x100796(0x155)](_0x100796(0x119));},_0x59b1d2=()=>{const _0x2fc386=_0xcc77c9;if(_0x2818a5)_0x2818a5[_0x2fc386(0x11b)]['remove'](_0x2fc386(0x119));};_0x1738cc&&_0x1738cc[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x547c30);_0x575b26&&_0x575b26[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x59b1d2);_0x2818a5&&_0x2818a5[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0xd2e453=>{const _0x440199=_0xcc77c9;_0xd2e453[_0x440199(0x157)]===_0x2818a5&&_0x59b1d2();});const _0x2b5bde=document[_0xcc77c9(0x161)](_0xcc77c9(0x146)),_0x49b547=document[_0xcc77c9(0x161)](_0xcc77c9(0x11c)),_0x3f81c7=document[_0xcc77c9(0x161)](_0xcc77c9(0x143)),_0x176e6e=()=>{const _0x271282=_0xcc77c9;if(_0x2b5bde)_0x2b5bde['classList'][_0x271282(0x155)](_0x271282(0x119));},_0x412931=()=>{const _0x28fb0c=_0xcc77c9;if(_0x2b5bde)_0x2b5bde[_0x28fb0c(0x11b)][_0x28fb0c(0x125)]('show');};_0x49b547&&_0x49b547['addEventListener'](_0xcc77c9(0x15d),_0x176e6e);_0x3f81c7&&_0x3f81c7[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x412931);_0x2b5bde&&_0x2b5bde['addEventListener'](_0xcc77c9(0x15d),_0x52767e=>{const _0x4a2fc0=_0xcc77c9;_0x52767e[_0x4a2fc0(0x157)]===_0x2b5bde&&_0x412931();});const _0x4b2552=document[_0xcc77c9(0x161)]('pesanModal'),_0x9956e0=document[_0xcc77c9(0x161)]('pesanButton'),_0x52c15b=document[_0xcc77c9(0x161)](_0xcc77c9(0x12b)),_0x287415=document['getElementById'](_0xcc77c9(0x13d)),_0x3531ff=document[_0xcc77c9(0x161)](_0xcc77c9(0x149)),_0x235b3d=document[_0xcc77c9(0x161)](_0xcc77c9(0x158)),_0x1f7c04=()=>{const _0x538edb=_0xcc77c9;if(_0x4b2552)_0x4b2552[_0x538edb(0x11b)][_0x538edb(0x155)](_0x538edb(0x119));},_0x3aebd9=()=>{const _0x296f37=_0xcc77c9;if(_0x4b2552)_0x4b2552[_0x296f37(0x11b)][_0x296f37(0x125)](_0x296f37(0x119));},_0x7d9f9f=()=>{const _0x542f85=_0xcc77c9;if(_0x3531ff)_0x3531ff[_0x542f85(0x11b)]['add']('show');},_0x479080=()=>{const _0xb31281=_0xcc77c9;if(_0x3531ff)_0x3531ff[_0xb31281(0x11b)][_0xb31281(0x125)](_0xb31281(0x119));};_0x9956e0&&_0x9956e0[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x1f7c04),_0x52c15b&&_0x52c15b[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x3aebd9),_0x4b2552&&_0x4b2552[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x5d37ba=>{const _0x1af061=_0xcc77c9;_0x5d37ba[_0x1af061(0x157)]===_0x4b2552&&_0x3aebd9();}),_0x235b3d&&_0x235b3d[_0xcc77c9(0x150)]('click',_0x479080),_0x3531ff&&_0x3531ff[_0xcc77c9(0x150)](_0xcc77c9(0x15d),_0x5511b4=>{_0x5511b4['target']===_0x3531ff&&_0x479080();}),_0x287415&&_0x287415[_0xcc77c9(0x150)](_0xcc77c9(0x138),_0x229a60=>{const _0xe83f90=_0xcc77c9;_0x229a60[_0xe83f90(0x15c)]();const _0xc8f77b=_0xe83f90(0x139),_0x114076=_0x229a60[_0xe83f90(0x157)],_0x5037e3=_0x114076[_0xe83f90(0x159)](_0xe83f90(0x147)),_0x13b232=_0x5037e3[_0xe83f90(0x156)];_0x5037e3[_0xe83f90(0x14c)]=!![],_0x5037e3[_0xe83f90(0x156)]=_0xe83f90(0x130),fetch(_0xc8f77b,{'method':_0xe83f90(0x153),'body':new FormData(_0x114076)})[_0xe83f90(0x14f)](_0x59a030=>{const _0x4cd520=_0xe83f90;_0x59a030['ok']?(_0x3aebd9(),_0x7d9f9f(),_0x114076[_0x4cd520(0x12f)]()):_0x59a030[_0x4cd520(0x136)]()[_0x4cd520(0x14f)](_0xf56808=>{const _0x502b95=_0x4cd520;console['error'](_0x502b95(0x12a),_0xf56808),alert('Maaf,\x20terjadi\x20kesalahan\x20di\x20server.\x20Pesan\x20tidak\x20terkirim.');})[_0x4cd520(0x15b)](()=>{alert('Maaf,\x20terjadi\x20kesalahan.\x20Pesan\x20tidak\x20terkirim\x20dan\x20respons\x20server\x20tidak\x20valid.');});})[_0xe83f90(0x15b)](_0x20c176=>{const _0x76106=_0xe83f90;console[_0x76106(0x11d)]('Fetch\x20Error:',_0x20c176),alert('Maaf,\x20terjadi\x20kesalahan\x20koneksi.\x20Periksa\x20internet\x20Anda\x20dan\x20coba\x20lagi.');})[_0xe83f90(0x163)](()=>{const _0x33c173=_0xe83f90;_0x5037e3[_0x33c173(0x14c)]=![],_0x5037e3['innerHTML']=_0x13b232;});});}));function _0x2624(){const _0x2859e2=['show','gridColumn','classList','donasiButton','error','mapelNama','comingSoonModal','nilaiDropdown','157760QudxNi','868TFXvmk','padding','toggle','remove','closeTutorialBtn','12px\x2016px','value','devModal','Server\x20Error:','closePesanBtn','Input\x20data\x20dahulu','closeModalBtn','1260680Yvvplo','reset','Mengirim...','forEach','tutorialModal','#777','.dropdown','length','json','color','submit','https://script.google.com/macros/s/AKfycbw_ugVlXmg7_s9157EAMTInowsDWL8xU0nc22DDklOrJp79KWvuKn7KSjjJYLgH-vQoNg/exec','.dropdown-menu.show','kokuId','82AhJoAs','pesanForm','.coming-soon','kelasAktif','bangbin_Kokurikuler.html','1253175LVUlgm','appendChild','closeDonasiBtn','bangbin_Nilai.html','function','donasiModal','button[type=\x22submit\x22]','change','pesanSuccessModal','style','2830120ixbMdc','disabled','mataPelajaran','kelas-4','then','addEventListener','querySelectorAll','nama','POST','infoDasar','add','innerHTML','target','closePesanSuccessBtn','querySelector','kokuNama','catch','preventDefault','click','690222USNLTs','devButton','pahamTutorialBtn','getElementById','createElement','finally','closest','span','1864BbTMtz','textContent','2358cZkNLO','mapelId','9bzlPJA'];_0x2624=function(){return _0x2859e2;};return _0x2624();}
     </script>
 </body>
 </html>
-
-
-
-
-
-
