@@ -22,7 +22,10 @@
 
         body {
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-color); 
+            background-image: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('https://lh3.googleusercontent.com/d/16rll5zsRdwTbR3nF_NmPKwY51tg4tnOn');
+            background-repeat: repeat; 
+            background-size: 100px; 
             color: var(--text-color);
             margin: 0;
             padding: 20px;
@@ -38,6 +41,8 @@
             box-shadow: var(--card-shadow);
             margin: auto;
             border: 1px solid rgba(255,255,255,0.5);
+            position: relative; 
+            z-index: 1;
         }
 
         /* HEADER & SEARCH */
@@ -95,7 +100,6 @@
             background-color: #fff;
         }
         
-        /* Icon search styling handled via CSS for better positioning */
         .search-icon-overlay {
             position: absolute;
             left: 15px;
@@ -171,7 +175,6 @@
 
         td:nth-child(2), td:nth-child(3), td:nth-child(4) { text-align: center; width: 120px; }
 
-        /* 3D ACTION BUTTONS */
         .btn-action {
             border: none;
             border-radius: 8px;
@@ -216,8 +219,6 @@
         }
         .btn-mutasi:hover { background-color: #dc2626; }
 
-
-        /* TH BUTTONS 3D (Header buttons) */
 		.th-button-3d {
 		  color: white;
 		  font-weight: bold;
