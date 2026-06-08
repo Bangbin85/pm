@@ -1,5 +1,5 @@
 // =================================================================
-// BANGBIN SPA MODUL: INPUT NILAI KOKURIKULER (P5)
+// BANGBIN SPA MODUL: INPUT NILAI KOKURIKULER
 // =================================================================
 
 let isKokuEventsInitialized = false;
@@ -42,7 +42,7 @@ function renderTabelKokurikuler(kokuId) {
     const wadah = document.getElementById('lembarPenilaianKoku');
 
     if (dimensionKeys.length === 0) {
-        wadah.innerHTML = `<div style="padding: 15px; color: #d9534f; background: #fdf7f7; border: 1px solid #d9534f; border-radius: 8px;">Belum ada Dimensi P5 yang dipilih untuk kegiatan ini. Silakan atur di menu <b>Tujuan Pembelajaran</b> terlebih dahulu.</div>`;
+        wadah.innerHTML = `<div style="padding: 15px; color: #d9534f; background: #fdf7f7; border: 1px solid #d9534f; border-radius: 8px;">Belum ada Dimensi yang dipilih untuk kegiatan ini. Silakan atur di menu <b>Tujuan Pembelajaran</b> terlebih dahulu.</div>`;
         return;
     }
     
@@ -77,7 +77,7 @@ function renderTabelKokurikuler(kokuId) {
     
     // Header Dimensi Dinamis
     dimensionKeys.forEach(key => {
-        let optionsHtml = '<option value="">☀️ Set Semua</option>';
+        let optionsHtml = '<option value="">Set Semua</option>';
         currentPredikatOptions.forEach(opt => optionsHtml += `<option value="${opt}">${opt}</option>`);
         
         const namaDimensi = dataRapor.dimensiKokurikuler[key]?.nama || key;
@@ -203,7 +203,7 @@ function renderTabelKokurikuler(kokuId) {
         btn.disabled = false;
         
         if (typeof showModal === 'function') {
-            showModal({ title: 'Tersimpan', message: 'Nilai dan Deskripsi P5 berhasil disimpan.', type: 'success' });
+            showModal({ title: 'Tersimpan', message: 'Nilai dan Deskripsi berhasil disimpan.', type: 'success' });
         }
     });
 
@@ -221,7 +221,7 @@ function renderTabelKokurikuler(kokuId) {
             <div id="modalKustomPredikatKoku" class="modal-backdrop show">
                 <div class="modal-content" style="max-width: 400px;">
                     <div class="modal-header">
-                        <h3 style="margin:0; font-size:1.2rem;"><i class="fa-solid fa-sliders"></i> Predikat P5</h3>
+                        <h3 style="margin:0; font-size:1.2rem;"><i class="fa-solid fa-sliders"></i> Predikat</h3>
                         <button type="button" class="close-button" onclick="document.getElementById('modalKustomPredikatKoku').remove()">×</button>
                     </div>
                     <div class="modal-body" style="padding: 15px 20px;">
@@ -281,11 +281,11 @@ function renderTabelKokurikuler(kokuId) {
     document.getElementById('btnTutorialKokuSpa').addEventListener('click', () => {
         if(typeof showModal === 'function'){
             showModal({
-                title: 'Panduan Nilai Kokurikuler (P5)',
+                title: 'Panduan Nilai Kokurikuler',
                 message: `<div style="text-align:left; font-size:0.9rem; line-height:1.5;">
                     1. Pilih predikat capaian siswa pada setiap dimensi.<br>
                     2. <b>Deskripsi akan terbuat otomatis</b> berdasarkan predikat dan dimensi yang dipilih.<br>
-                    3. Gunakan fitur <b>☀️ Set Semua</b> di judul kolom untuk pengisian cepat.<br>
+                    3. Gunakan fitur <b>Set Semua</b> di judul kolom untuk pengisian cepat.<br>
                     4. Klik tombol <b>Download PDF</b> untuk mencetak rekap laporan siap lapor.<br>
                     5. Wajib klik <b>Simpan Nilai</b> setelah selesai!
                 </div>`,
@@ -364,7 +364,7 @@ function generatePdfKokurikuler(dataRapor, dataSiswa, kokuId, kokuNama, dimensio
     const info = dataRapor.infoDasar || {};
     const docDefinition = {
         content: [
-            { text: 'Laporan Kegiatan Kokurikuler (P5)', style: 'header' },
+            { text: 'Laporan Kegiatan Kokurikuler', style: 'header' },
             {
                 style: 'headerGrid',
                 table: {
