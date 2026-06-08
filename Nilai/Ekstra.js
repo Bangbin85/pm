@@ -87,7 +87,7 @@ function renderTabelEkstra() {
     dataEkstra.forEach(eskul => {
         headerRow1 += `<th colspan="2" style="padding: 10px; border: 1px solid #ddd; background: var(--primary-color); color: white; position: sticky; top: 0; z-index: 5;">${eskul.nama}</th>`;
         
-        let bulkOptions = '<option value="">☀️ Pilih Semua</option>';
+        let bulkOptions = '<option value="">Pilih Semua</option>';
         opsiPredikatEkstra.forEach(p => bulkOptions += `<option value="${p}">${p}</option>`);
         
         headerRow2 += `<th style="padding: 8px; border: 1px solid #ddd; min-width: 150px; position: sticky; top: 41px; z-index: 4;">
@@ -305,7 +305,7 @@ function setupEventEkstra() {
                 <b>Langkah-langkah Pengisian Ekstrakurikuler:</b>
                 <ul style="padding-left: 20px; margin-top: 10px;">
                     <li><b>Isi Manual:</b> Pilih predikat dan ketik deskripsi di baris siswa.</li>
-                    <li><b>Ubah Massal (☀️):</b> Klik ikon ☀️ di kolom predikat untuk menyamakan predikat seluruh siswa pada satu ekskul.</li>
+                    <li><b>Ubah Massal:</b> Klik di kolom predikat untuk menyamakan predikat seluruh siswa pada satu ekskul.</li>
                     <li><b>Jalur Excel:</b> Unduh template, isi secara luring, dan unggah kembali melalui tombol 'Impor'.</li>
                 </ul>
                 <p style="color: #d9534f; margin-bottom: 0;"><b>Jangan lupa klik Simpan Nilai setelah selesai!</b></p>
