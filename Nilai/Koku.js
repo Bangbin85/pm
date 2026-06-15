@@ -52,6 +52,8 @@ function renderTabelKokurikuler(kokuId) {
     }
 
     const currentPredikatOptions = getPredikatOptionsKoku(dataRapor, kokuId);
+    const kelasAktif = dataRapor.infoDasar?.kelasAktif || 'kelas-1';
+    const semester = dataRapor.infoDasar?.semester || '1';
 
     // 1. STRUKTUR TOOLBAR (Filter, Simpan, PDF, Predikat)
     let html = `
@@ -101,7 +103,7 @@ function renderTabelKokurikuler(kokuId) {
                     <td style="padding: 8px; border: 1px solid #ddd; font-weight: 500;">${siswa.nama}</td>`;
         
         dimensionKeys.forEach(key => {
-            const savedPredikat = dataRapor.nilaiKokurikuler?.[siswa.id]?.[kokuId]?.[key] || '';
+            const savedPredikat = dataRapor.nilaiKokurikuler?.[kelasAktif]?.[semester]?.[siswa.id]?.[kokuId]?.[key] || '';
             let optionsHtml = '<option value="">-- Pilih --</option>';
             currentPredikatOptions.forEach(opt => {
                 optionsHtml += `<option value="${opt}" ${savedPredikat === opt ? 'selected' : ''}>${opt}</option>`;
@@ -113,7 +115,7 @@ function renderTabelKokurikuler(kokuId) {
                      </td>`;
         });
         
-        const savedDeskripsi = dataRapor.deskripsiKokurikuler?.[siswa.id]?.[kokuId] || '';
+        const savedDeskripsi = dataRapor.deskripsiKokurikuler?.[kelasAktif]?.[semester]?.[siswa.id]?.[kokuId] || '';
         html += `   <td id="desc-koku-${siswa.id}" style="padding: 10px; border: 1px solid #ddd; font-size: 0.8rem; line-height: 1.4; color: #334155; text-align: left; background: #fef9c3;">${savedDeskripsi}</td>
                 </tr>`;
     });
@@ -168,7 +170,7 @@ function renderTabelKokurikuler(kokuId) {
     // Eksekusi pembaruan deskripsi saat pertama kali dirender
     updateDeskripsiSemuaSiswa();
 
-    // D. Fitur Simpan
+    // D. Fitur Simpan (Penyimpanan Diisolasi per Kelas & Semester)
     document.getElementById('btnSimpanKokuSpa').addEventListener('click', async () => {
         const btn = document.getElementById('btnSimpanKokuSpa');
         const oriHtml = btn.innerHTML;
@@ -176,26 +178,35 @@ function renderTabelKokurikuler(kokuId) {
         btn.disabled = true;
 
         const dRapor = loadData();
+        const aktifKelas = dRapor.infoDasar?.kelasAktif || 'kelas-1';
+        const aktifSemester = dRapor.infoDasar?.semester || '1';
+
         if (!dRapor.nilaiKokurikuler) dRapor.nilaiKokurikuler = {};
+        if (!dRapor.nilaiKokurikuler[aktifKelas]) dRapor.nilaiKokurikuler[aktifKelas] = {};
+        if (!dRapor.nilaiKokurikuler[aktifKelas][aktifSemester]) dRapor.nilaiKokurikuler[aktifKelas][aktifSemester] = {};
+
         if (!dRapor.deskripsiKokurikuler) dRapor.deskripsiKokurikuler = {};
+        if (!dRapor.deskripsiKokurikuler[aktifKelas]) dRapor.deskripsiKokurikuler[aktifKelas] = {};
+        if (!dRapor.deskripsiKokurikuler[aktifKelas][aktifSemester]) dRapor.deskripsiKokurikuler[aktifKelas][aktifSemester] = {};
         
         dataSiswa.forEach(siswa => {
             const siswaId = siswa.id;
-            if (!dRapor.nilaiKokurikuler[siswaId]) dRapor.nilaiKokurikuler[siswaId] = {};
-            if (!dRapor.nilaiKokurikuler[siswaId][kokuId]) dRapor.nilaiKokurikuler[siswaId][kokuId] = {};
+            
+            if (!dRapor.nilaiKokurikuler[aktifKelas][aktifSemester][siswaId]) dRapor.nilaiKokurikuler[aktifKelas][aktifSemester][siswaId] = {};
+            if (!dRapor.nilaiKokurikuler[aktifKelas][aktifSemester][siswaId][kokuId]) dRapor.nilaiKokurikuler[aktifKelas][aktifSemester][siswaId][kokuId] = {};
             
             wadah.querySelectorAll(`select.predikat-siswa-koku[data-siswa-id="${siswaId}"]`).forEach(select => {
                 const dimKey = select.dataset.dimensiKey;
                 if(select.value) {
-                    dRapor.nilaiKokurikuler[siswaId][kokuId][dimKey] = select.value;
+                    dRapor.nilaiKokurikuler[aktifKelas][aktifSemester][siswaId][kokuId][dimKey] = select.value;
                 } else {
-                    delete dRapor.nilaiKokurikuler[siswaId][kokuId][dimKey];
+                    delete dRapor.nilaiKokurikuler[aktifKelas][aktifSemester][siswaId][kokuId][dimKey];
                 }
             });
             
             const deskripsi = document.getElementById(`desc-koku-${siswaId}`).textContent;
-            if (!dRapor.deskripsiKokurikuler[siswaId]) dRapor.deskripsiKokurikuler[siswaId] = {};
-            dRapor.deskripsiKokurikuler[siswaId][kokuId] = deskripsi;
+            if (!dRapor.deskripsiKokurikuler[aktifKelas][aktifSemester][siswaId]) dRapor.deskripsiKokurikuler[aktifKelas][aktifSemester][siswaId] = {};
+            dRapor.deskripsiKokurikuler[aktifKelas][aktifSemester][siswaId][kokuId] = deskripsi;
         });
 
         saveData(dRapor);
@@ -210,7 +221,10 @@ function renderTabelKokurikuler(kokuId) {
     // E. Fitur PDF
     document.getElementById('btnPdfKokuSpa').addEventListener('click', () => {
         if (typeof pdfMake === 'undefined') {
-            alert('Library PDFMake belum dimuat. Pastikan Anda terkoneksi internet.'); return;
+            if (typeof showModal === 'function') {
+                showModal({ title: 'Error', message: 'Library PDFMake belum dimuat. Pastikan Anda terkoneksi internet.', type: 'error' });
+            }
+            return;
         }
         generatePdfKokurikuler(dataRapor, dataSiswa, kokuId, kokuNama, dimensionKeys, selectedDimensions);
     });
