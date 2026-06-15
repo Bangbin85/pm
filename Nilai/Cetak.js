@@ -38,7 +38,7 @@ function getStatusKeputusanText(status, info) {
             if (nextNum <= 12) {
                 textKelasBaru = romawi[nextNum];
             }
-            return `NAIK KELAS KE ${textKelasBaru}`;
+            return `NAIK KELAS ${textKelasBaru}`;
         } else {
             let textKelasTinggal = `Kelas ${currentNum}`;
             if (currentNum <= 12) {
