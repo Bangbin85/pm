@@ -15,15 +15,16 @@ function memuatModulLegger() {
 function renderTabelLeggerSPA() {
     const dataRapor = loadData();
     const { infoDasar, dataSiswa, mataPelajaran, ekstrakurikuler, kokurikuler, nilai, pelengkap, nilaiKokurikuler } = dataRapor;
-    const kelasAktif = infoDasar.kelasAktif || 'kelas-1';
+    const kelasAktif = infoDasar?.kelasAktif || 'kelas-1';
+    const semesterAktif = infoDasar?.semester || '1'; // Penambahan variabel semester
 
-    document.getElementById('judulLeggerSPA').textContent = `Legger Nilai Kelas ${infoDasar.kelas || '-'} - Semester ${infoDasar.semester || '-'} T.A ${infoDasar.tahunAjaran || '-'}`;
+    document.getElementById('judulLeggerSPA').textContent = `Legger Nilai Kelas ${infoDasar?.kelas || '-'} - Semester ${infoDasar?.semester || '-'} T.A ${infoDasar?.tahunAjaran || '-'}`;
 
-    const isSemester2 = infoDasar.semester === '2';
-    const labelNaik = (infoDasar.kelas && (infoDasar.kelas.includes('6') || infoDasar.kelas.toUpperCase().includes('VI'))) ? 'Lulus' : 'Naik Kelas';
+    const isSemester2 = infoDasar?.semester === '2';
+    const labelNaik = (infoDasar?.kelas && (infoDasar.kelas.includes('6') || infoDasar.kelas.toUpperCase().includes('VI'))) ? 'Lulus' : 'Naik Kelas';
 
     const simpanBtn = document.getElementById('simpanStatusLeggerBtn');
-    simpanBtn.style.display = isSemester2 ? 'inline-flex' : 'none';
+    if (simpanBtn) simpanBtn.style.display = isSemester2 ? 'inline-flex' : 'none';
 
     const predikatMap = { "Sangat Baik": "SB", "Baik": "B", "Cukup": "C", "Perlu Peningkatan": "K", "Perlu Bimbingan": "K" };
     
@@ -35,6 +36,7 @@ function renderTabelLeggerSPA() {
             <th rowspan="2" class="col-nama">Nama Siswa</th>
             <th colspan="${mapelUmum.length + 3}">NILAI AKADEMIK</th>
             <th colspan="4">ABSENSI</th>`;
+            
         if (kokurikuler && kokurikuler.length > 0) headerRow1 += `<th colspan="${kokurikuler.length}">KEGIATAN KOKURIKULER</th>`;
         if (ekstrakurikuler && ekstrakurikuler.length > 0) headerRow1 += `<th colspan="${ekstrakurikuler.length}">KEGIATAN EKSTRAKURIKULER</th>`;
         if (isSemester2) headerRow1 += `<th rowspan="2">${labelNaik.toUpperCase()}</th>`;
@@ -50,11 +52,14 @@ function renderTabelLeggerSPA() {
         mapelUmum.forEach(mapel => { headerRow2 += `<th title="${mapel.nama}">${mapel.singkat || '??'}</th>`; });
         headerRow2 += `<th class="col-total" title="Jumlah Nilai">JML</th><th class="col-total" title="Rata-Rata Rapor">RR</th>`;
         headerRow2 += `<th>S</th><th>I</th><th>A</th><th>JL</th>`;
+        
         (kokurikuler || []).forEach(koku => { headerRow2 += `<th>${koku.nama}</th>`; });
         (ekstrakurikuler || []).forEach(eskul => { headerRow2 += `<th>${eskul.nama}</th>`; });
+        
         headerRow2 += `</tr>`;
 
-        document.getElementById('leggerHeadSPA').innerHTML = headerRow1 + headerRow2;
+        const leggerHead = document.getElementById('leggerHeadSPA');
+        if (leggerHead) leggerHead.innerHTML = headerRow1 + headerRow2;
     };
 
     const buildBody = () => {
@@ -86,11 +91,13 @@ function renderTabelLeggerSPA() {
             const jumlahAbsen = parseInt(absensi.sakit || 0) + parseInt(absensi.izin || 0) + parseInt(absensi.alpha || 0);
             rowHTML += `<td>${absensi.sakit || 0}</td><td>${absensi.izin || 0}</td><td>${absensi.alpha || 0}</td><td>${jumlahAbsen}</td>`;
             
+            // Perbaikan Body: Menggunakan path [kelasAktif] -> [semesterAktif] -> [siswa.id] -> [koku.id]
             (kokurikuler || []).forEach(koku => {
-                const nilaiKokuSiswa = nilaiKokurikuler?.[siswa.id]?.[koku.id] || {};
+                const nilaiKokuSiswa = nilaiKokurikuler?.[kelasAktif]?.[semesterAktif]?.[siswa.id]?.[koku.id] || {};
                 const predikats = Object.values(nilaiKokuSiswa).map(p => predikatMap[p] || p.charAt(0)).join('/');
                 rowHTML += `<td>${predikats || '-'}</td>`;
             });
+            
             (ekstrakurikuler || []).forEach(eskul => {
                 const predikat = pelengkap?.ekstrakurikuler?.[siswa.id]?.[eskul.id]?.predikat || '-';
                 rowHTML += `<td>${predikatMap[predikat] || '-'}</td>`;
@@ -103,7 +110,9 @@ function renderTabelLeggerSPA() {
             rowHTML += `<td class="cell-keterangan" contenteditable="true" style="background:#fef9c3;"></td></tr>`;
             bodyHTML += rowHTML;
         });
-        document.getElementById('leggerBodySPA').innerHTML = bodyHTML;
+        
+        const leggerBody = document.getElementById('leggerBodySPA');
+        if (leggerBody) leggerBody.innerHTML = bodyHTML;
     };
 
     buildHeader();
@@ -111,97 +120,112 @@ function renderTabelLeggerSPA() {
 }
 
 function setupEventLeggerSPA() {
-    document.getElementById('simpanStatusLeggerBtn').addEventListener('click', async () => {
-        const dataRapor = loadData();
-        const infoDasar = dataRapor.infoDasar;
-        const isKelas6 = infoDasar.kelas && (infoDasar.kelas.includes('6') || infoDasar.kelas.toUpperCase().includes('VI'));
-        const labelNaik = isKelas6 ? 'Lulus' : 'Naik Kelas';
-        const labelTidakNaik = isKelas6 ? 'Mengulang' : 'Tidak Naik Kelas';
+    const simpanBtn = document.getElementById('simpanStatusLeggerBtn');
+    if (simpanBtn) {
+        simpanBtn.addEventListener('click', async () => {
+            const dataRapor = loadData();
+            const infoDasar = dataRapor.infoDasar || {};
+            const isKelas6 = infoDasar.kelas && (infoDasar.kelas.includes('6') || infoDasar.kelas.toUpperCase().includes('VI'));
+            const labelNaik = isKelas6 ? 'Lulus' : 'Naik Kelas';
+            const labelTidakNaik = isKelas6 ? 'Mengulang' : 'Tidak Naik Kelas';
 
-        if (!dataRapor.pelengkap) dataRapor.pelengkap = {};
-        if (!dataRapor.pelengkap.kenaikanKelas) dataRapor.pelengkap.kenaikanKelas = {};
+            if (!dataRapor.pelengkap) dataRapor.pelengkap = {};
+            if (!dataRapor.pelengkap.kenaikanKelas) dataRapor.pelengkap.kenaikanKelas = {};
 
-        document.querySelectorAll('.chk-status-legger').forEach(cb => {
-            dataRapor.pelengkap.kenaikanKelas[cb.dataset.siswaId] = cb.checked ? labelNaik : labelTidakNaik;
-        });
+            document.querySelectorAll('.chk-status-legger').forEach(cb => {
+                dataRapor.pelengkap.kenaikanKelas[cb.dataset.siswaId] = cb.checked ? labelNaik : labelTidakNaik;
+            });
 
-        saveData(dataRapor);
-        if (typeof showModal === 'function') {
-            showModal({ title: 'Tersimpan', message: 'Status akhir tahun siswa telah berhasil disimpan.', type: 'success' });
-        }
-    });
-
-    document.getElementById('cetakLeggerBtn').addEventListener('click', () => {
-        const tableClone = document.getElementById('tabelLeggerSPA').cloneNode(true);
-        const selectInClone = tableClone.querySelector('#pilihanKeteranganSPA');
-        if (selectInClone) {
-            const headerCell = selectInClone.parentElement;
-            headerCell.textContent = selectInClone.options[selectInClone.selectedIndex].text;
-        }
-
-        const title = document.getElementById('judulLeggerSPA').textContent;
-        const printWindow = window.open('', '', 'height=800,width=1200');
-        printWindow.document.write('<html><head><title>Cetak Legger</title>');
-        printWindow.document.write('<style>body{font-family: Arial, sans-serif; font-size: 10pt;} h2{text-align:center;} table{border-collapse:collapse; width:100%;} th,td{border:1px solid #333; padding:5px; text-align:center; vertical-align:middle;} th{background-color:#f2f2f2; font-weight:bold;} .col-nama{text-align:left; white-space:normal;} .col-total{font-weight:bold; background:#e0f2fe;}</style>');
-        printWindow.document.write('</head><body>');
-        printWindow.document.write(`<h2>${title}</h2>`);
-        printWindow.document.write(tableClone.outerHTML);
-        printWindow.document.write('</body></html>');
-        printWindow.document.close();
-        printWindow.focus();
-        setTimeout(() => printWindow.print(), 500);
-    });
-
-    document.getElementById('leggerHeadSPA').addEventListener('change', (e) => {
-        if (e.target.id === 'pilihanKeteranganSPA') {
-            const mode = e.target.value;
-            const rows = document.querySelectorAll('#leggerBodySPA tr');
-            
-            if (mode === 'peringkat') {
-                const siswaSkor = [];
-                const predikatSkor = { "Sangat Baik": 4, "Baik": 3, "Cukup": 2, "Perlu Peningkatan": 1, "Perlu Bimbingan": 1 };
-                const dataRapor = loadData();
-
-                rows.forEach(row => {
-                    const siswaId = row.dataset.siswaId;
-                    const jmlNilaiCell = row.querySelectorAll('.col-total')[0];
-                    let skorTotal = parseFloat(jmlNilaiCell.textContent) || 0;
-
-                    (dataRapor.kokurikuler || []).forEach(koku => {
-                        Object.values(dataRapor.nilaiKokurikuler?.[siswaId]?.[koku.id] || {}).forEach(p => skorTotal += (predikatSkor[p] || 0));
-                    });
-                    (dataRapor.ekstrakurikuler || []).forEach(eskul => {
-                        const p = dataRapor.pelengkap?.ekstrakurikuler?.[siswaId]?.[eskul.id]?.predikat;
-                        if (p) skorTotal += (predikatSkor[p] || 0);
-                    });
-
-                    siswaSkor.push({ siswaId, skor: skorTotal });
-                });
-
-                siswaSkor.sort((a, b) => b.skor - a.skor);
-                const peringkatMap = new Map();
-                siswaSkor.forEach((item, index) => peringkatMap.set(item.siswaId, index + 1));
-
-                rows.forEach(row => {
-                    const cell = row.querySelector('.cell-keterangan');
-                    if (cell) {
-                        cell.textContent = peringkatMap.get(row.dataset.siswaId);
-                        cell.setAttribute('contenteditable', 'false');
-                        cell.style.fontWeight = 'bold';
-                        cell.style.background = '#e0f2fe';
-                    }
-                });
+            saveData(dataRapor);
+            if (typeof showModal === 'function') {
+                showModal({ title: 'Tersimpan', message: 'Status akhir tahun siswa telah berhasil disimpan.', type: 'success' });
             } else {
-                rows.forEach(row => {
-                    const cell = row.querySelector('.cell-keterangan');
-                    if (cell) {
-                        cell.textContent = '';
-                        cell.setAttribute('contenteditable', 'true');
-                        cell.style.fontWeight = 'normal';
-                        cell.style.background = '#fef9c3';
-                    }
-                });
+                alert('Tersimpan! Status akhir tahun siswa telah berhasil disimpan.');
             }
-        }
-    });
+        });
+    }
+
+    const cetakBtn = document.getElementById('cetakLeggerBtn');
+    if (cetakBtn) {
+        cetakBtn.addEventListener('click', () => {
+            const tableClone = document.getElementById('tabelLeggerSPA').cloneNode(true);
+            const selectInClone = tableClone.querySelector('#pilihanKeteranganSPA');
+            if (selectInClone) {
+                const headerCell = selectInClone.parentElement;
+                headerCell.textContent = selectInClone.options[selectInClone.selectedIndex].text;
+            }
+
+            const title = document.getElementById('judulLeggerSPA').textContent;
+            const printWindow = window.open('', '', 'height=800,width=1200');
+            printWindow.document.write('<html><head><title>Cetak Legger</title>');
+            printWindow.document.write('<style>body{font-family: Arial, sans-serif; font-size: 10pt;} h2{text-align:center;} table{border-collapse:collapse; width:100%;} th,td{border:1px solid #333; padding:5px; text-align:center; vertical-align:middle;} th{background-color:#f2f2f2; font-weight:bold;} .col-nama{text-align:left; white-space:normal;} .col-total{font-weight:bold; background:#e0f2fe;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(`<h2>${title}</h2>`);
+            printWindow.document.write(tableClone.outerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 500);
+        });
+    }
+
+    const leggerHead = document.getElementById('leggerHeadSPA');
+    if (leggerHead) {
+        leggerHead.addEventListener('change', (e) => {
+            if (e.target.id === 'pilihanKeteranganSPA') {
+                const mode = e.target.value;
+                const rows = document.querySelectorAll('#leggerBodySPA tr');
+                
+                if (mode === 'peringkat') {
+                    const siswaSkor = [];
+                    const predikatSkor = { "Sangat Baik": 4, "Baik": 3, "Cukup": 2, "Perlu Peningkatan": 1, "Perlu Bimbingan": 1 };
+                    const dataRapor = loadData();
+                    const kelasAktif = dataRapor.infoDasar?.kelasAktif || 'kelas-1';
+                    const semesterAktif = dataRapor.infoDasar?.semester || '1'; // Penambahan variabel semester
+
+                    rows.forEach(row => {
+                        const siswaId = row.dataset.siswaId;
+                        const jmlNilaiCell = row.querySelectorAll('.col-total')[0];
+                        let skorTotal = parseFloat(jmlNilaiCell?.textContent || 0) || 0;
+
+                        // Perbaikan Peringkat: Menggunakan path [kelasAktif] -> [semesterAktif] -> [siswaId] -> [kokuId]
+                        (dataRapor.kokurikuler || []).forEach(koku => {
+                            Object.values(dataRapor.nilaiKokurikuler?.[kelasAktif]?.[semesterAktif]?.[siswaId]?.[koku.id] || {}).forEach(p => skorTotal += (predikatSkor[p] || 0));
+                        });
+                        
+                        (dataRapor.ekstrakurikuler || []).forEach(eskul => {
+                            const p = dataRapor.pelengkap?.ekstrakurikuler?.[siswaId]?.[eskul.id]?.predikat;
+                            if (p) skorTotal += (predikatSkor[p] || 0);
+                        });
+
+                        siswaSkor.push({ siswaId, skor: skorTotal });
+                    });
+
+                    siswaSkor.sort((a, b) => b.skor - a.skor);
+                    const peringkatMap = new Map();
+                    siswaSkor.forEach((item, index) => peringkatMap.set(item.siswaId, index + 1));
+
+                    rows.forEach(row => {
+                        const cell = row.querySelector('.cell-keterangan');
+                        if (cell) {
+                            cell.textContent = peringkatMap.get(row.dataset.siswaId);
+                            cell.setAttribute('contenteditable', 'false');
+                            cell.style.fontWeight = 'bold';
+                            cell.style.background = '#e0f2fe';
+                        }
+                    });
+                } else {
+                    rows.forEach(row => {
+                        const cell = row.querySelector('.cell-keterangan');
+                        if (cell) {
+                            cell.textContent = '';
+                            cell.setAttribute('contenteditable', 'true');
+                            cell.style.fontWeight = 'normal';
+                            cell.style.background = '#fef9c3';
+                        }
+                    });
+                }
+            }
+        });
+    }
 }
