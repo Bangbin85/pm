@@ -376,10 +376,15 @@ window.showNilaiModal = function(siswaId) {
     Object.keys(ekstraSiswa).forEach((eskulId, i) => {
         const eskulData = dataRapor.ekstrakurikuler.find(e => e.id === eskulId);
         if (eskulData && ekstraSiswa[eskulId].predikat) {
-            ekstraRowsHTML += `<tr><td style="text-align:center;">${i+1}</td><td>${eskulData.nama}</td><td style="text-align:left;"><strong>${ekstraSiswa[eskulId].predikat}</strong></td></tr>`;
+            const predikat = ekstraSiswa[eskulId].predikat;
+            const deskripsi = ekstraSiswa[eskulId].deskripsi;
+            
+            // Gabungkan predikat (tebal) dengan deskripsi menggunakan koma
+            const teksKeterangan = deskripsi ? `<strong>${predikat}</strong>, ${deskripsi}` : `<strong>${predikat}</strong>`;
+            
+            ekstraRowsHTML += `<tr><td style="text-align:center;">${i+1}</td><td>${eskulData.nama}</td><td style="text-align:left;">${teksKeterangan}</td></tr>`;
         }
-    });
-    modalEkstraBody.innerHTML = ekstraRowsHTML || '<tr><td colspan="3" style="text-align:center;">Tidak mengikuti ekstrakurikuler.</td></tr>';
+    });    modalEkstraBody.innerHTML = ekstraRowsHTML || '<tr><td colspan="3" style="text-align:center;">Tidak mengikuti ekstrakurikuler.</td></tr>';
 
     const absensi = pelengkap?.absensi?.[siswa.id] || {};
     document.getElementById('modalAbsenSakit').textContent = `${absensi.sakit || 0} hari`;
@@ -570,10 +575,19 @@ function getNilaiPdfContent(siswaId) {
         const eskulData = dataRapor.ekstrakurikuler.find(e => e.id === eskulId);
         if (eskulData && ekstraSiswa[eskulId].predikat) {
             adaEkstra = true;
+            const predikat = ekstraSiswa[eskulId].predikat;
+            const deskripsi = ekstraSiswa[eskulId].deskripsi;
+            
+            // Buat array teks untuk memisahkan gaya styling pada pdfMake
+            const textArray = [{ text: predikat, bold: true }];
+            if (deskripsi) {
+                textArray.push({ text: `, ${deskripsi}` });
+            }
+
             ekstraBody.push([
                 { text: i + 1, alignment: 'center' },
                 { text: eskulData.nama },
-                { text: ekstraSiswa[eskulId].predikat, bold: true }
+                { text: textArray, alignment: 'justify' } // Format rata kiri-kanan
             ]);
         }
     });
